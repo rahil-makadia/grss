@@ -1,2 +1,2 @@
 # grss
-Gauss-Radau small-body simulator
+Gauss-Radau small-body simulator (development branch)
