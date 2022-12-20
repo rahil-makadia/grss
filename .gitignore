@@ -180,3 +180,10 @@ cython_debug/
 *.exe
 *.out
 *.app
+
+################################### Individual user exceptions
+# VS code setup directory
+.vscode/
+
+# C++ program debug symbols
+*.dSYM/
