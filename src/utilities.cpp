@@ -1,10 +1,17 @@
 #include "utilities.h"
 
-void get_spice_state_lt(int spiceID, real t0_et, double state[6], double &lt){
+void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state[6], double &lt){
+    real t0_et = mjd_to_et(t0_mjd);
     SpiceInt center = 0; // 0 = solar system barycenter
     ConstSpiceChar *frame="J2000"; // Earth mean equator and equinox of J2000, states output will be ICRF-EME2000 frame
     ConstSpiceChar *abcorr="NONE"; // No aberration correction
     spkez_c(spiceID, t0_et, frame, abcorr, center, state, &lt);
+    for (int i=0; i<6; i++){
+        state[i] /= consts.du2m;
+    }
+    for (int i=3; i<6; i++){
+        state[i] *= consts.tu2sec;
+    }
 };
 
 void jd_to_et(const real jd, real &et){
