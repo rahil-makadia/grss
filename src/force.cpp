@@ -1,6 +1,7 @@
 #include "force.h"
 
-void get_state_der(const real t, const std::vector<real> xInteg, std::vector<real> &xDotInteg, const ForceParameters forceParams, const IntegrationParameters integParams, const Constants consts){
+std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+    std::vector<real> xDotInteg(6*integParams.nInteg, 0.0);
     std::vector<real> posAll;
     std::vector<real> velAll;
     for (size_t i=0; i<integParams.nInteg; i++){
@@ -18,54 +19,37 @@ void get_state_der(const real t, const std::vector<real> xInteg, std::vector<rea
             velAll.push_back(xSpice_i[j+3]);
         }
     }
-    // print posAll and velAll
-    std::cout << "posAll: " << std::endl;
-    for (size_t i=0; i<posAll.size(); i+=3){
-        std::cout << posAll[i] << " " << posAll[i+1] << " " << posAll[i+2] << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout << "velAll: " << std::endl;
-    for (size_t i=0; i<velAll.size(); i+=3){
-        std::cout << velAll[i] << " " << velAll[i+1] << " " << velAll[i+2] << std::endl;
-    }
-    std::cout << std::endl;
-    std::cout<< "xDotInteg0:" << std::endl;
-    for (size_t i=0; i<xDotInteg.size(); i+=6){
-        std::cout << xDotInteg[i] << " " << xDotInteg[i+1] << " " << xDotInteg[i+2] << " " << xDotInteg[i+3] << " " << xDotInteg[i+4] << " " << xDotInteg[i+5] << std::endl;
-    }
+    // // print posAll and velAll
+    // std::cout << "posAll: " << std::endl;
+    // for (size_t i=0; i<posAll.size(); i+=3){
+    //     std::cout << posAll[i] << " " << posAll[i+1] << " " << posAll[i+2] << std::endl;
+    // }
+    // std::cout << std::endl;
+    // std::cout << "velAll: " << std::endl;
+    // for (size_t i=0; i<velAll.size(); i+=3){
+    //     std::cout << velAll[i] << " " << velAll[i+1] << " " << velAll[i+2] << std::endl;
+    // }
     for (size_t i=0; i<integParams.nInteg; i++){
         xDotInteg[6*i] = velAll[3*i];
         xDotInteg[6*i+1] = velAll[3*i+1];
         xDotInteg[6*i+2] = velAll[3*i+2];
     }
-    std::cout<< "xDotInteg1:" << std::endl;
-    for (size_t i=0; i<xDotInteg.size(); i+=6){
-        std::cout << xDotInteg[i] << " " << xDotInteg[i+1] << " " << xDotInteg[i+2] << " " << xDotInteg[i+3] << " " << xDotInteg[i+4] << " " << xDotInteg[i+5] << std::endl;
-    }
 
     force_newton(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    std::cout<< "xDotInteg2:" << std::endl;
-    for (size_t i=0; i<xDotInteg.size(); i+=6){
-        std::cout << xDotInteg[i] << " " << xDotInteg[i+1] << " " << xDotInteg[i+2] << " " << xDotInteg[i+3] << " " << xDotInteg[i+4] << " " << xDotInteg[i+5] << std::endl;
-    }
     force_ppn(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    std::cout<< "xDotInteg3:" << std::endl;
-    for (size_t i=0; i<xDotInteg.size(); i+=6){
-        std::cout << xDotInteg[i] << " " << xDotInteg[i+1] << " " << xDotInteg[i+2] << " " << xDotInteg[i+3] << " " << xDotInteg[i+4] << " " << xDotInteg[i+5] << std::endl;
-    }
     force_J2(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    std::cout<< "xDotInteg4:" << std::endl;
-    for (size_t i=0; i<xDotInteg.size(); i+=6){
-        std::cout << xDotInteg[i] << " " << xDotInteg[i+1] << " " << xDotInteg[i+2] << " " << xDotInteg[i+3] << " " << xDotInteg[i+4] << " " << xDotInteg[i+5] << std::endl;
-    }
     force_nongrav(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    std::cout<< "xDotInteg5:" << std::endl;
-    for (size_t i=0; i<xDotInteg.size(); i+=6){
-        std::cout << xDotInteg[i] << " " << xDotInteg[i+1] << " " << xDotInteg[i+2] << " " << xDotInteg[i+3] << " " << xDotInteg[i+4] << " " << xDotInteg[i+5] << std::endl;
+
+    std::vector<real> accInteg(3*integParams.nInteg, 0.0);
+    for (size_t i=0; i<integParams.nInteg; i++){
+        accInteg[3*i] = xDotInteg[6*i+3];
+        accInteg[3*i+1] = xDotInteg[6*i+4];
+        accInteg[3*i+2] = xDotInteg[6*i+5];
     }
+    return accInteg;
 };
 
-void force_newton(const real t, const std::vector<real> posAll, const std::vector<real> velAll, std::vector<real> &xDotInteg, const ForceParameters forceParams, const IntegrationParameters integParams, const Constants consts){
+void force_newton(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -98,7 +82,7 @@ void force_newton(const real t, const std::vector<real> posAll, const std::vecto
     }
 };
 
-void force_ppn(const real t, const std::vector<real> posAll, const std::vector<real> velAll, std::vector<real> &xDotInteg, const ForceParameters forceParams, const IntegrationParameters integParams, const Constants consts){
+void force_ppn(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real c = consts.clight;
     real c2 = c*c;
@@ -110,6 +94,8 @@ void force_ppn(const real t, const std::vector<real> posAll, const std::vector<r
     real ax, ay, az;
     real massJ;
     real dPosDotVel, dVelDotVel;
+    real beta = 1.0L;
+    real gamma = 1.0L;
     for (size_t i=0; i<integParams.nInteg; i++){
         x = posAll[3*i];
         y = posAll[3*i+1];
@@ -133,10 +119,10 @@ void force_ppn(const real t, const std::vector<real> posAll, const std::vector<r
                 dvz = vz - velAll[3*j+2];
                 dPosDotVel = dx*dvx + dy*dvy + dz*dvz;
                 dVelDotVel = dvx*dvx + dvy*dvy + dvz*dvz;
-                // 1st order PPN correction
-                ax -= G*massJ/(rRel3*c2)*((4*G*massJ/rRel - dVelDotVel)*dx + 4*dPosDotVel*dvx);
-                ay -= G*massJ/(rRel3*c2)*((4*G*massJ/rRel - dVelDotVel)*dy + 4*dPosDotVel*dvy);
-                az -= G*massJ/(rRel3*c2)*((4*G*massJ/rRel - dVelDotVel)*dz + 4*dPosDotVel*dvz);
+                // 1st order PPN approximation, equation 4-61 from Moyer (2003), https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
+                ax += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - dVelDotVel)*dx + 2*(1+gamma)*dPosDotVel*dvx);
+                ay += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - dVelDotVel)*dy + 2*(1+gamma)*dPosDotVel*dvy);
+                az += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - dVelDotVel)*dz + 2*(1+gamma)*dPosDotVel*dvz);
             }
         }
         xDotInteg[6*i+3] += ax;
@@ -145,7 +131,7 @@ void force_ppn(const real t, const std::vector<real> posAll, const std::vector<r
     }
 };
 
-void force_J2(const real t, const std::vector<real> posAll, const std::vector<real> velAll, std::vector<real> &xDotInteg, const ForceParameters forceParams, const IntegrationParameters integParams, const Constants consts){
+void force_J2(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -175,7 +161,7 @@ void force_J2(const real t, const std::vector<real> posAll, const std::vector<re
                 rRel5 = rRel2*rRel2*rRel;
                 radius = forceParams.radii[j];
                 rot_mat_x(EARTH_OBLIQUITY, R1); // equatorial to ecliptic
-                rot_mat_x(forceParams.obliquityList[j], R2); // ecliptic to body equator
+                rot_mat_x(-forceParams.obliquityList[j], R2); // ecliptic to body equator
                 mat_mat_mul(R1, R2, R); // equatorial to body equator
                 mat_vec_mul(R, {dx, dy, dz}, dPosBody);
                 dx = dPosBody[0];
@@ -192,7 +178,7 @@ void force_J2(const real t, const std::vector<real> posAll, const std::vector<re
     }
 };
 
-void force_nongrav(const real t, const std::vector<real> posAll, const std::vector<real> velAll, std::vector<real> &xDotInteg, const ForceParameters forceParams, const IntegrationParameters integParams, const Constants consts){
+void force_nongrav(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real a1, a2, a3;
     real alpha, k, m, n;
     real r0;
@@ -248,9 +234,9 @@ void force_nongrav(const real t, const std::vector<real> posAll, const std::vect
                 // std::cout<< "eNHat: " << eNHat[0] << " " << eNHat[1] << " " << eNHat[2] << std::endl;
                 // vnorm(eNHat, t3);
                 // std::cout<< "eNHat mag: " << t3 << std::endl;
-                ax = g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]);
-                ay = g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]);
-                az = g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]);
+                ax += g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]);
+                ay += g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]);
+                az += g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]);
             }
         }
         xDotInteg[6*i+3] += ax;

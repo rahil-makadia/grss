@@ -1,14 +1,13 @@
 /* COMPILE AND RUN USING
-clear && g++ utilities.cpp force.cpp simulation.cpp gr15.cpp test.cpp -o test.out -std=c++11 -fdiagnostics-color=always -I /opt/homebrew/include -lm /opt/homebrew/Cellar/cspice/67/lib/cspice.a -g3 -Wall && ./test.out
-clear && /opt/homebrew/Cellar/gcc/12.2.0/bin/g++-12  utilities.cpp force.cpp simulation.cpp gr15.cpp test.cpp -o test.out -std=c++11 -fdiagnostics-color=always -I /opt/homebrew/include -lm /opt/homebrew/Cellar/cspice/67/lib/cspice.a -g3 -Wall && ./test.out
+clear && g++ utilities.cpp force.cpp simulation.cpp gr15.cpp test.cpp -o test.out -std=c++11 -O3 -fdiagnostics-color=always -I /opt/homebrew/include -lm /opt/homebrew/Cellar/cspice/67/lib/cspice.a -g3 -Wall && ./test.out
+clear && /opt/homebrew/Cellar/gcc/12.2.0/bin/g++-12 utilities.cpp force.cpp simulation.cpp gr15.cpp test.cpp -o test.out -std=c++11 -O3 -fdiagnostics-color=always -I /opt/homebrew/include -lm /opt/homebrew/Cellar/cspice/67/lib/cspice.a -g3 -Wall && ./test.out
 */
-#include "utilities.h"
 #include "simulation.h"
 
 
 int main() {
     std::cout.precision(22);
-    std::cout << "The size on memory of a real variable is: " << sizeof(real) << std::endl;
+    // std::cout << "The size on memory of a real variable is: " << sizeof(real) << std::endl;
     
     // simulation testSim0;
     // const size_t ni = 1;
@@ -211,57 +210,57 @@ int main() {
     simTest1.add_integ_body(Didymos);
 
     std::cout<< "Size of simulation: "<< sizeof(simTest1) << " bytes" << std::endl;
-    // check orbital elements and their conversion
-    std::cout<< "Input Cometary state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyComState[i] << std::endl;
-    }
-    std::vector<real> didyComState0 = didyComState;
-    std::vector<real> didyKepState;
-    std::vector<real> didyCartState;
-    cometary_to_keplerian(simTest1.integParams.t0, didyComState0, didyKepState, simTest1.consts.G);
-    std::cout<< "Keplerian state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyKepState[i] << std::endl;
-    }
-    keplerian_to_cometary(simTest1.integParams.t0, didyKepState, didyComState0, simTest1.consts.G);
-    std::cout<< "Cometary state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyComState0[i] << std::endl;
-    }
-    keplerian_to_cartesian(simTest1.integParams.t0, didyKepState, didyCartState, simTest1.consts.G);
-    std::cout<< "Cartesian state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyCartState[i] << std::endl;
-    }
-    cartesian_to_keplerian(simTest1.integParams.t0, didyCartState, didyKepState, simTest1.consts.G);
-    std::cout<< "Keplerian state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyKepState[i] << std::endl;
-    }
-    cometary_to_cartesian(simTest1.integParams.t0, didyComState0, didyCartState, simTest1.consts.G);
-    std::cout<< "Cartesian state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyCartState[i] << std::endl;
-    }
-    cartesian_to_cometary(simTest1.integParams.t0, didyCartState, didyComState0, simTest1.consts.G);
-    std::cout<< "Cometary state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyComState0[i] << std::endl;
-    }
-    std::cout<< "Input Cometary state: " << std::endl;
-    for (int i = 0; i < 6; i++){
-        std::cout<< didyComState[i] << std::endl;
-    }
+    // // check orbital elements and their conversion
+    // std::cout<< "Input Cometary state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyComState[i] << std::endl;
+    // }
+    // std::vector<real> didyComState0 = didyComState;
+    // std::vector<real> didyKepState;
+    // std::vector<real> didyCartState;
+    // cometary_to_keplerian(simTest1.integParams.t0, didyComState0, didyKepState, simTest1.consts.G);
+    // std::cout<< "Keplerian state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyKepState[i] << std::endl;
+    // }
+    // keplerian_to_cometary(simTest1.integParams.t0, didyKepState, didyComState0, simTest1.consts.G);
+    // std::cout<< "Cometary state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyComState0[i] << std::endl;
+    // }
+    // keplerian_to_cartesian(simTest1.integParams.t0, didyKepState, didyCartState, simTest1.consts.G);
+    // std::cout<< "Cartesian state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyCartState[i] << std::endl;
+    // }
+    // cartesian_to_keplerian(simTest1.integParams.t0, didyCartState, didyKepState, simTest1.consts.G);
+    // std::cout<< "Keplerian state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyKepState[i] << std::endl;
+    // }
+    // cometary_to_cartesian(simTest1.integParams.t0, didyComState0, didyCartState, simTest1.consts.G);
+    // std::cout<< "Cartesian state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyCartState[i] << std::endl;
+    // }
+    // cartesian_to_cometary(simTest1.integParams.t0, didyCartState, didyComState0, simTest1.consts.G);
+    // std::cout<< "Cometary state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyComState0[i] << std::endl;
+    // }
+    // std::cout<< "Input Cometary state: " << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     std::cout<< didyComState[i] << std::endl;
+    // }
 
-    // print the covariance matrix
-    std::cout<< "Input covariance matrix: " << std::endl;
-    for (int i = 0; i < 7; i++){
-        for (int j = 0; j < 7; j++){
-            std::cout<< didyCov[i][j] << " ";
-        }
-        std::cout<< std::endl;
-    }
+    // // print the covariance matrix
+    // std::cout<< "Input covariance matrix: " << std::endl;
+    // for (int i = 0; i < 7; i++){
+    //     for (int j = 0; j < 7; j++){
+    //         std::cout<< didyCov[i][j] << " ";
+    //     }
+    //     std::cout<< std::endl;
+    // }
 
     real VhEcc = 1.443297491498406E-01;
     real VhPeriDist = 9.732482184639847E-01;
@@ -291,5 +290,20 @@ int main() {
 
     simTest1.preprocess();
     simTest1.integrate();
+    // real conv = 1;
+    real conv = simTest1.consts.du2m/1000.0L;
+    
+    std::cout << "t: " << simTest1.t << std::endl;
+    std::cout << "xInteg: " << "np.array([";
+    std::cout << simTest1.xInteg[0]*conv << ", ";
+    std::cout << simTest1.xInteg[1]*conv << ", ";
+    std::cout << simTest1.xInteg[2]*conv << ", ";
+    std::cout << simTest1.xInteg[3]*conv << ", ";
+    std::cout << simTest1.xInteg[4]*conv << ", ";
+    std::cout << simTest1.xInteg[5]*conv << " ";
+    std::cout << "])" << std::endl;
+    std::cout << "timestepCounter: " << simTest1.integParams.timestepCounter << std::endl;
+
+    std::cout<< "Size of simulation: "<< sizeof(simTest1) << " bytes" << std::endl;
     return 0;
 };

@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
+using std::fmin;
+using std::fmax;
 using std::pow;
 using std::sqrt;
 using std::sin;
@@ -42,13 +44,15 @@ struct IntegrationParameters{
     size_t nInteg;
     size_t nSpice;
     size_t nTotal;
-    size_t dim;
+    // size_t dim;
     real t0;
     real tf;
     real dt0;
     real dtMax;
+    real dtMin;
     real dtChangeFactor;
     bool adaptiveTimestep;
+    size_t timestepCounter;
     real tolPC;
     real tolInteg;
 };
@@ -91,6 +95,7 @@ void vadd(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<
 void vsub(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &diff);
 void vcmul(const std::vector<real> &v, const real &c, std::vector<real> &vc);
 void vvmul(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &v3);
+void vabs_max(const std::vector<real> &v, real &max);
 
 void mat_vec_mul(const std::vector<std::vector<real>> &A, const std::vector<real> &v, std::vector<real> &Av);
 void mat_mat_mul(const std::vector<std::vector<real>> &A, const std::vector<std::vector<real>> &B, std::vector<std::vector<real>> &AB);

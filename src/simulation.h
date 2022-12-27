@@ -2,7 +2,6 @@
 #define SIMULATION_H
 #include "utilities.h"
 #include "force.h"
-#include "gr15.h"
 
 class Body{
     private:
@@ -76,7 +75,7 @@ class Simulation
 
         // setters
         void set_sim_constants(real du2m=149597870700.0L, real tu2sec=86400.0L, real G=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, real clight=299792458.0L/149597870700.0L*86400.0L);
-        void set_integration_parameters(real t0, real tf, real dt0=0.0L, real dtMax=6.0L, real dtChangeFactor=0.25L, bool adaptiveTimestep=true, real tolPC=1.0e-16L, real tolInteg=1.0e-6L);
+        void set_integration_parameters(real t0, real tf, real dt0=0.0L, real dtMax=6.0L, real dtMin=1.0e-7L, real dtChangeFactor=0.25L, bool adaptiveTimestep=true, real tolPC=1.0e-16L, real tolInteg=1.0e-6L);
 
         // getters
         std::vector<real> get_sim_constants();

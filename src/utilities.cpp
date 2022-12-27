@@ -170,6 +170,15 @@ void vvmul(const std::vector<real> &v1, const std::vector<real> &v2, std::vector
     }
 };
 
+void vabs_max(const std::vector<real> &v, real &max){
+    max = -1.0e300L;
+    for (size_t i=0; i<v.size(); i++){
+        if (fabs(v[i]) > max){
+            max = fabs(v[i]);
+        }
+    }
+};
+
 void mat_vec_mul(const std::vector< std::vector<real> > &A, const std::vector<real> &v, std::vector<real> &Av){
     for (size_t i=0; i<A.size(); i++){
         Av[i] = 0;
@@ -252,7 +261,7 @@ void kepler_solve(const real &M, const real &e, real &E, const real &tol, const 
 };
 
 void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G){
-    real GM = G*1.9885e30; // sun mass from GSFC sun fact sheet (https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html)
+    real GM = G*1.988409871316534e30; // sun mass from horizons
     real a = cometaryState[1]/(1-cometaryState[0]);
     real M = sqrt(GM/pow(a, 3.0L))*(epochMjD-cometaryState[2]);
     wrap_to_2pi(M);
@@ -266,7 +275,7 @@ void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometa
 };
 
 void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G){
-    real GM = G*1.9885e30; // sun mass from GSFC sun fact sheet (https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html)
+    real GM = G*1.988409871316534e30; // sun mass from horizons
     real a = keplerianState[0];
     real e = keplerianState[1];
     real nu = keplerianState[5];
@@ -279,7 +288,7 @@ void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &kepler
 };
 
 void keplerian_to_cartesian(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G){
-    real GM = G*1.9885e30; // sun mass from GSFC sun fact sheet (https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html)
+    real GM = G*1.988409871316534e30; // sun mass from horizons
     real a = keplerianState[0];
     real e = keplerianState[1];
     real i = keplerianState[2];
@@ -323,7 +332,7 @@ void keplerian_to_cartesian(const real &epochMjd, const std::vector<real> &keple
 };
 
 void cartesian_to_keplerian(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G){
-    real GM = G*1.9885e30; // sun mass from GSFC sun fact sheet (https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html)
+    real GM = G*1.988409871316534e30; // sun mass from horizons
     
     std::vector<real> rVec(3);
     std::vector<real> vVec(3);
