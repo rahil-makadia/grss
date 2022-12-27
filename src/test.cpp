@@ -110,7 +110,7 @@ int main() {
     real tfSimMjd = t0SimMjd + num_days;
     simTest1.set_sim_constants();
     real G = simTest1.consts.G;
-    simTest1.set_integration_parameters(t0SimMjd, tfSimMjd);
+    simTest1.set_integration_parameters(t0SimMjd, tfSimMjd, true, 1.0L, 6.0L, 1e-7L, 0.25L);
 
     // add planets and planetary bodies from DE441 header (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de441_tech-comments.txt)
     SpiceBody Sun("Sun", 10, simTest1.integParams.t0, 2.9591220828411956e-04L/G, 6.957e8L, simTest1.consts);
@@ -289,10 +289,36 @@ int main() {
     simTest1.add_integ_body(Vh);
 
     simTest1.preprocess();
-    simTest1.integrate();
     // real conv = 1;
     real conv = simTest1.consts.du2m/1000.0L;
+    std::cout << "t: " << simTest1.t << std::endl;
+    std::cout << "xInteg: " << "np.array([";
+    std::cout << simTest1.xInteg[0]*conv << ", ";
+    std::cout << simTest1.xInteg[1]*conv << ", ";
+    std::cout << simTest1.xInteg[2]*conv << ", ";
+    std::cout << simTest1.xInteg[3]*conv << ", ";
+    std::cout << simTest1.xInteg[4]*conv << ", ";
+    std::cout << simTest1.xInteg[5]*conv << " ";
+    std::cout << "])" << std::endl;
+    std::cout << "timestepCounter: " << simTest1.integParams.timestepCounter << std::endl;
+
+    simTest1.integrate();
     
+    std::cout << "t: " << simTest1.t << std::endl;
+    std::cout << "xInteg: " << "np.array([";
+    std::cout << simTest1.xInteg[0]*conv << ", ";
+    std::cout << simTest1.xInteg[1]*conv << ", ";
+    std::cout << simTest1.xInteg[2]*conv << ", ";
+    std::cout << simTest1.xInteg[3]*conv << ", ";
+    std::cout << simTest1.xInteg[4]*conv << ", ";
+    std::cout << simTest1.xInteg[5]*conv << " ";
+    std::cout << "])" << std::endl;
+    std::cout << "timestepCounter: " << simTest1.integParams.timestepCounter << std::endl;
+
+    simTest1.set_integration_parameters(tfSimMjd, t0SimMjd, true, 1.0L, 6.0L, 1e-7L, 0.25L);
+
+    simTest1.integrate();
+
     std::cout << "t: " << simTest1.t << std::endl;
     std::cout << "xInteg: " << "np.array([";
     std::cout << simTest1.xInteg[0]*conv << ", ";

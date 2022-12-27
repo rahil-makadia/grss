@@ -210,7 +210,7 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.JdMinusMjd = 2400000.5;
 };
 
-void Simulation::set_integration_parameters(real t0, real tf, real dt0, real dtMax, real dtMin, real dtChangeFactor, bool adaptiveTimestep, real tolPC, real tolInteg){
+void Simulation::set_integration_parameters(real t0, real tf, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.t0 = t0;
     this->integParams.tf = tf;
     this->integParams.dt0 = dt0;

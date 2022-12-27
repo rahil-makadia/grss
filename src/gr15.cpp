@@ -1,8 +1,17 @@
 #include "gr15.h"
 
-real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const ForceParameters &forceParams, IntegrationParameters &integParams, const Constants &consts){
     
     real dt;
+    if (integParams.dt0!=0.0){
+        dt = abs(integParams.dt0);
+        if (integParams.tf < integParams.t0){
+            dt *= -1.0;
+            integParams.dtMax = -abs(integParams.dtMax);
+            integParams.dtMin = -abs(integParams.dtMin);
+        }
+        return dt;
+    }
     int order = 15;
     real absMaxPos0, absMaxAcc0, absMaxAcc1Minus0;
     real dtTemp0, dtTemp1;
@@ -39,6 +48,12 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const
         dtTemp1 = pow(0.01 / fmax(absMaxAcc0, absMaxAcc1Minus0), 1.0/(order+1));
     }
     dt = fmin(100*dtTemp0, dtTemp1);
+    if (abs(integParams.tf-integParams.t0) < dt){
+        dt = abs(integParams.tf - integParams.t0);
+    }
+    if (integParams.tf < integParams.t0){
+        dt *= -1.0;
+    }
     return dt;
 }
 
@@ -209,72 +224,81 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     int maxLoops = 100;
     int loopCounter = 0;
     int keepStepping = 1;
-    while (keepStepping){
-        for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++){
-            xInteg = xInteg0;
-            accIntegArr[0] = accInteg0;
-            compute_g_and_b(accIntegArr, hVec[0], g, b, dim);
-            for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
-                approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b, integParams.nInteg);
-                accIntegArr[hIdx] = get_state_der(t + hVec[hIdx]*dt, xInteg, forceParams, integParams, consts);
-                compute_g_and_b(accIntegArr, hIdx, g, b, dim);
-            }
-            for (size_t i = 0; i < dim; i++){
-                b6Tilde[i] = b[6][i] - b_old[6][i];
-            }
-            vabs_max(b6Tilde, b6TildeMax);
-            vabs_max(accIntegArr[7], accIntegArr7Max);
-            if (b6TildeMax / accIntegArr7Max < integParams.tolPC){
-                break;
-            }
-            b_old = b;
-        }
-        approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b, integParams.nInteg);
-        std::vector<real> accIntegNext = get_state_der(t+dt, xInteg, forceParams, integParams, consts);
-
-        vabs_max(b[6], b6Max);
-        vabs_max(accIntegNext, accIntegNextMax);
-        b6TildeEstim = b6Max / accIntegNextMax;
-        if (integParams.adaptiveTimestep){
-            relError = pow(b6TildeEstim/integParams.tolInteg, 1.0L/7.0L);
-        }
-        else{
-            relError = pow(b6TildeEstim/integParams.tolInteg, 0.0L);
-        }
-        dtReq = dt/relError;
-        
-        if (relError <= 1 || loopCounter > maxLoops){
-            t += dt;
-            integParams.timestepCounter += 1;
-            loopCounter = 0;
-            xInteg0 = xInteg;
-            accInteg0 = accIntegNext;
-            b_old = b;
-            if (t >= integParams.tf){
-                keepStepping = 0;
-            }
-            refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
-        }
-        else{
-            loopCounter += 1;
-        }
-        if (dtReq/dt > 1.0/integParams.dtChangeFactor){
-            dt /= integParams.dtChangeFactor;
-        } else if (dtReq < 1.0e-12L){
-            dt *= integParams.dtChangeFactor;
-        } else {
-            dt = dtReq;
-        }
-        if (dt > integParams.dtMax){
-            dt = integParams.dtMax;
-        }
-        if (dt < integParams.dtMin){
-            dt = integParams.dtMin;
-        }
-        if (t+dt > integParams.tf){
-            dt = integParams.tf-t;
-        }
+    int oneStepDone = 0;
+    if (integParams.t0 == integParams.tf){
+        keepStepping = 0;
     }
+    while (keepStepping){
+        while (!oneStepDone){
+            for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++){
+                xInteg = xInteg0;
+                accIntegArr[0] = accInteg0;
+                compute_g_and_b(accIntegArr, hVec[0], g, b, dim);
+                for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
+                    approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b, integParams.nInteg);
+                    accIntegArr[hIdx] = get_state_der(t + hVec[hIdx]*dt, xInteg, forceParams, integParams, consts);
+                    compute_g_and_b(accIntegArr, hIdx, g, b, dim);
+                }
+                for (size_t i = 0; i < dim; i++){
+                    b6Tilde[i] = b[6][i] - b_old[6][i];
+                }
+                vabs_max(b6Tilde, b6TildeMax);
+                vabs_max(accIntegArr[7], accIntegArr7Max);
+                if (b6TildeMax / accIntegArr7Max < integParams.tolPC){
+                    break;
+                }
+                b_old = b;
+            }
+            approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b, integParams.nInteg);
+            std::vector<real> accIntegNext = get_state_der(t+dt, xInteg, forceParams, integParams, consts);
+
+            vabs_max(b[6], b6Max);
+            vabs_max(accIntegNext, accIntegNextMax);
+            b6TildeEstim = b6Max / accIntegNextMax;
+            if (integParams.adaptiveTimestep){
+                relError = pow(b6TildeEstim/integParams.tolInteg, 1.0L/7.0L);
+            }
+            else{
+                relError = pow(b6TildeEstim/integParams.tolInteg, 0.0L);
+            }
+            dtReq = dt/relError;
+            
+            if (relError <= 1 || loopCounter > maxLoops){
+                t += dt;
+                integParams.timestepCounter += 1;
+                loopCounter = 0;
+                xInteg0 = xInteg;
+                accInteg0 = accIntegNext;
+                b_old = b;
+                if ((integParams.tf > integParams.t0 && t >= integParams.tf) || (integParams.tf < integParams.t0 && t <= integParams.tf)){
+                    keepStepping = 0;
+                }
+                refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
+                oneStepDone = 1;
+                std::cout << "t = " << t << ", dt = " << dt << ", loopCounter = " << loopCounter << std::endl;
+            }
+            else{
+                loopCounter += 1;
+            }
+            if (dtReq/dt > 1.0/integParams.dtChangeFactor){
+                dt /= integParams.dtChangeFactor;
+            } else if (abs(dtReq) < 1.0e-12L){
+                dt *= integParams.dtChangeFactor;
+            } else {
+                dt = dtReq;
+            }
+            if ( (integParams.tf > integParams.t0 && dt > integParams.dtMax) || (integParams.tf < integParams.t0 && dt < integParams.dtMax)){
+                dt = integParams.dtMax;
+            }
+            if ( (integParams.tf > integParams.t0 && dt < integParams.dtMin) || (integParams.tf < integParams.t0 && dt > integParams.dtMin)){
+                dt = integParams.dtMin;
+            }
+            if ( (integParams.tf > integParams.t0 && t+dt > integParams.tf) || (integParams.tf < integParams.t0 && t+dt < integParams.tf)){
+                dt = integParams.tf-t;
+            }
+        }
     sim.t = t;
     sim.xInteg = xInteg;
+    oneStepDone = 0;
+    }
 }
