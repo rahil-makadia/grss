@@ -10,7 +10,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
             velAll.push_back(xInteg[6*i+j+3]);
         }
     }
-    for (size_t i=integParams.nInteg; i<integParams.nSpice; i++){
+    for (size_t i=integParams.nInteg; i<integParams.nTotal; i++){
         double xSpice_i[6];
         double lt;
         get_spice_state_lt(forceParams.spiceIdList[i], t, consts, xSpice_i, lt);
@@ -46,6 +46,14 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
         accInteg[3*i+1] = xDotInteg[6*i+4];
         accInteg[3*i+2] = xDotInteg[6*i+5];
     }
+    // std::cout << "accInteg: ";
+    // for (size_t i=0; i<accInteg.size(); i+=3){
+    //     std::cout << accInteg[i] << " " << accInteg[i+1] << " " << accInteg[i+2] << std::endl;
+    // }
+    // std::cout << "force_xDotInteg: ";
+    // for (size_t i=0; i<xDotInteg.size(); i+=6){
+    //     std::cout << xDotInteg[i] << ", " << xDotInteg[i+1] << ", " << xDotInteg[i+2] << ", " << xDotInteg[i+3] << ", " << xDotInteg[i+4] << ", " << xDotInteg[i+5] << std::endl;
+    // }
     return accInteg;
 };
 
@@ -63,7 +71,7 @@ void force_newton(const real t, const std::vector<real> &posAll, const std::vect
         ax = 0.0;
         ay = 0.0;
         az = 0.0;
-        for (size_t j=0; j<integParams.nTotal; j++){
+        for (size_t j=integParams.nInteg; j<integParams.nTotal; j++){
             if (i != j){
                 massJ = forceParams.masses[j];
                 dx = x - posAll[3*j];
@@ -75,6 +83,7 @@ void force_newton(const real t, const std::vector<real> &posAll, const std::vect
                 ay -= G*massJ*dy/rRel3;
                 az -= G*massJ*dz/rRel3;
             }
+            // std::cout << j << ": mass: " << massJ << " ax: " << ax << " ay: " << ay << " az: " << az << std::endl;
         }
         xDotInteg[6*i+3] += ax;
         xDotInteg[6*i+4] += ay;

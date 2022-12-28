@@ -63,9 +63,9 @@ void approx_xInteg(const std::vector<real> &xInteg0, const std::vector<real> &ac
         xIntegNext[6*i+1] = xInteg0[6*i+1] + dt * h * (xInteg0[6*i+4] + dt * h * (accInteg0[3*i+1] + h * (b[0][3*i+1] / 0.3e1 + h * (b[1][3*i+1] / 0.6e1 + h * (b[2][3*i+1] / 0.10e2 + h * (b[3][3*i+1] / 0.15e2 + h * (b[4][3*i+1] / 0.21e2 + h * (b[5][3*i+1] / 0.28e2 + h * b[6][3*i+1] / 0.36e2))))))) / 0.2e1);
         xIntegNext[6*i+2] = xInteg0[6*i+2] + dt * h * (xInteg0[6*i+5] + dt * h * (accInteg0[3*i+2] + h * (b[0][3*i+2] / 0.3e1 + h * (b[1][3*i+2] / 0.6e1 + h * (b[2][3*i+2] / 0.10e2 + h * (b[3][3*i+2] / 0.15e2 + h * (b[4][3*i+2] / 0.21e2 + h * (b[5][3*i+2] / 0.28e2 + h * b[6][3*i+2] / 0.36e2))))))) / 0.2e1);
 
-        xIntegNext[6*i+3] = xInteg0[6*i+3] + dt * h * (accInteg0[3*i]   + h * (b[0][i]   / 0.2e1 + h * (b[1][3*i]   / 0.3e1 + h * (b[2][3*i]   / 0.4e1 + h * (b[3][3*i]   / 0.5e1 + h * (b[4][3*i]   / 0.6e1 + h * (b[5][3*i]   / 0.7e1 + h * b[6][3*i]   / 0.8e1)))))));
-        xIntegNext[6*i+4] = xInteg0[6*i+4] + dt * h * (accInteg0[3*i+1] + h * (b[0][i+1] / 0.2e1 + h * (b[1][3*i+1] / 0.3e1 + h * (b[2][3*i+1] / 0.4e1 + h * (b[3][3*i+1] / 0.5e1 + h * (b[4][3*i+1] / 0.6e1 + h * (b[5][3*i+1] / 0.7e1 + h * b[6][3*i+1] / 0.8e1)))))));
-        xIntegNext[6*i+5] = xInteg0[6*i+5] + dt * h * (accInteg0[3*i+2] + h * (b[0][i+2] / 0.2e1 + h * (b[1][3*i+2] / 0.3e1 + h * (b[2][3*i+2] / 0.4e1 + h * (b[3][3*i+2] / 0.5e1 + h * (b[4][3*i+2] / 0.6e1 + h * (b[5][3*i+2] / 0.7e1 + h * b[6][3*i+2] / 0.8e1)))))));
+        xIntegNext[6*i+3] = xInteg0[6*i+3] + dt * h * (accInteg0[3*i]   + h * (b[0][3*i]   / 0.2e1 + h * (b[1][3*i]   / 0.3e1 + h * (b[2][3*i]   / 0.4e1 + h * (b[3][3*i]   / 0.5e1 + h * (b[4][3*i]   / 0.6e1 + h * (b[5][3*i]   / 0.7e1 + h * b[6][3*i]   / 0.8e1)))))));
+        xIntegNext[6*i+4] = xInteg0[6*i+4] + dt * h * (accInteg0[3*i+1] + h * (b[0][3*i+1] / 0.2e1 + h * (b[1][3*i+1] / 0.3e1 + h * (b[2][3*i+1] / 0.4e1 + h * (b[3][3*i+1] / 0.5e1 + h * (b[4][3*i+1] / 0.6e1 + h * (b[5][3*i+1] / 0.7e1 + h * b[6][3*i+1] / 0.8e1)))))));
+        xIntegNext[6*i+5] = xInteg0[6*i+5] + dt * h * (accInteg0[3*i+2] + h * (b[0][3*i+2] / 0.2e1 + h * (b[1][3*i+2] / 0.3e1 + h * (b[2][3*i+2] / 0.4e1 + h * (b[3][3*i+2] / 0.5e1 + h * (b[4][3*i+2] / 0.6e1 + h * (b[5][3*i+2] / 0.7e1 + h * b[6][3*i+2] / 0.8e1)))))));
     }
 }
 
@@ -186,7 +186,7 @@ void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real
         e[3][i] = q4 * (b[6][i] * 35.0 + b[5][i] * 15.0 + b[4][i] * 5.0  + b[3][i]);
         e[4][i] = q5 * (b[6][i] * 21.0 + b[5][i] * 6.0  + b[4][i]);
         e[5][i] = q6 * (b[6][i] * 7.0  + b[5][i]);
-        e[6][i] = q7 * b[6][i];
+        e[6][i] = q7 * (b[6][i]);
     }
 
     for (size_t i = 0; i < dim; i++) {
@@ -231,13 +231,41 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     while (keepStepping){
         while (!oneStepDone){
             for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++){
+                // std::cout << "new PC iter" << std::endl;
                 xInteg = xInteg0;
                 accIntegArr[0] = accInteg0;
                 compute_g_and_b(accIntegArr, hVec[0], g, b, dim);
                 for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
+                    // std::cout << "new hVecLoop idx" << hIdx << std::endl;
+                    // std::cout << "PCxInteg0 = ";
+                    // for (size_t i=0; i<xInteg0.size(); i+=6){
+                    //     std::cout << xInteg0[i] << ", " << xInteg0[i+1] << ", " << xInteg0[i+2] << ", " << xInteg0[i+3] << ", " << xInteg0[i+4] << ", " << xInteg0[i+5] << std::endl;
+                    // }
+                    // std::cout << std::endl;
                     approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b, integParams.nInteg);
+                    // std::cout << "PCxInteg = ";
+                    // for (size_t i=0; i<xInteg.size(); i+=6){
+                    //     std::cout << xInteg[i] << ", " << xInteg[i+1] << ", " << xInteg[i+2] << ", " << xInteg[i+3] << ", " << xInteg[i+4] << ", " << xInteg[i+5] << std::endl;
+                    // }
+                    // std::cout << std::endl;
                     accIntegArr[hIdx] = get_state_der(t + hVec[hIdx]*dt, xInteg, forceParams, integParams, consts);
                     compute_g_and_b(accIntegArr, hIdx, g, b, dim);
+                    // std::cout << "PCg = " << std::endl;
+                    // for (size_t i=0; i<g.size(); i++){
+                    //     for (size_t j=0; j<g[i].size(); j++){
+                    //         std::cout << g[i][j] << ", ";
+                    //     }
+                    //     std::cout << std::endl;
+                    // }
+                    // std::cout << std::endl;
+                    // std::cout << "PCb = " << std::endl;
+                    // for (size_t i=0; i<b.size(); i++){
+                    //     for (size_t j=0; j<b[i].size(); j++){
+                    //         std::cout << b[i][j] << ", ";
+                    //     }
+                    //     std::cout << std::endl;
+                    // }
+                    // std::cout << std::endl;
                 }
                 for (size_t i = 0; i < dim; i++){
                     b6Tilde[i] = b[6][i] - b_old[6][i];
@@ -275,7 +303,12 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
                 }
                 refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
                 oneStepDone = 1;
-                std::cout << "t = " << t << ", dt = " << dt << ", loopCounter = " << loopCounter << std::endl;
+                // std::cout << "xInteg = " << std::endl;
+                // for (size_t i = 0; i < xInteg.size(); i++){
+                //     std::cout << xInteg[i] << ", ";
+                // }
+                // std::cout << std::endl;
+                // std::cout << "t = " << t << ", dt = " << dt << ", loopCounter = " << loopCounter << std::endl;
             }
             else{
                 loopCounter += 1;

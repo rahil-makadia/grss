@@ -47,7 +47,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius, std::vec
         cartesianPos[i] += sunState[i];
         cartesianVel[i] += sunState[i+3];
     }
-    
     this->pos = cartesianPos;
     this->vel = cartesianVel;
     this->covariance = covariance;

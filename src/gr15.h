@@ -37,7 +37,4 @@ const std::vector< std::vector<real> > cMat = {
 
 void gr15(real t, std::vector<real> xInteg, Simulation &sim);
 
-void Simulation::integrate(){
-    gr15(this->t, this->xInteg, *this);
-}
 #endif
