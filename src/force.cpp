@@ -19,16 +19,6 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
             velAll.push_back(xSpice_i[j+3]);
         }
     }
-    // // print posAll and velAll
-    // std::cout << "posAll: " << std::endl;
-    // for (size_t i=0; i<posAll.size(); i+=3){
-    //     std::cout << posAll[i] << " " << posAll[i+1] << " " << posAll[i+2] << std::endl;
-    // }
-    // std::cout << std::endl;
-    // std::cout << "velAll: " << std::endl;
-    // for (size_t i=0; i<velAll.size(); i+=3){
-    //     std::cout << velAll[i] << " " << velAll[i+1] << " " << velAll[i+2] << std::endl;
-    // }
     for (size_t i=0; i<integParams.nInteg; i++){
         xDotInteg[6*i] = velAll[3*i];
         xDotInteg[6*i+1] = velAll[3*i+1];
@@ -46,14 +36,6 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
         accInteg[3*i+1] = xDotInteg[6*i+4];
         accInteg[3*i+2] = xDotInteg[6*i+5];
     }
-    // std::cout << "accInteg: ";
-    // for (size_t i=0; i<accInteg.size(); i+=3){
-    //     std::cout << accInteg[i] << " " << accInteg[i+1] << " " << accInteg[i+2] << std::endl;
-    // }
-    // std::cout << "force_xDotInteg: ";
-    // for (size_t i=0; i<xDotInteg.size(); i+=6){
-    //     std::cout << xDotInteg[i] << ", " << xDotInteg[i+1] << ", " << xDotInteg[i+2] << ", " << xDotInteg[i+3] << ", " << xDotInteg[i+4] << ", " << xDotInteg[i+5] << std::endl;
-    // }
     return accInteg;
 };
 
@@ -83,7 +65,6 @@ void force_newton(const real t, const std::vector<real> &posAll, const std::vect
                 ay -= G*massJ*dy/rRel3;
                 az -= G*massJ*dz/rRel3;
             }
-            // std::cout << j << ": mass: " << massJ << " ax: " << ax << " ay: " << ay << " az: " << az << std::endl;
         }
         xDotInteg[6*i+3] += ax;
         xDotInteg[6*i+4] += ay;
@@ -211,7 +192,7 @@ void force_nongrav(const real t, const std::vector<real> &posAll, const std::vec
         ay = 0.0;
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
-            if (forceParams.spiceIdList[j]==10 && forceParams.isNongravList[i]){ // j is Sun index in spiceIdList
+            if (forceParams.spiceIdList[j]==10 && forceParams.isNongravList[i]){ // j is Sun index (value 10) in spiceIdList
                 // std::cout<< "Sun found at j = " << j << std::endl;
                 a1 = forceParams.ngParamsList[i].a1;
                 a2 = forceParams.ngParamsList[i].a2;
@@ -233,16 +214,6 @@ void force_nongrav(const real t, const std::vector<real> &posAll, const std::vec
                 vcross({dx, dy, dz}, {dvx, dvy, dvz}, hRelVec);
                 vunit(hRelVec, eNHat);
                 vcross(eNHat, eRHat, eTHat);
-                // real t1, t2, t3;
-                // std::cout<< "eRHat: " << eRHat[0] << " " << eRHat[1] << " " << eRHat[2] << std::endl;
-                // vnorm(eRHat, t1);
-                // std::cout<< "eRHat mag: " << t1 << std::endl;
-                // std::cout<< "eTHat: " << eTHat[0] << " " << eTHat[1] << " " << eTHat[2] << std::endl;
-                // vnorm(eTHat, t2);
-                // std::cout<< "eTHat mag: " << t2 << std::endl;
-                // std::cout<< "eNHat: " << eNHat[0] << " " << eNHat[1] << " " << eNHat[2] << std::endl;
-                // vnorm(eNHat, t3);
-                // std::cout<< "eNHat mag: " << t3 << std::endl;
                 ax += g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]);
                 ay += g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]);
                 az += g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]);

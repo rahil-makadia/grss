@@ -92,7 +92,6 @@ Simulation::Simulation(std::string name){
     this->integParams.nInteg = 0;
     this->integParams.nSpice = 0;
     this->integParams.nTotal = 0;
-    // this->integParams.dim = 0;
     this->consts.du2m = 0.0L;
     this->consts.tu2sec = 0.0L;
     this->consts.G = 0.0L;
@@ -121,7 +120,6 @@ void Simulation::add_spice_body(std::string name, int spiceId, real t0, real mas
     this->spiceBodies.push_back(body);
     this->integParams.nSpice++;
     this->integParams.nTotal++;
-    // this->integParams.dim = 3*integParams.nTotal;
 };
 
 void Simulation::add_spice_body(SpiceBody body){
@@ -134,7 +132,6 @@ void Simulation::add_spice_body(SpiceBody body){
     this->spiceBodies.push_back(body);
     this->integParams.nSpice++;
     this->integParams.nTotal++;
-    // this->integParams.dim = 3*integParams.nTotal;
 };
 
 void Simulation::add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts){
@@ -148,7 +145,6 @@ void Simulation::add_integ_body(std::string name, real t0, real mass, real radiu
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
-    // this->integParams.dim = 3*integParams.nTotal;
 };
 
 void Simulation::add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts){
@@ -162,7 +158,6 @@ void Simulation::add_integ_body(std::string name, real t0, real mass, real radiu
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
-    // this->integParams.dim = 3*integParams.nTotal;
 };
 
 void Simulation::add_integ_body(IntegBody body){
@@ -175,7 +170,6 @@ void Simulation::add_integ_body(IntegBody body){
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
-    // this->integParams.dim = 3*integParams.nTotal;
 };
 
 void Simulation::remove_body(std::string name){
@@ -184,7 +178,6 @@ void Simulation::remove_body(std::string name){
             this->spiceBodies.erase(this->spiceBodies.begin()+i);
             this->integParams.nSpice--;
             this->integParams.nTotal--;
-            // this->integParams.dim = 3*integParams.nTotal;
             return;
         }
     }
@@ -193,7 +186,6 @@ void Simulation::remove_body(std::string name){
             this->integBodies.erase(this->integBodies.begin()+i);
             this->integParams.nInteg--;
             this->integParams.nTotal--;
-            // this->integParams.dim = 3*integParams.nTotal;
             return;
         }
     }
@@ -229,7 +221,7 @@ std::vector<real> Simulation::get_sim_constants(){
     // std::cout << "The Julian date of J2000 is: " << consts.j2000Jd << std::endl;
     // std::cout << "The difference between the Julian date and the Modified Julian date is: " << consts.JdMinusMjd << std::endl;
 
-    std::vector<real> constants = {consts.du2m, consts.tu2sec, consts.G, consts.clight, consts.j2000Jd, consts.JdMinusMjd};
+    std::vector<real> constants = {this->consts.du2m, this->consts.tu2sec, this->consts.G, this->consts.clight, this->consts.j2000Jd, this->consts.JdMinusMjd};
     return constants;
 };
 
@@ -246,7 +238,7 @@ std::vector<real> Simulation::get_integration_parameters(){
     // std::cout << "The tolerance for the position and velocity error is: " << integParams.tolPC << std::endl;
     // std::cout << "The tolerance for the integration error is: " << integParams.tolInteg << std::endl;
 
-    std::vector<real> integration_parameters = {(real) integParams.nInteg, (real) integParams.nSpice, (real) integParams.nTotal, integParams.t0, integParams.tf, integParams.dt0, integParams.dtMax, integParams.dtMin, integParams.dtChangeFactor, (real) integParams.adaptiveTimestep, integParams.tolPC, integParams.tolInteg};
+    std::vector<real> integration_parameters = {(real) this->integParams.nInteg, (real) this->integParams.nSpice, (real) this->integParams.nTotal, this->integParams.t0, this->integParams.tf, (real) this->integParams.adaptiveTimestep, this->integParams.dt0, this->integParams.dtMax, this->integParams.dtMin, this->integParams.dtChangeFactor, this->integParams.tolInteg, this->integParams.tolPC};
     return integration_parameters;
 };
 
@@ -278,4 +270,9 @@ void Simulation::preprocess(){
         this->forceParams.J2List.push_back(spiceBodies[i].J2);
         this->forceParams.obliquityList.push_back(spiceBodies[i].obliquityToEcliptic);
     }
+}
+
+void Simulation::extend(real tf){
+    this->set_integration_parameters(this->t, tf, this->integParams.adaptiveTimestep, this->integParams.dt0, this->integParams.dtMax, this->integParams.dtMin, this->integParams.dtChangeFactor, this->integParams.tolInteg, this->integParams.tolPC);
+    this->integrate();
 }

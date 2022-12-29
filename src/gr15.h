@@ -2,6 +2,7 @@
 #define GR15_H
 #include "utilities.h"
 #include "simulation.h"
+#include "interpolate.h"
 
 const std::vector<real> hVec = {
     0.0,
@@ -13,7 +14,6 @@ const std::vector<real> hVec = {
     0.8853209468390957680903598,
     0.9775206135612875018911745
     };
-const real hSize = 8;
 const std::vector< std::vector<real> > rMat = {
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {17.773808914078000840752659565672904106978971632681, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},

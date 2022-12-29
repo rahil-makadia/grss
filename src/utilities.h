@@ -44,7 +44,6 @@ struct IntegrationParameters{
     size_t nInteg;
     size_t nSpice;
     size_t nTotal;
-    // size_t dim;
     real t0;
     real tf;
     real dt0;

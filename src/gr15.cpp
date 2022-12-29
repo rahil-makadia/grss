@@ -53,6 +53,8 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const
     }
     if (integParams.tf < integParams.t0){
         dt *= -1.0;
+        integParams.dtMax = -abs(integParams.dtMax);
+        integParams.dtMin = -abs(integParams.dtMin);
     }
     return dt;
 }
@@ -208,8 +210,13 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
 
     real dt = get_initial_timestep(t, xInteg0, forceParams, integParams, consts);
     std::vector<real> accInteg0 = get_state_der(t, xInteg0, forceParams, integParams, consts);
-
-    std::vector<real> xInteg(xInteg0.size(), 0.0);
+    if (dt > 0){
+        std::sort(sim.tEval.begin(), sim.tEval.end()); // sort sim.tEval into ascending order
+    }
+    else if (dt < 0){
+        std::sort(sim.tEval.begin(), sim.tEval.end(), std::greater<real>()); // sort sim.tEval into descending order
+    }
+    std::vector<real> xInteg(2*dim, 0.0);
     std::vector< std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
     std::vector< std::vector<real> > b(7, std::vector<real>(dim, 0.0));
     std::vector< std::vector<real> > g(7, std::vector<real>(dim, 0.0));
@@ -231,41 +238,13 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     while (keepStepping){
         while (!oneStepDone){
             for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++){
-                // std::cout << "new PC iter" << std::endl;
                 xInteg = xInteg0;
                 accIntegArr[0] = accInteg0;
                 compute_g_and_b(accIntegArr, hVec[0], g, b, dim);
                 for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
-                    // std::cout << "new hVecLoop idx" << hIdx << std::endl;
-                    // std::cout << "PCxInteg0 = ";
-                    // for (size_t i=0; i<xInteg0.size(); i+=6){
-                    //     std::cout << xInteg0[i] << ", " << xInteg0[i+1] << ", " << xInteg0[i+2] << ", " << xInteg0[i+3] << ", " << xInteg0[i+4] << ", " << xInteg0[i+5] << std::endl;
-                    // }
-                    // std::cout << std::endl;
                     approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b, integParams.nInteg);
-                    // std::cout << "PCxInteg = ";
-                    // for (size_t i=0; i<xInteg.size(); i+=6){
-                    //     std::cout << xInteg[i] << ", " << xInteg[i+1] << ", " << xInteg[i+2] << ", " << xInteg[i+3] << ", " << xInteg[i+4] << ", " << xInteg[i+5] << std::endl;
-                    // }
-                    // std::cout << std::endl;
                     accIntegArr[hIdx] = get_state_der(t + hVec[hIdx]*dt, xInteg, forceParams, integParams, consts);
                     compute_g_and_b(accIntegArr, hIdx, g, b, dim);
-                    // std::cout << "PCg = " << std::endl;
-                    // for (size_t i=0; i<g.size(); i++){
-                    //     for (size_t j=0; j<g[i].size(); j++){
-                    //         std::cout << g[i][j] << ", ";
-                    //     }
-                    //     std::cout << std::endl;
-                    // }
-                    // std::cout << std::endl;
-                    // std::cout << "PCb = " << std::endl;
-                    // for (size_t i=0; i<b.size(); i++){
-                    //     for (size_t j=0; j<b[i].size(); j++){
-                    //         std::cout << b[i][j] << ", ";
-                    //     }
-                    //     std::cout << std::endl;
-                    // }
-                    // std::cout << std::endl;
                 }
                 for (size_t i = 0; i < dim; i++){
                     b6Tilde[i] = b[6][i] - b_old[6][i];
@@ -292,23 +271,31 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
             dtReq = dt/relError;
             
             if (relError <= 1 || loopCounter > maxLoops){
-                t += dt;
+                oneStepDone = 1;
                 integParams.timestepCounter += 1;
-                loopCounter = 0;
-                xInteg0 = xInteg;
-                accInteg0 = accIntegNext;
-                b_old = b;
+                // // start interpolation call
+                std::vector< std::vector<real> > xIntegForInterp(hVec.size(), std::vector<real>(2*dim, 0.0));
+                std::vector<real> tVecForInterp (hVec.size(), 0.0);
+                xIntegForInterp[0] = xInteg0;
+                tVecForInterp[0] = t;
+                for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
+                    approx_xInteg(xInteg0, accInteg0, xIntegForInterp[hIdx], dt, hVec[hIdx], b, integParams.nInteg);
+                    tVecForInterp[hIdx] = t + hVec[hIdx]*dt;
+                }
+                // xIntegForInterp[hVec.size()] = xInteg;
+                // tVecForInterp[hVec.size()] = t + dt;
+                interpolate(t+dt, tVecForInterp, xIntegForInterp, sim);
+                // // end interpolation call
+                t += dt;
                 if ((integParams.tf > integParams.t0 && t >= integParams.tf) || (integParams.tf < integParams.t0 && t <= integParams.tf)){
                     keepStepping = 0;
                 }
+                xInteg0 = xInteg;
+                accInteg0 = accIntegNext;
+                b_old = b;
                 refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
-                oneStepDone = 1;
-                // std::cout << "xInteg = " << std::endl;
-                // for (size_t i = 0; i < xInteg.size(); i++){
-                //     std::cout << xInteg[i] << ", ";
-                // }
-                // std::cout << std::endl;
-                // std::cout << "t = " << t << ", dt = " << dt << ", loopCounter = " << loopCounter << std::endl;
+                loopCounter = 0;
+                // std::cout << "t: " << t << " dt: "<< dt << " timstepCounter: " << integParams.timestepCounter << std::endl;
             }
             else{
                 loopCounter += 1;

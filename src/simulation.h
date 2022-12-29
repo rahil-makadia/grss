@@ -65,6 +65,15 @@ class Simulation
         std::vector<SpiceBody> spiceBodies;
         std::vector<IntegBody> integBodies;
 
+        // preprocessor variables
+        real t;
+        std::vector<real> xInteg;
+        ForceParameters forceParams;
+
+        // interpolator variables
+        std::vector<real> tEval;
+        std::vector< std::vector<real> > xIntegEval;
+
         // add and remove bodies
         void add_spice_body(std::string name, int spiceID, real t0, real mass, real radius, Constants consts);
         void add_spice_body(SpiceBody body);
@@ -75,20 +84,20 @@ class Simulation
 
         // setters
         void set_sim_constants(real du2m=149597870700.0L, real tu2sec=86400.0L, real G=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, real clight=299792458.0L/149597870700.0L*86400.0L);
-        void set_integration_parameters(real t0, real tf, bool adaptiveTimestep=true, real dt0=0.0L, real dtMax=6.0L, real dtMin=1.0e-7L, real dtChangeFactor=0.25L, real tolInteg=1.0e-9L, real tolPC=1.0e-16L);
+        void set_integration_parameters(real t0, real tf, bool adaptiveTimestep=true, real dt0=0.0L, real dtMax=6.0L, real dtMin=1.0e-7L, real dtChangeFactor=0.25L, real tolInteg=1.0e-6L, real tolPC=1.0e-16L);
 
         // getters
         std::vector<real> get_sim_constants();
         std::vector<real> get_integration_parameters();
 
         // preprocessor
-        real t;
-        std::vector<real> xInteg;
-        ForceParameters forceParams;
         void preprocess();
 
         // integrator
         void integrate();
+
+        // integration extension
+        void extend(real tf);
 };
 
 #endif
