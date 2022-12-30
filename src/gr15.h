@@ -1,7 +1,6 @@
 #ifndef GR15_H
 #define GR15_H
-#include "utilities.h"
-#include "simulation.h"
+
 #include "interpolate.h"
 
 const std::vector<real> hVec = {

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <vector>
 #include <cmath>
 using std::fmin;
@@ -18,7 +19,10 @@ using std::atan2;
 
 #include "SpiceUsr.h"
 
-// #define LONGDOUBLE // use long double instead of double
+#ifndef LONGDOUBLE
+    #define LONGDOUBLE  // use long double instead of double
+#endif
+
 #ifndef real
     #ifdef LONGDOUBLE
         #define real long double
@@ -105,8 +109,8 @@ void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
 void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-16L, const int &max_iter=100);
 void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G);
 void keplerian_to_cometary(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G);
-void keplerian_to_cartesian(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G);
-void cartesian_to_keplerian(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G);
+void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G);
+void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G);
 void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real G);
 void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real G);
 

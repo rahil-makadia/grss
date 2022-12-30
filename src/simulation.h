@@ -1,6 +1,6 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
-#include "utilities.h"
+
 #include "force.h"
 
 class Body{

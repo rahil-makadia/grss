@@ -287,7 +287,7 @@ void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &kepler
     cometaryState = {e, a*(1-e), T0, keplerianState[2], keplerianState[3], keplerianState[4]};
 };
 
-void keplerian_to_cartesian(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G){
+void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G){
     real GM = G*1.988409871316534e30; // sun mass from horizons
     real a = keplerianState[0];
     real e = keplerianState[1];
@@ -331,7 +331,7 @@ void keplerian_to_cartesian(const real &epochMjd, const std::vector<real> &keple
     cartesianState = {r_final[0], r_final[1], r_final[2], v_final[0], v_final[1], v_final[2]};
 };
 
-void cartesian_to_keplerian(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G){
+void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G){
     real GM = G*1.988409871316534e30; // sun mass from horizons
     
     std::vector<real> rVec(3);
@@ -398,11 +398,11 @@ void cartesian_to_keplerian(const real &epochMjd, const std::vector<real> &carte
 void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real G){
     std::vector<real> keplerianState(6);
     cometary_to_keplerian(epochMjd, cometaryState, keplerianState, G);
-    keplerian_to_cartesian(epochMjd, keplerianState, cartesianState, G);
+    keplerian_to_cartesian(keplerianState, cartesianState, G);
 };
 
 void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real G){
     std::vector<real> keplerianState(6);
-    cartesian_to_keplerian(epochMjd, cartesianState, keplerianState, G);
+    cartesian_to_keplerian(cartesianState, keplerianState, G);
     keplerian_to_cometary(epochMjd, keplerianState, cometaryState, G);
 };

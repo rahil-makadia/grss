@@ -295,7 +295,6 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
                 b_old = b;
                 refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
                 loopCounter = 0;
-                // std::cout << "t: " << t << " dt: "<< dt << " timstepCounter: " << integParams.timestepCounter << std::endl;
             }
             else{
                 loopCounter += 1;

@@ -1,6 +1,6 @@
 #ifndef GRSS_H
 #define GRSS_H
-#include "utilities.h"
+
 #include "gr15.h"
 
 void Simulation::integrate(){

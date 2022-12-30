@@ -25,10 +25,10 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
         xDotInteg[6*i+2] = velAll[3*i+2];
     }
 
-    force_newton(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    force_ppn(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    force_J2(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    force_nongrav(t, posAll, velAll, xDotInteg, forceParams, integParams, consts);
+    force_newton(posAll, xDotInteg, forceParams, integParams, consts);
+    force_ppn(posAll, velAll, xDotInteg, forceParams, integParams, consts);
+    force_J2(posAll, xDotInteg, forceParams, integParams, consts);
+    force_nongrav(posAll, velAll, xDotInteg, forceParams, integParams, consts);
 
     std::vector<real> accInteg(3*integParams.nInteg, 0.0);
     for (size_t i=0; i<integParams.nInteg; i++){
@@ -39,7 +39,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
     return accInteg;
 };
 
-void force_newton(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -72,7 +72,7 @@ void force_newton(const real t, const std::vector<real> &posAll, const std::vect
     }
 };
 
-void force_ppn(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real c = consts.clight;
     real c2 = c*c;
@@ -121,7 +121,7 @@ void force_ppn(const real t, const std::vector<real> &posAll, const std::vector<
     }
 };
 
-void force_J2(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -168,7 +168,7 @@ void force_J2(const real t, const std::vector<real> &posAll, const std::vector<r
     }
 };
 
-void force_nongrav(const real t, const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real a1, a2, a3;
     real alpha, k, m, n;
     real r0;
