@@ -4,11 +4,11 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const
     
     real dt;
     if (integParams.dt0!=0.0){
-        dt = abs(integParams.dt0);
+        dt = fabs(integParams.dt0);
         if (integParams.tf < integParams.t0){
             dt *= -1.0;
-            integParams.dtMax = -abs(integParams.dtMax);
-            integParams.dtMin = -abs(integParams.dtMin);
+            integParams.dtMax = -fabs(integParams.dtMax);
+            integParams.dtMin = -fabs(integParams.dtMin);
         }
         return dt;
     }
@@ -48,13 +48,13 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const
         dtTemp1 = pow(0.01 / fmax(absMaxAcc0, absMaxAcc1Minus0), 1.0/(order+1));
     }
     dt = fmin(100*dtTemp0, dtTemp1);
-    if (abs(integParams.tf-integParams.t0) < dt){
-        dt = abs(integParams.tf - integParams.t0);
+    if (fabs(integParams.tf-integParams.t0) < dt){
+        dt = fabs(integParams.tf - integParams.t0);
     }
     if (integParams.tf < integParams.t0){
         dt *= -1.0;
-        integParams.dtMax = -abs(integParams.dtMax);
-        integParams.dtMin = -abs(integParams.dtMin);
+        integParams.dtMax = -fabs(integParams.dtMax);
+        integParams.dtMin = -fabs(integParams.dtMin);
     }
     return dt;
 }
@@ -295,15 +295,18 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
                 b_old = b;
                 refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
                 loopCounter = 0;
+                // std::cout << "t = " << t << ", dt = " << dt << ", dtReq = " << dtReq << std::endl;
             }
             else{
                 loopCounter += 1;
             }
             if (dtReq/dt > 1.0/integParams.dtChangeFactor){
                 dt /= integParams.dtChangeFactor;
-            } else if (abs(dtReq) < 1.0e-12L){
+            }
+            else if (fabs(dtReq) < 1.0e-12L){
                 dt *= integParams.dtChangeFactor;
-            } else {
+            }
+            else {
                 dt = dtReq;
             }
             if ( (integParams.tf > integParams.t0 && dt > integParams.dtMax) || (integParams.tf < integParams.t0 && dt < integParams.dtMax)){

@@ -243,10 +243,9 @@ void kepler_solve(const real &M, const real &e, real &E, const real &tol, const 
         E = PI;
     }
     int iter = 0;
-    int min_iter = 10;
     real F = E-e*sin(E)-M;
     real F_prime = 1-e*cos(E);
-    while ( (abs(F) > tol && iter < max_iter) || iter < min_iter ){
+    while ( (fabs(F) > tol && iter < max_iter) ){
         E -= (F/F_prime);
         F = E-e*sin(E)-M;
         F_prime = 1-e*cos(E);

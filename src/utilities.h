@@ -8,6 +8,7 @@
 #include <cmath>
 using std::fmin;
 using std::fmax;
+using std::fabs;
 using std::pow;
 using std::sqrt;
 using std::sin;
@@ -106,7 +107,7 @@ void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
 
-void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-16L, const int &max_iter=100);
+void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-14L, const int &max_iter=100);
 void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G);
 void keplerian_to_cometary(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G);
 void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G);

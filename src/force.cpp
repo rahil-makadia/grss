@@ -53,9 +53,9 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
         ax = 0.0;
         ay = 0.0;
         az = 0.0;
-        for (size_t j=integParams.nInteg; j<integParams.nTotal; j++){
-            if (i != j){
-                massJ = forceParams.masses[j];
+        for (size_t j=0; j<integParams.nTotal; j++){
+            massJ = forceParams.masses[j];
+            if (i != j && massJ != 0.0){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];
