@@ -187,3 +187,6 @@ cython_debug/
 
 # C++ program debug symbols
 *.dSYM/
+
+# cspice library in the external directory
+extern/cspice
