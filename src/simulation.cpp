@@ -36,7 +36,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius, std::vec
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip, consts.G);
     // rotate to eme2000
     std::vector< std::vector<real> > eclipToEquatorial(3, std::vector<real>(3));
-    rot_mat_x(-EARTH_OBLIQUITY, eclipToEquatorial); // rotate by negative earth obliquity for ecliptic to equatorial
+    rot_mat_x(EARTH_OBLIQUITY, eclipToEquatorial);
     mat_vec_mul(eclipToEquatorial, {cartesianStateEclip[0],cartesianStateEclip[1],cartesianStateEclip[2]}, cartesianPos);
     mat_vec_mul(eclipToEquatorial, {cartesianStateEclip[3],cartesianStateEclip[4],cartesianStateEclip[5]}, cartesianVel);
     // shift heliocentric to barycentric
@@ -86,28 +86,205 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius, std::vec
     }
 }
 
-
-Simulation::Simulation(std::string name){
+Simulation::Simulation(std::string name, real t0, const int defaultSpiceBodies){
     this->name = name;
-    this->integParams.nInteg = 0;
-    this->integParams.nSpice = 0;
-    this->integParams.nTotal = 0;
-    this->consts.du2m = 0.0L;
-    this->consts.tu2sec = 0.0L;
-    this->consts.G = 0.0L;
-    this->consts.clight = 0.0L;
-    this->consts.j2000Jd = 0.0L;
-    this->consts.JdMinusMjd = 0.0L;
-    this->integParams.t0 = 0.0L;
+    this->integParams.t0 = t0;
+
     this->integParams.tf = 0.0L;
     this->integParams.dt0 = 0.0L;
     this->integParams.dtMax = 0.0L;
     this->integParams.dtChangeFactor = 0.0L;
-    this->integParams.adaptiveTimestep = false;
+    this->integParams.adaptiveTimestep = true;
     this->integParams.timestepCounter = 0;
     this->integParams.tolPC = 0.0L;
     this->integParams.tolInteg = 0.0L;
+    this->integParams.nInteg = 0;
+    this->integParams.nSpice = 0;
+    this->integParams.nTotal = 0;
+
+    switch (defaultSpiceBodies){
+    case 0:
+    {
+        break;
+    }
+    case 431:
+    {
+        real G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
+        // add planets and planetary bodies from DE431 header (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de431_tech-comments.txt)
+        SpiceBody Sun("Sun", 10, this->integParams.t0, 2.959122082855911e-4L/G, 6.957e8L, this->consts);
+        SpiceBody MercuryBarycenter("Mercury Barycenter", 1, this->integParams.t0, 4.91248045036476e-11L/G, 0.0L, this->consts);
+        SpiceBody VenusBarycenter("Venus Barycenter", 2, this->integParams.t0, 7.24345233264412e-10L/G, 0.0L, this->consts);
+        SpiceBody Earth("Earth", 399, this->integParams.t0, 8.887692445125634e-10L/G, 6378136.3L, this->consts);
+        SpiceBody Moon("Moon", 301, this->integParams.t0, 1.093189450742374e-11L/G, 0.0L, this->consts);
+        SpiceBody MarsBarycenter("Mars Barycenter", 4, this->integParams.t0, 9.54954869555077e-11L/G, 0.0L, this->consts);
+        SpiceBody JupiterBarycenter("Jupiter Barycenter", 5, this->integParams.t0, 2.82534584083387e-07L/G, 0.0L, this->consts);
+        SpiceBody SaturnBarycenter("Saturn Barycenter", 6, this->integParams.t0, 8.45970607324503e-08L/G, 0.0L, this->consts);
+        SpiceBody UranusBarycenter("Uranus Barycenter", 7, this->integParams.t0, 1.29202482578296e-08L/G, 0.0L, this->consts);
+        SpiceBody NeptuneBarycenter("Neptune Barycenter", 8, this->integParams.t0, 1.52435734788511e-08L/G, 0.0L, this->consts);
+        SpiceBody PlutoBarycenter("Pluto Barycenter", 9, this->integParams.t0, 2.17844105197418e-12L/G, 0.0L, this->consts);
+        Sun.isPPN = true;
+        MercuryBarycenter.isPPN = true;
+        VenusBarycenter.isPPN = true;
+        Earth.isPPN = true;
+        Moon.isPPN = true;
+        MarsBarycenter.isPPN = true;
+        JupiterBarycenter.isPPN = true;
+        SaturnBarycenter.isPPN = true;
+        UranusBarycenter.isPPN = true;
+        NeptuneBarycenter.isPPN = true;
+        PlutoBarycenter.isPPN = true;
+        Sun.set_J2(2.1106088532726840e-7L, 7.25L*DEG2RAD); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
+        // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
+        // Earth.set_J2(0.00108262545L, EARTH_OBLIQUITY); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+        // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+        // JupiterBarycenter.set_J2(14736.0e-6L, 3.13L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+        // SaturnBarycenter.set_J2(16298.0e-6L, 26.73L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/saturnfact.html
+        // UranusBarycenter.set_J2(3343.43e-6L, 97.77L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/uranusfact.html
+        // NeptuneBarycenter.set_J2(3411.0e-6L, 28.32L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html
+        // PlutoBarycenter.set_J2(0.0L, 122.53L); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/plutofact.html
+        add_spice_body(Sun);
+        add_spice_body(MercuryBarycenter);
+        add_spice_body(VenusBarycenter);
+        add_spice_body(Earth);
+        add_spice_body(Moon);
+        add_spice_body(MarsBarycenter);
+        add_spice_body(JupiterBarycenter);
+        add_spice_body(SaturnBarycenter);
+        add_spice_body(UranusBarycenter);
+        add_spice_body(NeptuneBarycenter);
+        add_spice_body(PlutoBarycenter);
+
+        // add DE431 big16 asteroids from JPL sb431-big16s.bsp, mass parameters from DE431 header (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de431_tech-comments.txt)
+        SpiceBody Ceres("Ceres", 2000001, this->integParams.t0, 1.400476556172344e-13L/G, 0.0L, this->consts);
+        SpiceBody Vesta("Vesta", 2000004, this->integParams.t0, 3.85475018780881e-14L/G, 0.0L, this->consts);
+        SpiceBody Pallas("Pallas", 2000002, this->integParams.t0, 3.104448198938713e-14L/G, 0.0L, this->consts);
+        SpiceBody Hygiea("Hygiea", 2000010, this->integParams.t0, 1.235800787294125e-14L/G, 0.0L, this->consts);
+        SpiceBody Euphrosyne("Euphrosyne", 2000031, this->integParams.t0, 6.343280473648602e-15L/G, 0.0L, this->consts);
+        SpiceBody Interamnia("Interamnia", 2000704, this->integParams.t0, 5.256168678493662e-15L/G, 0.0L, this->consts);
+        SpiceBody Davida("Davida", 2000511, this->integParams.t0, 5.198126979457498e-15L/G, 0.0L, this->consts);
+        SpiceBody Eunomia("Eunomia", 2000015, this->integParams.t0, 4.678307418350905e-15L/G, 0.0L, this->consts);
+        SpiceBody Juno("Juno", 2000003, this->integParams.t0, 3.617538317147937e-15L/G, 0.0L, this->consts);
+        SpiceBody Psyche("Psyche", 2000016, this->integParams.t0, 3.411586826193812e-15L/G, 0.0L, this->consts);
+        SpiceBody Cybele("Cybele", 2000065, this->integParams.t0, 3.180659282652541e-15L/G, 0.0L, this->consts);
+        SpiceBody Thisbe("Thisbe", 2000088, this->integParams.t0, 2.577114127311047e-15L/G, 0.0L, this->consts);
+        SpiceBody Doris("Doris", 2000048, this->integParams.t0, 2.531091726015068e-15L/G, 0.0L, this->consts);
+        SpiceBody Europa("Europa", 2000052, this->integParams.t0, 2.476788101255867e-15L/G, 0.0L, this->consts);
+        SpiceBody Patientia("Patientia", 2000451, this->integParams.t0, 2.295559390637462e-15L/G, 0.0L, this->consts);
+        SpiceBody Sylvia("Sylvia", 2000087, this->integParams.t0, 2.199295173574073e-15L/G, 0.0L, this->consts);
+        add_spice_body(Ceres);
+        add_spice_body(Vesta);
+        add_spice_body(Pallas);
+        add_spice_body(Hygiea);
+        add_spice_body(Euphrosyne);
+        add_spice_body(Interamnia);
+        add_spice_body(Davida);
+        add_spice_body(Eunomia);
+        add_spice_body(Juno);
+        add_spice_body(Psyche);
+        add_spice_body(Cybele);
+        add_spice_body(Thisbe);
+        add_spice_body(Doris);
+        add_spice_body(Europa);
+        add_spice_body(Patientia);
+        add_spice_body(Sylvia);
+        break;
+    }
+    case 441:
+    {
+        real G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
+        // add planets and planetary bodies from DE441 header (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de441_tech-comments.txt)
+        SpiceBody Sun("Sun", 10, this->integParams.t0, 2.9591220828411956e-04L/G, 6.957e8L, this->consts);
+        SpiceBody MercuryBarycenter("Mercury Barycenter", 1, this->integParams.t0, 4.9125001948893182e-11L/G, 0.0L, this->consts);
+        SpiceBody VenusBarycenter("Venus Barycenter", 2, this->integParams.t0, 7.2434523326441187e-10L/G, 0.0L, this->consts);
+        SpiceBody Earth("Earth", 399, this->integParams.t0, 8.8876924467071022e-10L/G, 6378136.3L, this->consts);
+        SpiceBody Moon("Moon", 301, this->integParams.t0, 1.0931894624024351e-11L/G, 0.0L, this->consts);
+        SpiceBody MarsBarycenter("Mars Barycenter", 4, this->integParams.t0, 9.5495488297258119e-11L/G, 0.0L, this->consts);
+        SpiceBody JupiterBarycenter("Jupiter Barycenter", 5, this->integParams.t0, 2.8253458252257917e-07L/G, 0.0L, this->consts);
+        SpiceBody SaturnBarycenter("Saturn Barycenter", 6, this->integParams.t0, 8.4597059933762903e-08L/G, 0.0L, this->consts);
+        SpiceBody UranusBarycenter("Uranus Barycenter", 7, this->integParams.t0, 1.2920265649682399e-08L/G, 0.0L, this->consts);
+        SpiceBody NeptuneBarycenter("Neptune Barycenter", 8, this->integParams.t0, 1.5243573478851939e-08L/G, 0.0L, this->consts);
+        SpiceBody PlutoBarycenter("Pluto Barycenter", 9, this->integParams.t0, 2.1750964648933581e-12L/G, 0.0L, this->consts);
+        Sun.isPPN = true;
+        MercuryBarycenter.isPPN = true;
+        VenusBarycenter.isPPN = true;
+        Earth.isPPN = true;
+        Moon.isPPN = true;
+        MarsBarycenter.isPPN = true;
+        JupiterBarycenter.isPPN = true;
+        SaturnBarycenter.isPPN = true;
+        UranusBarycenter.isPPN = true;
+        NeptuneBarycenter.isPPN = true;
+        PlutoBarycenter.isPPN = true;
+        Sun.set_J2(2.1106088532726840e-7L, 7.25L*DEG2RAD); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
+        // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
+        // Earth.set_J2(0.00108262545L, EARTH_OBLIQUITY); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+        // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+        // JupiterBarycenter.set_J2(14736.0e-6L, 3.13L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+        // SaturnBarycenter.set_J2(16298.0e-6L, 26.73L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/saturnfact.html
+        // UranusBarycenter.set_J2(3343.43e-6L, 97.77L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/uranusfact.html
+        // NeptuneBarycenter.set_J2(3411.0e-6L, 28.32L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html
+        // PlutoBarycenter.set_J2(0.0L, 122.53L); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/plutofact.html
+        add_spice_body(Sun);
+        add_spice_body(MercuryBarycenter);
+        add_spice_body(VenusBarycenter);
+        add_spice_body(Earth);
+        add_spice_body(Moon);
+        add_spice_body(MarsBarycenter);
+        add_spice_body(JupiterBarycenter);
+        add_spice_body(SaturnBarycenter);
+        add_spice_body(UranusBarycenter);
+        add_spice_body(NeptuneBarycenter);
+        add_spice_body(PlutoBarycenter);
+
+        // add DE441 big16 asteroids from JPL SSD IOM 392R-21-005 (ftp://ssd.jpl.nasa.gov/pub/eph/small_bodies/asteroids_de441/SB441_IOM392R-21-005_perturbers.pdf)
+        SpiceBody Ceres("Ceres", 2000001, this->integParams.t0, 1.3964518123081070e-13L/G, 0.0L, this->consts);
+        SpiceBody Vesta("Vesta", 2000004, this->integParams.t0, 3.8548000225257904e-14L/G, 0.0L, this->consts);
+        SpiceBody Pallas("Pallas", 2000002, this->integParams.t0, 3.0471146330043200e-14L/G, 0.0L, this->consts);
+        SpiceBody Hygiea("Hygiea", 2000010, this->integParams.t0, 1.2542530761640810e-14L/G, 0.0L, this->consts);
+        SpiceBody Davida("Davida", 2000511, this->integParams.t0, 8.6836253492286545e-15L/G, 0.0L, this->consts);
+        SpiceBody Interamnia("Interamnia", 2000704, this->integParams.t0, 6.3110343420878887e-15L/G, 0.0L, this->consts);
+        SpiceBody Europa("Europa", 2000052, this->integParams.t0, 5.9824315264869841e-15L/G, 0.0L, this->consts);
+        SpiceBody Sylvia("Sylvia", 2000087, this->integParams.t0, 4.8345606546105521e-15L/G, 0.0L, this->consts);
+        SpiceBody Eunomia("Eunomia", 2000015, this->integParams.t0, 4.5107799051436795e-15L/G, 0.0L, this->consts);
+        SpiceBody Juno("Juno", 2000003, this->integParams.t0, 4.2823439677995011e-15L/G, 0.0L, this->consts);
+        SpiceBody Psyche("Psyche", 2000016, this->integParams.t0, 3.5445002842488978e-15L/G, 0.0L, this->consts);
+        SpiceBody Camilla("Camilla", 2000107, this->integParams.t0, 3.2191392075878588e-15L/G, 0.0L, this->consts);
+        SpiceBody Thisbe("Thisbe", 2000088, this->integParams.t0, 2.6529436610356353e-15L/G, 0.0L, this->consts);
+        SpiceBody Iris("Iris", 2000007, this->integParams.t0, 2.5416014973471498e-15L/G, 0.0L, this->consts);
+        SpiceBody Euphrosyne("Euphrosyne", 2000031, this->integParams.t0, 2.4067012218937576e-15L/G, 0.0L, this->consts);
+        SpiceBody Cybele("Cybele", 2000065, this->integParams.t0, 2.0917175955133682e-15L/G, 0.0L, this->consts);
+        add_spice_body(Ceres);
+        add_spice_body(Vesta);
+        add_spice_body(Pallas);
+        add_spice_body(Hygiea);
+        add_spice_body(Davida);
+        add_spice_body(Interamnia);
+        add_spice_body(Europa);
+        add_spice_body(Sylvia);
+        add_spice_body(Eunomia);
+        add_spice_body(Juno);
+        add_spice_body(Psyche);
+        add_spice_body(Camilla);
+        add_spice_body(Thisbe);
+        add_spice_body(Iris);
+        add_spice_body(Euphrosyne);
+        add_spice_body(Cybele);
+        break;
+    }
+    }
 };
+
+Simulation::Simulation(std::string name, const Simulation &simRef){
+    this->name = name;
+    this->integParams = simRef.integParams;
+    this->consts = simRef.consts;
+    this->integBodies = simRef.integBodies;
+    this->spiceBodies = simRef.spiceBodies;
+}
 
 void Simulation::add_spice_body(std::string name, int spiceId, real t0, real mass, real radius, Constants consts){
     // check if body already exists. if so, throw error
@@ -201,8 +378,7 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.JdMinusMjd = 2400000.5;
 };
 
-void Simulation::set_integration_parameters(real t0, real tf, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
-    this->integParams.t0 = t0;
+void Simulation::set_integration_parameters(real tf, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
     this->integParams.dt0 = dt0;
     this->integParams.dtMax = dtMax;
@@ -273,6 +449,7 @@ void Simulation::preprocess(){
 }
 
 void Simulation::extend(real tf){
-    this->set_integration_parameters(this->t, tf, this->integParams.adaptiveTimestep, this->integParams.dt0, this->integParams.dtMax, this->integParams.dtMin, this->integParams.dtChangeFactor, this->integParams.tolInteg, this->integParams.tolPC);
+    this->integParams.t0 = this->t;
+    this->integParams.tf = tf;
     this->integrate();
 }

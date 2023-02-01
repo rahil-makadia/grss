@@ -110,9 +110,9 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
                 dPosDotVel = dx*dvx + dy*dvy + dz*dvz;
                 dVelDotVel = dvx*dvx + dvy*dvy + dvz*dvz;
                 // 1st order PPN approximation, equation 4-61 from Moyer (2003), https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                ax += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - dVelDotVel)*dx + 2*(1+gamma)*dPosDotVel*dvx);
-                ay += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - dVelDotVel)*dy + 2*(1+gamma)*dPosDotVel*dvy);
-                az += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - dVelDotVel)*dz + 2*(1+gamma)*dPosDotVel*dvz);
+                ax += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dx + 2*(1+gamma)*dPosDotVel*dvx);
+                ay += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dy + 2*(1+gamma)*dPosDotVel*dvy);
+                az += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dz + 2*(1+gamma)*dPosDotVel*dvz);
             }
         }
         xDotInteg[6*i+3] += ax;
@@ -129,10 +129,12 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
     real radius;
     real ax, ay, az;
     real massJ;
-    std::vector< std::vector<real> > R1(3, std::vector<real>(3));;
-    std::vector< std::vector<real> > R2(3, std::vector<real>(3));;
-    std::vector< std::vector<real> > R(3, std::vector<real>(3));;
+    std::vector< std::vector<real> > R1(3, std::vector<real>(3));
+    std::vector< std::vector<real> > R2(3, std::vector<real>(3));
+    std::vector< std::vector<real> > R(3, std::vector<real>(3));
+    std::vector< std::vector<real> > Rinv(3, std::vector<real>(3));
     std::vector<real> dPosBody(3);
+    std::vector<real> aEquat(3);
     for (size_t i=0; i<integParams.nInteg; i++){
         x = posAll[3*i];
         y = posAll[3*i+1];
@@ -150,16 +152,21 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
                 rRel2 = rRel*rRel;
                 rRel5 = rRel2*rRel2*rRel;
                 radius = forceParams.radii[j];
-                rot_mat_x(EARTH_OBLIQUITY, R1); // equatorial to ecliptic
-                rot_mat_x(-forceParams.obliquityList[j], R2); // ecliptic to body equator
+                rot_mat_x(-EARTH_OBLIQUITY, R1); // equatorial to ecliptic
+                rot_mat_x(forceParams.obliquityList[j], R2); // ecliptic to body equator
                 mat_mat_mul(R1, R2, R); // equatorial to body equator
                 mat_vec_mul(R, {dx, dy, dz}, dPosBody);
                 dx = dPosBody[0];
                 dy = dPosBody[1];
                 dz = dPosBody[2];
-                ax -= 3*G*massJ*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dx/(2*rRel5);
-                ay -= 3*G*massJ*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dy/(2*rRel5);
-                az -= 3*G*massJ*forceParams.J2List[j]*radius*radius*(3-5*dz*dz/rRel2)*dz/(2*rRel5);
+                real axBody = 3*G*massJ*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dx/(2*rRel5);
+                real ayBody = 3*G*massJ*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dy/(2*rRel5);
+                real azBody = 3*G*massJ*forceParams.J2List[j]*radius*radius*(3-5*dz*dz/rRel2)*dz/(2*rRel5);
+                mat3_inv(R, Rinv);
+                mat_vec_mul(Rinv, {axBody, ayBody, azBody}, aEquat);
+                ax += aEquat[0];
+                ay += aEquat[1];
+                az += aEquat[2];
             }
         }
         xDotInteg[6*i+3] += ax;

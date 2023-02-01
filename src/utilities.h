@@ -62,14 +62,14 @@ struct IntegrationParameters{
 };
 
 struct NongravParams{
-    real a1;
-    real a2;
-    real a3;
-    real alpha;
-    real k;
-    real m;
-    real n;
-    real r0_au;
+    real a1 = 0.0L;
+    real a2 = 0.0L;
+    real a3 = 0.0L;
+    real alpha = 1.0L;
+    real k = 0.0L;
+    real m = 2.0L;
+    real n = 5.093L;
+    real r0_au = 1.0L;
 };
 
 void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state[6], double &lt);
@@ -103,11 +103,12 @@ void vabs_max(const std::vector<real> &v, real &max);
 
 void mat_vec_mul(const std::vector<std::vector<real>> &A, const std::vector<real> &v, std::vector<real> &Av);
 void mat_mat_mul(const std::vector<std::vector<real>> &A, const std::vector<std::vector<real>> &B, std::vector<std::vector<real>> &AB);
+void mat3_inv(const std::vector<std::vector<real>> &A, std::vector<std::vector<real>> &Ainv);
 void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
 
-void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-14L, const int &max_iter=100);
+void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-15L, const int &max_iter=100);
 void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G);
 void keplerian_to_cometary(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G);
 void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G);

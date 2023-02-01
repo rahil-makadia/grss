@@ -1,0 +1,17 @@
+LEAPSECONDS_KERNEL       = naif0012.tls
+SPK_KERNEL               = planets_big16_de441_1950_2350.bsp
+    LOG_FILE             = planets_big16_de441_1950_2350.log
+    SOURCE_SPK_KERNEL    = de441_part-1.bsp
+        INCLUDE_COMMENTS = yes
+        BEGIN_TIME       = 01 JAN 1950 00:00:00.000 TDB
+        END_TIME         = 01 JUL 1969 00:00:00.000 TDB
+    SOURCE_SPK_KERNEL    = de441_part-2.bsp
+        INCLUDE_COMMENTS = yes
+        BEGIN_TIME       = 01 JUL 1969 00:00:00.000 TDB
+        END_TIME         = 01 JAN 2350 00:00:00.000 TDB
+    SOURCE_SPK_KERNEL    = sb441-n16s.bsp
+        INCLUDE_COMMENTS = yes
+; semicolon means comment
+;        BODIES	         = 2000001, 2000015, 2000088, 2000002, 2000016, 2000107, 2000003, 2000031, 2000511, 2000004, 2000052, 2000704, 2000007, 2000065, 2000010, 2000087
+        BEGIN_TIME       = 01 JAN 1950 00:00:00.000 TDB
+        END_TIME         = 01 Jan 2350 00:00:00.000 TDB

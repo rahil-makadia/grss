@@ -199,35 +199,48 @@ void mat_mat_mul(const std::vector< std::vector<real> > &A, const std::vector< s
     }
 };
 
+void mat3_inv(const std::vector<std::vector<real>> &A, std::vector<std::vector<real>> &Ainv){
+    real det = A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0]) + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
+    Ainv[0][0] = (A[1][1]*A[2][2]-A[1][2]*A[2][1])/det;
+    Ainv[0][1] = (A[0][2]*A[2][1]-A[0][1]*A[2][2])/det;
+    Ainv[0][2] = (A[0][1]*A[1][2]-A[0][2]*A[1][1])/det;
+    Ainv[1][0] = (A[1][2]*A[2][0]-A[1][0]*A[2][2])/det;
+    Ainv[1][1] = (A[0][0]*A[2][2]-A[0][2]*A[2][0])/det;
+    Ainv[1][2] = (A[0][2]*A[1][0]-A[0][0]*A[1][2])/det;
+    Ainv[2][0] = (A[1][0]*A[2][1]-A[1][1]*A[2][0])/det;
+    Ainv[2][1] = (A[0][1]*A[2][0]-A[0][0]*A[2][1])/det;
+    Ainv[2][2] = (A[0][0]*A[1][1]-A[0][1]*A[1][0])/det;
+};
+
 void rot_mat_x(const real &theta, std::vector< std::vector<real> > &R){
     R[0][0] = 1;
     R[0][1] = 0;
     R[0][2] = 0;
     R[1][0] = 0;
     R[1][1] = cos(theta);
-    R[1][2] = sin(theta);
+    R[1][2] = -sin(theta);
     R[2][0] = 0;
-    R[2][1] = -sin(theta);
+    R[2][1] = sin(theta);
     R[2][2] = cos(theta);
 };
 
 void rot_mat_y(const real &theta, std::vector< std::vector<real> > &R){
     R[0][0] = cos(theta);
     R[0][1] = 0;
-    R[0][2] = -sin(theta);
+    R[0][2] = sin(theta);
     R[1][0] = 0;
     R[1][1] = 1;
     R[1][2] = 0;
-    R[2][0] = sin(theta);
+    R[2][0] = -sin(theta);
     R[2][1] = 0;
     R[2][2] = cos(theta);
 };
 
 void rot_mat_z(const real &theta, std::vector< std::vector<real> > &R){
     R[0][0] = cos(theta);
-    R[0][1] = sin(theta);
+    R[0][1] = -sin(theta);
     R[0][2] = 0;
-    R[1][0] = -sin(theta);
+    R[1][0] = sin(theta);
     R[1][1] = cos(theta);
     R[1][2] = 0;
     R[2][0] = 0;
@@ -252,7 +265,7 @@ void kepler_solve(const real &M, const real &e, real &E, const real &tol, const 
         iter++;
     }
     if (iter == max_iter){
-        std::cout << "WARNING: kepler_solve did not converge in " << max_iter << " iter" << std::endl;
+        std::cout << "utilities.cpp: WARNING: kepler_solve did not converge in " << max_iter << " iterations!!!" << std::endl;
     }
     // std::cout << "iter: " << iter << std::endl;
     // std::cout << "E: " << E*RAD2DEG << std::endl;
@@ -270,7 +283,7 @@ void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometa
     real nu = 2*atan2(tan(E/2)*sqrt(1+cometaryState[0]), sqrt(1-cometaryState[0]));
     wrap_to_2pi(nu);
 
-    keplerianState = {a, cometaryState[0], cometaryState[3], cometaryState[4], cometaryState[5], nu};
+    keplerianState = {a, cometaryState[0], cometaryState[5], cometaryState[3], cometaryState[4], nu};
 };
 
 void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G){
@@ -283,7 +296,7 @@ void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &kepler
     real n = sqrt(GM/pow(a, 3.0L));
     real T0 = epochMjD-(M/n);
 
-    cometaryState = {e, a*(1-e), T0, keplerianState[2], keplerianState[3], keplerianState[4]};
+    cometaryState = {e, a*(1-e), T0, keplerianState[3], keplerianState[4], keplerianState[2]};
 };
 
 void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G){
@@ -311,9 +324,9 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector
     std::vector<real> r_final(3);
     std::vector<real> v_final(3);
 
-    rot_mat_z(-Omega, R1);
-    rot_mat_x(-i, R2);
-    rot_mat_z(-omega, R3);
+    rot_mat_z(Omega, R1);
+    rot_mat_x(i, R2);
+    rot_mat_z(omega, R3);
     mat_mat_mul(R1, R2, RTemp);
     mat_mat_mul(RTemp, R3, R);
 
