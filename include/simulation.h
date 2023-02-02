@@ -3,7 +3,7 @@
 
 #include "force.h"
 
-class Body{
+struct Body{
     private:
 
     public:

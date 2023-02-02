@@ -37,7 +37,7 @@ using std::atan2;
 #define EARTH_OBLIQUITY 84381.448/3600.0*DEG2RAD
 
 struct Constants{
-    real du2m=149597870700.0L; // default au to m
+    real du2m = 149597870700.0L; // default au to m
     real tu2sec = 86400.0; // default day to sec
     real G = 6.6743e-11L/(du2m*du2m*du2m)*tu2sec*tu2sec; // default kg au^3 / day^2
     real clight = 299792458.0L/du2m*tu2sec; // default au/day
@@ -101,12 +101,12 @@ void vcmul(const std::vector<real> &v, const real &c, std::vector<real> &vc);
 void vvmul(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &v3);
 void vabs_max(const std::vector<real> &v, real &max);
 
-void mat_vec_mul(const std::vector<std::vector<real>> &A, const std::vector<real> &v, std::vector<real> &Av);
-void mat_mat_mul(const std::vector<std::vector<real>> &A, const std::vector<std::vector<real>> &B, std::vector<std::vector<real>> &AB);
-void mat3_inv(const std::vector<std::vector<real>> &A, std::vector<std::vector<real>> &Ainv);
-void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R);
-void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
-void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
+void mat_vec_mul(const std::vector<std::vector<real> > &A, const std::vector<real> &v, std::vector<real> &Av);
+void mat_mat_mul(const std::vector<std::vector<real> > &A, const std::vector<std::vector<real> > &B, std::vector<std::vector<real> > &AB);
+void mat3_inv(const std::vector<std::vector<real> > &A, std::vector<std::vector<real> > &Ainv);
+void rot_mat_x(const real &theta, std::vector<std::vector<real> > &R);
+void rot_mat_y(const real &theta, std::vector<std::vector<real> > &R);
+void rot_mat_z(const real &theta, std::vector<std::vector<real> > &R);
 
 void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-15L, const int &max_iter=100);
 void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G);

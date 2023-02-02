@@ -276,7 +276,7 @@ Simulation::Simulation(std::string name, real t0, const int defaultSpiceBodies){
         break;
     }
     }
-};
+}
 
 Simulation::Simulation(std::string name, const Simulation &simRef){
     this->name = name;
@@ -297,7 +297,7 @@ void Simulation::add_spice_body(std::string name, int spiceId, real t0, real mas
     this->spiceBodies.push_back(body);
     this->integParams.nSpice++;
     this->integParams.nTotal++;
-};
+}
 
 void Simulation::add_spice_body(SpiceBody body){
     // check if body already exists. if so, throw error
@@ -309,7 +309,7 @@ void Simulation::add_spice_body(SpiceBody body){
     this->spiceBodies.push_back(body);
     this->integParams.nSpice++;
     this->integParams.nTotal++;
-};
+}
 
 void Simulation::add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts){
     // check if body already exists. if so, throw error
@@ -322,7 +322,7 @@ void Simulation::add_integ_body(std::string name, real t0, real mass, real radiu
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
-};
+}
 
 void Simulation::add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts){
     // check if body already exists. if so, throw error
@@ -335,7 +335,7 @@ void Simulation::add_integ_body(std::string name, real t0, real mass, real radiu
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
-};
+}
 
 void Simulation::add_integ_body(IntegBody body){
     // check if body already exists. if so, throw error
@@ -347,7 +347,7 @@ void Simulation::add_integ_body(IntegBody body){
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
-};
+}
 
 void Simulation::remove_body(std::string name){
     for (size_t i=0; i<this->spiceBodies.size(); i++){
@@ -367,7 +367,7 @@ void Simulation::remove_body(std::string name){
         }
     }
     std::cout << "Error: Body " << name << " not found." << std::endl;
-};
+}
 
 void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.du2m = du2m;
@@ -376,7 +376,7 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.clight = clight;
     this->consts.j2000Jd = 2451545.0;
     this->consts.JdMinusMjd = 2400000.5;
-};
+}
 
 void Simulation::set_integration_parameters(real tf, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
@@ -387,7 +387,7 @@ void Simulation::set_integration_parameters(real tf, bool adaptiveTimestep, real
     this->integParams.adaptiveTimestep = adaptiveTimestep;
     this->integParams.tolPC = tolPC;
     this->integParams.tolInteg = tolInteg;
-};
+}
 
 std::vector<real> Simulation::get_sim_constants(){
     // std::cout << "The conversion from distance units to meters is: " << consts.du2m << std::endl;
@@ -399,7 +399,7 @@ std::vector<real> Simulation::get_sim_constants(){
 
     std::vector<real> constants = {this->consts.du2m, this->consts.tu2sec, this->consts.G, this->consts.clight, this->consts.j2000Jd, this->consts.JdMinusMjd};
     return constants;
-};
+}
 
 std::vector<real> Simulation::get_integration_parameters(){
     // std::cout << "The number of integrated bodies is: " << integParams.nInteg << std::endl;
@@ -416,7 +416,7 @@ std::vector<real> Simulation::get_integration_parameters(){
 
     std::vector<real> integration_parameters = {(real) this->integParams.nInteg, (real) this->integParams.nSpice, (real) this->integParams.nTotal, this->integParams.t0, this->integParams.tf, (real) this->integParams.adaptiveTimestep, this->integParams.dt0, this->integParams.dtMax, this->integParams.dtMin, this->integParams.dtChangeFactor, this->integParams.tolInteg, this->integParams.tolPC};
     return integration_parameters;
-};
+}
 
 void Simulation::preprocess(){
     this->t = this->integParams.t0;

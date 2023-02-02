@@ -16,73 +16,73 @@ void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state
     for (int i=3; i<6; i++){
         state[i] *= consts.tu2sec;
     }
-};
+}
 
 void jd_to_et(const real jd, real &et){
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     et = (jd-j2000)*day2sec;
-};
+}
 
 // real jd_to_et(const real jd){
 //     real j2000 = 2451545.0;
 //     real day2sec = 86400.0;
 //     return (jd-j2000)*day2sec;
-// };
+// }
 
 void jd_to_mjd(const real jd, real &mjd){
     real offset = 2400000.5;
     mjd = jd-offset;
-};
+}
 
 // real jd_to_mjd(const real jd){
 //     real offset = 2400000.5;
 //     return jd-offset;
-// };
+// }
 
 void et_to_jd(const real et, real &jd){
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     jd = (et/day2sec)+j2000;
-};
+}
 
 // real et_to_jd(const real et){
 //     real j2000 = 2451545.0;
 //     real day2sec = 86400.0;
 //     return (et/day2sec)+j2000;
-// };
+// }
 
 void et_to_mjd(const real et, real &mjd){
     real offset = 2400000.5;
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     mjd = (et/day2sec)-offset+j2000;
-};
+}
 
 // real et_to_mjd(const real et){
 //     real offset = 2400000.5;
 //     real j2000 = 2451545.0;
 //     real day2sec = 86400.0;
 //     return (et/day2sec)-offset+j2000;
-// };
+// }
 
 void mjd_to_jd(const real mjd, real &jd){
     real offset = 2400000.5;
     jd = mjd+offset;
-};
+}
 
 // real mjd_to_jd(const real mjd){
 //     real offset = 2400000.5;
 //     real jd = mjd+offset;
 //     return jd;
-// };
+// }
 
 void mjd_to_et(const real mjd, real &et){
     real offset = 2400000.5;
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     et = (mjd+offset-j2000)*day2sec;
-};
+}
 
 // real mjd_to_et(const real mjd){
 //     real offset = 2400000.5;
@@ -90,7 +90,7 @@ void mjd_to_et(const real mjd, real &et){
 //     real day2sec = 86400.0;
 //     real et = (mjd+offset-j2000)*day2sec;
 //     return et;
-// };
+// }
 
 void wrap_to_2pi(real &angle){
     if (angle < 0){
@@ -99,30 +99,30 @@ void wrap_to_2pi(real &angle){
     else if (angle > 2*PI){
         angle -= 2*PI;
     }
-};
+}
 
 void rad_to_deg(const real &rad, real &deg){
     deg = rad*180.0/PI;
-};
+}
 
 // real rad_to_deg(const real rad){
 //     return rad*180.0/PI;
-// };
+// }
 
 void deg_to_rad(const real &deg, real &rad){
     rad = deg*PI/180.0;
-};
+}
 
 // real deg_to_rad(const real deg){
 //     return deg*PI/180.0;
-// };
+// }
 
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot){
     dot = 0;
     for (size_t i=0; i<v1.size(); i++){
         dot += v1[i]*v2[i];
     }
-};
+}
 
 void vnorm(const std::vector<real> &v, real &norm){
     norm = 0;
@@ -130,7 +130,7 @@ void vnorm(const std::vector<real> &v, real &norm){
         norm += v[i]*v[i];
     }
     norm = sqrt(norm);
-};
+}
 
 void vunit(const std::vector<real> &v, std::vector<real> &vunit){
     real norm;
@@ -138,37 +138,37 @@ void vunit(const std::vector<real> &v, std::vector<real> &vunit){
     for (size_t i=0; i<v.size(); i++){
         vunit[i] = v[i]/norm;
     }
-};
+}
 
 void vcross(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &v3){
     v3[0] = v1[1]*v2[2]-v1[2]*v2[1];
     v3[1] = v1[2]*v2[0]-v1[0]*v2[2];
     v3[2] = v1[0]*v2[1]-v1[1]*v2[0];
-};
+}
 
 void vadd(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &v3){
     for (size_t i=0; i<v1.size(); i++){
         v3[i] = v1[i]+v2[i];
     }
-};
+}
 
 void vsub(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &v3){
     for (size_t i=0; i<v1.size(); i++){
         v3[i] = v1[i]-v2[i];
     }
-};
+}
 
 void vcmul(const std::vector<real> &v, const real &c, std::vector<real> &vc){
     for (size_t i=0; i<v.size(); i++){
         vc[i] = c*v[i];
     }
-};
+}
 
 void vvmul(const std::vector<real> &v1, const std::vector<real> &v2, std::vector<real> &v3){
     for (size_t i=0; i<v1.size(); i++){
         v3[i] = v1[i]*v2[i];
     }
-};
+}
 
 void vabs_max(const std::vector<real> &v, real &max){
     max = -1.0e300L;
@@ -177,7 +177,7 @@ void vabs_max(const std::vector<real> &v, real &max){
             max = fabs(v[i]);
         }
     }
-};
+}
 
 void mat_vec_mul(const std::vector< std::vector<real> > &A, const std::vector<real> &v, std::vector<real> &Av){
     for (size_t i=0; i<A.size(); i++){
@@ -186,7 +186,7 @@ void mat_vec_mul(const std::vector< std::vector<real> > &A, const std::vector<re
             Av[i] += A[i][j]*v[j];
         }
     }
-};
+}
 
 void mat_mat_mul(const std::vector< std::vector<real> > &A, const std::vector< std::vector<real> > &B, std::vector< std::vector<real> > &AB){
     for (size_t i=0; i<A.size(); i++){
@@ -197,7 +197,7 @@ void mat_mat_mul(const std::vector< std::vector<real> > &A, const std::vector< s
             }
         }
     }
-};
+}
 
 void mat3_inv(const std::vector<std::vector<real>> &A, std::vector<std::vector<real>> &Ainv){
     real det = A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0]) + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
@@ -210,7 +210,7 @@ void mat3_inv(const std::vector<std::vector<real>> &A, std::vector<std::vector<r
     Ainv[2][0] = (A[1][0]*A[2][1]-A[1][1]*A[2][0])/det;
     Ainv[2][1] = (A[0][1]*A[2][0]-A[0][0]*A[2][1])/det;
     Ainv[2][2] = (A[0][0]*A[1][1]-A[0][1]*A[1][0])/det;
-};
+}
 
 void rot_mat_x(const real &theta, std::vector< std::vector<real> > &R){
     R[0][0] = 1;
@@ -222,7 +222,7 @@ void rot_mat_x(const real &theta, std::vector< std::vector<real> > &R){
     R[2][0] = 0;
     R[2][1] = sin(theta);
     R[2][2] = cos(theta);
-};
+}
 
 void rot_mat_y(const real &theta, std::vector< std::vector<real> > &R){
     R[0][0] = cos(theta);
@@ -234,7 +234,7 @@ void rot_mat_y(const real &theta, std::vector< std::vector<real> > &R){
     R[2][0] = -sin(theta);
     R[2][1] = 0;
     R[2][2] = cos(theta);
-};
+}
 
 void rot_mat_z(const real &theta, std::vector< std::vector<real> > &R){
     R[0][0] = cos(theta);
@@ -246,7 +246,7 @@ void rot_mat_z(const real &theta, std::vector< std::vector<real> > &R){
     R[2][0] = 0;
     R[2][1] = 0;
     R[2][2] = 1;
-};
+}
 
 void kepler_solve(const real &M, const real &e, real &E, const real &tol, const int &max_iter){
     if (e < 0.8){
@@ -270,7 +270,7 @@ void kepler_solve(const real &M, const real &e, real &E, const real &tol, const 
     // std::cout << "iter: " << iter << std::endl;
     // std::cout << "E: " << E*RAD2DEG << std::endl;
     // std::cout << "M: " << M*RAD2DEG << std::endl;
-};
+}
 
 void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G){
     real GM = G*1.988409871316534e30; // sun mass from horizons
@@ -284,7 +284,7 @@ void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometa
     wrap_to_2pi(nu);
 
     keplerianState = {a, cometaryState[0], cometaryState[5], cometaryState[3], cometaryState[4], nu};
-};
+}
 
 void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G){
     real GM = G*1.988409871316534e30; // sun mass from horizons
@@ -297,7 +297,7 @@ void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &kepler
     real T0 = epochMjD-(M/n);
 
     cometaryState = {e, a*(1-e), T0, keplerianState[3], keplerianState[4], keplerianState[2]};
-};
+}
 
 void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G){
     real GM = G*1.988409871316534e30; // sun mass from horizons
@@ -341,7 +341,7 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector
     mat_vec_mul(R, r_temp, r_final);
     mat_vec_mul(R, v_temp, v_final);
     cartesianState = {r_final[0], r_final[1], r_final[2], v_final[0], v_final[1], v_final[2]};
-};
+}
 
 void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G){
     real GM = G*1.988409871316534e30; // sun mass from horizons
@@ -405,16 +405,16 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector
     keplerianState[3] = Omega;
     keplerianState[4] = omega;
     keplerianState[5] = nu;
-};
+}
 
 void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real G){
     std::vector<real> keplerianState(6);
     cometary_to_keplerian(epochMjd, cometaryState, keplerianState, G);
     keplerian_to_cartesian(keplerianState, cartesianState, G);
-};
+}
 
 void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real G){
     std::vector<real> keplerianState(6);
     cartesian_to_keplerian(cartesianState, keplerianState, G);
     keplerian_to_cometary(epochMjd, keplerianState, cometaryState, G);
-};
+}

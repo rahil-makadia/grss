@@ -37,7 +37,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
         accInteg[3*i+2] = xDotInteg[6*i+5];
     }
     return accInteg;
-};
+}
 
 void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
@@ -70,7 +70,7 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
         xDotInteg[6*i+4] += ay;
         xDotInteg[6*i+5] += az;
     }
-};
+}
 
 void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
@@ -119,7 +119,7 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
         xDotInteg[6*i+4] += ay;
         xDotInteg[6*i+5] += az;
     }
-};
+}
 
 void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
@@ -173,7 +173,7 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
         xDotInteg[6*i+4] += ay;
         xDotInteg[6*i+5] += az;
     }
-};
+}
 
 void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real a1, a2, a3;
@@ -230,4 +230,4 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
         xDotInteg[6*i+4] += ay;
         xDotInteg[6*i+5] += az;
     }
-};
+}
