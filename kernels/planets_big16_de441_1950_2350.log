@@ -1,0 +1,29 @@
+; planets_big16_de441_1950_2350.bsp LOG FILE
+ 
+; Created 2022-04-18/19:10:51.98.
+;
+; BEGIN SPKMERGE COMMANDS
+ 
+LEAPSECONDS_KERNEL   = naif0012.tls
+ 
+SPK_KERNEL           = planets_big16_de441_1950_2350.bsp
+  LOG_FILE           = planets_big16_de441_1950_2350.log
+  SOURCE_SPK_KERNEL  = de441_part-1.bsp
+    INCLUDE_COMMENTS = YES
+    BODIES           = 299, 199, 399, 301, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+    BEGIN_TIME       = 1949 DEC 31 23:59:18.816
+    END_TIME         = 1969 JUN 30 23:59:18.816
+  SOURCE_SPK_KERNEL  = de441_part-2.bsp
+    INCLUDE_COMMENTS = YES
+    BODIES           = 299, 199, 399, 301, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+    BEGIN_TIME       = 1969 JUN 30 23:59:18.816
+    END_TIME         = 2349 DEC 31 23:58:50.816
+  SOURCE_SPK_KERNEL  = sb441-n16s.bsp
+    INCLUDE_COMMENTS = YES
+    BODIES           = 2000065, 2000031, 2000007, 2000088, 2000107, 2000016,
+                       2000003, 2000015, 2000087, 2000052, 2000704, 2000511,
+                       2000010, 2000002, 2000004, 2000001
+    BEGIN_TIME       = 1949 DEC 31 23:59:18.816
+    END_TIME         = 2349 DEC 31 23:58:50.816
+ 
+; END SPKMERGE COMMANDS

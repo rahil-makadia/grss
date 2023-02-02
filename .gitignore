@@ -190,3 +190,9 @@ cython_debug/
 
 # cspice library in the external directory
 extern/cspice
+
+# custom portable spice kernels and their log files
+!planets_big16_de431_1950_2350.bsp
+!planets_big16_de441_1950_2350.bsp
+!planets_big16_de431_1950_2350.log
+!planets_big16_de441_1950_2350.log
