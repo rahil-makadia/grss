@@ -97,8 +97,8 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
         ay = 0.0;
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
-            if (i != j && forceParams.isPPNList[j]){
-                massJ = forceParams.masses[j];
+            massJ = forceParams.masses[j];
+            if (i != j && massJ != 0.0 && forceParams.isPPNList[j]){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];
@@ -143,8 +143,8 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
         ay = 0.0;
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
-            if (i != j && forceParams.isJ2List[j]){
-                massJ = forceParams.masses[j];
+            massJ = forceParams.masses[j];
+            if (i != j && massJ != 0.0 && forceParams.isJ2List[j]){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];

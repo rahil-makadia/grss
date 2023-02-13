@@ -40,5 +40,4 @@ include(CPack)
 # create pybind11 module
 pybind11_add_module(${PROJECT_NAME}_py src/${PROJECT_NAME}.cpp)
 target_link_libraries(${PROJECT_NAME}_py PRIVATE ${PROJECT_NAME})
-# EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a define (VERSION_INFO) here.
 target_compile_definitions(${PROJECT_NAME}_py PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})

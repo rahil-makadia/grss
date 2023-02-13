@@ -54,17 +54,17 @@ PYBIND11_MODULE(grss_py, m) {
         .def_readwrite("r0_au", &NongravParamaters::r0_au);
 
     // // from force.h
-    // py::class_<ForceParameters>(m, "ForceParameters")
-    //     .def(py::init<>())
-    //     .def_readwrite("masses", &ForceParameters::masses)
-    //     .def_readwrite("radii", &ForceParameters::radii)
-    //     .def_readwrite("spiceIdList", &ForceParameters::spiceIdList)
-    //     .def_readwrite("ngParamsList", &ForceParameters::ngParamsList)
-    //     .def_readwrite("isPPNList", &ForceParameters::isPPNList)
-    //     .def_readwrite("isJ2List", &ForceParameters::isJ2List)
-    //     .def_readwrite("J2List", &ForceParameters::J2List)
-    //     .def_readwrite("obliquityList", &ForceParameters::obliquityList)
-    //     .def_readwrite("isNongravList", &ForceParameters::isNongravList);
+    py::class_<ForceParameters>(m, "ForceParameters")
+        .def(py::init<>())
+        .def_readwrite("masses", &ForceParameters::masses)
+        .def_readwrite("radii", &ForceParameters::radii)
+        .def_readwrite("spiceIdList", &ForceParameters::spiceIdList)
+        .def_readwrite("ngParamsList", &ForceParameters::ngParamsList)
+        .def_readwrite("isPPNList", &ForceParameters::isPPNList)
+        .def_readwrite("isJ2List", &ForceParameters::isJ2List)
+        .def_readwrite("J2List", &ForceParameters::J2List)
+        .def_readwrite("obliquityList", &ForceParameters::obliquityList)
+        .def_readwrite("isNongravList", &ForceParameters::isNongravList);
 
     // from simulation.h
     py::class_<Body>(m, "Body")
@@ -80,23 +80,23 @@ PYBIND11_MODULE(grss_py, m) {
         .def_readwrite("isPPN", &Body::isPPN)
         .def_readwrite("isJ2", &Body::isJ2)
         .def_readwrite("isNongrav", &Body::isNongrav)
-        .def("set_J2", &Body::set_J2);
+        .def("set_J2", &Body::set_J2, py::arg("J2"), py::arg("obliquityToEcliptic"));
 
     py::class_<SpiceBody, Body>(m, "SpiceBody")
-        .def(py::init<std::string, std::string, int, real, real, real, Constants>())
+        .def(py::init<std::string, std::string, int, real, real, real, Constants>(), py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("constants"))
         .def_readwrite("spiceId", &SpiceBody::spiceId)
         .def_readwrite("isSpice", &SpiceBody::isSpice);
 
     py::class_<IntegBody, Body>(m, "IntegBody")
-        .def(py::init<std::string, std::string, real, real, real, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants>())
-        .def(py::init<std::string, real, real, real, std::vector<real>, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants>())
+        .def(py::init<std::string, std::string, real, real, real, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants>(), py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("cometaryState"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
+        .def(py::init<std::string, real, real, real, std::vector<real>, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants>(), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("pos"), py::arg("vel"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
         .def_readwrite("isInteg", &IntegBody::isInteg)
         .def_readwrite("covariance", &IntegBody::covariance)
         .def_readwrite("ngParams", &IntegBody::ngParams);
 
     py::class_<Simulation>(m, "Simulation")
-        .def(py::init<std::string, real, const int, std::string>())
-        .def(py::init<std::string, const Simulation&>())
+        .def(py::init<std::string, real, const int, std::string>(), py::arg("name"), py::arg("t0"), py::arg("defaultSpiceBodies"), py::arg("DEkernelPath"))
+        .def(py::init<std::string, const Simulation&>(), py::arg("name"), py::arg("simRef"))
         .def_readwrite("name", &Simulation::name)
         .def_readwrite("DEkernelPath", &Simulation::DEkernelPath)
         .def_readwrite("consts", &Simulation::consts)
@@ -108,19 +108,19 @@ PYBIND11_MODULE(grss_py, m) {
         .def_readwrite("forceParams", &Simulation::forceParams)
         .def_readwrite("tEval", &Simulation::tEval)
         .def_readwrite("xIntegEval", &Simulation::xIntegEval)
-        .def("add_spice_body", static_cast<void (Simulation::*)(std::string, std::string, int, real, real, real, Constants)>(&Simulation::add_spice_body))
-        .def("add_spice_body", static_cast<void (Simulation::*)(SpiceBody)>(&Simulation::add_spice_body))
-        .def("add_integ_body", static_cast<void (Simulation::*)(std::string, std::string, real, real, real, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants)>(&Simulation::add_integ_body))
-        .def("add_integ_body", static_cast<void (Simulation::*)(std::string, real, real, real, std::vector<real>, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants)>(&Simulation::add_integ_body))
-        .def("add_integ_body", static_cast<void (Simulation::*)(IntegBody)>(&Simulation::add_integ_body))
-        .def("remove_body", &Simulation::remove_body)
+        .def("add_spice_body", static_cast<void (Simulation::*)(std::string, std::string, int, real, real, real, Constants)>(&Simulation::add_spice_body), py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("constants"))
+        .def("add_spice_body", static_cast<void (Simulation::*)(SpiceBody)>(&Simulation::add_spice_body), py::arg("body"))
+        .def("add_integ_body", static_cast<void (Simulation::*)(std::string, std::string, real, real, real, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants)>(&Simulation::add_integ_body), py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("cometaryState"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
+        .def("add_integ_body", static_cast<void (Simulation::*)(std::string, real, real, real, std::vector<real>, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants)>(&Simulation::add_integ_body), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("pos"), py::arg("vel"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
+        .def("add_integ_body", static_cast<void (Simulation::*)(IntegBody)>(&Simulation::add_integ_body), py::arg("body"))
+        .def("remove_body", &Simulation::remove_body, py::arg("name"))
         .def("set_sim_constants", &Simulation::set_sim_constants, py::arg("du2m")=149597870700.0L, py::arg("tu2sec")=86400.0L, py::arg("G")=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, py::arg("clight")=299792458.0L/149597870700.0L*86400.0L)
         .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
         .def("get_sim_constants", &Simulation::get_sim_constants)
         .def("get_integration_parameters", &Simulation::get_integration_parameters)
         .def("preprocess", &Simulation::preprocess)
         .def("integrate", &Simulation::integrate)
-        .def("extend", &Simulation::extend);
+        .def("extend", &Simulation::extend, py::arg("tf"));
 
     #ifdef VERSION_INFO
         m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
@@ -128,5 +128,3 @@ PYBIND11_MODULE(grss_py, m) {
         m.attr("__version__") = "dev";
     #endif
 }
-
-// c++ -O3 -Wall -shared -std=c++11 -undefined dynamic_lookup -I ../extern/pybind11/include -I /Users/rahil/miniconda3/envs/grss/include/python3.10 $(python3-config --includes -I ../extern/pybind11/include) ../src/wrap.cpp -o grss_py2$(python3-config --extension-suffix)

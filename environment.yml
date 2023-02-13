@@ -1,0 +1,14 @@
+name: grss
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - astropy
+  - astroquery
+  - healpy
+  - ipykernel
+  - jupyter
+  - matplotlib
+  - numpy
+  - pandas
+  - python=3.10
