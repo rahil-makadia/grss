@@ -6,7 +6,7 @@ struct ForceParameters{
     std::vector<real> masses;
     std::vector<real> radii;
     std::vector<int> spiceIdList;
-    std::vector<NongravParams> ngParamsList;
+    std::vector<NongravParamaters> ngParamsList;
     std::vector<bool> isPPNList;
     std::vector<bool> isJ2List;
     std::vector<real> J2List;

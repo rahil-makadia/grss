@@ -28,7 +28,7 @@ class SpiceBody: public Body{
         int spiceId;
         bool isSpice=true;
         // constructor
-        SpiceBody(std::string name, int spiceID, real t0, real mass, real radius, Constants consts);
+        SpiceBody(std::string DEkernelPath, std::string name, int spiceID, real t0, real mass, real radius, Constants consts);
 
 };
 
@@ -38,10 +38,10 @@ class IntegBody: public Body{
     public:
         bool isInteg=true;
         std::vector< std::vector<real> > covariance;
-        NongravParams ngParams;
+        NongravParamaters ngParams;
         // constructors
-        IntegBody(std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts);
-        IntegBody(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts);
+        IntegBody(std::string DEkernelPath, std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
+        IntegBody(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
 
 };
 
@@ -50,10 +50,11 @@ class Simulation
     private:
 
     public:
-        // name
+        // name and path to DE kernels
         std::string name;
+        std::string DEkernelPath;
         // constructor and copy constructor
-        Simulation(std::string name, real t0, const int defaultSpiceBodies=0);
+        Simulation(std::string name, real t0, const int defaultSpiceBodies, std::string DEkernelPath);
         Simulation(std::string name, const Simulation &simRef);
 
         // constants
@@ -76,10 +77,10 @@ class Simulation
         std::vector< std::vector<real> > xIntegEval;
 
         // add and remove bodies
-        void add_spice_body(std::string name, int spiceID, real t0, real mass, real radius, Constants consts);
+        void add_spice_body(std::string DEkernelPath, std::string name, int spiceID, real t0, real mass, real radius, Constants consts);
         void add_spice_body(SpiceBody body);
-        void add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts);
-        void add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParams ngParams, Constants consts);
+        void add_integ_body(std::string DEkernelPath, std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
+        void add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
         void add_integ_body(IntegBody body);
         void remove_body(std::string name);
 

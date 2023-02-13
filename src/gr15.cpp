@@ -209,6 +209,7 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     Constants &consts = sim.consts;
 
     real dt = get_initial_timestep(t, xInteg0, forceParams, integParams, consts);
+    integParams.timestepCounter = 0;
     std::vector<real> accInteg0 = get_state_der(t, xInteg0, forceParams, integParams, consts);
     if (dt > 0){
         std::sort(sim.tEval.begin(), sim.tEval.end()); // sort sim.tEval into ascending order

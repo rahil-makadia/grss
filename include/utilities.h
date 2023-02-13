@@ -61,7 +61,7 @@ struct IntegrationParameters{
     real tolInteg;
 };
 
-struct NongravParams{
+struct NongravParamaters{
     real a1 = 0.0L;
     real a2 = 0.0L;
     real a3 = 0.0L;

@@ -8,7 +8,8 @@ void Simulation::integrate(){
     if (this->integParams.nInteg < 1){
         throw std::runtime_error("\n\ngrss.h: ERROR: There are no integration bodies in the simulation. Need at least one body with a full state vector to integrate.\n");
     }
-
+    furnsh_c(this->DEkernelPath.c_str());
     gr15(this->t, this->xInteg, *this);
+    unload_c(this->DEkernelPath.c_str());
 }
 #endif
