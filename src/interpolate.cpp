@@ -24,21 +24,29 @@ void interpolate(const real &tNext, const std::vector<real> &tVecForInterp, cons
     }
 
     static size_t interpIdx = 0;
-    if (tVecForInterp[0] == sim.integParams.t0){
+    if (interpIdx == sim.tEval.size()){
         interpIdx = 0;
     }
     bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[tLen-1];
     bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[tLen-1];
-    while ( (forwardIntegrate && (sim.tEval[interpIdx] == tVecForInterp[0] || (sim.tEval[interpIdx] > tVecForInterp[0] && sim.tEval[interpIdx] <= tNext)))
-            || (backwardIntegrate && (sim.tEval[interpIdx] == tVecForInterp[0] || (sim.tEval[interpIdx] < tVecForInterp[0] && sim.tEval[interpIdx] >= tNext))) ){
-        real tInterp = sim.tEval[interpIdx];
+    while ( interpIdx < sim.tEval.size()
+            &&( (forwardIntegrate && (sim.tEval[interpIdx] == tVecForInterp[0] || (sim.tEval[interpIdx] > tVecForInterp[0] && sim.tEval[interpIdx] <= tNext)))
+            ||  (forwardIntegrate && sim.tEval[interpIdx] <= sim.integParams.t0 && sim.tEval[interpIdx]+sim.tEvalMargin >= sim.integParams.t0) || (forwardIntegrate && sim.tEval[interpIdx] >= sim.integParams.tf && sim.tEval[interpIdx]-sim.tEvalMargin <= sim.integParams.tf)
+            ||  (backwardIntegrate && (sim.tEval[interpIdx] == tVecForInterp[0] || (sim.tEval[interpIdx] < tVecForInterp[0] && sim.tEval[interpIdx] >= tNext)))
+            ||  (backwardIntegrate && sim.tEval[interpIdx] >= sim.integParams.t0 && sim.tEval[interpIdx]-sim.tEvalMargin <= sim.integParams.t0) || (backwardIntegrate && sim.tEval[interpIdx] <= sim.integParams.tf && sim.tEval[interpIdx]+sim.tEvalMargin >= sim.integParams.tf) )
+        ){
+        real tInterp;
         for (size_t i = 0; i < tLen; i++){
+            tInterp = sim.tEval[interpIdx];
             if (tInterp == tVecForInterp[i]){
                 sim.xIntegEval.push_back(xIntegForInterp[i]);
                 interpIdx++;
+                // std::cout << "exactly interpolated tInterp = " << tInterp << std::endl;
                 continue;
             }
         }
+        tInterp = sim.tEval[interpIdx];
+        // std::cout << "tInterp = " << tInterp << std::endl;
         std::vector<real> xInterp(numStates, 0.0);
         size_t n = tLen-1;
         for (size_t i = 0; i < numStates; i++){

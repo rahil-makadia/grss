@@ -73,6 +73,7 @@ class Simulation
         ForceParameters forceParams;
 
         // interpolator variables
+        real tEvalMargin = 0.0L;
         std::vector<real> tEval;
         std::vector< std::vector<real> > xIntegEval;
 

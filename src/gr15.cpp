@@ -209,13 +209,47 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     Constants &consts = sim.consts;
 
     real dt = get_initial_timestep(t, xInteg0, forceParams, integParams, consts);
+    if (integParams.t0+dt > integParams.tf && integParams.tf > integParams.t0){
+        dt = integParams.tf - integParams.t0;
+    }
+    else if (integParams.t0+dt < integParams.tf && integParams.tf < integParams.t0){
+        dt = integParams.tf - integParams.t0;
+    }
     integParams.timestepCounter = 0;
     std::vector<real> accInteg0 = get_state_der(t, xInteg0, forceParams, integParams, consts);
     if (dt > 0){
         std::sort(sim.tEval.begin(), sim.tEval.end()); // sort sim.tEval into ascending order
+        int removeCounter = 0;
+        while (sim.tEval[0] < integParams.t0 - sim.tEvalMargin){
+            // remove any tEval values that are too small
+            sim.tEval.erase(sim.tEval.begin());
+            removeCounter++;
+        }
+        while (sim.tEval.back() > integParams.tf + sim.tEvalMargin){
+            // remove any tEval values that are too large
+            sim.tEval.pop_back();
+            removeCounter++;
+        }
+        if (removeCounter > 0){
+            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< sim.tEvalMargin << " day(s)." << std::endl;
+        }
     }
     else if (dt < 0){
         std::sort(sim.tEval.begin(), sim.tEval.end(), std::greater<real>()); // sort sim.tEval into descending order
+        int removeCounter = 0;
+        while (sim.tEval[0] > integParams.t0 + sim.tEvalMargin){
+            // remove any tEval values that are too large
+            sim.tEval.erase(sim.tEval.begin());
+            removeCounter++;
+        }
+        while (sim.tEval.back() < integParams.tf - sim.tEvalMargin){
+            // remove any tEval values that are too small
+            sim.tEval.pop_back();
+            removeCounter++;
+        }
+        if (removeCounter > 0){
+            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< sim.tEvalMargin << " day(s)." << std::endl;
+        }
     }
     std::vector<real> xInteg(2*dim, 0.0);
     std::vector< std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
@@ -279,12 +313,12 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
                 std::vector<real> tVecForInterp (hVec.size(), 0.0);
                 xIntegForInterp[0] = xInteg0;
                 tVecForInterp[0] = t;
+                // xIntegForInterp.push_back(xInteg);
+                // tVecForInterp.push_back(t+dt);
                 for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
                     approx_xInteg(xInteg0, accInteg0, xIntegForInterp[hIdx], dt, hVec[hIdx], b, integParams.nInteg);
                     tVecForInterp[hIdx] = t + hVec[hIdx]*dt;
                 }
-                // xIntegForInterp[hVec.size()] = xInteg;
-                // tVecForInterp[hVec.size()] = t + dt;
                 interpolate(t+dt, tVecForInterp, xIntegForInterp, sim);
                 // // end interpolation call
                 t += dt;

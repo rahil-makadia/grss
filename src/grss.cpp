@@ -106,6 +106,7 @@ PYBIND11_MODULE(grss_py, m) {
         .def_readwrite("t", &Simulation::t)
         .def_readwrite("xInteg", &Simulation::xInteg)
         .def_readwrite("forceParams", &Simulation::forceParams)
+        .def_readwrite("tEvalMargin", &Simulation::tEvalMargin)
         .def_readwrite("tEval", &Simulation::tEval)
         .def_readwrite("xIntegEval", &Simulation::xIntegEval)
         .def("add_spice_body", static_cast<void (Simulation::*)(std::string, std::string, int, real, real, real, Constants)>(&Simulation::add_spice_body), py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("constants"))
