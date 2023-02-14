@@ -92,6 +92,16 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius, std::vec
     }
 }
 
+void ImpulseEvent::apply(const real &t, std::vector<real> &xInteg, const real &propDir){
+    if (t != this->t){
+        throw std::runtime_error("ImpulseEvent::apply: Integration time does not match event time. Cannot apply impulse.");
+    }
+    size_t velStartIdx = 6*this->bodyIndex+3;
+    for (size_t i=0; i<3; i++){
+        xInteg[velStartIdx+i] += propDir*this->deltaV[i];
+    }
+}
+
 Simulation::Simulation(std::string name, real t0, const int defaultSpiceBodies, std::string DEkernelPath){
     this->name = name;
     this->DEkernelPath = DEkernelPath;
@@ -375,6 +385,47 @@ void Simulation::remove_body(std::string name){
         }
     }
     std::cout << "Error: Body " << name << " not found." << std::endl;
+}
+
+void Simulation::add_event(IntegBody body, real tEvent, std::vector<real> deltaV){
+    // check if tEvent is valid
+    if (tEvent < this->integParams.t0 || tEvent > this->integParams.tf){
+        throw std::invalid_argument("Event time " + std::to_string(tEvent) + " is not within simulation time bounds.");
+    }
+    // check if body exists
+    bool bodyExists = false;
+    size_t bodyIndex;
+    for (size_t i = 0; i < this->integParams.nInteg; i++){
+        if (this->integBodies[i].name == body.name){
+            bodyExists = true;
+            bodyIndex = i;
+            break;
+        }
+    }
+    if (!bodyExists){
+        throw std::invalid_argument("Integration body with name " + body.name + " does not exist in simulation " + this->name);
+    }
+    ImpulseEvent event;
+    event.t = tEvent;
+    event.deltaV = deltaV;
+    event.bodyName = body.name;
+    event.bodyIndex = bodyIndex;
+    // add event to this->events sorted by time
+    if (this->events.size() == 0){
+        this->events.push_back(event);
+    }
+    else{
+        for (size_t i = 0; i < this->events.size(); i++){
+            if (event.t < this->events[i].t){
+                this->events.insert(this->events.begin()+i, event);
+                break;
+            }
+            else if (i == this->events.size()-1){
+                this->events.push_back(event);
+                break;
+            }
+        }
+    }
 }
 
 void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){

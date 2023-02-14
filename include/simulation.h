@@ -45,6 +45,23 @@ class IntegBody: public Body{
 
 };
 
+class Event{
+    private:
+
+    public:
+        real t;
+        std::string bodyName;
+        size_t bodyIndex;
+};
+
+class ImpulseEvent : public Event{
+    private:
+
+    public:
+        std::vector<real> deltaV = {0.0L, 0.0L, 0.0L};
+        void apply(const real &t, std::vector<real> &xInteg, const real &propDir);
+};
+
 class Simulation
 {
     private:
@@ -63,9 +80,10 @@ class Simulation
         // integration parameters
         IntegrationParameters integParams;
 
-        // bodies
+        // bodies and events
         std::vector<SpiceBody> spiceBodies;
         std::vector<IntegBody> integBodies;
+        std::vector<ImpulseEvent> events;
 
         // preprocessor variables
         real t;
@@ -77,13 +95,14 @@ class Simulation
         std::vector<real> tEval;
         std::vector< std::vector<real> > xIntegEval;
 
-        // add and remove bodies
+        // add/remove bodies and add events
         void add_spice_body(std::string DEkernelPath, std::string name, int spiceID, real t0, real mass, real radius, Constants consts);
         void add_spice_body(SpiceBody body);
         void add_integ_body(std::string DEkernelPath, std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
         void add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
         void add_integ_body(IntegBody body);
         void remove_body(std::string name);
+        void add_event(IntegBody body, real tEvent, std::vector<real> deltaV);
 
         // setters
         void set_sim_constants(real du2m=149597870700.0L, real tu2sec=86400.0L, real G=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, real clight=299792458.0L/149597870700.0L*86400.0L);

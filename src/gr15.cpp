@@ -202,55 +202,37 @@ void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real
     }
 }
 
+void check_and_apply_events(Simulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
+    while (nextEventIdx < sim.events.size() && t == tNextEvent){
+        std::cout << "Applying event at t = " << t << std::endl;
+        // apply events for the state just reached by the integrator
+        real propDir;
+        if (sim.integParams.t0 < sim.integParams.tf){
+            propDir = 1.0L;
+        } else {
+            propDir = -1.0L;
+        }
+        sim.events[nextEventIdx].apply(t, xInteg, propDir);
+        // update next event index and time
+        nextEventIdx += 1;
+        if (nextEventIdx < sim.events.size()){
+            tNextEvent = sim.events[nextEventIdx].t;
+            std::cout << "Next event at t = " << tNextEvent << std::endl;
+        } else {
+            tNextEvent = sim.integParams.tf;
+            std::cout << "Next event is integration end at t = " << tNextEvent << std::endl;
+        }
+    }
+}
+
 void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     ForceParameters &forceParams = sim.forceParams;
     IntegrationParameters &integParams = sim.integParams;
     size_t dim = 3*integParams.nInteg;
     Constants &consts = sim.consts;
-
     real dt = get_initial_timestep(t, xInteg0, forceParams, integParams, consts);
-    if (integParams.t0+dt > integParams.tf && integParams.tf > integParams.t0){
-        dt = integParams.tf - integParams.t0;
-    }
-    else if (integParams.t0+dt < integParams.tf && integParams.tf < integParams.t0){
-        dt = integParams.tf - integParams.t0;
-    }
     integParams.timestepCounter = 0;
     std::vector<real> accInteg0 = get_state_der(t, xInteg0, forceParams, integParams, consts);
-    if (dt > 0){
-        std::sort(sim.tEval.begin(), sim.tEval.end()); // sort sim.tEval into ascending order
-        int removeCounter = 0;
-        while (sim.tEval[0] < integParams.t0 - sim.tEvalMargin){
-            // remove any tEval values that are too small
-            sim.tEval.erase(sim.tEval.begin());
-            removeCounter++;
-        }
-        while (sim.tEval.back() > integParams.tf + sim.tEvalMargin){
-            // remove any tEval values that are too large
-            sim.tEval.pop_back();
-            removeCounter++;
-        }
-        if (removeCounter > 0){
-            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< sim.tEvalMargin << " day(s)." << std::endl;
-        }
-    }
-    else if (dt < 0){
-        std::sort(sim.tEval.begin(), sim.tEval.end(), std::greater<real>()); // sort sim.tEval into descending order
-        int removeCounter = 0;
-        while (sim.tEval[0] > integParams.t0 + sim.tEvalMargin){
-            // remove any tEval values that are too large
-            sim.tEval.erase(sim.tEval.begin());
-            removeCounter++;
-        }
-        while (sim.tEval.back() < integParams.tf - sim.tEvalMargin){
-            // remove any tEval values that are too small
-            sim.tEval.pop_back();
-            removeCounter++;
-        }
-        if (removeCounter > 0){
-            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< sim.tEvalMargin << " day(s)." << std::endl;
-        }
-    }
     std::vector<real> xInteg(2*dim, 0.0);
     std::vector< std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
     std::vector< std::vector<real> > b(7, std::vector<real>(dim, 0.0));
@@ -262,6 +244,22 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
     real b6TildeEstim, b6Max, accIntegNextMax;
     real relError, dtReq;
     
+    real tNextEvent = integParams.tf;
+    static size_t nextEventIdx = 0;
+    if (t == integParams.t0){
+        nextEventIdx = 0;
+    }
+    if (sim.events.size() != 0){
+        std::cout << "Number of events: " << sim.events.size() << std::endl;
+        tNextEvent = sim.events[0].t;
+    }
+    check_and_apply_events(sim, t, tNextEvent, nextEventIdx, xInteg0);
+    if ( (integParams.tf > integParams.t0 && t+dt > tNextEvent) || (integParams.tf < integParams.t0 && t+dt < tNextEvent)){
+        std::cout << "Reducing initial timestep from dt = " << dt;
+        dt = tNextEvent-t;
+        std::cout << " to dt = " << dt << " to reach next event at t = " << tNextEvent << std::endl;
+    }
+    
     size_t PCmaxIter = 12;
     int maxLoops = 100;
     int loopCounter = 0;
@@ -271,6 +269,7 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
         keepStepping = 0;
     }
     while (keepStepping){
+        oneStepDone = 0;
         while (!oneStepDone){
             for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++){
                 xInteg = xInteg0;
@@ -330,7 +329,10 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
                 b_old = b;
                 refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
                 loopCounter = 0;
+                check_and_apply_events(sim, t, tNextEvent, nextEventIdx, xInteg);
                 // std::cout << "t = " << t << ", dt = " << dt << ", dtReq = " << dtReq << std::endl;
+                sim.t = t;
+                sim.xInteg = xInteg;
             }
             else{
                 loopCounter += 1;
@@ -350,12 +352,9 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
             if ( (integParams.tf > integParams.t0 && dt < integParams.dtMin) || (integParams.tf < integParams.t0 && dt > integParams.dtMin)){
                 dt = integParams.dtMin;
             }
-            if ( (integParams.tf > integParams.t0 && t+dt > integParams.tf) || (integParams.tf < integParams.t0 && t+dt < integParams.tf)){
-                dt = integParams.tf-t;
+            if ( (integParams.tf > integParams.t0 && t+dt > tNextEvent) || (integParams.tf < integParams.t0 && t+dt < tNextEvent)){
+                dt = tNextEvent-t;
             }
         }
-    sim.t = t;
-    sim.xInteg = xInteg;
-    oneStepDone = 0;
     }
 }
