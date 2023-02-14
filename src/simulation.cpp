@@ -107,14 +107,6 @@ Simulation::Simulation(std::string name, real t0, const int defaultSpiceBodies, 
     this->DEkernelPath = DEkernelPath;
     this->integParams.t0 = t0;
 
-    this->integParams.tf = 0.0L;
-    this->integParams.dt0 = 0.0L;
-    this->integParams.dtMax = 0.0L;
-    this->integParams.dtChangeFactor = 0.0L;
-    this->integParams.adaptiveTimestep = true;
-    this->integParams.timestepCounter = 0;
-    this->integParams.tolPC = 0.0L;
-    this->integParams.tolInteg = 0.0L;
     this->integParams.nInteg = 0;
     this->integParams.nSpice = 0;
     this->integParams.nTotal = 0;
@@ -304,6 +296,46 @@ Simulation::Simulation(std::string name, const Simulation &simRef){
     this->spiceBodies = simRef.spiceBodies;
 }
 
+void Simulation::sort_and_clean_up_tEval(std::vector<real> &tEval){
+    bool forwardProp = this->integParams.t0 < this->integParams.tf;
+    bool backwardProp = this->integParams.t0 > this->integParams.tf;
+    if (forwardProp){
+        std::sort(tEval.begin(), tEval.end()); // sort tEval into ascending order
+        int removeCounter = 0;
+        while (tEval[0] < this->integParams.t0 - this->tEvalMargin){
+            // remove any tEval values that are too small
+            tEval.erase(tEval.begin());
+            removeCounter++;
+        }
+        while (tEval.back() > this->integParams.tf + this->tEvalMargin){
+            // remove any tEval values that are too large
+            tEval.pop_back();
+            removeCounter++;
+        }
+        if (removeCounter > 0){
+            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
+        }
+    }
+    else if (backwardProp){
+        std::sort(tEval.begin(), tEval.end(), std::greater<real>()); // sort tEval into descending order
+        int removeCounter = 0;
+        while (tEval[0] > this->integParams.t0 + this->tEvalMargin){
+            // remove any tEval values that are too large
+            tEval.erase(tEval.begin());
+            removeCounter++;
+        }
+        while (tEval.back() < this->integParams.tf - this->tEvalMargin){
+            // remove any tEval values that are too small
+            tEval.pop_back();
+            removeCounter++;
+        }
+        if (removeCounter > 0){
+            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
+        }
+    }
+}
+
+
 void Simulation::add_spice_body(std::string DEkernelPath, std::string name, int spiceId, real t0, real mass, real radius, Constants consts){
     // check if body already exists. if so, throw error
     for (size_t i=0; i<this->spiceBodies.size(); i++){
@@ -437,8 +469,18 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.JdMinusMjd = 2400000.5;
 }
 
-void Simulation::set_integration_parameters(real tf, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
+void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
+    if (tEval.size() != 0){
+        sort_and_clean_up_tEval(tEval);
+        if (this->tEval.size() == 0){
+            this->tEval = tEval;
+        } else if (this->tEval.size() != 0){
+            for (size_t i = 0; i < tEval.size(); i++){
+                this->tEval.push_back(tEval[i]);
+            }
+        }
+    }
     this->integParams.dt0 = dt0;
     this->integParams.dtMax = dtMax;
     this->integParams.dtMin = dtMin;
@@ -507,8 +549,8 @@ void Simulation::preprocess(){
     }
 }
 
-void Simulation::extend(real tf){
+void Simulation::extend(real tf, std::vector<real> tEvalNew){
     this->integParams.t0 = this->t;
-    this->integParams.tf = tf;
+    this->set_integration_parameters(tf, tEvalNew);
     this->integrate();
 }

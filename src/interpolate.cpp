@@ -24,9 +24,7 @@ void interpolate(const real &tNext, const std::vector<real> &tVecForInterp, cons
     }
 
     static size_t interpIdx = 0;
-    if (interpIdx == sim.tEval.size()){
-        interpIdx = 0;
-    }
+    std::cout << "interpIdx = " << interpIdx << std::endl;
     bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[tLen-1];
     bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[tLen-1];
     while ( interpIdx < sim.tEval.size()
@@ -41,12 +39,12 @@ void interpolate(const real &tNext, const std::vector<real> &tVecForInterp, cons
             if (tInterp == tVecForInterp[i]){
                 sim.xIntegEval.push_back(xIntegForInterp[i]);
                 interpIdx++;
-                // std::cout << "exactly interpolated tInterp = " << tInterp << std::endl;
+                std::cout << "exactly interpolated tInterp = " << tInterp << std::endl;
                 continue;
             }
         }
         tInterp = sim.tEval[interpIdx];
-        // std::cout << "tInterp = " << tInterp << std::endl;
+        std::cout << "tInterp = " << tInterp << std::endl;
         std::vector<real> xInterp(numStates, 0.0);
         size_t n = tLen-1;
         for (size_t i = 0; i < numStates; i++){

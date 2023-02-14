@@ -204,7 +204,6 @@ void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real
 
 void check_and_apply_events(Simulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
     while (nextEventIdx < sim.events.size() && t == tNextEvent){
-        std::cout << "Applying event at t = " << t << std::endl;
         // apply events for the state just reached by the integrator
         real propDir;
         if (sim.integParams.t0 < sim.integParams.tf){
@@ -217,10 +216,8 @@ void check_and_apply_events(Simulation &sim, const real &t, real &tNextEvent, si
         nextEventIdx += 1;
         if (nextEventIdx < sim.events.size()){
             tNextEvent = sim.events[nextEventIdx].t;
-            std::cout << "Next event at t = " << tNextEvent << std::endl;
         } else {
             tNextEvent = sim.integParams.tf;
-            std::cout << "Next event is integration end at t = " << tNextEvent << std::endl;
         }
     }
 }
@@ -250,14 +247,11 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
         nextEventIdx = 0;
     }
     if (sim.events.size() != 0){
-        std::cout << "Number of events: " << sim.events.size() << std::endl;
         tNextEvent = sim.events[0].t;
     }
     check_and_apply_events(sim, t, tNextEvent, nextEventIdx, xInteg0);
     if ( (integParams.tf > integParams.t0 && t+dt > tNextEvent) || (integParams.tf < integParams.t0 && t+dt < tNextEvent)){
-        std::cout << "Reducing initial timestep from dt = " << dt;
         dt = tNextEvent-t;
-        std::cout << " to dt = " << dt << " to reach next event at t = " << tNextEvent << std::endl;
     }
     
     size_t PCmaxIter = 12;

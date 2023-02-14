@@ -61,7 +61,8 @@ PYBIND11_MODULE(grss_py, m) {
     
     py::class_<ImpulseEvent, Event>(m, "ImpulseEvent")
         .def(py::init<>())
-        .def_readwrite("deltaV", &ImpulseEvent::deltaV);
+        .def_readwrite("deltaV", &ImpulseEvent::deltaV)
+        .def("apply", &ImpulseEvent::apply, py::arg("t"), py::arg("xInteg"), py::arg("propDir"));
 
     // // from force.h
     py::class_<ForceParameters>(m, "ForceParameters")
@@ -128,12 +129,12 @@ PYBIND11_MODULE(grss_py, m) {
         .def("remove_body", &Simulation::remove_body, py::arg("name"))
         .def("add_event", &Simulation::add_event, py::arg("body"), py::arg("tEvent"), py::arg("deltaV"))
         .def("set_sim_constants", &Simulation::set_sim_constants, py::arg("du2m")=149597870700.0L, py::arg("tu2sec")=86400.0L, py::arg("G")=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, py::arg("clight")=299792458.0L/149597870700.0L*86400.0L)
-        .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
+        .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
         .def("get_sim_constants", &Simulation::get_sim_constants)
         .def("get_integration_parameters", &Simulation::get_integration_parameters)
         .def("preprocess", &Simulation::preprocess)
         .def("integrate", &Simulation::integrate)
-        .def("extend", &Simulation::extend, py::arg("tf"));
+        .def("extend", &Simulation::extend, py::arg("tf"), py::arg("tEvalNew")=std::vector<real>());
 
     #ifdef VERSION_INFO
         m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

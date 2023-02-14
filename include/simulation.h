@@ -65,7 +65,7 @@ class ImpulseEvent : public Event{
 class Simulation
 {
     private:
-
+        void sort_and_clean_up_tEval(std::vector<real> &tEval);
     public:
         // name and path to DE kernels
         std::string name;
@@ -106,7 +106,7 @@ class Simulation
 
         // setters
         void set_sim_constants(real du2m=149597870700.0L, real tu2sec=86400.0L, real G=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, real clight=299792458.0L/149597870700.0L*86400.0L);
-        void set_integration_parameters(real tf, bool adaptiveTimestep=true, real dt0=0.0L, real dtMax=6.0L, real dtMin=7.0e-3L, real dtChangeFactor=0.25L, real tolInteg=1.0e-6L, real tolPC=1.0e-16L);
+        void set_integration_parameters(real tf, std::vector<real> tEval=std::vector<real>(), bool adaptiveTimestep=true, real dt0=0.0L, real dtMax=6.0L, real dtMin=7.0e-3L, real dtChangeFactor=0.25L, real tolInteg=1.0e-6L, real tolPC=1.0e-16L);
 
         // getters
         std::vector<real> get_sim_constants();
@@ -119,7 +119,7 @@ class Simulation
         void integrate();
 
         // integration extension
-        void extend(real tf);
+        void extend(real tf, std::vector<real> tEvalNew=std::vector<real>());
 };
 
 #endif
