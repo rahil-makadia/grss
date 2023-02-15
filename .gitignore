@@ -182,6 +182,9 @@ cython_debug/
 *.app
 
 ################################### Individual user exceptions
+# data file for astrometric catalog debiasing
+bias.dat
+
 # VS code setup directory
 .vscode/
 

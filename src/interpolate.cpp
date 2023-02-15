@@ -99,13 +99,11 @@ void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVec
             std::vector<real> lightTime(sim.integParams.nInteg, 0.0);
             std::vector<real> xInterpApparent(numStates, 0.0);
             for (size_t i = 0; i < sim.integParams.nInteg; i++){
-                std::cout << "Body name = " << sim.integBodies[i].name << ". ";
                 for (size_t j = 0; j < 6; j++){
                     xRelativeTemp[j] = xInterpGeom[6*i+j] - sim.xObserver[interpIdx][j];
                 }
                 vnorm({xRelativeTemp[0], xRelativeTemp[1], xRelativeTemp[2]}, distRelativeTemp);
                 lightTimeTemp = distRelativeTemp/sim.consts.clight;
-                std::cout << "One iteration light time: " << lightTimeTemp*86400 << " s. ";
                 if (sim.convergedLightTime){
                     real lightTimeTol = 1e-16/86400.0L;
                     real lightTimeTempPrev = 0.0L;
@@ -122,12 +120,11 @@ void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVec
                         lightTimeTemp = distRelativeTemp/sim.consts.clight;
                         iter++;
                     }
-                    std::cout << "Converged light time: " << lightTimeTemp*86400 << " s in " << iter << " iterations. " << std::endl;
                 }
                 evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, xInterpApparentTemp);
                 lightTime[i] = lightTimeTemp;
                 for (size_t j = 0; j < 6; j++){
-                    xInterpApparent[6*i+j] = xInterpApparentTemp[6*i+j];
+                    xInterpApparent[6*i+j] = xInterpApparentTemp[6*i+j] - sim.xObserver[interpIdx][j];
                 }
             }
             sim.xIntegEval.push_back(xInterpApparent);

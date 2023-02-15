@@ -505,7 +505,6 @@ void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bo
             }
         }
     }
-    std::cout << "size of xObserver: " << this->xObserver.size() << std::endl;
     this->integParams.dt0 = dt0;
     this->integParams.dtMax = dtMax;
     this->integParams.dtMin = dtMin;
