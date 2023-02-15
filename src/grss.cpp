@@ -118,6 +118,9 @@ PYBIND11_MODULE(grss_py, m) {
         .def_readwrite("t", &Simulation::t)
         .def_readwrite("xInteg", &Simulation::xInteg)
         .def_readwrite("forceParams", &Simulation::forceParams)
+        .def_readwrite("evalApparentState", &Simulation::evalApparentState)
+        .def_readwrite("convergedLightTime", &Simulation::convergedLightTime)
+        .def_readwrite("xObserver", &Simulation::xObserver)
         .def_readwrite("tEvalMargin", &Simulation::tEvalMargin)
         .def_readwrite("tEval", &Simulation::tEval)
         .def_readwrite("xIntegEval", &Simulation::xIntegEval)
@@ -129,12 +132,12 @@ PYBIND11_MODULE(grss_py, m) {
         .def("remove_body", &Simulation::remove_body, py::arg("name"))
         .def("add_event", &Simulation::add_event, py::arg("body"), py::arg("tEvent"), py::arg("deltaV"))
         .def("set_sim_constants", &Simulation::set_sim_constants, py::arg("du2m")=149597870700.0L, py::arg("tu2sec")=86400.0L, py::arg("G")=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, py::arg("clight")=299792458.0L/149597870700.0L*86400.0L)
-        .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
+        .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("evalApparentState")=false, py::arg("convergedLightTims")=false, py::arg("xObserver")=std::vector< std::vector<real> >(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
         .def("get_sim_constants", &Simulation::get_sim_constants)
         .def("get_integration_parameters", &Simulation::get_integration_parameters)
         .def("preprocess", &Simulation::preprocess)
         .def("integrate", &Simulation::integrate)
-        .def("extend", &Simulation::extend, py::arg("tf"), py::arg("tEvalNew")=std::vector<real>());
+        .def("extend", &Simulation::extend, py::arg("tf"), py::arg("tEvalNew")=std::vector<real>(), py::arg("xObserverNew")=std::vector< std::vector<real> >());
 
     #ifdef VERSION_INFO
         m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

@@ -301,19 +301,9 @@ void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
             if (relError <= 1 || loopCounter > maxLoops){
                 oneStepDone = 1;
                 integParams.timestepCounter += 1;
-                // // start interpolation call
-                std::vector< std::vector<real> > xIntegForInterp(hVec.size(), std::vector<real>(2*dim, 0.0));
-                std::vector<real> tVecForInterp (hVec.size(), 0.0);
-                xIntegForInterp[0] = xInteg0;
-                tVecForInterp[0] = t;
-                // xIntegForInterp.push_back(xInteg);
-                // tVecForInterp.push_back(t+dt);
-                for (size_t hIdx = 1; hIdx < hVec.size(); hIdx++) {
-                    approx_xInteg(xInteg0, accInteg0, xIntegForInterp[hIdx], dt, hVec[hIdx], b, integParams.nInteg);
-                    tVecForInterp[hIdx] = t + hVec[hIdx]*dt;
-                }
-                interpolate(t+dt, tVecForInterp, xIntegForInterp, sim);
-                // // end interpolation call
+                // start interpolation call
+                interpolate(t, dt, xInteg0, accInteg0, b, hVec, sim);
+                // end interpolation call
                 t += dt;
                 if ((integParams.tf > integParams.t0 && t >= integParams.tf) || (integParams.tf < integParams.t0 && t <= integParams.tf)){
                     keepStepping = 0;

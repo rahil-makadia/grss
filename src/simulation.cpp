@@ -469,18 +469,43 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.JdMinusMjd = 2400000.5;
 }
 
-void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
+void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > xObserver, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
+    this->evalApparentState = evalApparentState;
+    this->convergedLightTime = convergedLightTime;
     if (tEval.size() != 0){
         sort_and_clean_up_tEval(tEval);
         if (this->tEval.size() == 0){
             this->tEval = tEval;
+            if (this->evalApparentState){
+                if (xObserver.size() == 0){
+                    this->xObserver = std::vector< std::vector<real> >(tEval.size(), std::vector<real>(6, 0.0));
+                } else if (xObserver.size() == tEval.size() && xObserver[0].size() == 6){
+                    this->xObserver = xObserver;
+                } else if (xObserver.size() != tEval.size() || xObserver[0].size() != 6){
+                    throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
+                }
+            }
         } else if (this->tEval.size() != 0){
             for (size_t i = 0; i < tEval.size(); i++){
                 this->tEval.push_back(tEval[i]);
             }
+            if (this->evalApparentState){
+                if (xObserver.size() == 0){
+                    for (size_t i = 0; i < tEval.size(); i++){
+                        this->xObserver.push_back(std::vector<real>(6, 0.0));
+                    }
+                } else if (xObserver.size() == tEval.size() && xObserver[0].size() == 6){
+                    for (size_t i = 0; i < tEval.size(); i++){
+                        this->xObserver.push_back(xObserver[i]);
+                    }
+                } else if (xObserver.size() != tEval.size() || xObserver[0].size() != 6){
+                    throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
+                }
+            }
         }
     }
+    std::cout << "size of xObserver: " << this->xObserver.size() << std::endl;
     this->integParams.dt0 = dt0;
     this->integParams.dtMax = dtMax;
     this->integParams.dtMin = dtMin;
@@ -549,8 +574,8 @@ void Simulation::preprocess(){
     }
 }
 
-void Simulation::extend(real tf, std::vector<real> tEvalNew){
+void Simulation::extend(real tf, std::vector<real> tEvalNew, std::vector< std::vector<real> > xObserverNew){
     this->integParams.t0 = this->t;
-    this->set_integration_parameters(tf, tEvalNew);
+    this->set_integration_parameters(tf, tEvalNew, this->evalApparentState, this->convergedLightTime, xObserverNew);
     this->integrate();
 }
