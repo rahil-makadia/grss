@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(grss_py, m) {
+PYBIND11_MODULE(cppgrss, m) {
     m.doc() = "pybind11 binding for grss library";
 
     // from utilities.h
@@ -120,9 +120,11 @@ PYBIND11_MODULE(grss_py, m) {
         .def_readwrite("forceParams", &Simulation::forceParams)
         .def_readwrite("evalApparentState", &Simulation::evalApparentState)
         .def_readwrite("convergedLightTime", &Simulation::convergedLightTime)
+        .def_readwrite("tEvalUTC", &Simulation::tEvalUTC)
         .def_readwrite("xObserver", &Simulation::xObserver)
         .def_readwrite("tEvalMargin", &Simulation::tEvalMargin)
         .def_readwrite("tEval", &Simulation::tEval)
+        .def_readwrite("lightTimeEval", &Simulation::lightTimeEval)
         .def_readwrite("xIntegEval", &Simulation::xIntegEval)
         .def("add_spice_body", static_cast<void (Simulation::*)(std::string, std::string, int, real, real, real, Constants)>(&Simulation::add_spice_body), py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("constants"))
         .def("add_spice_body", static_cast<void (Simulation::*)(SpiceBody)>(&Simulation::add_spice_body), py::arg("body"))
@@ -132,7 +134,7 @@ PYBIND11_MODULE(grss_py, m) {
         .def("remove_body", &Simulation::remove_body, py::arg("name"))
         .def("add_event", &Simulation::add_event, py::arg("body"), py::arg("tEvent"), py::arg("deltaV"))
         .def("set_sim_constants", &Simulation::set_sim_constants, py::arg("du2m")=149597870700.0L, py::arg("tu2sec")=86400.0L, py::arg("G")=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, py::arg("clight")=299792458.0L/149597870700.0L*86400.0L)
-        .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("evalApparentState")=false, py::arg("convergedLightTims")=false, py::arg("xObserver")=std::vector< std::vector<real> >(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
+        .def("set_integration_parameters", &Simulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("tEvalUTC")=false, py::arg("evalApparentState")=false, py::arg("convergedLightTims")=false, py::arg("xObserver")=std::vector< std::vector<real> >(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
         .def("get_sim_constants", &Simulation::get_sim_constants)
         .def("get_integration_parameters", &Simulation::get_integration_parameters)
         .def("preprocess", &Simulation::preprocess)

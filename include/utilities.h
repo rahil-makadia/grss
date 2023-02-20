@@ -75,21 +75,23 @@ struct NongravParamaters{
 void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state[6], double &lt);
 
 void jd_to_mjd(const real jd, real &mjd);
-// real jd_to_mjd(const real jd);
+real jd_to_mjd(const real jd);
 void mjd_to_jd(const real mjd, real &jd);
-// real mjd_to_jd(const real mjd);
+real mjd_to_jd(const real mjd);
 void jd_to_et(const real jd, real &et);
-// real jd_to_et(const real jd);
+real jd_to_et(const real jd);
 void et_to_jd(const real et, real &jd);
-// real et_to_jd(const real et);
+real et_to_jd(const real et);
 void mjd_to_et(const real mjd, real &et);
-// real mjd_to_et(const real mjd);
+real mjd_to_et(const real mjd);
 void et_to_mjd(const real et, real &mjd);
-// real et_to_mjd(const real et);
+real et_to_mjd(const real et);
 
 void wrap_to_2pi(real &angle);
 void rad_to_deg(const real &rad, real &deg);
+real rad_to_deg(const real rad);
 void deg_to_rad(const real &deg, real &rad);
+real deg_to_rad(const real deg);
 
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
 void vnorm(const std::vector<real> &v, real &norm);

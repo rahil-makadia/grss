@@ -56,6 +56,51 @@ void evaluate_one_interpolation(const real &tInterp, const std::vector<real> &tV
     }
 }
 
+void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const Simulation &sim, std::vector<real> &lightTime, std::vector<real> &xInterpApparent){
+    size_t numStates = xInterpGeom.size();
+    real lightTimeTemp;
+    std::vector<real> xRelativeTemp(6, 0.0);
+    real distRelativeTemp;
+    std::vector<real> xInterpApparentTemp(numStates, 0.0);
+    for (size_t i = 0; i < sim.integParams.nInteg; i++){
+        for (size_t j = 0; j < 6; j++){
+            xRelativeTemp[j] = xInterpGeom[6*i+j] - sim.xObserver[interpIdx][j];
+        }
+        vnorm({xRelativeTemp[0], xRelativeTemp[1], xRelativeTemp[2]}, distRelativeTemp);
+        lightTimeTemp = distRelativeTemp/sim.consts.clight;
+        if (sim.convergedLightTime){
+            real lightTimeTol = 1e-16/86400.0L;
+            real lightTimeTempPrev = 0.0L;
+            size_t maxIter = 20;
+            size_t iter = 0;
+            // keep iterating until max iterations or light time tolerance is met
+            while (iter < maxIter && fabs(lightTimeTemp - lightTimeTempPrev) > lightTimeTol){
+                if (tInterpGeom-lightTimeTemp < tVecForInterp[0]){
+                    evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterpPrev, coeffsPrev, xInterpApparentTemp);
+                } else {
+                    evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, xInterpApparentTemp);
+                }
+                for (size_t j = 0; j < 6; j++){
+                    xRelativeTemp[j] = xInterpApparentTemp[6*i+j] - sim.xObserver[interpIdx][j];
+                }
+                vnorm({xRelativeTemp[0], xRelativeTemp[1], xRelativeTemp[2]}, distRelativeTemp);
+                lightTimeTempPrev = lightTimeTemp;
+                lightTimeTemp = distRelativeTemp/sim.consts.clight;
+                iter++;
+            }
+        }
+        if (tInterpGeom-lightTimeTemp < tVecForInterp[0]){
+            evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterpPrev, coeffsPrev, xInterpApparentTemp);
+        } else {
+            evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, xInterpApparentTemp);
+        }
+        lightTime[i] = lightTimeTemp;
+        for (size_t j = 0; j < 6; j++){
+            xInterpApparent[6*i+j] = xInterpApparentTemp[6*i+j] - sim.xObserver[interpIdx][j];
+        }
+    }
+}
+
 void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &xIntegForInterp, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &xIntegForInterpPrev, Simulation &sim){
     size_t tLen = tVecForInterp.size();
     size_t numStates = xIntegForInterp[0].size();
@@ -87,46 +132,22 @@ void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVec
                 }
             }
         }
-        tInterpGeom = sim.tEval[interpIdx];
+        if (sim.tEvalUTC){
+            SpiceDouble et_minus_utc;
+            real sec_past_j2000_utc = (sim.tEval[interpIdx] + sim.consts.JdMinusMjd - 2451545.0)*86400.0;
+            deltet_c (sec_past_j2000_utc,  "UTC", &et_minus_utc);
+            tInterpGeom = et_to_mjd(sec_past_j2000_utc + et_minus_utc);
+        } else {
+            tInterpGeom = sim.tEval[interpIdx];
+        }
         // std::cout << "tInterpGeom = " << tInterpGeom << std::endl;
         std::vector<real> xInterpGeom(numStates, 0.0);
         evaluate_one_interpolation(tInterpGeom, tVecForInterp, coeffs, xInterpGeom);
         if (sim.evalApparentState){
-            real lightTimeTemp;
-            std::vector<real> xRelativeTemp(6, 0.0);
-            real distRelativeTemp;
-            std::vector<real> xInterpApparentTemp(numStates, 0.0);
             std::vector<real> lightTime(sim.integParams.nInteg, 0.0);
             std::vector<real> xInterpApparent(numStates, 0.0);
-            for (size_t i = 0; i < sim.integParams.nInteg; i++){
-                for (size_t j = 0; j < 6; j++){
-                    xRelativeTemp[j] = xInterpGeom[6*i+j] - sim.xObserver[interpIdx][j];
-                }
-                vnorm({xRelativeTemp[0], xRelativeTemp[1], xRelativeTemp[2]}, distRelativeTemp);
-                lightTimeTemp = distRelativeTemp/sim.consts.clight;
-                if (sim.convergedLightTime){
-                    real lightTimeTol = 1e-16/86400.0L;
-                    real lightTimeTempPrev = 0.0L;
-                    size_t maxIter = 20;
-                    size_t iter = 0;
-                    // keep iterating until max iterations or light time tolerance is met
-                    while (iter < maxIter && fabs(lightTimeTemp - lightTimeTempPrev) > lightTimeTol){
-                        evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, xInterpApparentTemp);
-                        for (size_t j = 0; j < 6; j++){
-                            xRelativeTemp[j] = xInterpApparentTemp[6*i+j] - sim.xObserver[interpIdx][j];
-                        }
-                        vnorm({xRelativeTemp[0], xRelativeTemp[1], xRelativeTemp[2]}, distRelativeTemp);
-                        lightTimeTempPrev = lightTimeTemp;
-                        lightTimeTemp = distRelativeTemp/sim.consts.clight;
-                        iter++;
-                    }
-                }
-                evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, xInterpApparentTemp);
-                lightTime[i] = lightTimeTemp;
-                for (size_t j = 0; j < 6; j++){
-                    xInterpApparent[6*i+j] = xInterpApparentTemp[6*i+j] - sim.xObserver[interpIdx][j];
-                }
-            }
+            get_lightTime_and_xRelative(interpIdx, tInterpGeom, xInterpGeom, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, sim, lightTime, xInterpApparent);
+            sim.lightTimeEval.push_back(lightTime);
             sim.xIntegEval.push_back(xInterpApparent);
         } else {
             sim.xIntegEval.push_back(xInterpGeom);

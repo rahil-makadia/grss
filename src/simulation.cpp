@@ -469,8 +469,9 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.JdMinusMjd = 2400000.5;
 }
 
-void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > xObserver, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
+void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > xObserver, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
+    this->tEvalUTC = tEvalUTC;
     this->evalApparentState = evalApparentState;
     this->convergedLightTime = convergedLightTime;
     if (tEval.size() != 0){
@@ -575,6 +576,6 @@ void Simulation::preprocess(){
 
 void Simulation::extend(real tf, std::vector<real> tEvalNew, std::vector< std::vector<real> > xObserverNew){
     this->integParams.t0 = this->t;
-    this->set_integration_parameters(tf, tEvalNew, this->evalApparentState, this->convergedLightTime, xObserverNew);
+    this->set_integration_parameters(tf, tEvalNew, this->tEvalUTC, this->evalApparentState, this->convergedLightTime, xObserverNew);
     this->integrate();
 }

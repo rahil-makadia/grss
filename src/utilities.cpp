@@ -24,21 +24,21 @@ void jd_to_et(const real jd, real &et){
     et = (jd-j2000)*day2sec;
 }
 
-// real jd_to_et(const real jd){
-//     real j2000 = 2451545.0;
-//     real day2sec = 86400.0;
-//     return (jd-j2000)*day2sec;
-// }
+real jd_to_et(const real jd){
+    real j2000 = 2451545.0;
+    real day2sec = 86400.0;
+    return (jd-j2000)*day2sec;
+}
 
 void jd_to_mjd(const real jd, real &mjd){
     real offset = 2400000.5;
     mjd = jd-offset;
 }
 
-// real jd_to_mjd(const real jd){
-//     real offset = 2400000.5;
-//     return jd-offset;
-// }
+real jd_to_mjd(const real jd){
+    real offset = 2400000.5;
+    return jd-offset;
+}
 
 void et_to_jd(const real et, real &jd){
     real j2000 = 2451545.0;
@@ -46,11 +46,11 @@ void et_to_jd(const real et, real &jd){
     jd = (et/day2sec)+j2000;
 }
 
-// real et_to_jd(const real et){
-//     real j2000 = 2451545.0;
-//     real day2sec = 86400.0;
-//     return (et/day2sec)+j2000;
-// }
+real et_to_jd(const real et){
+    real j2000 = 2451545.0;
+    real day2sec = 86400.0;
+    return (et/day2sec)+j2000;
+}
 
 void et_to_mjd(const real et, real &mjd){
     real offset = 2400000.5;
@@ -59,23 +59,23 @@ void et_to_mjd(const real et, real &mjd){
     mjd = (et/day2sec)-offset+j2000;
 }
 
-// real et_to_mjd(const real et){
-//     real offset = 2400000.5;
-//     real j2000 = 2451545.0;
-//     real day2sec = 86400.0;
-//     return (et/day2sec)-offset+j2000;
-// }
+real et_to_mjd(const real et){
+    real offset = 2400000.5;
+    real j2000 = 2451545.0;
+    real day2sec = 86400.0;
+    return (et/day2sec)-offset+j2000;
+}
 
 void mjd_to_jd(const real mjd, real &jd){
     real offset = 2400000.5;
     jd = mjd+offset;
 }
 
-// real mjd_to_jd(const real mjd){
-//     real offset = 2400000.5;
-//     real jd = mjd+offset;
-//     return jd;
-// }
+real mjd_to_jd(const real mjd){
+    real offset = 2400000.5;
+    real jd = mjd+offset;
+    return jd;
+}
 
 void mjd_to_et(const real mjd, real &et){
     real offset = 2400000.5;
@@ -84,13 +84,13 @@ void mjd_to_et(const real mjd, real &et){
     et = (mjd+offset-j2000)*day2sec;
 }
 
-// real mjd_to_et(const real mjd){
-//     real offset = 2400000.5;
-//     real j2000 = 2451545.0;
-//     real day2sec = 86400.0;
-//     real et = (mjd+offset-j2000)*day2sec;
-//     return et;
-// }
+real mjd_to_et(const real mjd){
+    real offset = 2400000.5;
+    real j2000 = 2451545.0;
+    real day2sec = 86400.0;
+    real et = (mjd+offset-j2000)*day2sec;
+    return et;
+}
 
 void wrap_to_2pi(real &angle){
     if (angle < 0){
@@ -105,17 +105,17 @@ void rad_to_deg(const real &rad, real &deg){
     deg = rad*180.0/PI;
 }
 
-// real rad_to_deg(const real rad){
-//     return rad*180.0/PI;
-// }
+real rad_to_deg(const real rad){
+    return rad*180.0/PI;
+}
 
 void deg_to_rad(const real &deg, real &rad){
     rad = deg*PI/180.0;
 }
 
-// real deg_to_rad(const real deg){
-//     return deg*PI/180.0;
-// }
+real deg_to_rad(const real deg){
+    return deg*PI/180.0;
+}
 
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot){
     dot = 0;
