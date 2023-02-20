@@ -14,13 +14,12 @@ project(grss VERSION 0.1.0)
 # TODO: add gprof profiling, iee standards for floats
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Wall -Wextra -Werror -pedantic) # -Weffc++
+add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Wall -Wextra -Werror -pedantic)
 
 # Set output directories, from https://stackoverflow.com/a/6595001
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME})
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -38,6 +37,6 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # create pybind11 module
-pybind11_add_module(${PROJECT_NAME}_py src/${PROJECT_NAME}.cpp)
-target_link_libraries(${PROJECT_NAME}_py PRIVATE ${PROJECT_NAME})
-target_compile_definitions(${PROJECT_NAME}_py PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})
+pybind11_add_module(cpp${PROJECT_NAME} src/${PROJECT_NAME}.cpp)
+target_link_libraries(cpp${PROJECT_NAME} PRIVATE ${PROJECT_NAME})
+target_compile_definitions(cpp${PROJECT_NAME} PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})

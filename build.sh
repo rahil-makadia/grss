@@ -12,13 +12,12 @@ if [[ $clean -eq 1 ]]; then
     rm -r build
     mkdir build
     cd build
-    cmake .. -DPYBIND11_FINDPYTHON=ON
+    rm ../grss/*.so
+    cmake ..
     make
-    rm ../examples/*.so
-    cp *.so ../examples/
 else
     cd build
+    rm ../grss/*.so
+    cmake ..
     make
-    rm ../examples/*.so
-    cp *.so ../examples/
 fi
