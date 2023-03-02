@@ -62,7 +62,7 @@ class ImpulseEvent : public Event{
         void apply(const real &t, std::vector<real> &xInteg, const real &propDir);
 };
 
-class Simulation
+class propSimulation
 {
     private:
         void sort_and_clean_up_tEval(std::vector<real> &tEval);
@@ -71,8 +71,8 @@ class Simulation
         std::string name;
         std::string DEkernelPath;
         // constructor and copy constructor
-        Simulation(std::string name, real t0, const int defaultSpiceBodies, std::string DEkernelPath);
-        Simulation(std::string name, const Simulation &simRef);
+        propSimulation(std::string name, real t0, const int defaultSpiceBodies, std::string DEkernelPath);
+        propSimulation(std::string name, const propSimulation &simRef);
 
         // constants
         Constants consts;

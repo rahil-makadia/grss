@@ -102,7 +102,7 @@ void ImpulseEvent::apply(const real &t, std::vector<real> &xInteg, const real &p
     }
 }
 
-Simulation::Simulation(std::string name, real t0, const int defaultSpiceBodies, std::string DEkernelPath){
+propSimulation::propSimulation(std::string name, real t0, const int defaultSpiceBodies, std::string DEkernelPath){
     this->name = name;
     this->DEkernelPath = DEkernelPath;
     this->integParams.t0 = t0;
@@ -287,7 +287,7 @@ Simulation::Simulation(std::string name, real t0, const int defaultSpiceBodies, 
     }
 }
 
-Simulation::Simulation(std::string name, const Simulation &simRef){
+propSimulation::propSimulation(std::string name, const propSimulation &simRef){
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
     this->integParams = simRef.integParams;
@@ -296,7 +296,7 @@ Simulation::Simulation(std::string name, const Simulation &simRef){
     this->spiceBodies = simRef.spiceBodies;
 }
 
-void Simulation::sort_and_clean_up_tEval(std::vector<real> &tEval){
+void propSimulation::sort_and_clean_up_tEval(std::vector<real> &tEval){
     bool forwardProp = this->integParams.t0 < this->integParams.tf;
     bool backwardProp = this->integParams.t0 > this->integParams.tf;
     if (forwardProp){
@@ -336,7 +336,7 @@ void Simulation::sort_and_clean_up_tEval(std::vector<real> &tEval){
 }
 
 
-void Simulation::add_spice_body(std::string DEkernelPath, std::string name, int spiceId, real t0, real mass, real radius, Constants consts){
+void propSimulation::add_spice_body(std::string DEkernelPath, std::string name, int spiceId, real t0, real mass, real radius, Constants consts){
     // check if body already exists. if so, throw error
     for (size_t i=0; i<this->spiceBodies.size(); i++){
         if (this->spiceBodies[i].name == name){
@@ -349,7 +349,7 @@ void Simulation::add_spice_body(std::string DEkernelPath, std::string name, int 
     this->integParams.nTotal++;
 }
 
-void Simulation::add_spice_body(SpiceBody body){
+void propSimulation::add_spice_body(SpiceBody body){
     // check if body already exists. if so, throw error
     for (size_t i=0; i<this->spiceBodies.size(); i++){
         if (this->spiceBodies[i].name == body.name){
@@ -361,7 +361,7 @@ void Simulation::add_spice_body(SpiceBody body){
     this->integParams.nTotal++;
 }
 
-void Simulation::add_integ_body(std::string DEkernelPath, std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts){
+void propSimulation::add_integ_body(std::string DEkernelPath, std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts){
     // check if body already exists. if so, throw error
     for (size_t i=0; i<this->integBodies.size(); i++){
         if (this->integBodies[i].name == name){
@@ -374,7 +374,7 @@ void Simulation::add_integ_body(std::string DEkernelPath, std::string name, real
     this->integParams.nTotal++;
 }
 
-void Simulation::add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts){
+void propSimulation::add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts){
     // check if body already exists. if so, throw error
     for (size_t i=0; i<this->integBodies.size(); i++){
         if (this->integBodies[i].name == name){
@@ -387,7 +387,7 @@ void Simulation::add_integ_body(std::string name, real t0, real mass, real radiu
     this->integParams.nTotal++;
 }
 
-void Simulation::add_integ_body(IntegBody body){
+void propSimulation::add_integ_body(IntegBody body){
     // check if body already exists. if so, throw error
     for (size_t i=0; i<this->integBodies.size(); i++){
         if (this->integBodies[i].name == body.name){
@@ -399,7 +399,7 @@ void Simulation::add_integ_body(IntegBody body){
     this->integParams.nTotal++;
 }
 
-void Simulation::remove_body(std::string name){
+void propSimulation::remove_body(std::string name){
     for (size_t i=0; i<this->spiceBodies.size(); i++){
         if (this->spiceBodies[i].name == name){
             this->spiceBodies.erase(this->spiceBodies.begin()+i);
@@ -419,7 +419,7 @@ void Simulation::remove_body(std::string name){
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
-void Simulation::add_event(IntegBody body, real tEvent, std::vector<real> deltaV){
+void propSimulation::add_event(IntegBody body, real tEvent, std::vector<real> deltaV){
     // check if tEvent is valid
     if (tEvent < this->integParams.t0 || tEvent > this->integParams.tf){
         throw std::invalid_argument("Event time " + std::to_string(tEvent) + " is not within simulation time bounds.");
@@ -460,7 +460,7 @@ void Simulation::add_event(IntegBody body, real tEvent, std::vector<real> deltaV
     }
 }
 
-void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
+void propSimulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.du2m = du2m;
     this->consts.tu2sec = tu2sec;
     this->consts.G = G;
@@ -469,7 +469,7 @@ void Simulation::set_sim_constants(real du2m, real tu2sec, real G, real clight){
     this->consts.JdMinusMjd = 2400000.5;
 }
 
-void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > xObserver, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
+void propSimulation::set_integration_parameters(real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > xObserver, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
     this->tEvalUTC = tEvalUTC;
     this->evalApparentState = evalApparentState;
@@ -515,7 +515,7 @@ void Simulation::set_integration_parameters(real tf, std::vector<real> tEval, bo
     this->integParams.tolInteg = tolInteg;
 }
 
-std::vector<real> Simulation::get_sim_constants(){
+std::vector<real> propSimulation::get_sim_constants(){
     // std::cout << "The conversion from distance units to meters is: " << consts.du2m << std::endl;
     // std::cout << "The conversion from time units to seconds is: " << consts.tu2sec << std::endl;
     // std::cout << "The universal gravitational constant in nondimensional units is: " << consts.G << std::endl;
@@ -527,7 +527,7 @@ std::vector<real> Simulation::get_sim_constants(){
     return constants;
 }
 
-std::vector<real> Simulation::get_integration_parameters(){
+std::vector<real> propSimulation::get_integration_parameters(){
     // std::cout << "The number of integrated bodies is: " << integParams.nInteg << std::endl;
     // std::cout << "The number of bodies whose states are taken from SPICE kernels is: " << integParams.nSpice << std::endl;
     // std::cout << "The total number of bodies in this simulation is: " << integParams.nTotal << std::endl;
@@ -544,7 +544,7 @@ std::vector<real> Simulation::get_integration_parameters(){
     return integration_parameters;
 }
 
-void Simulation::preprocess(){
+void propSimulation::preprocess(){
     this->t = this->integParams.t0;
     for (size_t i = 0; i < this->integParams.nInteg; i++){
         for (size_t j = 0; j < 3; j++){
@@ -574,7 +574,7 @@ void Simulation::preprocess(){
     }
 }
 
-void Simulation::extend(real tf, std::vector<real> tEvalNew, std::vector< std::vector<real> > xObserverNew){
+void propSimulation::extend(real tf, std::vector<real> tEvalNew, std::vector< std::vector<real> > xObserverNew){
     this->integParams.t0 = this->t;
     this->set_integration_parameters(tf, tEvalNew, this->tEvalUTC, this->evalApparentState, this->convergedLightTime, xObserverNew);
     this->integrate();

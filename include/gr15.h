@@ -37,8 +37,8 @@ const std::vector< std::vector<real> > cMat = {
 real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const ForceParameters &forceParams, IntegrationParameters &integParams, const Constants &consts);
 void compute_g_and_b(const std::vector< std::vector<real> > &AccIntegArr, const size_t &hIdx, std::vector< std::vector<real> > &g, std::vector< std::vector<real> > &b, const size_t &dim);
 void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real> > &e, const real &dtRatio, const size_t &dim, const size_t &timestepCounter);
-void check_and_apply_events(Simulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg);
+void check_and_apply_events(propSimulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg);
 void approx_xInteg(const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, std::vector<real> &xIntegNext, const real &dt, const real &h, const std::vector< std::vector<real> > &b, const size_t &nInteg);
-void gr15(real t, std::vector<real> xInteg, Simulation &sim);
+void gr15(real t, std::vector<real> xInteg, propSimulation &sim);
 
 #endif

@@ -1,6 +1,6 @@
 #include "interpolate.h"
 
-void interpolate(const real &t, const real &dt, const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, const std::vector< std::vector<real> > &b, const std::vector<real> &hVec, Simulation &sim){
+void interpolate(const real &t, const real &dt, const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, const std::vector< std::vector<real> > &b, const std::vector<real> &hVec, propSimulation &sim){
     std::vector<real> tVecForInterp (hVec.size(), 0.0);
     std::vector< std::vector<real> > xIntegForInterp(hVec.size(), std::vector<real>(xInteg0.size(), 0.0));
     static std::vector<real> tVecForInterpPrev(tVecForInterp.size(), 0.0);
@@ -56,7 +56,7 @@ void evaluate_one_interpolation(const real &tInterp, const std::vector<real> &tV
     }
 }
 
-void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const Simulation &sim, std::vector<real> &lightTime, std::vector<real> &xInterpApparent){
+void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation &sim, std::vector<real> &lightTime, std::vector<real> &xInterpApparent){
     size_t numStates = xInterpGeom.size();
     real lightTimeTemp;
     std::vector<real> xRelativeTemp(6, 0.0);
@@ -101,7 +101,7 @@ void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom,
     }
 }
 
-void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &xIntegForInterp, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &xIntegForInterpPrev, Simulation &sim){
+void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &xIntegForInterp, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &xIntegForInterpPrev, propSimulation &sim){
     size_t tLen = tVecForInterp.size();
     size_t numStates = xIntegForInterp[0].size();
     std::vector< std::vector<real> > coeffs(numStates, std::vector<real>(tLen, 0.0));

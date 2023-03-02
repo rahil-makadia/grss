@@ -202,7 +202,7 @@ void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real
     }
 }
 
-void check_and_apply_events(Simulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
+void check_and_apply_events(propSimulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
     while (nextEventIdx < sim.events.size() && t == tNextEvent){
         // apply events for the state just reached by the integrator
         real propDir;
@@ -222,7 +222,7 @@ void check_and_apply_events(Simulation &sim, const real &t, real &tNextEvent, si
     }
 }
 
-void gr15(real t, std::vector<real> xInteg0, Simulation &sim){
+void gr15(real t, std::vector<real> xInteg0, propSimulation &sim){
     ForceParameters &forceParams = sim.forceParams;
     IntegrationParameters &integParams = sim.integParams;
     size_t dim = 3*integParams.nInteg;
