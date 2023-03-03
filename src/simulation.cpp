@@ -110,6 +110,7 @@ propSimulation::propSimulation(std::string name, real t0, const int defaultSpice
     this->integParams.nInteg = 0;
     this->integParams.nSpice = 0;
     this->integParams.nTotal = 0;
+    this->integParams.timestepCounter = 0;
 
     switch (defaultSpiceBodies){
     case 0:
@@ -296,20 +297,23 @@ propSimulation::propSimulation(std::string name, const propSimulation &simRef){
     this->spiceBodies = simRef.spiceBodies;
 }
 
-void propSimulation::sort_and_clean_up_tEval(std::vector<real> &tEval){
+void propSimulation::prepare_for_evaluation(std::vector<real> &tEval, std::vector<std::vector<real>> &xObserver){
     bool forwardProp = this->integParams.t0 < this->integParams.tf;
     bool backwardProp = this->integParams.t0 > this->integParams.tf;
+    sort_vector_by_another(xObserver, tEval, forwardProp);
+    sort_vector(tEval, forwardProp); // sort tEval into ascending order or descending order based on the integration direction
     if (forwardProp){
-        std::sort(tEval.begin(), tEval.end()); // sort tEval into ascending order
         int removeCounter = 0;
         while (tEval[0] < this->integParams.t0 - this->tEvalMargin){
-            // remove any tEval values that are too small
+            // remove any tEval and xObserver values that are too small
             tEval.erase(tEval.begin());
+            xObserver.erase(xObserver.begin());
             removeCounter++;
         }
         while (tEval.back() > this->integParams.tf + this->tEvalMargin){
-            // remove any tEval values that are too large
+            // remove any tEval and xObserver values that are too small
             tEval.pop_back();
+            xObserver.pop_back();
             removeCounter++;
         }
         if (removeCounter > 0){
@@ -317,24 +321,50 @@ void propSimulation::sort_and_clean_up_tEval(std::vector<real> &tEval){
         }
     }
     else if (backwardProp){
-        std::sort(tEval.begin(), tEval.end(), std::greater<real>()); // sort tEval into descending order
         int removeCounter = 0;
         while (tEval[0] > this->integParams.t0 + this->tEvalMargin){
-            // remove any tEval values that are too large
+            // remove any tEval and xObserver values that are too small
             tEval.erase(tEval.begin());
+            xObserver.erase(xObserver.begin());
             removeCounter++;
         }
         while (tEval.back() < this->integParams.tf - this->tEvalMargin){
-            // remove any tEval values that are too small
+            // remove any tEval and xObserver values that are too small
             tEval.pop_back();
+            xObserver.pop_back();
             removeCounter++;
         }
         if (removeCounter > 0){
-            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
+            std::cout << "WARNING: " << removeCounter << " tEval and xObserver value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
+        }
+    }
+
+    if (this->tEval.size() == 0){
+        this->tEval = tEval;
+        if (this->evalApparentState){
+            if (xObserver.size() == 0){
+                this->xObserver = std::vector< std::vector<real> >(tEval.size(), std::vector<real>(6, 0.0));
+            } else if (xObserver.size() == tEval.size() && xObserver[0].size() == 6){
+                this->xObserver = xObserver;
+            } else if (xObserver.size() != tEval.size() || xObserver[0].size() != 6){
+                throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
+            }
+        }
+    } else if (this->tEval.size() != 0){
+        for (size_t i = 0; i < tEval.size(); i++){
+            this->tEval.push_back(tEval[i]);
+            if (this->evalApparentState){
+                if (xObserver.size() == 0){
+                    this->xObserver.push_back(std::vector<real>(6, 0.0));
+                } else if (xObserver.size() == tEval.size() && xObserver[i].size() == 6){
+                    this->xObserver.push_back(xObserver[i]);
+                } else if (xObserver.size() != tEval.size() || xObserver[i].size() != 6){
+                    throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
+                }
+            }
         }
     }
 }
-
 
 void propSimulation::add_spice_body(std::string DEkernelPath, std::string name, int spiceId, real t0, real mass, real radius, Constants consts){
     // check if body already exists. if so, throw error
@@ -475,36 +505,7 @@ void propSimulation::set_integration_parameters(real tf, std::vector<real> tEval
     this->evalApparentState = evalApparentState;
     this->convergedLightTime = convergedLightTime;
     if (tEval.size() != 0){
-        sort_and_clean_up_tEval(tEval);
-        if (this->tEval.size() == 0){
-            this->tEval = tEval;
-            if (this->evalApparentState){
-                if (xObserver.size() == 0){
-                    this->xObserver = std::vector< std::vector<real> >(tEval.size(), std::vector<real>(6, 0.0));
-                } else if (xObserver.size() == tEval.size() && xObserver[0].size() == 6){
-                    this->xObserver = xObserver;
-                } else if (xObserver.size() != tEval.size() || xObserver[0].size() != 6){
-                    throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
-                }
-            }
-        } else if (this->tEval.size() != 0){
-            for (size_t i = 0; i < tEval.size(); i++){
-                this->tEval.push_back(tEval[i]);
-            }
-            if (this->evalApparentState){
-                if (xObserver.size() == 0){
-                    for (size_t i = 0; i < tEval.size(); i++){
-                        this->xObserver.push_back(std::vector<real>(6, 0.0));
-                    }
-                } else if (xObserver.size() == tEval.size() && xObserver[0].size() == 6){
-                    for (size_t i = 0; i < tEval.size(); i++){
-                        this->xObserver.push_back(xObserver[i]);
-                    }
-                } else if (xObserver.size() != tEval.size() || xObserver[0].size() != 6){
-                    throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
-                }
-            }
-        }
+        prepare_for_evaluation(tEval, xObserver);
     }
     this->integParams.dt0 = dt0;
     this->integParams.dtMax = dtMax;

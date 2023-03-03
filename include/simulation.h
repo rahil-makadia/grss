@@ -65,7 +65,7 @@ class ImpulseEvent : public Event{
 class propSimulation
 {
     private:
-        void sort_and_clean_up_tEval(std::vector<real> &tEval);
+        void prepare_for_evaluation(std::vector<real> &tEval, std::vector<std::vector<real>> &xObserver);
     public:
         // name and path to DE kernels
         std::string name;

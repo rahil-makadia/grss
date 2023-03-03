@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <numeric>
 #include <algorithm>
 #include <vector>
 #include <cmath>
@@ -93,6 +94,9 @@ real rad_to_deg(const real rad);
 void deg_to_rad(const real &deg, real &rad);
 real deg_to_rad(const real deg);
 
+void sort_vector(std::vector<real> &v, const bool &ascending);
+void sort_vector_by_another(std::vector<real> &v, const std::vector<real> &vRef, const bool &ascending);
+void sort_vector_by_another(std::vector< std::vector<real> > &v, const std::vector<real> &vRef, const bool &ascending);
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
 void vnorm(const std::vector<real> &v, real &norm);
 void vunit(const std::vector<real> &v, std::vector<real> &unit);
