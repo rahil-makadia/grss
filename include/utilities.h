@@ -6,6 +6,7 @@
 #include <numeric>
 #include <algorithm>
 #include <vector>
+#include <limits>
 #include <cmath>
 using std::fmin;
 using std::fmax;
@@ -73,7 +74,8 @@ struct NongravParamaters{
     real r0_au = 1.0L;
 };
 
-void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state[6], double &lt);
+void get_spice_state_lt(const int &spiceID, const real &t0_mjd, const Constants &consts, double state[6], double &lt);
+void get_observer_state(const real &t_obs_mjd, const std::vector<real> &observerInfo, const Constants &consts, const bool &tObsInUTC, std::vector<real> &observerState);
 
 void jd_to_mjd(const real jd, real &mjd);
 real jd_to_mjd(const real jd);

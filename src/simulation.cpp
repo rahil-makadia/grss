@@ -285,6 +285,9 @@ propSimulation::propSimulation(std::string name, real t0, const int defaultSpice
         add_spice_body(Cybele);
         break;
     }
+    default:
+        throw std::invalid_argument("The defaultSpiceBodies argument is only defined for no default SPICE bodies (case 0) or DE431 (case 431) or DE441 (case 441).");
+        break;
     }
 }
 
@@ -297,71 +300,98 @@ propSimulation::propSimulation(std::string name, const propSimulation &simRef){
     this->spiceBodies = simRef.spiceBodies;
 }
 
-void propSimulation::prepare_for_evaluation(std::vector<real> &tEval, std::vector<std::vector<real>> &xObserver){
+void propSimulation::prepare_for_evaluation(std::vector<real> &tEval, std::vector< std::vector<real> > &observerInfo){
     bool forwardProp = this->integParams.t0 < this->integParams.tf;
     bool backwardProp = this->integParams.t0 > this->integParams.tf;
-    sort_vector_by_another(xObserver, tEval, forwardProp);
-    sort_vector(tEval, forwardProp); // sort tEval into ascending order or descending order based on the integration direction
+    if (forwardProp && backwardProp){
+        throw std::invalid_argument("The initial and final times must be different.");
+    }
+    // sort tEval and corresponding observerInfo into ascending order or descending order based on the integration direction
+    if (observerInfo.size() != 0){
+        if (observerInfo.size() != tEval.size()){
+            throw std::invalid_argument("The number of tEval values and the number of observerInfo vectors must be equal.");
+        }
+        sort_vector_by_another(observerInfo, tEval, forwardProp);
+    }
+    sort_vector(tEval, forwardProp);
     if (forwardProp){
         int removeCounter = 0;
         while (tEval[0] < this->integParams.t0 - this->tEvalMargin){
-            // remove any tEval and xObserver values that are too small
+            // remove any tEval values that are before the integration start time
             tEval.erase(tEval.begin());
-            xObserver.erase(xObserver.begin());
+            observerInfo.erase(observerInfo.begin());
             removeCounter++;
         }
         while (tEval.back() > this->integParams.tf + this->tEvalMargin){
-            // remove any tEval and xObserver values that are too small
+            // remove any tEval values that are after the integration end time
             tEval.pop_back();
-            xObserver.pop_back();
+            observerInfo.pop_back();
             removeCounter++;
         }
         if (removeCounter > 0){
-            std::cout << "WARNING: " << removeCounter << " tEval value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
+            std::cout << "WARNING: " << removeCounter << " tEval and observerInfo value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
         }
     }
     else if (backwardProp){
         int removeCounter = 0;
         while (tEval[0] > this->integParams.t0 + this->tEvalMargin){
-            // remove any tEval and xObserver values that are too small
+            // remove any tEval values that are after the integration start time
             tEval.erase(tEval.begin());
-            xObserver.erase(xObserver.begin());
+            observerInfo.erase(observerInfo.begin());
             removeCounter++;
         }
         while (tEval.back() < this->integParams.tf - this->tEvalMargin){
-            // remove any tEval and xObserver values that are too small
+            // remove any tEval values that are before the integration end time
             tEval.pop_back();
-            xObserver.pop_back();
+            observerInfo.pop_back();
             removeCounter++;
         }
         if (removeCounter > 0){
-            std::cout << "WARNING: " << removeCounter << " tEval and xObserver value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
+            std::cout << "WARNING: " << removeCounter << " tEval and observerInfo value(s) were removed because they were outside the interpolation range, i.e., integration range with a margin of "<< this->tEvalMargin << " day(s)." << std::endl;
         }
     }
 
+    if (this->observerInfo.size() == 0){
+        this->observerInfo = observerInfo;
+    } else if (this->observerInfo.size() != 0){
+        for (size_t i = 0; i < observerInfo.size(); i++){
+            this->observerInfo.push_back(observerInfo[i]);
+        }
+    }
+
+    std::vector< std::vector<real> > xObserver = std::vector< std::vector<real> >(tEval.size(), std::vector<real>(6, 0.0L));
+    std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
+    furnsh_c(this->DEkernelPath.c_str());
+    std::cout.precision(22);
+    if (tEval.size() != 0){
+        for (size_t i = 0; i < tEval.size(); i++){
+            if (observerInfo[i].size() == 4){
+                radarObserver[i] = 0;
+            }
+            else if (observerInfo[i].size() == 8){
+                radarObserver[i] = 1;
+            }
+            else if (observerInfo[i].size() == 9){
+                radarObserver[i] = 2;
+            } else {
+                throw std::invalid_argument("The observerInfo vector must have 4 (optical), 8 (radar delay), or 9 elements (radar doppler).");
+            }
+            get_observer_state(tEval[i], observerInfo[i], this->consts, this->tEvalUTC, xObserver[i]);
+            // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " << xObserver[i][2] << " " << xObserver[i][3] << " " << xObserver[i][4] << " " << xObserver[i][5] << std::endl;
+        }
+    }
+    unload_c(this->DEkernelPath.c_str());
+
     if (this->tEval.size() == 0){
         this->tEval = tEval;
-        if (this->evalApparentState){
-            if (xObserver.size() == 0){
-                this->xObserver = std::vector< std::vector<real> >(tEval.size(), std::vector<real>(6, 0.0));
-            } else if (xObserver.size() == tEval.size() && xObserver[0].size() == 6){
-                this->xObserver = xObserver;
-            } else if (xObserver.size() != tEval.size() || xObserver[0].size() != 6){
-                throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
-            }
-        }
-    } else if (this->tEval.size() != 0){
+        this->xObserver = xObserver;
+        this->radarObserver = radarObserver;
+    }
+    else if (this->tEval.size() != 0){
         for (size_t i = 0; i < tEval.size(); i++){
             this->tEval.push_back(tEval[i]);
-            if (this->evalApparentState){
-                if (xObserver.size() == 0){
-                    this->xObserver.push_back(std::vector<real>(6, 0.0));
-                } else if (xObserver.size() == tEval.size() && xObserver[i].size() == 6){
-                    this->xObserver.push_back(xObserver[i]);
-                } else if (xObserver.size() != tEval.size() || xObserver[i].size() != 6){
-                    throw std::invalid_argument("The number of evaluation times must match the number of input observer states and the observer states must be 6-dimensional.");
-                }
-            }
+            this->xObserver.push_back(xObserver[i]);
+            this->radarObserver.push_back(radarObserver[i]);
         }
     }
 }
@@ -499,13 +529,13 @@ void propSimulation::set_sim_constants(real du2m, real tu2sec, real G, real clig
     this->consts.JdMinusMjd = 2400000.5;
 }
 
-void propSimulation::set_integration_parameters(real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > xObserver, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
+void propSimulation::set_integration_parameters(real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState, bool convergedLightTime, std::vector< std::vector<real> > observerInfo, bool adaptiveTimestep, real dt0, real dtMax, real dtMin, real dtChangeFactor, real tolInteg, real tolPC){
     this->integParams.tf = tf;
     this->tEvalUTC = tEvalUTC;
     this->evalApparentState = evalApparentState;
     this->convergedLightTime = convergedLightTime;
     if (tEval.size() != 0){
-        prepare_for_evaluation(tEval, xObserver);
+        prepare_for_evaluation(tEval, observerInfo);
     }
     this->integParams.dt0 = dt0;
     this->integParams.dtMax = dtMax;

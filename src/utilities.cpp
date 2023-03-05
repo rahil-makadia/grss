@@ -1,6 +1,6 @@
 #include "utilities.h"
 
-void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state[6], double &lt){
+void get_spice_state_lt(const int &spiceID, const real &t0_mjd, const Constants &consts, double state[6], double &lt){
     real t0_et;
     mjd_to_et(t0_mjd, t0_et);
     SpiceInt center = 0; // 0 = solar system barycenter
@@ -16,6 +16,75 @@ void get_spice_state_lt(int spiceID, real t0_mjd, Constants consts, double state
     for (int i=3; i<6; i++){
         state[i] *= consts.tu2sec;
     }
+}
+
+void get_observer_state(const real &tObsMjd, const std::vector<real> &observerInfo, const Constants &consts, const bool &tObsInUTC, std::vector<real> &observerState){
+    SpiceInt baseBody = observerInfo[0];
+    if (baseBody == 0){
+        observerState[0] = 0.0L;
+        observerState[1] = 0.0L;
+        observerState[2] = 0.0L;
+        observerState[3] = 0.0L;
+        observerState[4] = 0.0L;
+        observerState[5] = 0.0L;
+        return;
+    }
+    real lon = observerInfo[1];
+    real geodetLat = observerInfo[2];
+    real alt = observerInfo[3];
+    real t_obs_et;
+    real tObsMjdTDB;
+    mjd_to_et(tObsMjd, t_obs_et);
+    if (tObsInUTC){
+        // std::cout << tObsMjd << " MJD UTC" << t_obs_et << " s UTC -> ";
+        SpiceDouble et_minus_utc;
+        real sec_past_j2000_utc = t_obs_et;
+        deltet_c (sec_past_j2000_utc,  "UTC", &et_minus_utc);
+        t_obs_et += et_minus_utc;
+        et_to_mjd(t_obs_et, tObsMjdTDB);
+        // std::cout << t_obs_et << " s ET " << tObsMjdTDB << " MJD TDB" << std::endl;
+    } else {
+        tObsMjdTDB = tObsMjd;
+    }
+    double baseBodyState[6];
+    double lt;
+    get_spice_state_lt(baseBody, tObsMjdTDB, consts, baseBodyState, lt);
+
+    real a, f;
+    ConstSpiceChar *baseBodyFrame;
+    switch (baseBody)
+    {
+    case 399:
+        // earth WGS84 ellipsoid
+        a = 6378137.0L;
+        f = 1.0L/298.257223563L;
+        baseBodyFrame = "ITRF93";
+        break;
+    
+    default:
+        std::cout << "Given base body: " << baseBody << std::endl;
+        throw std::invalid_argument("Given base body not supported");
+        break;
+    }
+    real b = a*(1.0L-f);
+    real eSquared = 1.0L-(b*b)/(a*a);
+    real N = a/sqrt(1.0L-eSquared*sin(geodetLat)*sin(geodetLat));
+    ConstSpiceDouble bodyFixedX = (N+alt)*cos(geodetLat)*cos(lon)/consts.du2m;
+    ConstSpiceDouble bodyFixedY = (N+alt)*cos(geodetLat)*sin(lon)/consts.du2m;
+    ConstSpiceDouble bodyFixedZ = (N*(1.0L-eSquared)+alt)*sin(geodetLat)/consts.du2m;
+    ConstSpiceDouble bodyFixedPos[3] = {bodyFixedX, bodyFixedY, bodyFixedZ};
+    ConstSpiceChar *outFrame = "J2000";
+    SpiceDouble rotMat[3][3];
+    pxform_c(baseBodyFrame, outFrame, t_obs_et, rotMat);
+    SpiceDouble observerPos[3];
+    mxv_c(rotMat, bodyFixedPos, observerPos);
+
+    observerState[0] = baseBodyState[0] + (real) observerPos[0];
+    observerState[1] = baseBodyState[1] + (real) observerPos[1];
+    observerState[2] = baseBodyState[2] + (real) observerPos[2];
+    observerState[3] = std::numeric_limits<real>::quiet_NaN(); // baseBodyState[3];
+    observerState[4] = std::numeric_limits<real>::quiet_NaN(); // baseBodyState[4];
+    observerState[5] = std::numeric_limits<real>::quiet_NaN(); // baseBodyState[5];
 }
 
 void jd_to_et(const real jd, real &et){
