@@ -544,6 +544,11 @@ void propSimulation::set_integration_parameters(real tf, std::vector<real> tEval
     this->integParams.adaptiveTimestep = adaptiveTimestep;
     this->integParams.tolPC = tolPC;
     this->integParams.tolInteg = tolInteg;
+
+    bool backwardProp = this->integParams.t0 > this->integParams.tf;
+    if (backwardProp){
+        std::reverse(this->events.begin(),this->events.end());
+    }
 }
 
 std::vector<real> propSimulation::get_sim_constants(){
