@@ -12,12 +12,11 @@ from .fit_utilities import *
 __all__ = [ 'get_optical_obs_array',
 ]
 
-def get_optical_data(body_id, allow_roving_observers=False, t_max_tdb=None, verbose=False):
+def get_optical_data(body_id, t_max_tdb=None, verbose=False):
     """Get observation data for a given body.
 
     Args:
         body_id (int or str): Target id, numbers are interpreted as asteroids, append 'P' for comets, start with comet type and a '/' for comet designations
-        allow_roving_observers (bool, optional): Toggle for whether to allow observation data from roving observatories. Defaults to False.
         t_max_tdb (float or None, optional): Maximum date to cap the optical observation epochs. Defaults to None.
         verbose (bool, optional): Toggle for whether to print out information about the observations. Defaults to False.
 
@@ -34,6 +33,9 @@ def get_optical_data(body_id, allow_roving_observers=False, t_max_tdb=None, verb
     obs_array_optical = np.zeros((len(obs_raw), 5))
     star_catalog_codes = []
     observer_codes_optical = []
+    roving_observatory_codes = ['270', '247']
+    space_observatory_codes = ['245', '249', '250', '258', '274', 'C49', 'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59',]
+    non_geocentric_occultation_codes = ['275']
     for i, row in enumerate(obs_raw):
         data = row['obs']
         date = data[15:32]
@@ -41,8 +43,8 @@ def get_optical_data(body_id, allow_roving_observers=False, t_max_tdb=None, verb
         ra = get_ra_from_hms(data[32:44])
         dec = get_dec_from_dms(data[44:56])
         obs_code = data[77:80]
-        roving_observation = obs_code in ['270', '247']
-        if (not roving_observation or allow_roving_observers) and obs_time_mjd <= t_max_utc:
+        disallowed_observation = obs_code in roving_observatory_codes or obs_code in space_observatory_codes or obs_code in non_geocentric_occultation_codes
+        if (not disallowed_observation) and obs_time_mjd <= t_max_utc:
             obs_array_optical[i, 0] = obs_time_mjd
             obs_array_optical[i, 1] = ra
             obs_array_optical[i, 2] = dec
@@ -51,8 +53,8 @@ def get_optical_data(body_id, allow_roving_observers=False, t_max_tdb=None, verb
             observer_codes_optical.append(obs_code)
         else:
             if verbose:
-                if roving_observation:
-                    print(f"Skipping observation {i} because it is a roving observation.")
+                if disallowed_observation:
+                    print(f"Skipping observation {i} because it is disallowed observation (roving observer or space-based observer).")
                 else:
                     print(f"Skipping observation {i} because it is past the maximum observation epoch limit.")
             obs_array_optical[i, :] = np.nan
@@ -282,12 +284,11 @@ def eliminate_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
         print(f"Removed {len(obs_array_optical)-len(obs_array_eliminated)} observations as part of elimination scheme.")
     return obs_array_eliminated, tuple(catalog_eliminated), tuple(observer_loc_eliminated)
 
-def get_optical_obs_array(body_id, allow_roving_observers=False, t_max_tdb=None, debias=True, debias_lowres=False, deweight=True, eliminate=False, max_obs_per_night=5, verbose=False):
+def get_optical_obs_array(body_id, t_max_tdb=None, debias=True, debias_lowres=False, deweight=True, eliminate=False, max_obs_per_night=5, verbose=False):
     """Assemble the optical observations for a given body into an array for an orbit fit.
 
     Args:
         body_id (int or str): Target id, numbers are interpreted as asteroids, append 'P' for comets, start with comet type and a '/' for comet designations
-        allow_roving_observers (bool, optional): Toggle for whether to allow observation data from roving observatories. Defaults to False.
         t_max_tdb (float or None, optional): Maximum date to cap the optical observation epochs. Defaults to None.
         debias (bool, optional): Toggle for whether to use the debiasing scheme. Defaults to True.
         debias_lowres (bool, optional): Toggle for whether to use the low resolution debiasing scheme. Defaults to False.
@@ -315,7 +316,7 @@ def get_optical_obs_array(body_id, allow_roving_observers=False, t_max_tdb=None,
     elif not debias and not debias_lowres:
         raise ValueError('Must debias or debias_lowres.')
     
-    obs_array_optical, star_catalog_codes, observer_codes_optical = get_optical_data(65803, allow_roving_observers, t_max_tdb, verbose)
+    obs_array_optical, star_catalog_codes, observer_codes_optical = get_optical_data(body_id, t_max_tdb, verbose)
     if debias:
         obs_array_optical, star_catalog_codes, observer_codes_optical = apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes_optical, debias_lowres, verbose)
     obs_array_optical = apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical, verbose)

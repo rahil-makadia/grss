@@ -54,8 +54,8 @@ def get_radar_obs_array(tdes):
     for i in range(num_obs):
         obs = data[num_obs-i-1]
         date = Time(obs[1], format='iso', scale='utc')
-        obs_val = obs[2]
-        obs_sigma = obs[3]
+        obs_val = float(obs[2])
+        obs_sigma = float(obs[3])
         delay = obs[4] == 'us'
         doppler = obs[4] == 'Hz'
         freq = float(obs[5])*1e6 # MHz -> Hz

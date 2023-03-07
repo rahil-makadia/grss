@@ -12,6 +12,8 @@ class iterationParams:
         self.iter_number = iter_number
         self.x_nom = x_nom
         self.covariance = covariance
+        variance = np.sqrt(np.diag(self.covariance))
+        self.variance = dict(zip([f'var_{k}' for k in self.x_nom.keys()], variance))
         self.residuals = residuals
         self.obs_array = obs_array
         self.observer_codes = observer_codes
@@ -76,10 +78,81 @@ class iterationParams:
         ax_histy.hist(y, bins=bins, orientation='horizontal', color=color, edgecolor=color, linewidth=0.75, fill=fill, histtype='step')
         return None
 
-    def plot_residuals(self, show_logarithmic=False):
+    def plot_residuals(self, t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic):
         # sourcery skip: extract-duplicate-method
+        fig = plt.figure(figsize=(21,6), dpi=150)
+        iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
+        plt.suptitle(iter_string, y=0.95)
+        gs = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
+        ax1 = fig.add_subplot(gs[0, 0])
+        ax1.plot(t_arr_optical, ra_residuals, '.', label='RA', markersize=markersize)
+        ax1.plot(t_arr_optical, dec_residuals, '.', label='Dec', markersize=markersize)
+        ax1.legend()
+        ax1.set_xlabel('MJD [UTC]')
+        ax1.set_ylabel('Residuals, O-C [arcsec]')
+        ax1.grid(True, which='both', axis='both', alpha=0.2)
+        if show_logarithmic: ax1.set_yscale('log')
+
+        ax2 = gs[0,1].subgridspec(2, 2, width_ratios=(4,1), height_ratios=(1,4), wspace=0.05, hspace=0.05)
+        ax2main = fig.add_subplot(ax2[1,0])
+        ax2histx = fig.add_subplot(ax2[0,0], sharex=ax2main)
+        ax2histy = fig.add_subplot(ax2[1,1], sharey=ax2main)
+        self.scatter_hist(ra_cosdec_residuals, dec_residuals, ax2main, ax2histx, ax2histy, markersize, show_logarithmic)
+        ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
+        ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
+        ax2main.grid(True, which='both', axis='both', alpha=0.2, zorder=-100)
+        if show_logarithmic: ax2main.set_yscale('log'); ax2main.set_xscale('log')
+        
+        ax3 = fig.add_subplot(gs[0, 2])
+        ax3.plot(t_arr_radar, delay_residuals, '.', mfc='C2', mec='C2', label='Delay', markersize=radar_scale*markersize)
+        ax3.plot(t_arr_radar, doppler_residuals, '.', mfc='C3', mec='C3', label='Doppler', markersize=radar_scale*markersize)
+        ax3.legend()
+        ax3.set_xlabel('MJD [UTC]')
+        ax3.set_ylabel('Residuals, O-C [$\mu$s, Hz]')
+        ax3.grid(True, which='both', axis='both', alpha=0.2)
+        if show_logarithmic: ax3.set_yscale('log')
+        plt.show()
+
+    def plot_chi(self, t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic):
+        # plot chi values
+        plt.figure(figsize=(21,6), dpi=150)
+        iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
+        plt.suptitle(f'{iter_string}. Chi Squared: RA={np.sum(ra_chi_squared):.2f}, Dec={np.sum(dec_chi_squared):.2f}, Delay={np.sum(delay_chi_squared):.2f}, Doppler={np.sum(doppler_chi_squared):.2f}', y=0.95)
+        plt.subplot(1,2,1)
+        plt.plot(t_arr_optical, ra_chi, '.', markersize=markersize, label='RA')
+        plt.plot(t_arr_optical, dec_chi, '.', markersize=markersize, label='Dec')
+        plt.plot(t_arr_radar, delay_chi, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
+        plt.plot(t_arr_radar, doppler_chi, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
+        plt.axhline(-sigma_limit, c='khaki', linestyle='--', alpha=1.0, label=f'$\pm{sigma_limit:.0f}\sigma$')
+        plt.axhline(sigma_limit, c='khaki', linestyle='--', alpha=1.0)
+        plt.axhline(-2*sigma_limit, c='red', linestyle='--', alpha=0.5, label=f'$\pm{2*sigma_limit:.0f}\sigma$')
+        plt.axhline(2*sigma_limit, c='red', linestyle='--', alpha=0.5)
+        plt.legend()
+        plt.xlabel('MJD [UTC]')
+        plt.ylabel('$\chi$, (O-C)/$\sigma$ $[\cdot]$')
+        plt.grid(True, which='both', axis='both', alpha=0.2)
+        if show_logarithmic: plt.yscale('log')
+
+        plt.subplot(1,2,2)
+        plt.plot(t_arr_optical, ra_chi_squared, '.', markersize=markersize, label='RA')
+        plt.plot(t_arr_optical, dec_chi_squared, '.', markersize=markersize, label='Dec')
+        plt.plot(t_arr_radar, delay_chi_squared, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
+        plt.plot(t_arr_radar, doppler_chi_squared, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
+        plt.legend()
+        plt.xlabel('MJD [UTC]')
+        plt.ylabel('$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
+        plt.grid(True, which='both', axis='both', alpha=0.2)
+        if show_logarithmic: plt.yscale('log')
+        plt.show()
+
+
+    def plot_iteration_summary(self, show_logarithmic=False):
         markersize = 3
         sigma_limit = 3
+        radar_scale = 3
+        plt.rcParams['font.size'] = 12
+        plt.rcParams['axes.labelsize'] = 12
+
         obs_array = self.obs_array
         residuals = self.residuals
         # opticalIdx is where neither the ra nor dec residuals are NaN
@@ -130,65 +203,9 @@ class iterationParams:
         delay_chi = np.abs(delay_chi) if show_logarithmic else delay_chi
         doppler_chi = np.abs(doppler_chi) if show_logarithmic else doppler_chi
 
-        fig = plt.figure(figsize=(21,6), dpi=150)
-        gs = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
-        ax1 = fig.add_subplot(gs[0, 0])
-        ax1.plot(t_arr_optical, ra_residuals, '.', label='RA', markersize=markersize)
-        ax1.plot(t_arr_optical, dec_residuals, '.', label='Dec', markersize=markersize)
-        ax1.legend()
-        ax1.set_xlabel('MJD [UTC]')
-        ax1.set_ylabel('Residuals, O-C [arcsec]')
-        ax1.grid(True, which='both', axis='both', alpha=0.2)
-        if show_logarithmic: ax1.set_yscale('log')
-
-        ax2 = gs[0,1].subgridspec(2, 2, width_ratios=(4,1), height_ratios=(1,4), wspace=0.05, hspace=0.05)
-        ax2main = fig.add_subplot(ax2[1,0])
-        ax2histx = fig.add_subplot(ax2[0,0], sharex=ax2main)
-        ax2histy = fig.add_subplot(ax2[1,1], sharey=ax2main)
-        self.scatter_hist(ra_cosdec_residuals, dec_residuals, ax2main, ax2histx, ax2histy, markersize, show_logarithmic)
-        ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
-        ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
-        ax2main.grid(True, which='both', axis='both', alpha=0.2, zorder=-100)
-        if show_logarithmic: ax2main.set_yscale('log'); ax2main.set_xscale('log')
-        
-        ax3 = fig.add_subplot(gs[0, 2])
-        ax3.plot(t_arr_radar, delay_residuals, '.', label='Delay', markersize=markersize)
-        ax3.plot(t_arr_radar, doppler_residuals, '.', label='Doppler', markersize=markersize)
-        ax3.legend()
-        ax3.set_xlabel('MJD [UTC]')
-        ax3.set_ylabel('Residuals, O-C [$\mu$s, Hz]')
-        ax3.grid(True, which='both', axis='both', alpha=0.2)
-        if show_logarithmic: ax3.set_yscale('log')
-        plt.show()
-
-        # plot chi values
-        plt.figure(figsize=(16,6), dpi=150)
-        plt.subplot(1,2,1)
-        plt.plot(t_arr_optical, ra_chi, '.', label='RA', markersize=markersize)
-        plt.plot(t_arr_optical, dec_chi, '.', label='Dec', markersize=markersize)
-        plt.plot(t_arr_radar, delay_chi, '.', label='Delay', markersize=markersize)
-        plt.plot(t_arr_radar, doppler_chi, '.', label='Doppler', markersize=markersize)
-        plt.axhline(-sigma_limit, c='khaki', linestyle='--', alpha=1.0, label=f'$\pm{sigma_limit:.0f}\sigma$')
-        plt.axhline(sigma_limit, c='khaki', linestyle='--', alpha=1.0)
-        plt.axhline(-2*sigma_limit, c='red', linestyle='--', alpha=0.5, label=f'$\pm{2*sigma_limit:.0f}\sigma$')
-        plt.axhline(2*sigma_limit, c='red', linestyle='--', alpha=0.5)
-        plt.legend()
-        plt.xlabel('MJD [UTC]')
-        plt.ylabel('$\chi$, (O-C)/$\sigma$ $[\cdot]$')
-        plt.grid(True, which='both', axis='both', alpha=0.2)
-        if show_logarithmic: plt.yscale('log')
-
-        plt.subplot(1,2,2)
-        plt.plot(t_arr_optical, ra_chi_squared, '.', markersize=markersize, label='RA')
-        plt.plot(t_arr_optical, dec_chi_squared, '.', markersize=markersize, label='Dec')
-        plt.plot(t_arr_radar, delay_chi_squared, '.', markersize=markersize, label='Delay')
-        plt.plot(t_arr_radar, doppler_chi_squared, '.', markersize=markersize, label='Doppler')
-        plt.legend()
-        plt.xlabel('MJD [UTC]')
-        plt.ylabel('$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
-        plt.grid(True, which='both', axis='both', alpha=0.2)
-        if show_logarithmic: plt.yscale('log')
-        plt.show()
+        self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic)
+        self.plot_chi(t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic)
+        return None
 
 class fitSimulation:
     def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None, obs_array_radar=None, observer_codes_radar=None, n_iter=5, DEkernel=441, DEkernelPath=''):
@@ -200,7 +217,7 @@ class fitSimulation:
         self.DEkernel = DEkernel
         self.DEkernelPath = DEkernelPath
         self.analytic_partials = False
-        self.fixed_nongrav_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0, 'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0, 'r0_au': 1.0}
+        self.fixed_propSim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0, 'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0, 'r0_au': 1.0, 'radius': 0.0, 'mass': 0.0}
         return None
 
     def check_initial_solution(self, x_init, cov_init):
@@ -212,11 +229,12 @@ class fitSimulation:
             if key in x_init and x_init[key] != 0.0:
                 self.fit_nongrav = True
         self.t = x_init['t']
-        x_init = x_init
+        self.x_init = x_init
         self.x_nom = {key: x_init[key] for key in x_init if key != 't'} # remove t for self.x_nom
         self.n_fit = len(self.x_nom)
         if cov_init.shape != (self.n_fit, self.n_fit):
             raise ValueError("Covariance matrix must be the same size as the number of fitted parameters.")
+        self.covariance_init = cov_init
         self.covariance = cov_init
         
         return None
@@ -326,9 +344,9 @@ class fitSimulation:
 
     def x_dict_to_nongrav_params(self, x_dict):
         nongravParams = prop.NongravParamaters()
-        a1 = x_dict['a1'] if 'a1' in x_dict.keys() else self.fixed_nongrav_params['a1']
-        a2 = x_dict['a2'] if 'a2' in x_dict.keys() else self.fixed_nongrav_params['a2']
-        a3 = x_dict['a3'] if 'a3' in x_dict.keys() else self.fixed_nongrav_params['a3']
+        a1 = x_dict['a1'] if 'a1' in x_dict.keys() else self.fixed_propSim_params['a1']
+        a2 = x_dict['a2'] if 'a2' in x_dict.keys() else self.fixed_propSim_params['a2']
+        a3 = x_dict['a3'] if 'a3' in x_dict.keys() else self.fixed_propSim_params['a3']
         nongravParams.a1 = a1
         nongravParams.a2 = a2
         nongravParams.a3 = a3
@@ -339,9 +357,11 @@ class fitSimulation:
         nongravParams.r0_au = 1.0
         return nongravParams
 
-    def get_perturbed_state(self, key, fd_pert):
+    def get_perturbed_state(self, key):
+        if key in ['x', 'y', 'z', 'vx', 'vy', 'vz']:
+            fd_pert = 1e-10
         if key in ['a1', 'a2', 'a3']:
-            fd_pert = 1e-2
+            fd_pert = 1e-1
         x_plus = self.x_nom.copy()
         x_minus = self.x_nom.copy()
         fd_delta = self.x_nom[key]*fd_pert # fd_pert = finite difference perturbation to nominal state for calculating derivatives
@@ -356,8 +376,7 @@ class fitSimulation:
     def get_perturbation_info(self):
         perturbation_info = []
         for key in self.x_nom:
-            fd_pert = 1e-10 if self.fit_optical and self.fit_radar else 1e-3
-            pert_result = self.get_perturbed_state(key, fd_pert)
+            pert_result = self.get_perturbed_state(key)
             perturbation_info.append(tuple(pert_result))
         return perturbation_info
 
@@ -369,7 +388,7 @@ class fitSimulation:
         pos_nom, vel_nom = self.x_dict_to_cartesian_state(self.x_nom)
         ngParams_nom = self.x_dict_to_nongrav_params(self.x_nom)
         cov_nom = self.covariance
-        integBody_nom = prop.IntegBody("integBody_nom", self.t, 0.0, 0.0, pos_nom, vel_nom, cov_nom, ngParams_nom, consts)
+        integBody_nom = prop.IntegBody("integBody_nom", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_nom, vel_nom, cov_nom, ngParams_nom, consts)
         # add the nominal IntegBody for the residuals
         if self.pastObsExist:
             propSimPast.add_integ_body(integBody_nom)
@@ -380,8 +399,8 @@ class fitSimulation:
             for i in range(self.n_fit):
                 key = list(self.x_nom.keys())[i]
                 pos_plus, vel_plus, ngParams_plus, pos_minus, vel_minus, ngParams_minus, fd_delta = perturbation_info[i]
-                integBody_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t, 0.0, 0.0, pos_plus, vel_plus, cov_nom, ngParams_plus, consts)
-                integBody_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t, 0.0, 0.0, pos_minus, vel_minus, cov_nom, ngParams_minus, consts)
+                integBody_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_plus, vel_plus, cov_nom, ngParams_plus, consts)
+                integBody_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_minus, vel_minus, cov_nom, ngParams_minus, consts)
                 if self.pastObsExist:
                     propSimPast.add_integ_body(integBody_plus)
                     propSimPast.add_integ_body(integBody_minus)
@@ -459,9 +478,6 @@ class fitSimulation:
         residuals = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=0)
         # get partials
         partials = self.get_partials(propSimPast, propSimFuture, perturbation_info)
-        # destroy propSim objects
-        del propSimPast
-        del propSimFuture
         return residuals, partials
 
     def add_iteration(self, iter_number, residuals):
@@ -469,14 +485,15 @@ class fitSimulation:
         return None
     
     def filter_lsq(self):
-        print("Iteration\tUnweighted RMS\tWeighted RMS\tChi Squared\tReduced Chi Squared")
+        print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
+        # add prefit iteration
+        prefit_residuals = self.get_residuals_and_partials()[0]
+        self.add_iteration(0, prefit_residuals)
+        # print("%d%s\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t%.3f" % (self.iters[-1].iter_number, " (prefit)", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
         for i in range(self.n_iter):
             # get residuals and partials
             residuals, a = self.get_residuals_and_partials()
             b = self.flatten_and_clean(residuals)
-            # add iteration
-            self.add_iteration(i+1, residuals)
-            print("%d\t\t%.3f\t\t%.3f\t\t%.3f\t\t%.3f" % (i, self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
             # get initial guess
             x0 = np.array(list(self.x_nom.values()))
             # get covariance
@@ -485,55 +502,66 @@ class fitSimulation:
             w = self.weight_matrix
             P = np.linalg.inv(a.T @ w @ a)
             dx = P @ a.T @ w @ b
-            print("dx: ", dx)
             # get new state
             x = x0 - dx
             self.x_nom = dict(zip(self.x_nom.keys(), x))
             # get new covariance
             self.covariance = P
+            # add iteration
+            self.add_iteration(i+1, residuals)
+            print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
         return None
 
-    def print_summary(self):
-        print("Iteration\tUnweighted RMS\tWeighted RMS\tChi-squared\tReduced Chi-squared")
-        for iteration in self.iters:
-            print("%d\t\t%.3f\t\t%.3f\t\t%.3f\t\t%.3f" % (iteration.iter_number, iteration.unweighted_rms, iteration.weighted_rms, iteration.chi_squared, iteration.reduced_chi_squared))
-        
-        print("Summary of the orbit fit calculations:")
+    def print_summary(self, iter_idx=-1):
+        data = self.iters[iter_idx]
+        print(f"Summary of the orbit fit calculations at iteration {data.iter_number} (of {self.n_iter}):")
         print("====================================================")
-        print(f"Number of iterations: {len(self.iters)}")
-        print(f"Final RMS unweighted: {self.iters[-1].unweighted_rms}")
-        print(f"Final RMS weighted: {self.iters[-1].weighted_rms}")
-        print(f"Final chi-squared: {self.iters[-1].chi_squared}")
-        print(f"Final reduced chi-squared: {self.iters[-1].reduced_chi_squared}")
+        print(f"RMS unweighted: {data.unweighted_rms}")
+        print(f"RMS weighted: {data.weighted_rms}")
+        print(f"chi-squared: {data.chi_squared}")
+        print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print("====================================================")
+        print(f"t: MJD {self.t} TDB")
+        print("Fitted Variable\t\tInitial Value\t\tUncertainty\t\tFitted Value\t\tUncertainty\t\tChange\t\t\tChange (sigma)")
+        init_variance = np.sqrt(np.diag(self.covariance_init))
+        final_variance = np.sqrt(np.diag(self.covariance))
+        init_sol = self.iters[0].x_nom
+        final_sol = data.x_nom
+        with np.errstate(divide='ignore'):
+            for i, key in enumerate(init_sol.keys()):
+                print(f"{key}\t\t\t{init_sol[key]:.8e}\t\t{init_variance[i]:.8e}\t\t{final_sol[key]:.8e}\t\t{final_variance[i]:.8e}\t\t{final_sol[key]-init_sol[key]:.8e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:.8e}")
         return None
 
     def plot_summary(self):
+        plt.rcParams['font.size'] = 12
+        plt.rcParams['axes.labelsize'] = 12
         ticks = np.arange(1, self.n_iter+1, 1)
-        plt.figure(figsize=(15,10), dpi=150)
+        start_idx = 1
+        iters_for_plot = self.iters[start_idx:]
+        plt.figure(figsize=(21,10), dpi=150)
         plt.subplot(2, 2, 1)
-        plt.semilogy([iteration.iter_number for iteration in self.iters], [iteration.unweighted_rms for iteration in self.iters], label=f"Unweighted RMS={self.iters[-1].unweighted_rms:.3e}")
+        plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.unweighted_rms for iteration in iters_for_plot], label=f"Final Unweighted RMS={iters_for_plot[-1].unweighted_rms:.3e}")
         plt.xticks(ticks)
         plt.xlabel("Iteration #")
         plt.ylabel("Unweighted RMS")
         plt.legend()
 
         plt.subplot(2, 2, 2)
-        plt.semilogy([iteration.iter_number for iteration in self.iters], [iteration.weighted_rms for iteration in self.iters], label=f"Weighted RMS={self.iters[-1].weighted_rms:.3e}")
+        plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.weighted_rms for iteration in iters_for_plot], label=f"Final Weighted RMS={iters_for_plot[-1].weighted_rms:.3e}")
         plt.xticks(ticks)
         plt.xlabel("Iteration #")
         plt.ylabel("Weighted RMS")
         plt.legend()
 
         plt.subplot(2, 2, 3)
-        plt.semilogy([iteration.iter_number for iteration in self.iters], [iteration.chi_squared for iteration in self.iters], label=f"$\chi^2$={self.iters[-1].chi_squared:.3e}")
+        plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.chi_squared for iteration in iters_for_plot], label=f"Final $\chi^2$={iters_for_plot[-1].chi_squared:.3e}")
         plt.xticks(ticks)
         plt.xlabel("Iteration #")
         plt.ylabel("$\chi^2$")
         plt.legend()
 
         plt.subplot(2, 2, 4)
-        plt.semilogy([iteration.iter_number for iteration in self.iters], [iteration.reduced_chi_squared for iteration in self.iters], label=f"Reduced $\chi^2$={self.iters[-1].reduced_chi_squared:.3e}")
+        plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.reduced_chi_squared for iteration in iters_for_plot], label=f"Final Reduced $\chi^2$={iters_for_plot[-1].reduced_chi_squared:.3e}")
         plt.xticks(ticks)
         plt.xlabel("Iteration #")
         plt.ylabel("Reduced $\chi^2$")
