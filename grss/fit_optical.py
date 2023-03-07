@@ -7,7 +7,7 @@ from astroquery.mpc import MPC
 import numpy as np
 import pandas as pd
 
-from .fit_utils import *
+from .fit_utilities import *
 
 __all__ = [ 'get_optical_obs_array',
 ]

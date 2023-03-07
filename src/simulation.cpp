@@ -351,6 +351,10 @@ void propSimulation::prepare_for_evaluation(std::vector<real> &tEval, std::vecto
         }
     }
 
+    if (observerInfo.size() == 0){
+        observerInfo = std::vector< std::vector<real> >(tEval.size(), std::vector<real>(4, 0.0L));
+    }
+
     if (this->observerInfo.size() == 0){
         this->observerInfo = observerInfo;
     } else if (this->observerInfo.size() != 0){

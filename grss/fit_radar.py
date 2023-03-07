@@ -3,7 +3,7 @@ from astropy.time import Time
 from json import loads
 from requests import request
 
-from .fit_utils import *
+from .fit_utilities import *
 
 __all__ = [ 'get_radar_obs_array',
 ]

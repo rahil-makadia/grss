@@ -202,31 +202,31 @@ void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real
     }
 }
 
-void check_and_apply_events(propSimulation &sim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
-    while (nextEventIdx < sim.events.size() && t == tNextEvent){
+void check_and_apply_events(propSimulation &propSim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
+    while (nextEventIdx < propSim.events.size() && t == tNextEvent){
         // apply events for the state just reached by the integrator
         real propDir;
-        if (sim.integParams.t0 < sim.integParams.tf){
+        if (propSim.integParams.t0 < propSim.integParams.tf){
             propDir = 1.0L;
         } else {
             propDir = -1.0L;
         }
-        sim.events[nextEventIdx].apply(t, xInteg, propDir);
+        propSim.events[nextEventIdx].apply(t, xInteg, propDir);
         // update next event index and time
         nextEventIdx += 1;
-        if (nextEventIdx < sim.events.size()){
-            tNextEvent = sim.events[nextEventIdx].t;
+        if (nextEventIdx < propSim.events.size()){
+            tNextEvent = propSim.events[nextEventIdx].t;
         } else {
-            tNextEvent = sim.integParams.tf;
+            tNextEvent = propSim.integParams.tf;
         }
     }
 }
 
-void gr15(real t, std::vector<real> xInteg0, propSimulation &sim){
-    ForceParameters &forceParams = sim.forceParams;
-    IntegrationParameters &integParams = sim.integParams;
+void gr15(real t, std::vector<real> xInteg0, propSimulation &propSim){
+    ForceParameters &forceParams = propSim.forceParams;
+    IntegrationParameters &integParams = propSim.integParams;
     size_t dim = 3*integParams.nInteg;
-    Constants &consts = sim.consts;
+    Constants &consts = propSim.consts;
     real dt = get_initial_timestep(t, xInteg0, forceParams, integParams, consts);
     integParams.timestepCounter = 0;
     std::vector<real> accInteg0 = get_state_der(t, xInteg0, forceParams, integParams, consts);
@@ -246,10 +246,10 @@ void gr15(real t, std::vector<real> xInteg0, propSimulation &sim){
     if (t == integParams.t0){
         nextEventIdx = 0;
     }
-    if (sim.events.size() != 0){
-        tNextEvent = sim.events[0].t;
+    if (propSim.events.size() != 0){
+        tNextEvent = propSim.events[0].t;
     }
-    check_and_apply_events(sim, t, tNextEvent, nextEventIdx, xInteg0);
+    check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg0);
     if ( (integParams.tf > integParams.t0 && t+dt > tNextEvent) || (integParams.tf < integParams.t0 && t+dt < tNextEvent)){
         dt = tNextEvent-t;
     }
@@ -302,7 +302,7 @@ void gr15(real t, std::vector<real> xInteg0, propSimulation &sim){
                 oneStepDone = 1;
                 integParams.timestepCounter += 1;
                 // start interpolation call
-                interpolate(t, dt, xInteg0, accInteg0, b, hVec, sim);
+                interpolate(t, dt, xInteg0, accInteg0, b, hVec, propSim);
                 // end interpolation call
                 t += dt;
                 if ((integParams.tf > integParams.t0 && t >= integParams.tf) || (integParams.tf < integParams.t0 && t <= integParams.tf)){
@@ -313,10 +313,10 @@ void gr15(real t, std::vector<real> xInteg0, propSimulation &sim){
                 b_old = b;
                 refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
                 loopCounter = 0;
-                check_and_apply_events(sim, t, tNextEvent, nextEventIdx, xInteg);
+                check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg);
                 // std::cout << "t = " << t << ", dt = " << dt << ", dtReq = " << dtReq << std::endl;
-                sim.t = t;
-                sim.xInteg = xInteg;
+                propSim.t = t;
+                propSim.xInteg = xInteg;
             }
             else{
                 loopCounter += 1;
