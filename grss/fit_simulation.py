@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import spiceypy as spice
 
 from . import prop
 from .fit_utilities import *
@@ -223,8 +224,14 @@ class fitSimulation:
     def check_initial_solution(self, x_init, cov_init):
         if 't' not in x_init:
             raise ValueError("Must provide a time for the initial solution.")
-        if any(key not in x_init for key in ("x", "y", "z", "vx", "vy", "vz")):
-            raise ValueError("Must provide at least a full cartesian state for the initial solution.")
+        if all(key in x_init for key in ("x", "y", "z", "vx", "vy", "vz")):
+            self.fit_cartesian = True
+            self.fit_cometary = False
+        elif all(key in x_init for key in ("e", "q", "tp", "om", "w", "i")):
+            self.fit_cartesian = False
+            self.fit_cometary = True
+        else:
+            raise ValueError("Must provide at least a full cartesian or cometary state for the initial solution.")
         for key in ["a1", "a2", "a3"]:
             if key in x_init and x_init[key] != 0.0:
                 self.fit_nongrav = True
@@ -236,7 +243,6 @@ class fitSimulation:
             raise ValueError("Covariance matrix must be the same size as the number of fitted parameters.")
         self.covariance_init = cov_init
         self.covariance = cov_init
-        
         return None
 
     def check_input_observation_arrays(self, obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar):
@@ -301,6 +307,23 @@ class fitSimulation:
         self.obs_array = obs_array[sort_idx]
         self.observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
         return None
+    
+    def helioEclipCometary_to_baryEquatCartesian(self, cometary_elements):
+        t0Mjd = self.t
+        obliq = 84381.448/3600.0*3.141592653589793238462643383279502884197169399375105820974944/180.0
+        eclip_to_equat = np.array([ [1,             0,              0],
+                                    [0, np.cos(obliq),  -np.sin(obliq)],
+                                    [0, np.sin(obliq),  np.cos(obliq)] ])
+        helioEclipCartesian = prop.cometary_to_cartesian(t0Mjd, cometary_elements)
+        helioEclipCartesian = np.array([helioEclipCartesian[0], helioEclipCartesian[1], helioEclipCartesian[2], helioEclipCartesian[3], helioEclipCartesian[4], helioEclipCartesian[5]])
+        helioEquatCartesian = np.zeros_like(helioEclipCartesian)
+        helioEquatCartesian[:3] = np.matmul(eclip_to_equat, helioEclipCartesian[:3])
+        helioEquatCartesian[3:] = np.matmul(eclip_to_equat, helioEclipCartesian[3:])
+        sunBaryEquatCartesian = spice.spkez(10, mjd2et(t0Mjd), 'J2000', 'NONE', 0)[0]
+        consts = prop.Constants()
+        sunBaryEquatCartesian *= 1000.0/consts.du2m
+        sunBaryEquatCartesian[3:6] *= consts.tu2sec
+        return list(helioEquatCartesian + sunBaryEquatCartesian)
 
     def get_propSimPast(self, name, tEvalUTC, evalApparentState, convergedLightTime, observerInfo):
         tEvalPast = self.obs_array[self.pastObsIdx, 0]
@@ -332,14 +355,29 @@ class fitSimulation:
         return propSimPast, propSimFuture
 
     def x_dict_to_cartesian_state(self, x_dict):
-        x = x_dict['x']
-        y = x_dict['y']
-        z = x_dict['z']
-        vx = x_dict['vx']
-        vy = x_dict['vy']
-        vz = x_dict['vz']
-        pos = [x, y, z]
-        vel = [vx, vy, vz]
+        # sourcery skip: extract-method
+        if self.fit_cartesian:
+            x = x_dict['x']
+            y = x_dict['y']
+            z = x_dict['z']
+            vx = x_dict['vx']
+            vy = x_dict['vy']
+            vz = x_dict['vz']
+            pos = [x, y, z]
+            vel = [vx, vy, vz]
+        elif self.fit_cometary:
+            e = x_dict['e']
+            q = x_dict['q']
+            tp = x_dict['tp']
+            om = x_dict['om']
+            w = x_dict['w']
+            i = x_dict['i']
+            cometary_elements = [e, q, tp, om*np.pi/180.0, w*np.pi/180.0, i*np.pi/180.0]
+            state = self.helioEclipCometary_to_baryEquatCartesian(cometary_elements)
+            pos = state[:3]
+            vel = state[3:]
+        else:
+            raise ValueError("fit_cartesian or fit_cometary must be True")
         return pos, vel
 
     def x_dict_to_nongrav_params(self, x_dict):
@@ -358,10 +396,25 @@ class fitSimulation:
         return nongravParams
 
     def get_perturbed_state(self, key):
-        if key in ['x', 'y', 'z', 'vx', 'vy', 'vz']:
-            fd_pert = 1e-10
+        if self.fit_cartesian:
+            if key in ['x', 'y', 'z']:
+                fd_pert = 1e-7
+            elif key in ['vx', 'vy', 'vz']:
+                fd_pert = 1e-10
+        elif self.fit_cometary:
+            if key in ['q']:
+                fd_pert = 5e-5
+            # if key in ['q']:
+            #     fd_pert = 1e-8
+            elif key in ['e']:
+                fd_pert = 5e-4
+            elif key in ['tp']:
+                fd_pert = 1e-5
+            elif key in ['om', 'w', 'i']:
+                fd_pert = 1e-4
         if key in ['a1', 'a2', 'a3']:
-            fd_pert = 1e-1
+            fd_pert = 1e-3
+        
         x_plus = self.x_nom.copy()
         x_minus = self.x_nom.copy()
         fd_delta = self.x_nom[key]*fd_pert # fd_pert = finite difference perturbation to nominal state for calculating derivatives
@@ -485,14 +538,15 @@ class fitSimulation:
         return None
     
     def filter_lsq(self):
+        spice.furnsh(self.DEkernelPath)
         print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
-        # add prefit iteration
-        prefit_residuals = self.get_residuals_and_partials()[0]
-        self.add_iteration(0, prefit_residuals)
-        # print("%d%s\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t%.3f" % (self.iters[-1].iter_number, " (prefit)", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
         for i in range(self.n_iter):
             # get residuals and partials
             residuals, a = self.get_residuals_and_partials()
+            if i == 0:
+                # add prefit iteration
+                prefit_residuals = residuals.copy()
+                self.add_iteration(0, prefit_residuals)
             b = self.flatten_and_clean(residuals)
             # get initial guess
             x0 = np.array(list(self.x_nom.values()))
@@ -510,6 +564,7 @@ class fitSimulation:
             # add iteration
             self.add_iteration(i+1, residuals)
             print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
+        spice.unload(self.DEkernelPath)
         return None
 
     def print_summary(self, iter_idx=-1):
@@ -522,14 +577,14 @@ class fitSimulation:
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print("====================================================")
         print(f"t: MJD {self.t} TDB")
-        print("Fitted Variable\t\tInitial Value\t\tUncertainty\t\tFitted Value\t\tUncertainty\t\tChange\t\t\tChange (sigma)")
+        print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
         init_sol = self.iters[0].x_nom
         final_sol = data.x_nom
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
-                print(f"{key}\t\t\t{init_sol[key]:.8e}\t\t{init_variance[i]:.8e}\t\t{final_sol[key]:.8e}\t\t{final_variance[i]:.8e}\t\t{final_sol[key]-init_sol[key]:.8e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:.8e}")
+                print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
         return None
 
     def plot_summary(self):
