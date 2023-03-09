@@ -1,6 +1,8 @@
 import numpy as np
 from numba import jit
 from astroquery.mpc import MPC
+from json import loads
+from requests import request
 
 __all__ = [ 'get_ra_from_hms',
             'get_dec_from_dms',
@@ -10,6 +12,7 @@ __all__ = [ 'get_ra_from_hms',
             'parallax_constants_to_lat_lon_alt',
             'get_codes_dict',
             'get_observer_info',
+            'get_sbdb_info',
 ]
 
 def get_ra_from_hms(ra_hms):
@@ -181,3 +184,91 @@ def get_observer_info(observer_codes):
             info_list.extend((info[0], info[1], info[2]))
         observer_info.append(info_list)
     return observer_info
+
+def get_sbdb_raw_data(tdes):
+    """Get json data from JPL SBDB entry for desired small body
+    Args:
+        tdes (str): IMPORTANT: must be the designation of the small body, not the name.
+    Returns:
+        raw_data (dict): JSON output of small body information query from SBDB
+    """
+    url = f"https://ssd-api.jpl.nasa.gov/sbdb.api?sstr={tdes}&cov=mat&phys-par=true&full-prec=true"
+    r = request("GET",url)
+    return loads(r.text)
+
+def get_sbdb_elems(tdes, cov_elems=True):
+    """Get a set of desired elements for small body from SBDB API
+    Args:
+        tdes (str): IMPORTANT: must be the designation of the small body, not the name.
+        cov_elems (bool, optional): Boolean for whether to extract element set corresponding to the covariance information (since the nominal set on the webpage might have a different epoch than the full covariance info). Defaults to True.
+    Returns:
+        elements (dict): Dictionary containing desired cometary elements for the small body
+    """
+    raw_data = get_sbdb_raw_data(tdes)
+    if cov_elems:
+        # epoch of orbital elements at reference time [JD -> MJD]
+        epoch_mjd = float(raw_data['orbit']['covariance']['epoch']) - 2400000.5
+        # cometary elements at epoch_mjd
+        if epoch_mjd == float(raw_data['orbit']['epoch']):
+            elem = raw_data['orbit']['elements']
+        else:
+            elem = raw_data['orbit']['covariance']['elements']
+    else:
+        # epoch of orbital elements at reference time [JD -> MJD]
+        epoch_mjd = float(raw_data['orbit']['epoch']) - 2400000.5
+        # cometary elements at epoch_mjd
+        elem = raw_data['orbit']['elements']
+    hdr = []
+    val = []
+    for i in range(len(elem)):
+        hdr.append(elem[i]['name'])
+        val.append(float(elem[i]['value']))
+    full_elements_dict = dict(zip(hdr, val))
+    # cometary elements
+    # eccentricity, perihelion distance, time of periapse passage (JD), longitude of the ascending node, argument of perihelion, inclination
+    keys = ['e', 'q', 'tp', 'om', 'w', 'i']
+    values = [full_elements_dict[key] for key in keys]
+    elements = {'t': epoch_mjd}
+    # add every element key to elements dictionary
+    for key in keys:
+        elements[key] = full_elements_dict[key]
+        if key == 'tp':
+            elements[key] = full_elements_dict[key] - 2400000.5
+        # if key in {'om', 'w', 'i'}:
+        #     elements[key] = full_elements_dict[key]*np.pi/180
+    return elements
+
+def get_sbdb_info(tdes):
+    """Return small body information from JPL SBDB API
+    Args:
+        tdes (str): IMPORTANT: must be the designation of the small body, not the name.
+    Returns:
+        elements (dict): Dictionary containing desired cometary elements for the small body
+        cov_mat (np.ndarray): Covariance matrix corresponding to cometary elements
+        nongrav_params (dict): Dictionary containing information about nongravitational acceleration constants for target body
+    """
+    # get json info from SBDB entry for small body
+    raw_data = get_sbdb_raw_data(tdes)
+    # cometary elements corresponding to the covariance on JPL SBDB
+    elements = get_sbdb_elems(tdes, cov_elems=True)
+    # covariance matrix for cometary orbital elements
+    cov_keys = raw_data['orbit']['covariance']['labels']
+    cov_mat = (np.array(raw_data['orbit']['covariance']['data'])).astype(float)
+    # nongravitatinoal constants for target body
+    nongrav_data = raw_data['orbit']['model_pars']
+    hdr = [param['name'] for param in nongrav_data]
+    val = [float(param['value']) for param in nongrav_data]
+    nongrav_data_dict = dict(zip(hdr, val))
+    nongrav_keys = ['A1', 'A2', 'A3', 'ALN', 'NK', 'NM', 'NN', 'R0']
+    nongrav_default_vals = [0.0, 0.0, 0.0, 0.1112620426, 4.6142, 2.15, 5.093, 2.808] # from https://ssd.jpl.nasa.gov/horizons/manual.html
+    nongrav_default_dict = dict(zip(nongrav_keys, nongrav_default_vals))
+    nongrav_key_map = {'A1': 'a1', 'A2': 'a2', 'A3': 'a3', 'ALN': 'alpha', 'NK': 'k', 'NM': 'm', 'NN': 'n', 'R0': 'r0_au'}
+    nongrav_params = {}
+    for key in nongrav_keys:
+        try:
+            nongrav_params[nongrav_key_map[key]] = nongrav_data_dict[key]
+        except KeyError:
+            nongrav_params[nongrav_key_map[key]] = nongrav_default_dict[key]
+        if key in cov_keys:
+            elements[nongrav_key_map[key]] = nongrav_data_dict[key]
+    return [elements, cov_mat, nongrav_params]
