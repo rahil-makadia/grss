@@ -64,6 +64,19 @@ PYBIND11_MODULE(cppgrss, m) {
         .def_readwrite("deltaV", &ImpulseEvent::deltaV)
         .def("apply", &ImpulseEvent::apply, py::arg("t"), py::arg("xInteg"), py::arg("propDir"));
 
+    m.def("cometary_to_cartesian", [](real epochMjd, std::vector<real> cometaryState, real GM) {
+                                        std::vector<real> cartesianState(6);
+                                        cometary_to_cartesian(epochMjd, cometaryState, cartesianState, GM);
+                                        return cartesianState;
+                                        },
+        py::arg("epochMjd"), py::arg("cometaryState"), py::arg("GM")=2.9591220828559115e-4L);
+    m.def("cartesian_to_cometary", [](real epochMjd, std::vector<real> cartesianState, real GM) {
+                                        std::vector<real> cometaryState(6);
+                                        cartesian_to_cometary(epochMjd, cartesianState, cometaryState, GM);
+                                        return cometaryState;
+                                        },
+        py::arg("epochMjd"), py::arg("cartesianState"), py::arg("GM")=2.9591220828559115e-4L);
+
     // // from force.h
     py::class_<ForceParameters>(m, "ForceParameters")
         .def(py::init<>())

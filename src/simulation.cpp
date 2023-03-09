@@ -37,7 +37,7 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0, real m
     std::vector<real> cartesianPos(3);
     std::vector<real> cartesianVel(3);
 
-    cometary_to_cartesian(t0, cometaryState, cartesianStateEclip, consts.G);
+    cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
     std::vector< std::vector<real> > eclipToEquatorial(3, std::vector<real>(3));
     rot_mat_x(EARTH_OBLIQUITY, eclipToEquatorial);

@@ -64,14 +64,15 @@ struct IntegrationParameters{
 };
 
 struct NongravParamaters{
+    // from https://ssd.jpl.nasa.gov/horizons/manual.html
     real a1 = 0.0L;
     real a2 = 0.0L;
     real a3 = 0.0L;
-    real alpha = 1.0L;
-    real k = 0.0L;
-    real m = 2.0L;
+    real alpha = 0.1112620426L;
+    real k = 4.6142L;
+    real m = 2.15L;
     real n = 5.093L;
-    real r0_au = 1.0L;
+    real r0_au = 2.808L;
 };
 
 void get_spice_state_lt(const int &spiceID, const real &t0_mjd, const Constants &consts, double state[6], double &lt);
@@ -117,11 +118,11 @@ void rot_mat_y(const real &theta, std::vector<std::vector<real> > &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real> > &R);
 
 void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-15L, const int &max_iter=100);
-void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G);
-void keplerian_to_cometary(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G);
-void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G);
-void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G);
-void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real G);
-void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real G);
+void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real GM=2.959122082855911e-4L);
+void keplerian_to_cometary(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real GM=2.959122082855911e-4L);
+void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real GM=2.959122082855911e-4L);
+void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real GM=2.959122082855911e-4L);
+void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real GM=2.959122082855911e-4L);
+void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real GM=2.959122082855911e-4L);
 
 #endif

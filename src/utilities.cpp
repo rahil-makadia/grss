@@ -388,8 +388,7 @@ void kepler_solve(const real &M, const real &e, real &E, const real &tol, const 
     // std::cout << "M: " << M*RAD2DEG << std::endl;
 }
 
-void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real G){
-    real GM = G*1.988409871316534e30; // sun mass from horizons
+void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real GM){
     real a = cometaryState[1]/(1-cometaryState[0]);
     real M = sqrt(GM/pow(a, 3.0L))*(epochMjD-cometaryState[2]);
     wrap_to_2pi(M);
@@ -399,11 +398,15 @@ void cometary_to_keplerian(const real &epochMjD, const std::vector<real> &cometa
     real nu = 2*atan2(tan(E/2)*sqrt(1+cometaryState[0]), sqrt(1-cometaryState[0]));
     wrap_to_2pi(nu);
 
-    keplerianState = {a, cometaryState[0], cometaryState[5], cometaryState[3], cometaryState[4], nu};
+    keplerianState[0] = a;
+    keplerianState[1] = cometaryState[0];
+    keplerianState[2] = cometaryState[5];
+    keplerianState[3] = cometaryState[3];
+    keplerianState[4] = cometaryState[4];
+    keplerianState[5] = nu;
 }
 
-void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real G){
-    real GM = G*1.988409871316534e30; // sun mass from horizons
+void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real GM){
     real a = keplerianState[0];
     real e = keplerianState[1];
     real nu = keplerianState[5];
@@ -412,11 +415,15 @@ void keplerian_to_cometary(const real &epochMjD, const std::vector<real> &kepler
     real n = sqrt(GM/pow(a, 3.0L));
     real T0 = epochMjD-(M/n);
 
-    cometaryState = {e, a*(1-e), T0, keplerianState[3], keplerianState[4], keplerianState[2]};
+    cometaryState[0] = e;
+    cometaryState[1] = a*(1-e);
+    cometaryState[2] = T0;
+    cometaryState[3] = keplerianState[3];
+    cometaryState[4] = keplerianState[4];
+    cometaryState[5] = keplerianState[2];
 }
 
-void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real G){
-    real GM = G*1.988409871316534e30; // sun mass from horizons
+void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real GM){
     real a = keplerianState[0];
     real e = keplerianState[1];
     real i = keplerianState[2];
@@ -429,6 +436,11 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector
     // real M = E-e*sin(E);
     // real n = sqrt(GM/pow(a, 3.0L));
     // real T0 = epochMjd-(M/n);
+    // ConstSpiceDouble elts[8] = {(double) (a*(1-e)), (double)e, (double)i, (double)Omega, (double)omega, (double)M, 0.0, (double)GM};
+    // SpiceDouble state[6];
+    // conics_c(elts, 0.0, state);
+    // std::cout << "spice state:" << std::endl;
+    // std::cout << state[0] << " " << state[1] << " " << state[2] << " " << state[3] << " " << state[4] << " " << state[5] << std::endl;
 
     std::vector< std::vector<real> > R1(3, std::vector<real>(3));
     std::vector< std::vector<real> > R2(3, std::vector<real>(3));
@@ -456,12 +468,15 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector
     
     mat_vec_mul(R, r_temp, r_final);
     mat_vec_mul(R, v_temp, v_final);
-    cartesianState = {r_final[0], r_final[1], r_final[2], v_final[0], v_final[1], v_final[2]};
+    cartesianState[0] = r_final[0];
+    cartesianState[1] = r_final[1];
+    cartesianState[2] = r_final[2];
+    cartesianState[3] = v_final[0];
+    cartesianState[4] = v_final[1];
+    cartesianState[5] = v_final[2];
 }
 
-void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real G){
-    real GM = G*1.988409871316534e30; // sun mass from horizons
-    
+void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector<real> &keplerianState, const real GM){    
     std::vector<real> rVec(3);
     std::vector<real> vVec(3);
     rVec[0] = cartesianState[0];
@@ -523,14 +538,14 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState, std::vector
     keplerianState[5] = nu;
 }
 
-void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real G){
+void cometary_to_cartesian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &cartesianState, const real GM){
     std::vector<real> keplerianState(6);
-    cometary_to_keplerian(epochMjd, cometaryState, keplerianState, G);
-    keplerian_to_cartesian(keplerianState, cartesianState, G);
+    cometary_to_keplerian(epochMjd, cometaryState, keplerianState, GM);
+    keplerian_to_cartesian(keplerianState, cartesianState, GM);
 }
 
-void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real G){
+void cartesian_to_cometary(const real &epochMjd, const std::vector<real> &cartesianState, std::vector<real> &cometaryState, const real GM){
     std::vector<real> keplerianState(6);
-    cartesian_to_keplerian(cartesianState, keplerianState, G);
-    keplerian_to_cometary(epochMjd, keplerianState, cometaryState, G);
+    cartesian_to_keplerian(cartesianState, keplerianState, GM);
+    keplerian_to_cometary(epochMjd, keplerianState, cometaryState, GM);
 }
