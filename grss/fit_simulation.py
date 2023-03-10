@@ -404,14 +404,16 @@ class fitSimulation:
         elif self.fit_cometary:
             if key in ['q']:
                 fd_pert = 5e-5
-            # if key in ['q']:
-            #     fd_pert = 1e-8
             elif key in ['e']:
                 fd_pert = 5e-4
             elif key in ['tp']:
                 fd_pert = 1e-5
-            elif key in ['om', 'w', 'i']:
+            elif key in ['om']:
                 fd_pert = 1e-4
+            elif key in ['w']:
+                fd_pert = 1e-5
+            elif key in ['i']:
+                fd_pert = 1e-6
         if key in ['a1', 'a2', 'a3']:
             fd_pert = 1e-3
         

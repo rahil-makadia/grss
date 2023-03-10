@@ -19,6 +19,7 @@ using std::tan;
 using std::asin;
 using std::acos;
 using std::atan2;
+using std::log;
 
 #include "SpiceUsr.h"
 
