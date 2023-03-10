@@ -42,7 +42,6 @@ class IntegBody: public Body{
         // constructors
         IntegBody(std::string DEkernelPath, std::string name, real t0, real mass, real radius, std::vector<real> cometaryState, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
         IntegBody(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
-
 };
 
 class Event{

@@ -60,7 +60,6 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
         f = 1.0L/298.257223563L;
         baseBodyFrame = "ITRF93";
         break;
-    
     default:
         std::cout << "Given base body: " << baseBody << std::endl;
         throw std::invalid_argument("Given base body not supported");
@@ -74,17 +73,27 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
     ConstSpiceDouble bodyFixedZ = (N*(1.0L-eSquared)+alt)*sin(geodetLat)/consts.du2m;
     ConstSpiceDouble bodyFixedPos[3] = {bodyFixedX, bodyFixedY, bodyFixedZ};
     ConstSpiceChar *outFrame = "J2000";
+
     SpiceDouble rotMat[3][3];
     pxform_c(baseBodyFrame, outFrame, t_obs_et, rotMat);
     SpiceDouble observerPos[3];
     mxv_c(rotMat, bodyFixedPos, observerPos);
-
     observerState[0] = baseBodyState[0] + (real) observerPos[0];
     observerState[1] = baseBodyState[1] + (real) observerPos[1];
     observerState[2] = baseBodyState[2] + (real) observerPos[2];
-    observerState[3] = std::numeric_limits<real>::quiet_NaN(); // baseBodyState[3];
-    observerState[4] = std::numeric_limits<real>::quiet_NaN(); // baseBodyState[4];
-    observerState[5] = std::numeric_limits<real>::quiet_NaN(); // baseBodyState[5];
+
+    SpiceDouble rotMatOffset[3][3];
+    real offset = 1e-3L/consts.tu2sec; // 1 millisecond offset to calculate derivative of observer position
+    pxform_c(baseBodyFrame, outFrame, t_obs_et+offset, rotMatOffset);
+    SpiceDouble observerPosOffset[3];
+    SpiceDouble observerVel[3];
+    mxv_c(rotMatOffset, bodyFixedPos, observerPosOffset);
+    observerVel[0] = (observerPosOffset[0]-observerPos[0])/offset;
+    observerVel[1] = (observerPosOffset[1]-observerPos[1])/offset;
+    observerVel[2] = (observerPosOffset[2]-observerPos[2])/offset;
+    observerState[3] = baseBodyState[3] + (real) observerVel[0];
+    observerState[4] = baseBodyState[4] + (real) observerVel[1];
+    observerState[5] = baseBodyState[5] + (real) observerVel[2];
 }
 
 void jd_to_et(const real jd, real &et){
