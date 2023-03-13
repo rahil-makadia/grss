@@ -623,6 +623,8 @@ void propSimulation::extend(real tf, std::vector<real> tEvalNew, std::vector< st
     // std::reverse(this->xIntegEval.begin(), this->xIntegEval.end());
     // std::reverse(this->radarObsEval.begin(), this->radarObsEval.end());
 
+    std::cout << "WARNING: The extend() function is under development and may not work properly." << std::endl;
+
     // empty existing vectors from previous integration
     this->tEval.clear();
     this->xIntegEval.clear();
