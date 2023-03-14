@@ -146,21 +146,20 @@ class iterationParams:
         if show_logarithmic: plt.yscale('log')
         plt.show()
 
-
     def plot_iteration_summary(self, show_logarithmic=False):
         markersize = 3
         sigma_limit = 3
         radar_scale = 3
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
-
+        
         obs_array = self.obs_array
         residuals = self.residuals
         # opticalIdx is where neither the ra nor dec residuals are NaN
         opticalIdx = np.where(~np.isnan(residuals[:, 0]) & ~np.isnan(residuals[:, 1]))[0]
         # radarIdx is where either the ra or dec residuals are NaN
         radarIdx = np.where(np.isnan(residuals[:, 0]) | np.isnan(residuals[:, 1]))[0]
-
+        
         t_arr_optical = obs_array[opticalIdx, 0]
         ra_obs = obs_array[opticalIdx, 1]
         dec_obs = obs_array[opticalIdx, 2]
@@ -185,7 +184,7 @@ class iterationParams:
         dec_chi = np.abs(dec_chi) if show_logarithmic else dec_chi
         ra_chi_squared = np.abs(ra_chi_squared) if show_logarithmic else ra_chi_squared
         dec_chi_squared = np.abs(dec_chi_squared) if show_logarithmic else dec_chi_squared
-
+        
         t_arr_radar = obs_array[radarIdx, 0]
         delay_obs = obs_array[radarIdx, 1]
         doppler_obs = obs_array[radarIdx, 2]
@@ -203,13 +202,13 @@ class iterationParams:
         doppler_residuals = np.abs(doppler_residuals) if show_logarithmic else doppler_residuals
         delay_chi = np.abs(delay_chi) if show_logarithmic else delay_chi
         doppler_chi = np.abs(doppler_chi) if show_logarithmic else doppler_chi
-
+        
         self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic)
         self.plot_chi(t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic)
         return None
 
 class fitSimulation:
-    def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None, obs_array_radar=None, observer_codes_radar=None, n_iter=5, DEkernel=441, DEkernelPath=''):
+    def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None, obs_array_radar=None, observer_codes_radar=None, n_iter=5, DEkernel=441, DEkernelPath='', radius=0.0, nongravInfo=None, events=None):
         self.check_initial_solution(x_init, cov_init)
         self.check_input_observation_arrays(obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar)
         self.assemble_observation_arrays()
@@ -218,7 +217,15 @@ class fitSimulation:
         self.DEkernel = DEkernel
         self.DEkernelPath = DEkernelPath
         self.analytic_partials = False
-        self.fixed_propSim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0, 'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0, 'r0_au': 1.0, 'radius': 0.0, 'mass': 0.0}
+        self.fixed_propSim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0, 'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0, 'r0_au': 1.0, 'radius': radius, 'mass': 0.0}
+        for key in nongravInfo:
+            self.fixed_propSim_params[key] = nongravInfo[key]
+        if events is not None:
+            self.fixed_propSim_params['events'] = events
+            self.fit_events = True
+        else:
+            self.fixed_propSim_params['events'] = []
+            self.fit_events = False
         return None
 
     def check_initial_solution(self, x_init, cov_init):
@@ -274,7 +281,7 @@ class fitSimulation:
         self.obs_array_radar = obs_array_radar
         self.observer_codes_radar = observer_codes_radar
         return None
-    
+
     def flatten_and_clean(self, arr):
         arr = arr.flatten()
         arr = arr[~np.isnan(arr)]
@@ -307,7 +314,7 @@ class fitSimulation:
         self.obs_array = obs_array[sort_idx]
         self.observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
         return None
-    
+
     def helioEclipCometary_to_baryEquatCartesian(self, cometary_elements):
         t0Mjd = self.t
         obliq = 84381.448/3600.0*3.141592653589793238462643383279502884197169399375105820974944/180.0
@@ -395,6 +402,30 @@ class fitSimulation:
         nongravParams.r0_au = 1.0
         return nongravParams
 
+    def x_dict_to_events(self, x_dict):
+        events = []
+        for i in range(len(self.fixed_propSim_params['events'])):
+            event = self.fixed_propSim_params['events'][i]
+            event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else event[1]
+            event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else event[2]
+            event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else event[3]
+            event[4] = x_dict[f"multiplier{i}"] if f"multiplier{i}" in x_dict.keys() else event[4]
+            events.append(tuple(event))
+        return events
+
+    def check_and_add_events(self, propSimPast, propSimFuture, integBody, events):
+        for event in events:
+            t_event = event[0]
+            dvx = event[1]
+            dvy = event[2]
+            dvz = event[3]
+            multiplier = event[4]
+            if t_event < self.t:
+                propSimPast.add_event(integBody, t_event, [dvx, dvy, dvz], multiplier)
+            else:
+                propSimFuture.add_event(integBody, t_event, [dvx, dvy, dvz], multiplier)
+        return propSimPast, propSimFuture
+
     def get_perturbed_state(self, key):
         if self.fit_cartesian:
             if key in ['x', 'y', 'z']:
@@ -416,17 +447,23 @@ class fitSimulation:
                 fd_pert = 1e-6
         if key in ['a1', 'a2', 'a3']:
             fd_pert = 1e-3
-        
+        if key[:10] == 'multiplier':
+            fd_pert = 1e-2
+        if key[:3] in ['dvx', 'dvy', 'dvz']:
+            fd_pert = 1e-4
+
         x_plus = self.x_nom.copy()
         x_minus = self.x_nom.copy()
         fd_delta = self.x_nom[key]*fd_pert # fd_pert = finite difference perturbation to nominal state for calculating derivatives
         x_plus[key] = self.x_nom[key]+fd_delta
         pos_plus, vel_plus = self.x_dict_to_cartesian_state(x_plus)
         ngParams_plus = self.x_dict_to_nongrav_params(x_plus)
+        events_plus = self.x_dict_to_events(x_plus)
         x_minus[key] = self.x_nom[key]-fd_delta
         pos_minus, vel_minus = self.x_dict_to_cartesian_state(x_minus)
         ngParams_minus = self.x_dict_to_nongrav_params(x_minus)
-        return pos_plus, vel_plus, ngParams_plus, pos_minus, vel_minus, ngParams_minus, fd_delta
+        events_minus = self.x_dict_to_events(x_minus)
+        return pos_plus, vel_plus, ngParams_plus, events_plus, pos_minus, vel_minus, ngParams_minus, events_minus, fd_delta
 
     def get_perturbation_info(self):
         perturbation_info = []
@@ -442,6 +479,7 @@ class fitSimulation:
         consts = prop.Constants()
         pos_nom, vel_nom = self.x_dict_to_cartesian_state(self.x_nom)
         ngParams_nom = self.x_dict_to_nongrav_params(self.x_nom)
+        events_nom = self.x_dict_to_events(self.x_nom)
         cov_nom = self.covariance
         integBody_nom = prop.IntegBody("integBody_nom", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_nom, vel_nom, cov_nom, ngParams_nom, consts)
         # add the nominal IntegBody for the residuals
@@ -449,11 +487,12 @@ class fitSimulation:
             propSimPast.add_integ_body(integBody_nom)
         if self.futureObsExist:
             propSimFuture.add_integ_body(integBody_nom)
+        propSimPast, propSimFuture = self.check_and_add_events(propSimPast, propSimFuture, integBody_nom, events_nom)
         # add the perturbed IntegBodies for numerical derivatives
         if not self.analytic_partials and perturbation_info is not None:
             for i in range(self.n_fit):
                 key = list(self.x_nom.keys())[i]
-                pos_plus, vel_plus, ngParams_plus, pos_minus, vel_minus, ngParams_minus, fd_delta = perturbation_info[i]
+                pos_plus, vel_plus, ngParams_plus, events_plus, pos_minus, vel_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
                 integBody_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_plus, vel_plus, cov_nom, ngParams_plus, consts)
                 integBody_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_minus, vel_minus, cov_nom, ngParams_minus, consts)
                 if self.pastObsExist:
@@ -462,6 +501,8 @@ class fitSimulation:
                 if self.futureObsExist:
                     propSimFuture.add_integ_body(integBody_plus)
                     propSimFuture.add_integ_body(integBody_minus)
+                propSimPast, propSimFuture = self.check_and_add_events(propSimPast, propSimFuture, integBody_plus, events_plus)
+                propSimPast, propSimFuture = self.check_and_add_events(propSimPast, propSimFuture, integBody_minus, events_minus)
         if self.pastObsExist:
             propSimPast.preprocess()
             propSimPast.integrate()
@@ -513,7 +554,7 @@ class fitSimulation:
         partials = np.zeros((self.n_obs, self.n_fit))
         for i in range(self.n_fit):
             key = list(self.x_nom.keys())[i]
-            pos_plus, vel_plus, ngParams_plus, pos_minus, vel_minus, ngParams_minus, fd_delta = perturbation_info[i]
+            pos_plus, vel_plus, ngParams_plus, events_plus, pos_minus, vel_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
             # get residuals for perturbed states
             residuals_plus = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=2*i+1)
             residuals_minus = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=2*i+2)
@@ -538,7 +579,7 @@ class fitSimulation:
     def add_iteration(self, iter_number, residuals):
         self.iters.append(iterationParams(iter_number, self.x_nom, self.covariance, residuals, self.obs_array, self.observer_codes))
         return None
-    
+
     def filter_lsq(self):
         spice.furnsh(self.DEkernelPath)
         print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
@@ -586,7 +627,10 @@ class fitSimulation:
         final_sol = data.x_nom
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
-                print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
+                if key[:10] == 'multiplier':
+                    print(f"{key}\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
+                else:
+                    print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
         return None
 
     def plot_summary(self):
@@ -602,21 +646,21 @@ class fitSimulation:
         plt.xlabel("Iteration #")
         plt.ylabel("Unweighted RMS")
         plt.legend()
-
+        
         plt.subplot(2, 2, 2)
         plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.weighted_rms for iteration in iters_for_plot], label=f"Final Weighted RMS={iters_for_plot[-1].weighted_rms:.3e}")
         plt.xticks(ticks)
         plt.xlabel("Iteration #")
         plt.ylabel("Weighted RMS")
         plt.legend()
-
+        
         plt.subplot(2, 2, 3)
         plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.chi_squared for iteration in iters_for_plot], label=f"Final $\chi^2$={iters_for_plot[-1].chi_squared:.3e}")
         plt.xticks(ticks)
         plt.xlabel("Iteration #")
         plt.ylabel("$\chi^2$")
         plt.legend()
-
+        
         plt.subplot(2, 2, 4)
         plt.semilogy([iteration.iter_number for iteration in iters_for_plot], [iteration.reduced_chi_squared for iteration in iters_for_plot], label=f"Final Reduced $\chi^2$={iters_for_plot[-1].reduced_chi_squared:.3e}")
         plt.xticks(ticks)
