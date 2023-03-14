@@ -53,17 +53,6 @@ PYBIND11_MODULE(cppgrss, m) {
         .def_readwrite("n", &NongravParamaters::n)
         .def_readwrite("r0_au", &NongravParamaters::r0_au);
 
-    py::class_<Event>(m, "Event")
-        .def(py::init<>())
-        .def_readwrite("t", &ImpulseEvent::t)
-        .def_readwrite("bodyName", &ImpulseEvent::bodyName)
-        .def_readwrite("bodyIndex", &ImpulseEvent::bodyIndex);
-    
-    py::class_<ImpulseEvent, Event>(m, "ImpulseEvent")
-        .def(py::init<>())
-        .def_readwrite("deltaV", &ImpulseEvent::deltaV)
-        .def("apply", &ImpulseEvent::apply, py::arg("t"), py::arg("xInteg"), py::arg("propDir"));
-
     m.def("cometary_to_cartesian", [](real epochMjd, std::vector<real> cometaryState, real GM) {
                                         std::vector<real> cartesianState(6);
                                         cometary_to_cartesian(epochMjd, cometaryState, cartesianState, GM);
@@ -118,6 +107,17 @@ PYBIND11_MODULE(cppgrss, m) {
         .def_readwrite("covariance", &IntegBody::covariance)
         .def_readwrite("ngParams", &IntegBody::ngParams);
 
+    py::class_<Event>(m, "Event")
+        .def(py::init<>())
+        .def_readwrite("t", &ImpulseEvent::t)
+        .def_readwrite("bodyName", &ImpulseEvent::bodyName)
+        .def_readwrite("bodyIndex", &ImpulseEvent::bodyIndex);
+
+    py::class_<ImpulseEvent, Event>(m, "ImpulseEvent")
+        .def(py::init<>())
+        .def_readwrite("deltaV", &ImpulseEvent::deltaV)
+        .def_readwrite("multiplier", &ImpulseEvent::multiplier);
+
     py::class_<propSimulation>(m, "propSimulation")
         .def(py::init<std::string, real, const int, std::string>(), py::arg("name"), py::arg("t0"), py::arg("defaultSpiceBodies"), py::arg("DEkernelPath"))
         .def(py::init<std::string, const propSimulation&>(), py::arg("name"), py::arg("simRef"))
@@ -148,7 +148,7 @@ PYBIND11_MODULE(cppgrss, m) {
         .def("add_integ_body", static_cast<void (propSimulation::*)(std::string, real, real, real, std::vector<real>, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants)>(&propSimulation::add_integ_body), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("pos"), py::arg("vel"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
         .def("add_integ_body", static_cast<void (propSimulation::*)(IntegBody)>(&propSimulation::add_integ_body), py::arg("body"))
         .def("remove_body", &propSimulation::remove_body, py::arg("name"))
-        .def("add_event", &propSimulation::add_event, py::arg("body"), py::arg("tEvent"), py::arg("deltaV"))
+        .def("add_event", &propSimulation::add_event, py::arg("body"), py::arg("tEvent"), py::arg("deltaV"), py::arg("multiplier")=1.0L)
         .def("set_sim_constants", &propSimulation::set_sim_constants, py::arg("du2m")=149597870700.0L, py::arg("tu2sec")=86400.0L, py::arg("G")=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, py::arg("clight")=299792458.0L/149597870700.0L*86400.0L)
         .def("set_integration_parameters", &propSimulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("tEvalUTC")=false, py::arg("evalApparentState")=false, py::arg("convergedLightTims")=false, py::arg("observerInfo")=std::vector< std::vector<real> >(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
         .def("get_sim_constants", &propSimulation::get_sim_constants)

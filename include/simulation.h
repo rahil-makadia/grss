@@ -58,6 +58,7 @@ class ImpulseEvent : public Event{
 
     public:
         std::vector<real> deltaV = {0.0L, 0.0L, 0.0L};
+        real multiplier = 1.0L;
         void apply(const real &t, std::vector<real> &xInteg, const real &propDir);
 };
 
@@ -109,7 +110,7 @@ class propSimulation
         void add_integ_body(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts);
         void add_integ_body(IntegBody body);
         void remove_body(std::string name);
-        void add_event(IntegBody body, real tEvent, std::vector<real> deltaV);
+        void add_event(IntegBody body, real tEvent, std::vector<real> deltaV, real multiplier=1.0L);
 
         // setters
         void set_sim_constants(real du2m=149597870700.0L, real tu2sec=86400.0L, real G=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, real clight=299792458.0L/149597870700.0L*86400.0L);

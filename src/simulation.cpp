@@ -98,7 +98,7 @@ void ImpulseEvent::apply(const real &t, std::vector<real> &xInteg, const real &p
     }
     size_t velStartIdx = 6*this->bodyIndex+3;
     for (size_t i=0; i<3; i++){
-        xInteg[velStartIdx+i] += propDir*this->deltaV[i];
+        xInteg[velStartIdx+i] += propDir*this->multiplier*this->deltaV[i];
     }
 }
 
@@ -483,9 +483,12 @@ void propSimulation::remove_body(std::string name){
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
-void propSimulation::add_event(IntegBody body, real tEvent, std::vector<real> deltaV){
+void propSimulation::add_event(IntegBody body, real tEvent, std::vector<real> deltaV, real multiplier){
     // check if tEvent is valid
-    if (tEvent < this->integParams.t0 || tEvent > this->integParams.tf){
+    bool forwardProp = this->integParams.tf > this->integParams.t0;
+    bool backwardProp = this->integParams.tf < this->integParams.t0;
+    if ( (forwardProp && (tEvent < this->integParams.t0 || tEvent >= this->integParams.tf))
+        || (backwardProp && (tEvent > this->integParams.t0 || tEvent <= this->integParams.tf)) ){
         throw std::invalid_argument("Event time " + std::to_string(tEvent) + " is not within simulation time bounds.");
     }
     // check if body exists
@@ -504,6 +507,7 @@ void propSimulation::add_event(IntegBody body, real tEvent, std::vector<real> de
     ImpulseEvent event;
     event.t = tEvent;
     event.deltaV = deltaV;
+    event.multiplier = multiplier;
     event.bodyName = body.name;
     event.bodyIndex = bodyIndex;
     // add event to this->events sorted by time
