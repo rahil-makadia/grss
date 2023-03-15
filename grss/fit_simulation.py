@@ -315,23 +315,6 @@ class fitSimulation:
         self.observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
         return None
 
-    def helioEclipCometary_to_baryEquatCartesian(self, cometary_elements):
-        t0Mjd = self.t
-        obliq = 84381.448/3600.0*3.141592653589793238462643383279502884197169399375105820974944/180.0
-        eclip_to_equat = np.array([ [1,             0,              0],
-                                    [0, np.cos(obliq),  -np.sin(obliq)],
-                                    [0, np.sin(obliq),  np.cos(obliq)] ])
-        helioEclipCartesian = prop.cometary_to_cartesian(t0Mjd, cometary_elements)
-        helioEclipCartesian = np.array([helioEclipCartesian[0], helioEclipCartesian[1], helioEclipCartesian[2], helioEclipCartesian[3], helioEclipCartesian[4], helioEclipCartesian[5]])
-        helioEquatCartesian = np.zeros_like(helioEclipCartesian)
-        helioEquatCartesian[:3] = np.matmul(eclip_to_equat, helioEclipCartesian[:3])
-        helioEquatCartesian[3:] = np.matmul(eclip_to_equat, helioEclipCartesian[3:])
-        sunBaryEquatCartesian = spice.spkez(10, mjd2et(t0Mjd), 'J2000', 'NONE', 0)[0]
-        consts = prop.Constants()
-        sunBaryEquatCartesian *= 1000.0/consts.du2m
-        sunBaryEquatCartesian[3:6] *= consts.tu2sec
-        return list(helioEquatCartesian + sunBaryEquatCartesian)
-
     def get_propSimPast(self, name, tEvalUTC, evalApparentState, convergedLightTime, observerInfo):
         tEvalPast = self.obs_array[self.pastObsIdx, 0]
         tfPast = np.min(tEvalPast) - 1
@@ -361,7 +344,7 @@ class fitSimulation:
             propSimFuture = self.get_propSimFuture(f"{name}_future", tEvalUTC, evalApparentState, convergedLightTime, observerInfoFuture)
         return propSimPast, propSimFuture
 
-    def x_dict_to_cartesian_state(self, x_dict):
+    def x_dict_to_state(self, x_dict):
         # sourcery skip: extract-method
         if self.fit_cartesian:
             x = x_dict['x']
@@ -370,8 +353,7 @@ class fitSimulation:
             vx = x_dict['vx']
             vy = x_dict['vy']
             vz = x_dict['vz']
-            pos = [x, y, z]
-            vel = [vx, vy, vz]
+            state = [x, y, z, vx, vy, vz]
         elif self.fit_cometary:
             e = x_dict['e']
             q = x_dict['q']
@@ -380,12 +362,10 @@ class fitSimulation:
             w = x_dict['w']
             i = x_dict['i']
             cometary_elements = [e, q, tp, om*np.pi/180.0, w*np.pi/180.0, i*np.pi/180.0]
-            state = self.helioEclipCometary_to_baryEquatCartesian(cometary_elements)
-            pos = state[:3]
-            vel = state[3:]
+            state = cometary_elements
         else:
             raise ValueError("fit_cartesian or fit_cometary must be True")
-        return pos, vel
+        return state
 
     def x_dict_to_nongrav_params(self, x_dict):
         nongravParams = prop.NongravParamaters()
@@ -456,14 +436,14 @@ class fitSimulation:
         x_minus = self.x_nom.copy()
         fd_delta = self.x_nom[key]*fd_pert # fd_pert = finite difference perturbation to nominal state for calculating derivatives
         x_plus[key] = self.x_nom[key]+fd_delta
-        pos_plus, vel_plus = self.x_dict_to_cartesian_state(x_plus)
+        state_plus = self.x_dict_to_state(x_plus)
         ngParams_plus = self.x_dict_to_nongrav_params(x_plus)
         events_plus = self.x_dict_to_events(x_plus)
         x_minus[key] = self.x_nom[key]-fd_delta
-        pos_minus, vel_minus = self.x_dict_to_cartesian_state(x_minus)
+        state_minus = self.x_dict_to_state(x_minus)
         ngParams_minus = self.x_dict_to_nongrav_params(x_minus)
         events_minus = self.x_dict_to_events(x_minus)
-        return pos_plus, vel_plus, ngParams_plus, events_plus, pos_minus, vel_minus, ngParams_minus, events_minus, fd_delta
+        return state_plus, ngParams_plus, events_plus, state_minus, ngParams_minus, events_minus, fd_delta
 
     def get_perturbation_info(self):
         perturbation_info = []
@@ -477,11 +457,14 @@ class fitSimulation:
         propSimPast, propSimFuture = self.get_propSims("orbit_fit_sim")
         # create nominal IntegBody object
         consts = prop.Constants()
-        pos_nom, vel_nom = self.x_dict_to_cartesian_state(self.x_nom)
+        state_nom = self.x_dict_to_state(self.x_nom)
         ngParams_nom = self.x_dict_to_nongrav_params(self.x_nom)
         events_nom = self.x_dict_to_events(self.x_nom)
         cov_nom = self.covariance
-        integBody_nom = prop.IntegBody("integBody_nom", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_nom, vel_nom, cov_nom, ngParams_nom, consts)
+        if self.fit_cartesian:
+            integBody_nom = prop.IntegBody("integBody_nom", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], state_nom[:3], state_nom[3:6], cov_nom, ngParams_nom, consts)
+        elif self.fit_cometary:
+            integBody_nom = prop.IntegBody(self.DEkernelPath, "integBody_nom", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], state_nom, cov_nom, ngParams_nom, consts)
         # add the nominal IntegBody for the residuals
         if self.pastObsExist:
             propSimPast.add_integ_body(integBody_nom)
@@ -492,9 +475,13 @@ class fitSimulation:
         if not self.analytic_partials and perturbation_info is not None:
             for i in range(self.n_fit):
                 key = list(self.x_nom.keys())[i]
-                pos_plus, vel_plus, ngParams_plus, events_plus, pos_minus, vel_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
-                integBody_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_plus, vel_plus, cov_nom, ngParams_plus, consts)
-                integBody_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], pos_minus, vel_minus, cov_nom, ngParams_minus, consts)
+                state_plus, ngParams_plus, events_plus, state_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
+                if self.fit_cartesian:
+                    integBody_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], state_plus[:3], state_plus[3:6], cov_nom, ngParams_plus, consts)
+                    integBody_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], state_minus[:3], state_minus[3:6], cov_nom, ngParams_minus, consts)
+                elif self.fit_cometary:
+                    integBody_plus = prop.IntegBody(self.DEkernelPath, f"integBody_pert_{key}_plus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], state_plus, cov_nom, ngParams_plus, consts)
+                    integBody_minus = prop.IntegBody(self.DEkernelPath, f"integBody_pert_{key}_minus", self.t, self.fixed_propSim_params['mass'], self.fixed_propSim_params['radius'], state_minus, cov_nom, ngParams_minus, consts)
                 if self.pastObsExist:
                     propSimPast.add_integ_body(integBody_plus)
                     propSimPast.add_integ_body(integBody_minus)
@@ -554,7 +541,7 @@ class fitSimulation:
         partials = np.zeros((self.n_obs, self.n_fit))
         for i in range(self.n_fit):
             key = list(self.x_nom.keys())[i]
-            pos_plus, vel_plus, ngParams_plus, events_plus, pos_minus, vel_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
+            state_plus, ngParams_plus, events_plus, state_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
             # get residuals for perturbed states
             residuals_plus = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=2*i+1)
             residuals_minus = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=2*i+2)
@@ -597,8 +584,10 @@ class fitSimulation:
             cov = self.covariance
             # get state correction
             w = self.weight_matrix
-            P = np.linalg.inv(a.T @ w @ a)
-            dx = P @ a.T @ w @ b
+            atwa = a.T @ w @ a
+            P = np.linalg.inv(atwa)
+            atwb = a.T @ w @ b
+            dx = P @ atwb
             # get new state
             x = x0 - dx
             self.x_nom = dict(zip(self.x_nom.keys(), x))
@@ -606,7 +595,7 @@ class fitSimulation:
             self.covariance = P
             # add iteration
             self.add_iteration(i+1, residuals)
-            print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
+            print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
         spice.unload(self.DEkernelPath)
         return None
 
