@@ -39,7 +39,7 @@ def get_optical_data(body_id, t_max_tdb=None, verbose=False):
     for i, row in enumerate(obs_raw):
         data = row['obs']
         date = data[15:32]
-        obs_time_mjd = Time(date[:-7].replace(' ','-'), format='iso', scale='utc').mjd+float(date[-7:])
+        obs_time_mjd = Time(date[:-7].replace(' ','-'), format='iso', scale='utc').utc.mjd+float(date[-7:])
         ra = get_ra_from_hms(data[32:44])
         dec = get_dec_from_dms(data[44:56])
         obs_code = data[77:80]

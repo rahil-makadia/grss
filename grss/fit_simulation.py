@@ -79,10 +79,11 @@ class iterationParams:
         ax_histy.hist(y, bins=bins, orientation='horizontal', color=color, edgecolor=color, linewidth=0.75, fill=fill, histtype='step')
         return None
 
-    def plot_residuals(self, t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic):
+    def plot_residuals(self, t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title):
         # sourcery skip: extract-duplicate-method
         fig = plt.figure(figsize=(21,6), dpi=150)
         iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
+        iter_string = title if title is not None else iter_string
         plt.suptitle(iter_string, y=0.95)
         gs = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
         ax1 = fig.add_subplot(gs[0, 0])
@@ -112,6 +113,8 @@ class iterationParams:
         ax3.set_ylabel('Residuals, O-C [$\mu$s, Hz]')
         ax3.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic: ax3.set_yscale('log')
+        # if title is not None:
+        #     plt.savefig('./plots/'+title.replace(' ', '_')+'.pdf', bbox_inches='tight')
         plt.show()
 
     def plot_chi(self, t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic):
@@ -128,7 +131,7 @@ class iterationParams:
         plt.axhline(sigma_limit, c='khaki', linestyle='--', alpha=1.0)
         plt.axhline(-2*sigma_limit, c='red', linestyle='--', alpha=0.5, label=f'$\pm{2*sigma_limit:.0f}\sigma$')
         plt.axhline(2*sigma_limit, c='red', linestyle='--', alpha=0.5)
-        plt.legend()
+        plt.legend(ncol=3)
         plt.xlabel('MJD [UTC]')
         plt.ylabel('$\chi$, (O-C)/$\sigma$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
@@ -139,14 +142,14 @@ class iterationParams:
         plt.plot(t_arr_optical, dec_chi_squared, '.', markersize=markersize, label='Dec')
         plt.plot(t_arr_radar, delay_chi_squared, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
         plt.plot(t_arr_radar, doppler_chi_squared, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
-        plt.legend()
+        plt.legend(ncol=2)
         plt.xlabel('MJD [UTC]')
         plt.ylabel('$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic: plt.yscale('log')
         plt.show()
 
-    def plot_iteration_summary(self, show_logarithmic=False):
+    def plot_iteration_summary(self, show_logarithmic=False, title=None):
         markersize = 3
         sigma_limit = 3
         radar_scale = 3
@@ -203,7 +206,7 @@ class iterationParams:
         delay_chi = np.abs(delay_chi) if show_logarithmic else delay_chi
         doppler_chi = np.abs(doppler_chi) if show_logarithmic else doppler_chi
         
-        self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic)
+        self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title)
         self.plot_chi(t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic)
         return None
 
@@ -428,7 +431,7 @@ class fitSimulation:
         if key in ['a1', 'a2', 'a3']:
             fd_pert = 1e-3
         if key[:10] == 'multiplier':
-            fd_pert = 1e-2
+            fd_pert = 1e0
         if key[:3] in ['dvx', 'dvy', 'dvz']:
             fd_pert = 1e-4
 
