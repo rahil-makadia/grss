@@ -104,17 +104,17 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
     skip_counter = 0
     for i, row in enumerate(obs_array_optical):
         obs_time_jd = Time(row[0], format='mjd', scale='utc').tt.jd
-        ra = row[1]
-        dec = row[2]
+        ra = row[1]/3600*np.pi/180
+        dec = row[2]/3600*np.pi/180
         star_catalog = star_catalog_codes[i]
         if star_catalog in unbiased_catalogs:
             continue
         elif star_catalog in biased_catalogs:
             # apply debiasing from Eggl et al. 2020, https://doi.org/10.1016/j.icarus.2019.113596
             ra_new, dec_new = ad.debiasRADec(ra, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
-            obs_array_optical[i, 1] = ra_new
-            obs_array_optical[i, 2] = dec_new
-            margin = 1 / 3600
+            obs_array_optical[i, 1] = ra_new*180/np.pi*3600
+            obs_array_optical[i, 2] = dec_new*180/np.pi*3600
+            margin = 1
             if (verbose and (np.rad2deg(ra_new - ra) > margin or np.rad2deg(dec_new - dec) > margin)):
                 print(f"Debiased observation {i} from observatory {observer_codes_optical[i]} using star_catalog_codes {star_catalog}. RA bias = {np.rad2deg(ra_new-ra)*3600:0.4f} arcsec, DEC bias = {np.rad2deg(dec_new-dec)*3600:0.4f} arcsec")
         else:
@@ -151,51 +151,51 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
         obs_date_jd = obs_array_optical[i, 0]
         # table 2
         if obs_code == '703':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.8 / 3600) if obs_date_jd >= Time('2014-01-01', format='iso', scale='utc').jd else np.deg2rad(1.0 / 3600)
+            obs_array_optical[i, 3:5] = 0.8 if obs_date_jd >= Time('2014-01-01', format='iso', scale='utc').jd else 1.0
         elif obs_code == '691':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.5 / 3600) if obs_date_jd >= Time('2003-01-01', format='iso', scale='utc').jd else np.deg2rad(0.6 / 3600)
+            obs_array_optical[i, 3:5] = 0.5 if obs_date_jd >= Time('2003-01-01', format='iso', scale='utc').jd else 0.6
         elif obs_code == '644':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.4 / 3600) if obs_date_jd >= Time('2003-09-01', format='iso', scale='utc').jd else np.deg2rad(0.6 / 3600)
+            obs_array_optical[i, 3:5] = 0.4 if obs_date_jd >= Time('2003-09-01', format='iso', scale='utc').jd else 0.6
         # table 3
         elif obs_code in ['704', 'C51', 'J75']:
-            obs_array_optical[i, 3:5] = np.deg2rad(1.0/3600)
+            obs_array_optical[i, 3:5] = 1.0
         elif obs_code == 'G96':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.5/3600)
+            obs_array_optical[i, 3:5] = 0.5
         elif obs_code == 'F51':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.2/3600)
+            obs_array_optical[i, 3:5] = 0.2
         elif obs_code in ['G45', '608']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.6/3600)
+            obs_array_optical[i, 3:5] = 0.6
         elif obs_code == '699':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.8/3600)
+            obs_array_optical[i, 3:5] = 0.8
         elif obs_code in ['D29', 'E12']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.75/3600)
+            obs_array_optical[i, 3:5] = 0.75
         # table 4
         elif obs_code in ['645', '673', 'H01']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.3/3600)
+            obs_array_optical[i, 3:5] = 0.3
         elif obs_code in ['689', '950']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.5/3600)
+            obs_array_optical[i, 3:5] = 0.5
         elif obs_code in ['J04', 'K92', 'K93', 'Q63', 'Q64', 'V37', 'W84', 'W85', 'W86', 'W87', 'K91', 'E10', 'F65']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.4/3600)
+            obs_array_optical[i, 3:5] = 0.4
         elif obs_code == 'G83' and star_catalog in ['U', 'V', 'W', 'X']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.2/3600)
+            obs_array_optical[i, 3:5] = 0.2
         elif obs_code == 'G83' and star_catalog in ['q', 't']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.3/3600)
+            obs_array_optical[i, 3:5] = 0.3
         elif obs_code == 'Y28' and star_catalog in ['t', 'U', 'V', 'W', 'X']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.3/3600)
+            obs_array_optical[i, 3:5] = 0.3
         elif obs_code == '568' and star_catalog in ['o', 's']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.5/3600)
+            obs_array_optical[i, 3:5] = 0.5
         elif obs_code == '568' and star_catalog in ['U', 'V', 'W', 'X']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.1/3600)
+            obs_array_optical[i, 3:5] = 0.1
         elif obs_code == '568' and star_catalog == 't':
-            obs_array_optical[i, 3:5] = np.deg2rad(0.2/3600)
+            obs_array_optical[i, 3:5] = 0.2
         elif obs_code in ['T09', 'T12', 'T14'] and star_catalog in ['U', 'V', 'W', 'X']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.1/3600)
+            obs_array_optical[i, 3:5] = 0.1
         elif obs_code == '309' and star_catalog == ['q', 't']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.3/3600)
+            obs_array_optical[i, 3:5] = 0.3
         elif obs_code == '309' and star_catalog in ['U', 'V', 'W', 'X']:
-            obs_array_optical[i, 3:5] = np.deg2rad(0.2/3600)
+            obs_array_optical[i, 3:5] = 0.2
         else:
-            obs_array_optical[i, 3:5] = np.deg2rad(1.0/3600)
+            obs_array_optical[i, 3:5] = 1.0
             default_weight_counter += 1
     if verbose:
         print(f"Applied default weight of 1 arcsec to {default_weight_counter} observations")

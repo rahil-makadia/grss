@@ -27,7 +27,7 @@ def get_ra_from_hms(ra_hms):
     # convert right ascension from HH:MM:SS.SSS to radians
     ra_split = ra_hms.split(' ')
     ra = 15*(float(ra_split[0])+float(ra_split[1])/60+float(ra_split[2])/3600)
-    return np.deg2rad(ra)
+    return ra*3600 # np.deg2rad(ra)
 
 def get_dec_from_dms(dec_dms):
     """Convert declination from deg MM:SS.SSS to radians.
@@ -43,7 +43,7 @@ def get_dec_from_dms(dec_dms):
     dec = (float(dec_split[0])+float(dec_split[1])/60+float(dec_split[2])/3600)
     if dec_dms[0] == '-':
         dec *= -1
-    return np.deg2rad(dec)
+    return dec*3600 # np.deg2rad(dec)
 
 @jit('float64(float64)', nopython=True, cache=True)
 def mjd2et(MJD):
@@ -59,7 +59,6 @@ def mjd2et(MJD):
     --------
     ET  ... Ephemeris time (ephemeris seconds beyond epoch J2000)
     """
-
     return (MJD+2400000.5-2451545.0)*86400
 
 @jit('float64(float64)', nopython=True, cache=True)
@@ -91,15 +90,13 @@ def get_radec(state):
     """
     pos = state[:3]
     # vel = state[3:6]
-
     dist = np.linalg.norm(pos) # calculate distance
     ra = np.arctan2(pos[1], pos[0])
     if ra < 0:
         ra = ra + 2*np.pi
     # end if
     dec = np.arcsin(pos[2]/dist) # calculate declination
-
-    return ra, dec
+    return ra*180/np.pi*3600, dec*180/np.pi*3600 # ra, dec
 
 @jit('Tuple((float64, float64, float64, float64))(float64, float64, float64)', nopython=True, cache=False)
 def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):

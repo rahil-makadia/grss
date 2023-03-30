@@ -79,7 +79,7 @@ class iterationParams:
         ax_histy.hist(y, bins=bins, orientation='horizontal', color=color, edgecolor=color, linewidth=0.75, fill=fill, histtype='step')
         return None
 
-    def plot_residuals(self, t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title):
+    def plot_residuals(self, t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname):
         # sourcery skip: extract-duplicate-method
         fig = plt.figure(figsize=(21,6), dpi=150)
         iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
@@ -113,14 +113,16 @@ class iterationParams:
         ax3.set_ylabel('Residuals, O-C [$\mu$s, Hz]')
         ax3.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic: ax3.set_yscale('log')
-        # if title is not None:
-        #     plt.savefig('./plots/'+title.replace(' ', '_')+'.pdf', bbox_inches='tight')
+        if savefig:
+            figname = f'residuals_iter_{self.iter_number}' if figname is None else figname
+            plt.savefig(f'{figname}_residuals.pdf', bbox_inches='tight')
         plt.show()
 
-    def plot_chi(self, t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic):
+    def plot_chi(self, t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname):
         # plot chi values
         plt.figure(figsize=(21,6), dpi=150)
         iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
+        iter_string = title if title is not None else iter_string
         plt.suptitle(f'{iter_string}. Chi Squared: RA={np.sum(ra_chi_squared):.2f}, Dec={np.sum(dec_chi_squared):.2f}, Delay={np.sum(delay_chi_squared):.2f}, Doppler={np.sum(doppler_chi_squared):.2f}', y=0.95)
         plt.subplot(1,2,1)
         plt.plot(t_arr_optical, ra_chi, '.', markersize=markersize, label='RA')
@@ -147,9 +149,12 @@ class iterationParams:
         plt.ylabel('$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic: plt.yscale('log')
+        if savefig:
+            figname = f'chi_iter_{self.iter_number}' if figname is None else figname
+            plt.savefig(f'{figname}_chi.pdf', bbox_inches='tight')
         plt.show()
 
-    def plot_iteration_summary(self, show_logarithmic=False, title=None):
+    def plot_iteration_summary(self, show_logarithmic=False, title=None, savefig=False, figname=None):
         markersize = 3
         sigma_limit = 3
         radar_scale = 3
@@ -172,14 +177,11 @@ class iterationParams:
         dec_residuals = residuals[opticalIdx, 1]
         ra_computed = ra_obs - ra_residuals
         dec_computed = dec_obs - dec_residuals
-        ra_cosdec_residuals = ra_obs*np.cos(dec_obs) - ra_computed*np.cos(dec_computed)
+        ra_cosdec_residuals = ( (ra_obs/3600*np.pi/180*np.cos(dec_obs/3600*np.pi/180)) - (ra_computed/3600*np.pi/180*np.cos(dec_computed/3600*np.pi/180)) )*180/np.pi*3600
         ra_chi = ra_residuals/ra_noise
         dec_chi = dec_residuals/dec_noise
         ra_chi_squared = ra_chi**2
         dec_chi_squared = dec_chi**2
-        ra_residuals *= 180/np.pi*3600
-        dec_residuals *= 180/np.pi*3600
-        ra_cosdec_residuals *= 180/np.pi*3600
         ra_residuals = np.abs(ra_residuals) if show_logarithmic else ra_residuals
         dec_residuals = np.abs(dec_residuals) if show_logarithmic else dec_residuals
         ra_cosdec_residuals = np.abs(ra_cosdec_residuals) if show_logarithmic else ra_cosdec_residuals
@@ -206,8 +208,8 @@ class iterationParams:
         delay_chi = np.abs(delay_chi) if show_logarithmic else delay_chi
         doppler_chi = np.abs(doppler_chi) if show_logarithmic else doppler_chi
         
-        self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title)
-        self.plot_chi(t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic)
+        self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname)
+        self.plot_chi(t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname)
         return None
 
 class fitSimulation:
@@ -620,9 +622,9 @@ class fitSimulation:
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
                 if key[:10] == 'multiplier':
-                    print(f"{key}\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
+                    print(f"{key}\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/final_variance[i]:+.3f}")
                 else:
-                    print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
+                    print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/final_variance[i]:+.3f}")
         return None
 
     def plot_summary(self):
