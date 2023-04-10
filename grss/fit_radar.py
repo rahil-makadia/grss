@@ -37,7 +37,7 @@ def get_radar_obs_array(tdes):
     radar_observer_map = {  '-1': '251', # Arecibo (300-m, 1963 to 2020)
                             '-2': '254', # Haystack (37-m)
                             '-9': '256', # Green Bank Telescope (100-m, GBT)
-                            '-13:': '252', # DSS-13 (34-m BWG, R&D)
+                            '-13': '252', # DSS-13 (34-m BWG, R&D)
                             '-14': '253', # DSS-14 (70-m)
                             '-25': '257', # Goldstone DSS 25
                             '-35': '-35', # DSS-35 (34-m BWG)
@@ -70,9 +70,10 @@ def get_radar_obs_array(tdes):
             obs_array_radar[i,4] = np.nan
             observer_codes_radar.append((radar_observer_map[tx], radar_observer_map[rx]))
         elif doppler:
+            continue
             obs_array_radar[i,1] = np.nan
             obs_array_radar[i,2] = obs_val
             obs_array_radar[i,3] = np.nan
             obs_array_radar[i,4] = obs_sigma
-            observer_codes_radar.append((radar_observer_map[rx], radar_observer_map[tx]), freq)
+            observer_codes_radar.append(((radar_observer_map[rx], radar_observer_map[tx]), freq))
     return obs_array_radar, tuple(observer_codes_radar)
