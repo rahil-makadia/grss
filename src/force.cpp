@@ -84,6 +84,9 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
     real ax, ay, az;
     real massJ;
     real dPosDotVel, dVelDotVel;
+    real gm, gmOverC2, gm2OverC2;
+    real ppn1_0, ppn1_1, ppn1_2;
+    real ppn2, ppn2_0, ppn2_1, ppn2_2;
     real beta = 1.0L;
     real gamma = 1.0L;
     for (size_t i=0; i<integParams.nInteg; i++){
@@ -110,9 +113,27 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
                 dPosDotVel = dx*dvx + dy*dvy + dz*dvz;
                 dVelDotVel = dvx*dvx + dvy*dvy + dvz*dvz;
                 // 1st order PPN approximation, equation 4-61 from Moyer (2003), https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                ax += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dx + 2*(1+gamma)*dPosDotVel*dvx);
-                ay += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dy + 2*(1+gamma)*dPosDotVel*dvy);
-                az += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dz + 2*(1+gamma)*dPosDotVel*dvz);
+                gm = G*massJ;
+                gmOverC2 = gm/c2;
+                gm2OverC2 = gm*gmOverC2;
+                ppn1_0 = 2*(beta+gamma) * gm2OverC2 / (rRel*rRel3);
+                ppn1_1 = -gmOverC2 * dVelDotVel / rRel3;
+                ppn1_2 = 2*(1+gamma) * gmOverC2 * dPosDotVel / rRel3;
+                // ax += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dx + 2*(1+gamma)*dPosDotVel*dvx);
+                // ay += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dy + 2*(1+gamma)*dPosDotVel*dvy);
+                // az += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dz + 2*(1+gamma)*dPosDotVel*dvz);
+                // 1st order PPN approximation, from ABIE, https://github.com/MovingPlanetsAround/ABIE/blob/master/src/additional_forces.c
+                ax += ppn1_0 * dx + ppn1_1 * dx + ppn1_2 * dvx;
+                ay += ppn1_0 * dy + ppn1_1 * dy + ppn1_2 * dvy;
+                az += ppn1_0 * dz + ppn1_1 * dz + ppn1_2 * dvz;
+                // 2nd order PPN approximation, from ABIE, https://github.com/MovingPlanetsAround/ABIE/blob/master/src/additional_forces.c
+                ppn2 = gm2OverC2/(c2*rRel*rRel3);
+                ppn2_0 = 2.0 * dPosDotVel * dPosDotVel / (rRel*rRel);
+                ppn2_1 = -9.0 * gm / rRel;
+                ppn2_2 = -2.0 * dPosDotVel;
+                ax += ppn2 * (ppn2_0 * dx + ppn2_1 * dx + ppn2_2 * dvx);
+                ay += ppn2 * (ppn2_0 * dy + ppn2_1 * dy + ppn2_2 * dvy);
+                az += ppn2 * (ppn2_0 * dz + ppn2_1 * dz + ppn2_2 * dvz);
             }
         }
         xDotInteg[6*i+3] += ax;
