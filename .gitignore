@@ -1,4 +1,7 @@
 ################################### NAIF Spice file extensions
+# comment files
+*.cmt
+
 # binary orientation/attitude kernel (ck)
 *.bc
 

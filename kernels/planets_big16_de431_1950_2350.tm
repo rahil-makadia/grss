@@ -9,6 +9,6 @@
                         '../kernels/planets_big16_de431_1950_2350.bsp',
                         '../kernels/earth_200101_990628_predict.bpc',
                         '../kernels/earth_720101_070426.bpc',
-                        '../kernels/earth_000101_230525_230301.bpc')
+                        '../kernels/earth_latest_high_prec.bpc')
 
 \begintext
