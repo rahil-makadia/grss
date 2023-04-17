@@ -17,6 +17,8 @@ SpiceBody::SpiceBody(std::string DEkernelPath, std::string name, int spiceId, re
     this->mass = mass;
     this->radius = radius/consts.du2m;
     this->isNongrav = false;
+    this->isPPN = false;
+    this->isMajor = false;
     if (this->isSpice){
         double state[6];
         double lt;
@@ -68,6 +70,8 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0, real m
         this->ngParams.r0_au = ngParams.r0_au;
         this->isNongrav = true;
     }
+    this->isPPN = false;
+    this->isMajor = false;
 }
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius, std::vector<real> pos, std::vector<real> vel, std::vector< std::vector<real> > covariance, NongravParamaters ngParams, Constants consts){
@@ -90,6 +94,8 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius, std::vec
         this->ngParams.r0_au = ngParams.r0_au;
         this->isNongrav = true;
     }
+    this->isPPN = false;
+    this->isMajor = false;
 }
 
 void ImpulseEvent::apply(const real &t, std::vector<real> &xInteg, const real &propDir){
@@ -121,7 +127,7 @@ propSimulation::propSimulation(std::string name, real t0, const int defaultSpice
     {
         real G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
         // add planets and planetary bodies from DE431 header (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de431_tech-comments.txt)
-        SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0, 2.959122082855911e-4L/G, 6.957e8L, this->consts);
+        SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0, 2.959122082855911e-4L/G, 6.96e8L, this->consts);
         SpiceBody MercuryBarycenter(DEkernelPath, "Mercury Barycenter", 1, this->integParams.t0, 4.91248045036476e-11L/G, 0.0L, this->consts);
         SpiceBody VenusBarycenter(DEkernelPath, "Venus Barycenter", 2, this->integParams.t0, 7.24345233264412e-10L/G, 0.0L, this->consts);
         SpiceBody Earth(DEkernelPath, "Earth", 399, this->integParams.t0, 8.887692445125634e-10L/G, 6378136.3L, this->consts);
@@ -133,20 +139,31 @@ propSimulation::propSimulation(std::string name, real t0, const int defaultSpice
         SpiceBody NeptuneBarycenter(DEkernelPath, "Neptune Barycenter", 8, this->integParams.t0, 1.52435734788511e-08L/G, 0.0L, this->consts);
         SpiceBody PlutoBarycenter(DEkernelPath, "Pluto Barycenter", 9, this->integParams.t0, 2.17844105197418e-12L/G, 0.0L, this->consts);
         Sun.isPPN = true;
-        MercuryBarycenter.isPPN = true;
-        VenusBarycenter.isPPN = true;
-        Earth.isPPN = true;
-        Moon.isPPN = true;
-        MarsBarycenter.isPPN = true;
-        JupiterBarycenter.isPPN = true;
-        SaturnBarycenter.isPPN = true;
-        UranusBarycenter.isPPN = true;
-        NeptuneBarycenter.isPPN = true;
-        PlutoBarycenter.isPPN = true;
+        Sun.isMajor = true;
+        MercuryBarycenter.isPPN = false;
+        MercuryBarycenter.isMajor = true;
+        VenusBarycenter.isPPN = false;
+        VenusBarycenter.isMajor = true;
+        Earth.isPPN = false;
+        Earth.isMajor = true;
+        Moon.isPPN = false;
+        Moon.isMajor = false;
+        MarsBarycenter.isPPN = false;
+        MarsBarycenter.isMajor = true;
+        JupiterBarycenter.isPPN = false;
+        JupiterBarycenter.isMajor = true;
+        SaturnBarycenter.isPPN = false;
+        SaturnBarycenter.isMajor = true;
+        UranusBarycenter.isPPN = false;
+        UranusBarycenter.isMajor = true;
+        NeptuneBarycenter.isPPN = false;
+        NeptuneBarycenter.isMajor = true;
+        PlutoBarycenter.isPPN = false;
+        PlutoBarycenter.isMajor = true;
         Sun.set_J2(2.1106088532726840e-7L, 7.25L*DEG2RAD); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
         // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
         // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
-        // Earth.set_J2(0.00108262545L, EARTH_OBLIQUITY); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        Earth.set_J2(0.00108262545L, EARTH_OBLIQUITY); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
         // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
         // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
         // JupiterBarycenter.set_J2(14736.0e-6L, 3.13L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
@@ -203,34 +220,45 @@ propSimulation::propSimulation(std::string name, real t0, const int defaultSpice
     }
     case 441:
     {
-        real G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
+        real G = 6.6743e-20L; // default km^3 / (kg s^2)
         // add planets and planetary bodies from DE441 header (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de441_tech-comments.txt)
-        SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0, 2.9591220828411956e-04L/G, 6.957e8L, this->consts);
-        SpiceBody MercuryBarycenter(DEkernelPath, "Mercury Barycenter", 1, this->integParams.t0, 4.9125001948893182e-11L/G, 0.0L, this->consts);
-        SpiceBody VenusBarycenter(DEkernelPath, "Venus Barycenter", 2, this->integParams.t0, 7.2434523326441187e-10L/G, 0.0L, this->consts);
-        SpiceBody Earth(DEkernelPath, "Earth", 399, this->integParams.t0, 8.8876924467071022e-10L/G, 6378136.3L, this->consts);
-        SpiceBody Moon(DEkernelPath, "Moon", 301, this->integParams.t0, 1.0931894624024351e-11L/G, 0.0L, this->consts);
-        SpiceBody MarsBarycenter(DEkernelPath, "Mars Barycenter", 4, this->integParams.t0, 9.5495488297258119e-11L/G, 0.0L, this->consts);
-        SpiceBody JupiterBarycenter(DEkernelPath, "Jupiter Barycenter", 5, this->integParams.t0, 2.8253458252257917e-07L/G, 0.0L, this->consts);
-        SpiceBody SaturnBarycenter(DEkernelPath, "Saturn Barycenter", 6, this->integParams.t0, 8.4597059933762903e-08L/G, 0.0L, this->consts);
-        SpiceBody UranusBarycenter(DEkernelPath, "Uranus Barycenter", 7, this->integParams.t0, 1.2920265649682399e-08L/G, 0.0L, this->consts);
-        SpiceBody NeptuneBarycenter(DEkernelPath, "Neptune Barycenter", 8, this->integParams.t0, 1.5243573478851939e-08L/G, 0.0L, this->consts);
-        SpiceBody PlutoBarycenter(DEkernelPath, "Pluto Barycenter", 9, this->integParams.t0, 2.1750964648933581e-12L/G, 0.0L, this->consts);
+        SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0, 132712440041.279419L/G, 6.957e8L, this->consts);
+        SpiceBody MercuryBarycenter(DEkernelPath, "Mercury Barycenter", 1, this->integParams.t0, 22031.868551L/G, 0.0L, this->consts);
+        SpiceBody VenusBarycenter(DEkernelPath, "Venus Barycenter", 2, this->integParams.t0, 324858.592000L/G, 0.0L, this->consts);
+        SpiceBody Earth(DEkernelPath, "Earth", 399, this->integParams.t0, 398600.435507L/G, 6378136.3L, this->consts);
+        SpiceBody Moon(DEkernelPath, "Moon", 301, this->integParams.t0, 4902.800118L/G, 0.0L, this->consts);
+        SpiceBody MarsBarycenter(DEkernelPath, "Mars Barycenter", 4, this->integParams.t0, 42828.375816L/G, 0.0L, this->consts);
+        SpiceBody JupiterBarycenter(DEkernelPath, "Jupiter Barycenter", 5, this->integParams.t0, 126712764.100000L/G, 0.0L, this->consts);
+        SpiceBody SaturnBarycenter(DEkernelPath, "Saturn Barycenter", 6, this->integParams.t0, 37940584.841800L/G, 0.0L, this->consts);
+        SpiceBody UranusBarycenter(DEkernelPath, "Uranus Barycenter", 7, this->integParams.t0, 5794556.400000L/G, 0.0L, this->consts);
+        SpiceBody NeptuneBarycenter(DEkernelPath, "Neptune Barycenter", 8, this->integParams.t0, 6836527.100580L/G, 0.0L, this->consts);
+        SpiceBody PlutoBarycenter(DEkernelPath, "Pluto Barycenter", 9, this->integParams.t0, 975.500000L/G, 0.0L, this->consts);
         Sun.isPPN = true;
-        MercuryBarycenter.isPPN = true;
-        VenusBarycenter.isPPN = true;
-        Earth.isPPN = true;
-        Moon.isPPN = true;
-        MarsBarycenter.isPPN = true;
-        JupiterBarycenter.isPPN = true;
-        SaturnBarycenter.isPPN = true;
-        UranusBarycenter.isPPN = true;
-        NeptuneBarycenter.isPPN = true;
-        PlutoBarycenter.isPPN = true;
-        Sun.set_J2(2.1106088532726840e-7L, 7.25L*DEG2RAD); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        Sun.isMajor = true;
+        MercuryBarycenter.isPPN = false;
+        MercuryBarycenter.isMajor = true;
+        VenusBarycenter.isPPN = false;
+        VenusBarycenter.isMajor = true;
+        Earth.isPPN = false;
+        Earth.isMajor = true;
+        Moon.isPPN = false;
+        Moon.isMajor = false;
+        MarsBarycenter.isPPN = false;
+        MarsBarycenter.isMajor = true;
+        JupiterBarycenter.isPPN = false;
+        JupiterBarycenter.isMajor = true;
+        SaturnBarycenter.isPPN = false;
+        SaturnBarycenter.isMajor = true;
+        UranusBarycenter.isPPN = false;
+        UranusBarycenter.isMajor = true;
+        NeptuneBarycenter.isPPN = false;
+        NeptuneBarycenter.isMajor = true;
+        PlutoBarycenter.isPPN = false;
+        PlutoBarycenter.isMajor = true;
+        Sun.set_J2(2.1961391516529825e-07L, 7.25L*DEG2RAD); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
         // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
         // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
-        // Earth.set_J2(0.00108262545L, EARTH_OBLIQUITY); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+        Earth.set_J2(1.0826253900000000e-03L, EARTH_OBLIQUITY); // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
         // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
         // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
         // JupiterBarycenter.set_J2(14736.0e-6L, 3.13L*DEG2RAD); // https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
@@ -251,6 +279,7 @@ propSimulation::propSimulation(std::string name, real t0, const int defaultSpice
         add_spice_body(PlutoBarycenter);
 
         // add DE441 big16 asteroids from JPL SSD IOM 392R-21-005 (ftp://ssd.jpl.nasa.gov/pub/eph/small_bodies/asteroids_de441/SB441_IOM392R-21-005_perturbers.pdf)
+        G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
         SpiceBody Ceres(DEkernelPath, "Ceres", 2000001, this->integParams.t0, 1.3964518123081070e-13L/G, 0.0L, this->consts);
         SpiceBody Vesta(DEkernelPath, "Vesta", 2000004, this->integParams.t0, 3.8548000225257904e-14L/G, 0.0L, this->consts);
         SpiceBody Pallas(DEkernelPath, "Pallas", 2000002, this->integParams.t0, 3.0471146330043200e-14L/G, 0.0L, this->consts);
@@ -606,6 +635,7 @@ void propSimulation::preprocess(){
         this->forceParams.obliquityList.push_back(integBodies[i].obliquityToEcliptic);
         this->forceParams.isNongravList.push_back(integBodies[i].isNongrav);
         this->forceParams.ngParamsList.push_back(integBodies[i].ngParams);
+        this->forceParams.isMajorList.push_back(integBodies[i].isMajor);
     }
     for (size_t i = 0; i < this->integParams.nSpice; i++){
         this->forceParams.masses.push_back(spiceBodies[i].mass);
@@ -615,6 +645,7 @@ void propSimulation::preprocess(){
         this->forceParams.isJ2List.push_back(spiceBodies[i].isJ2);
         this->forceParams.J2List.push_back(spiceBodies[i].J2);
         this->forceParams.obliquityList.push_back(spiceBodies[i].obliquityToEcliptic);
+        this->forceParams.isMajorList.push_back(spiceBodies[i].isMajor);
     }
 }
 

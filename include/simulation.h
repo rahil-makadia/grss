@@ -18,6 +18,7 @@ struct Body{
         bool isPPN=false;
         bool isJ2=false;
         bool isNongrav=false;
+        bool isMajor=false;
         void set_J2(real J2, real obliquityToEcliptic);
 };
 

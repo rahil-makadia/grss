@@ -26,8 +26,9 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
     }
 
     force_newton(posAll, xDotInteg, forceParams, integParams, consts);
-    force_ppn(posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    force_J2(posAll, xDotInteg, forceParams, integParams, consts);
+    // force_ppn_simple(posAll, velAll, xDotInteg, forceParams, integParams, consts);
+    force_ppn_eih(posAll, velAll, xDotInteg, forceParams, integParams, consts);
+    // force_J2(posAll, xDotInteg, forceParams, integParams, consts);
     force_nongrav(posAll, velAll, xDotInteg, forceParams, integParams, consts);
 
     std::vector<real> accInteg(3*integParams.nInteg, 0.0);
@@ -45,7 +46,7 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
     real dx, dy, dz;
     real rRel, rRel3;
     real ax, ay, az;
-    real massJ;
+    real massj;
     for (size_t i=0; i<integParams.nInteg; i++){
         x = posAll[3*i];
         y = posAll[3*i+1];
@@ -54,16 +55,16 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
         ay = 0.0;
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
-            massJ = forceParams.masses[j];
-            if (i != j && massJ != 0.0){
+            massj = forceParams.masses[j];
+            if (i != j && massj != 0.0){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];
                 rRel = sqrt(dx*dx + dy*dy + dz*dz);
                 rRel3 = rRel*rRel*rRel;
-                ax -= G*massJ*dx/rRel3;
-                ay -= G*massJ*dy/rRel3;
-                az -= G*massJ*dz/rRel3;
+                ax -= G*massj*dx/rRel3;
+                ay -= G*massj*dy/rRel3;
+                az -= G*massj*dz/rRel3;
             }
         }
         xDotInteg[6*i+3] += ax;
@@ -72,7 +73,7 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
     }
 }
 
-void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real c = consts.clight;
     real c2 = c*c;
@@ -82,11 +83,10 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
     real vx, vy, vz;
     real dvx, dvy, dvz;
     real ax, ay, az;
-    real massJ;
+    real massj;
     real dPosDotVel, dVelDotVel;
-    real gm, gmOverC2, gm2OverC2;
-    real ppn1_0, ppn1_1, ppn1_2;
-    real ppn2, ppn2_0, ppn2_1, ppn2_2;
+    real gm, gmOverC2;
+    real fac1, fac2, fac3;
     real beta = 1.0L;
     real gamma = 1.0L;
     for (size_t i=0; i<integParams.nInteg; i++){
@@ -100,8 +100,10 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
         ay = 0.0;
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
-            massJ = forceParams.masses[j];
-            if (i != j && massJ != 0.0 && forceParams.isPPNList[j]){
+            massj = forceParams.masses[j];
+            gm = G*massj;
+            gmOverC2 = gm/c2;
+            if (i != j && massj != 0.0 && forceParams.isPPNList[j]){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];
@@ -113,27 +115,12 @@ void force_ppn(const std::vector<real> &posAll, const std::vector<real> &velAll,
                 dPosDotVel = dx*dvx + dy*dvy + dz*dvz;
                 dVelDotVel = dvx*dvx + dvy*dvy + dvz*dvz;
                 // 1st order PPN approximation, equation 4-61 from Moyer (2003), https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                gm = G*massJ;
-                gmOverC2 = gm/c2;
-                gm2OverC2 = gm*gmOverC2;
-                ppn1_0 = 2*(beta+gamma) * gm2OverC2 / (rRel*rRel3);
-                ppn1_1 = -gmOverC2 * dVelDotVel / rRel3;
-                ppn1_2 = 2*(1+gamma) * gmOverC2 * dPosDotVel / rRel3;
-                // ax += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dx + 2*(1+gamma)*dPosDotVel*dvx);
-                // ay += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dy + 2*(1+gamma)*dPosDotVel*dvy);
-                // az += G*massJ/(rRel3*c2)*((2*(beta+gamma)*G*massJ/rRel - gamma*dVelDotVel)*dz + 2*(1+gamma)*dPosDotVel*dvz);
-                // 1st order PPN approximation, from ABIE, https://github.com/MovingPlanetsAround/ABIE/blob/master/src/additional_forces.c
-                ax += ppn1_0 * dx + ppn1_1 * dx + ppn1_2 * dvx;
-                ay += ppn1_0 * dy + ppn1_1 * dy + ppn1_2 * dvy;
-                az += ppn1_0 * dz + ppn1_1 * dz + ppn1_2 * dvz;
-                // 2nd order PPN approximation, from ABIE, https://github.com/MovingPlanetsAround/ABIE/blob/master/src/additional_forces.c
-                ppn2 = gm2OverC2/(c2*rRel*rRel3);
-                ppn2_0 = 2.0 * dPosDotVel * dPosDotVel / (rRel*rRel);
-                ppn2_1 = -9.0 * gm / rRel;
-                ppn2_2 = -2.0 * dPosDotVel;
-                ax += ppn2 * (ppn2_0 * dx + ppn2_1 * dx + ppn2_2 * dvx);
-                ay += ppn2 * (ppn2_0 * dy + ppn2_1 * dy + ppn2_2 * dvy);
-                az += ppn2 * (ppn2_0 * dz + ppn2_1 * dz + ppn2_2 * dvz);
+                fac1 = gmOverC2/rRel3;
+                fac2 = (2*(beta+gamma)*gm/rRel - gamma*dVelDotVel);
+                fac3 = 2*(1+gamma)*dPosDotVel;
+                ax += fac1*(fac2*dx + fac3*dvx);
+                ay += fac1*(fac2*dy + fac3*dvy);
+                az += fac1*(fac2*dz + fac3*dvz);
             }
         }
         xDotInteg[6*i+3] += ax;
@@ -149,7 +136,7 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
     real rRel, rRel2, rRel5;
     real radius;
     real ax, ay, az;
-    real massJ;
+    real massj;
     std::vector< std::vector<real> > R1(3, std::vector<real>(3));
     std::vector< std::vector<real> > R2(3, std::vector<real>(3));
     std::vector< std::vector<real> > R(3, std::vector<real>(3));
@@ -164,8 +151,8 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
         ay = 0.0;
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
-            massJ = forceParams.masses[j];
-            if (i != j && massJ != 0.0 && forceParams.isJ2List[j]){
+            massj = forceParams.masses[j];
+            if (i != j && massj != 0.0 && forceParams.isJ2List[j]){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];
@@ -180,9 +167,9 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
                 dx = dPosBody[0];
                 dy = dPosBody[1];
                 dz = dPosBody[2];
-                real axBody = 3*G*massJ*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dx/(2*rRel5);
-                real ayBody = 3*G*massJ*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dy/(2*rRel5);
-                real azBody = 3*G*massJ*forceParams.J2List[j]*radius*radius*(3-5*dz*dz/rRel2)*dz/(2*rRel5);
+                real axBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dx/(2*rRel5);
+                real ayBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dy/(2*rRel5);
+                real azBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(3-5*dz*dz/rRel2)*dz/(2*rRel5);
                 mat3_inv(R, Rinv);
                 mat_vec_mul(Rinv, {axBody, ayBody, azBody}, aEquat);
                 ax += aEquat[0];
@@ -237,7 +224,7 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
                 dvy = vy - velAll[3*j+1];
                 dvz = vz - velAll[3*j+2]; 
                 rRel = sqrt(dx*dx + dy*dy + dz*dz);
-                g = pow(alpha*(rRel/r0), -m) * pow(1+pow(rRel/r0, n), -k);
+                g = alpha*pow(rRel/r0, -m) * pow(1+pow(rRel/r0, n), -k);
                 vunit({dx, dy, dz}, eRHat);
                 vcross({dx, dy, dz}, {dvx, dvy, dvz}, hRelVec);
                 vunit(hRelVec, eNHat);
@@ -250,5 +237,117 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
         xDotInteg[6*i+3] += ax;
         xDotInteg[6*i+4] += ay;
         xDotInteg[6*i+5] += az;
+    }
+}
+
+void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+    // calculate accelerations using the Einstein-Infeld-Hoffmann (EIH) PPN formalism
+    // see eqn 27 in https://iopscience.iop.org/article/10.3847/1538-3881/abd414/pdf (without the factor of 1 in the first big summation)
+    real G = consts.G;
+    real c2 = consts.clight*consts.clight;
+    real oneOverC2 = 1.0/c2;
+    real beta = 1.0;
+    real gamma = 1.0;
+    for (size_t i=0; i<integParams.nInteg; i++){
+        const real xi = posAll[3*i];
+        const real yi = posAll[3*i+1];
+        const real zi = posAll[3*i+2];
+        const real vxi = velAll[3*i];
+        const real vyi = velAll[3*i+1];
+        const real vzi = velAll[3*i+2];
+        real axi = 0.0;
+        real ayi = 0.0;
+        real azi = 0.0;
+        real axj, ayj, azj;
+        for (size_t j=0; j<integParams.nTotal; j++){
+            const real massj = forceParams.masses[j];
+            if (i != j && massj != 0.0 && forceParams.isPPNList[j]){ // 
+                const real muj = G*massj;
+                const real xj = posAll[3*j];
+                const real yj = posAll[3*j+1];
+                const real zj = posAll[3*j+2];
+                const real vxj = velAll[3*j];
+                const real vyj = velAll[3*j+1];
+                const real vzj = velAll[3*j+2];
+                const real dxij = xi - xj;
+                const real dyij = yi - yj;
+                const real dzij = zi - zj;
+                const real dvxij = vxi - vxj;
+                const real dvyij = vyi - vyj;
+                const real dvzij = vzi - vzj;
+                const real rRelij = sqrt(dxij*dxij + dyij*dyij + dzij*dzij);
+                const real rRelij3 = rRelij*rRelij*rRelij;
+                const real viDotVi = vxi*vxi + vyi*vyi + vzi*vzi;
+                const real term1c = viDotVi*oneOverC2;
+                const real vjDotVj = vxj*vxj + vyj*vyj + vzj*vzj;
+                const real term1d = vjDotVj*oneOverC2;
+                const real viDotVj = vxi*vxj + vyi*vyj + vzi*vzj;
+                const real term1e = viDotVj;
+                const real rijDotVj = dxij*vxj + dyij*vyj + dzij*vzj;
+                const real term1f = rijDotVj*rijDotVj/(rRelij*rRelij);
+                real term1a = 0.0;
+                real term1b = 0.0;
+                axj = 0.0;
+                ayj = 0.0;
+                azj = 0.0;
+                for (size_t k=0; k<integParams.nTotal; k++){
+                    const real massk = forceParams.masses[k];
+                    if (massk != 0.0 && forceParams.isMajorList[k]){ // 
+                        const real muk = G*massk;
+                        const real xk = posAll[3*k];
+                        const real yk = posAll[3*k+1];
+                        const real zk = posAll[3*k+2];
+                        // if (k != i){
+                            const real dxik = xi - xk;
+                            const real dyik = yi - yk;
+                            const real dzik = zi - zk;
+                            const real rRelik = sqrt(dxik*dxik + dyik*dyik + dzik*dzik);
+                            term1a += muk/rRelik;
+                        // }
+                        if (k != j){
+                            const real dxjk = xj - xk;
+                            const real dyjk = yj - yk;
+                            const real dzjk = zj - zk;
+                            const real rReljk = sqrt(dxjk*dxjk + dyjk*dyjk + dzjk*dzjk);
+                            term1b += muk/rReljk;
+                            const real rReljk3 = rReljk*rReljk*rReljk;
+                            axj -= muk*dxjk/rReljk3;
+                            ayj -= muk*dyjk/rReljk3;
+                            azj -= muk*dzjk/rReljk3;
+                        }
+                    }
+                }
+                const real rijDotAj = dxij*axj + dyij*ayj + dzij*azj;
+                const real term1g = -rijDotAj;
+
+                const real term1Fac = -2.0*(beta+gamma)*oneOverC2*term1a - (2.0*beta-1)*oneOverC2*term1b + gamma*term1c + (1.0+gamma)*term1d - 2.0*(1.0+gamma)*oneOverC2*term1e - 1.5*oneOverC2*term1f + 0.5*oneOverC2*term1g;
+                const real term1X = -muj/rRelij3*dxij*term1Fac;
+                const real term1Y = -muj/rRelij3*dyij*term1Fac;
+                const real term1Z = -muj/rRelij3*dzij*term1Fac;
+                // std::cout << " " << std::endl;
+                // std::cout << "term1Fac = " << term1Fac << ", term1X = " << term1X << ", term1Y = " << term1Y << ", term1Z = " << term1Z << std::endl;
+
+                const real term2DotProduct = dxij*((2.0+2.0*gamma)*vxi-(1.0+2.0*gamma)*vxj) + dyij*((2.0+2.0*gamma)*vyi-(1.0+2.0*gamma)*vyj) + dzij*((2.0+2.0*gamma)*vzi-(1.0+2.0*gamma)*vzj);
+                const real term2Fac = oneOverC2*muj/rRelij3*term2DotProduct;
+                const real term2X = term2Fac*dvxij;
+                const real term2Y = term2Fac*dvyij;
+                const real term2Z = term2Fac*dvzij;
+                // std::cout << "term2X = " << term2X << ", term2Y = " << term2Y << ", term2Z = " << term2Z << std::endl;
+
+                const real term3X = (3.0+4.0*gamma)*0.5*oneOverC2*muj/rRelij*axj;
+                const real term3Y = (3.0+4.0*gamma)*0.5*oneOverC2*muj/rRelij*ayj;
+                const real term3Z = (3.0+4.0*gamma)*0.5*oneOverC2*muj/rRelij*azj;
+                // std::cout << "term3X = " << term3X << ", term3Y = " << term3Y << ", term3Z = " << term3Z << std::endl;
+
+                axi += term1X + term2X + term3X;
+                ayi += term1Y + term2Y + term3Y;
+                azi += term1Z + term2Z + term3Z;
+            }
+        }
+        // std::cout << ", axi = " << axi << ", ayi = " << ayi << ", azi = " << azi << std::endl;
+        // std::cout << " " << std::endl;
+        xDotInteg[6*i+3] += axi;
+        xDotInteg[6*i+4] += ayi;
+        xDotInteg[6*i+5] += azi;
     }
 }

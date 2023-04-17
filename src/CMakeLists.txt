@@ -14,7 +14,7 @@ else()
 endif()
 
 # link openmp
-find_package(OpenMP REQUIRED)
-if(OPENMP_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
-endif()
+# find_package(OpenMP REQUIRED)
+# if(OPENMP_FOUND)
+#     target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+# endif()

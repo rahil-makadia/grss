@@ -77,7 +77,8 @@ PYBIND11_MODULE(cppgrss, m) {
         .def_readwrite("isJ2List", &ForceParameters::isJ2List)
         .def_readwrite("J2List", &ForceParameters::J2List)
         .def_readwrite("obliquityList", &ForceParameters::obliquityList)
-        .def_readwrite("isNongravList", &ForceParameters::isNongravList);
+        .def_readwrite("isNongravList", &ForceParameters::isNongravList)
+        .def_readwrite("isMajorList", &ForceParameters::isMajorList);
 
     // from simulation.h
     py::class_<Body>(m, "Body")
