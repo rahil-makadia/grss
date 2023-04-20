@@ -3,7 +3,7 @@
 
 #include "interpolate.h"
 
-const std::vector<real> hVec = {
+const real hVec[8] = {
     0.0,
     0.0562625605369221464656522,
     0.1802406917368923649875799,
@@ -13,7 +13,7 @@ const std::vector<real> hVec = {
     0.8853209468390957680903598,
     0.9775206135612875018911745
     };
-const std::vector< std::vector<real> > rMat = {
+const real rMat[8][8] = {
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {17.773808914078000840752659565672904106978971632681, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {5.5481367185372165056928216140765061758579336941398, 8.0659386483818866885371256689687154412267416180207, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -23,7 +23,7 @@ const std::vector< std::vector<real> > rMat = {
     {1.1295338753367899027322861542728593509768148769105, 1.2061876660584456166252036299646227791474203527801, 1.4182782637347391537713783674858328433713640692518, 1.8772424961868100972169920283109658335427446084411, 2.9571160172904557478071040204245556508352776929762, 6.6176620137024244874471284891193925737033291491748, 0.0, 0.0},
     {1.0229963298234867458386119071939636779024159134103, 1.0854721939386423840467243172568913862030118679827, 1.2542646222818777659905422465868249586862369725826, 1.6002665494908162609916716949161150366323259154408, 2.3235983002196942228325345451091668073608955835034, 4.1099757783445590862385761824068782144723082633980, 10.846026190236844684706431007823415424143683137181, 0.0}
     };
-const std::vector< std::vector<real> > cMat = {
+const real cMat[8][8] = {
     {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {-0.562625605369221464656522e-1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {0.1014080283006362998648180399549641417413495311078e-1, -0.2365032522738145114532321e0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -37,8 +37,8 @@ const std::vector< std::vector<real> > cMat = {
 real get_initial_timestep(const real &t, const std::vector<real> &xInteg0, const ForceParameters &forceParams, IntegrationParameters &integParams, const Constants &consts);
 void compute_g_and_b(const std::vector< std::vector<real> > &AccIntegArr, const size_t &hIdx, std::vector< std::vector<real> > &g, std::vector< std::vector<real> > &b, const size_t &dim);
 void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real> > &e, const real &dtRatio, const size_t &dim, const size_t &timestepCounter);
-void check_and_apply_events(propSimulation &propSim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg);
+void check_and_apply_events(propSimulation *propSim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg);
 void approx_xInteg(const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, std::vector<real> &xIntegNext, const real &dt, const real &h, const std::vector< std::vector<real> > &b, const size_t &nInteg);
-void gr15(real t, std::vector<real> xInteg, propSimulation &propSim);
+void gr15(propSimulation *propSim);
 
 #endif

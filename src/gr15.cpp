@@ -202,55 +202,58 @@ void refine_b(std::vector< std::vector<real> > &b, std::vector< std::vector<real
     }
 }
 
-void check_and_apply_events(propSimulation &propSim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
-    while (nextEventIdx < propSim.events.size() && t == tNextEvent){
+void check_and_apply_events(propSimulation *propSim, const real &t, real &tNextEvent, size_t &nextEventIdx, std::vector<real> &xInteg){
+    while (nextEventIdx < propSim->events.size() && t == tNextEvent){
         // apply events for the state just reached by the integrator
         real propDir;
-        if (propSim.integParams.t0 < propSim.integParams.tf){
+        if (propSim->integParams.t0 < propSim->integParams.tf){
             propDir = 1.0L;
         } else {
             propDir = -1.0L;
         }
-        propSim.events[nextEventIdx].apply(t, xInteg, propDir);
+        propSim->events[nextEventIdx].apply(t, xInteg, propDir);
         // update next event index and time
         nextEventIdx += 1;
-        if (nextEventIdx < propSim.events.size()){
-            tNextEvent = propSim.events[nextEventIdx].t;
+        if (nextEventIdx < propSim->events.size()){
+            tNextEvent = propSim->events[nextEventIdx].t;
         } else {
-            tNextEvent = propSim.integParams.tf;
+            tNextEvent = propSim->integParams.tf;
         }
     }
 }
 
-void gr15(real t, std::vector<real> xInteg0, propSimulation &propSim){
-    ForceParameters &forceParams = propSim.forceParams;
-    IntegrationParameters &integParams = propSim.integParams;
-    size_t dim = 3*integParams.nInteg;
-    Constants &consts = propSim.consts;
-    real dt = get_initial_timestep(t, xInteg0, forceParams, integParams, consts);
-    integParams.timestepCounter = 0;
+void gr15(propSimulation *propSim){
+    real t = propSim->t;
+    std::vector<real> xInteg0 = propSim->xInteg;
+    // ForceParameters &forceParams = propSim->forceParams;
+    // IntegrationParameters &integParams = propSim->integParams;
+    size_t nh = 8;
+    size_t dim = 3*propSim->integParams.nInteg;
+    // Constants &consts = propSim->consts;
+    real dt = get_initial_timestep(t, xInteg0, propSim->forceParams, propSim->integParams, propSim->consts);
+    propSim->integParams.timestepCounter = 0;
     std::vector<real> accInteg0;
     std::vector<real> xInteg(2*dim, 0.0);
     std::vector< std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
     std::vector< std::vector<real> > b(7, std::vector<real>(dim, 0.0));
     std::vector< std::vector<real> > g(7, std::vector<real>(dim, 0.0));
     std::vector< std::vector<real> > e(7, std::vector<real>(dim, 0.0));
-    std::vector< std::vector<real> > accIntegArr(hVec.size(), std::vector<real>(dim, 0.0));
+    std::vector< std::vector<real> > accIntegArr(nh, std::vector<real>(dim, 0.0));
     std::vector<real> b6Tilde(dim, 0.0);
     real b6TildeMax, accIntegArr7Max;
     real b6TildeEstim, b6Max, accIntegNextMax;
     real relError, dtReq;
     
-    real tNextEvent = integParams.tf;
+    real tNextEvent = propSim->integParams.tf;
     static size_t nextEventIdx = 0;
-    if (t == integParams.t0){
+    if (t == propSim->integParams.t0){
         nextEventIdx = 0;
     }
-    if (propSim.events.size() != 0){
-        tNextEvent = propSim.events[0].t;
+    if (propSim->events.size() != 0){
+        tNextEvent = propSim->events[0].t;
     }
     check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg0);
-    if ( (integParams.tf > integParams.t0 && t+dt > tNextEvent) || (integParams.tf < integParams.t0 && t+dt < tNextEvent)){
+    if ( (propSim->integParams.tf > propSim->integParams.t0 && t+dt > tNextEvent) || (propSim->integParams.tf < propSim->integParams.t0 && t+dt < tNextEvent)){
         dt = tNextEvent-t;
     }
     
@@ -259,17 +262,19 @@ void gr15(real t, std::vector<real> xInteg0, propSimulation &propSim){
     int loopCounter = 0;
     int keepStepping = 1;
     int oneStepDone = 0;
-    if (integParams.t0 == integParams.tf){
+    if (propSim->integParams.t0 == propSim->integParams.tf){
         keepStepping = 0;
     }
     while (keepStepping){
+        t = propSim->t;
+        xInteg0 = propSim->xInteg;
         oneStepDone = 0;
         while (!oneStepDone){
-            accInteg0 = get_state_der(t, xInteg0, forceParams, integParams, consts);
+            accInteg0 = get_state_der(t, xInteg0, propSim->forceParams, propSim->integParams, propSim->consts);
             for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++){
-                for (size_t hIdx = 0; hIdx < hVec.size(); hIdx++) {
-                    approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b, integParams.nInteg);
-                    accIntegArr[hIdx] = get_state_der(t + hVec[hIdx]*dt, xInteg, forceParams, integParams, consts);
+                for (size_t hIdx = 0; hIdx < nh; hIdx++) {
+                    approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b, propSim->integParams.nInteg);
+                    accIntegArr[hIdx] = get_state_der(t + hVec[hIdx]*dt, xInteg, propSim->forceParams, propSim->integParams, propSim->consts);
                     compute_g_and_b(accIntegArr, hIdx, g, b, dim);
                 }
                 for (size_t i = 0; i < dim; i++){
@@ -277,63 +282,63 @@ void gr15(real t, std::vector<real> xInteg0, propSimulation &propSim){
                 }
                 vabs_max(b6Tilde, b6TildeMax);
                 vabs_max(accIntegArr[7], accIntegArr7Max);
-                if (b6TildeMax / accIntegArr7Max < integParams.tolPC){
+                if (b6TildeMax / accIntegArr7Max < propSim->integParams.tolPC){
                     break;
                 }
                 b_old = b;
             }
-            approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b, integParams.nInteg);
-            std::vector<real> accIntegNext = get_state_der(t+dt, xInteg, forceParams, integParams, consts);
+            approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b, propSim->integParams.nInteg);
+            std::vector<real> accIntegNext = get_state_der(t+dt, xInteg, propSim->forceParams, propSim->integParams, propSim->consts);
 
             vabs_max(b[6], b6Max);
             vabs_max(accIntegNext, accIntegNextMax);
             b6TildeEstim = b6Max / accIntegNextMax;
-            if (integParams.adaptiveTimestep){
-                relError = pow(b6TildeEstim/integParams.tolInteg, 1.0L/7.0L);
+            if (propSim->integParams.adaptiveTimestep){
+                relError = pow(b6TildeEstim/propSim->integParams.tolInteg, 1.0L/7.0L);
             }
             else{
-                relError = pow(b6TildeEstim/integParams.tolInteg, 0.0L);
+                relError = pow(b6TildeEstim/propSim->integParams.tolInteg, 0.0L);
             }
             dtReq = dt/relError;
             
             if (relError <= 1 || loopCounter > maxLoops){
                 oneStepDone = 1;
-                integParams.timestepCounter += 1;
+                propSim->integParams.timestepCounter += 1;
                 loopCounter = 0;
-                if (propSim.tEval.size() != propSim.xIntegEval.size()){
-                    interpolate(t, dt, xInteg0, accInteg0, b, hVec, propSim);
+                if (propSim->tEval.size() != propSim->xIntegEval.size()){
+                    interpolate(t, dt, xInteg0, accInteg0, b, propSim);
                 }
                 t += dt;
-                if ((integParams.tf > integParams.t0 && t >= integParams.tf) || (integParams.tf < integParams.t0 && t <= integParams.tf)){
+                if ((propSim->integParams.tf > propSim->integParams.t0 && t >= propSim->integParams.tf) || (propSim->integParams.tf < propSim->integParams.t0 && t <= propSim->integParams.tf)){
                     keepStepping = 0;
                 }
                 b_old = b;
-                refine_b(b, e, dtReq/dt, dim, integParams.timestepCounter);
+                refine_b(b, e, dtReq/dt, dim, propSim->integParams.timestepCounter);
                 check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg);
                 // add close approaach/impact handling here
-                xInteg0 = xInteg;
-                propSim.t = t;
-                propSim.xInteg = xInteg;
+                // xInteg0 = xInteg;
+                propSim->t = t;
+                propSim->xInteg = xInteg;
             }
             else{
                 loopCounter += 1;
             }
-            if (dtReq/dt > 1.0/integParams.dtChangeFactor){
-                dt /= integParams.dtChangeFactor;
+            if (dtReq/dt > 1.0/propSim->integParams.dtChangeFactor){
+                dt /= propSim->integParams.dtChangeFactor;
             }
             else if (fabs(dtReq) < 1.0e-12L){
-                dt *= integParams.dtChangeFactor;
+                dt *= propSim->integParams.dtChangeFactor;
             }
             else {
                 dt = dtReq;
             }
-            if ( (integParams.tf > integParams.t0 && dt > integParams.dtMax) || (integParams.tf < integParams.t0 && dt < integParams.dtMax)){
-                dt = integParams.dtMax;
+            if ( (propSim->integParams.tf > propSim->integParams.t0 && dt > propSim->integParams.dtMax) || (propSim->integParams.tf < propSim->integParams.t0 && dt < propSim->integParams.dtMax)){
+                dt = propSim->integParams.dtMax;
             }
-            if ( (integParams.tf > integParams.t0 && dt < integParams.dtMin) || (integParams.tf < integParams.t0 && dt > integParams.dtMin)){
-                dt = integParams.dtMin;
+            if ( (propSim->integParams.tf > propSim->integParams.t0 && dt < propSim->integParams.dtMin) || (propSim->integParams.tf < propSim->integParams.t0 && dt > propSim->integParams.dtMin)){
+                dt = propSim->integParams.dtMin;
             }
-            if ( (integParams.tf > integParams.t0 && t+dt > tNextEvent) || (integParams.tf < integParams.t0 && t+dt < tNextEvent)){
+            if ( (propSim->integParams.tf > propSim->integParams.t0 && t+dt > tNextEvent) || (propSim->integParams.tf < propSim->integParams.t0 && t+dt < tNextEvent)){
                 dt = tNextEvent-t;
             }
         }

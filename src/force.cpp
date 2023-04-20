@@ -1,46 +1,39 @@
 #include "force.h"
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
-    std::vector<real> xDotInteg(6*integParams.nInteg, 0.0);
-    std::vector<real> posAll;
-    std::vector<real> velAll;
+    std::vector<real> posAll(3*integParams.nTotal, 0.0);
+    std::vector<real> velAll(3*integParams.nTotal, 0.0);
+    std::vector<real> accInteg(3*integParams.nInteg, 0.0);
     for (size_t i=0; i<integParams.nInteg; i++){
-        for (size_t j=0; j<3; j++){
-            posAll.push_back(xInteg[6*i+j]);
-            velAll.push_back(xInteg[6*i+j+3]);
-        }
+        posAll[3*i] = xInteg[6*i];
+        posAll[3*i+1] = xInteg[6*i+1];
+        posAll[3*i+2] = xInteg[6*i+2];
+        velAll[3*i] = xInteg[6*i+3];
+        velAll[3*i+1] = xInteg[6*i+4];
+        velAll[3*i+2] = xInteg[6*i+5];
     }
     for (size_t i=integParams.nInteg; i<integParams.nTotal; i++){
         double xSpice_i[6];
         double lt;
         get_spice_state_lt(forceParams.spiceIdList[i], t, consts, xSpice_i, lt);
-        for (size_t j=0; j<3; j++){
-            posAll.push_back(xSpice_i[j]);
-            velAll.push_back(xSpice_i[j+3]);
-        }
-    }
-    for (size_t i=0; i<integParams.nInteg; i++){
-        xDotInteg[6*i] = velAll[3*i];
-        xDotInteg[6*i+1] = velAll[3*i+1];
-        xDotInteg[6*i+2] = velAll[3*i+2];
+        posAll[3*i] = xSpice_i[0];
+        posAll[3*i+1] = xSpice_i[1];
+        posAll[3*i+2] = xSpice_i[2];
+        velAll[3*i] = xSpice_i[3];
+        velAll[3*i+1] = xSpice_i[4];
+        velAll[3*i+2] = xSpice_i[5];
     }
 
-    force_newton(posAll, xDotInteg, forceParams, integParams, consts);
-    // force_ppn_simple(posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    force_ppn_eih(posAll, velAll, xDotInteg, forceParams, integParams, consts);
-    // force_J2(posAll, xDotInteg, forceParams, integParams, consts);
-    force_nongrav(posAll, velAll, xDotInteg, forceParams, integParams, consts);
+    force_newton(posAll, accInteg, forceParams, integParams, consts);
+    // force_ppn_simple(posAll, velAll, accInteg, forceParams, integParams, consts);
+    force_ppn_eih(posAll, velAll, accInteg, forceParams, integParams, consts);
+    force_J2(posAll, accInteg, forceParams, integParams, consts);
+    force_nongrav(posAll, velAll, accInteg, forceParams, integParams, consts);
 
-    std::vector<real> accInteg(3*integParams.nInteg, 0.0);
-    for (size_t i=0; i<integParams.nInteg; i++){
-        accInteg[3*i] = xDotInteg[6*i+3];
-        accInteg[3*i+1] = xDotInteg[6*i+4];
-        accInteg[3*i+2] = xDotInteg[6*i+5];
-    }
     return accInteg;
 }
 
-void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -67,13 +60,13 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
                 az -= G*massj*dz/rRel3;
             }
         }
-        xDotInteg[6*i+3] += ax;
-        xDotInteg[6*i+4] += ay;
-        xDotInteg[6*i+5] += az;
+        accInteg[3*i+0] += ax;
+        accInteg[3*i+1] += ay;
+        accInteg[3*i+2] += az;
     }
 }
 
-void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &accInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real c = consts.clight;
     real c2 = c*c;
@@ -123,13 +116,13 @@ void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &
                 az += fac1*(fac2*dz + fac3*dvz);
             }
         }
-        xDotInteg[6*i+3] += ax;
-        xDotInteg[6*i+4] += ay;
-        xDotInteg[6*i+5] += az;
+        accInteg[3*i+0] += ax;
+        accInteg[3*i+1] += ay;
+        accInteg[3*i+2] += az;
     }
 }
 
-void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -167,9 +160,9 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
                 dx = dPosBody[0];
                 dy = dPosBody[1];
                 dz = dPosBody[2];
-                real axBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dx/(2*rRel5);
-                real ayBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(1-5*dz*dz/rRel2)*dy/(2*rRel5);
-                real azBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(3-5*dz*dz/rRel2)*dz/(2*rRel5);
+                real axBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(5*dz*dz/rRel2-1)*dx/(2*rRel5);
+                real ayBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(5*dz*dz/rRel2-1)*dy/(2*rRel5);
+                real azBody = 3*G*massj*forceParams.J2List[j]*radius*radius*(5*dz*dz/rRel2-3)*dz/(2*rRel5);
                 mat3_inv(R, Rinv);
                 mat_vec_mul(Rinv, {axBody, ayBody, azBody}, aEquat);
                 ax += aEquat[0];
@@ -177,13 +170,13 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &xDotInteg, con
                 az += aEquat[2];
             }
         }
-        xDotInteg[6*i+3] += ax;
-        xDotInteg[6*i+4] += ay;
-        xDotInteg[6*i+5] += az;
+        accInteg[3*i+0] += ax;
+        accInteg[3*i+1] += ay;
+        accInteg[3*i+2] += az;
     }
 }
 
-void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &accInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     real a1, a2, a3;
     real alpha, k, m, n;
     real r0;
@@ -234,13 +227,13 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
                 az += g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]);
             }
         }
-        xDotInteg[6*i+3] += ax;
-        xDotInteg[6*i+4] += ay;
-        xDotInteg[6*i+5] += az;
+        accInteg[3*i+0] += ax;
+        accInteg[3*i+1] += ay;
+        accInteg[3*i+2] += az;
     }
 }
 
-void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &xDotInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
+void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &velAll, std::vector<real> &accInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     // calculate accelerations using the Einstein-Infeld-Hoffmann (EIH) PPN formalism
     // see eqn 27 in https://iopscience.iop.org/article/10.3847/1538-3881/abd414/pdf (without the factor of 1 in the first big summation)
     real G = consts.G;
@@ -342,12 +335,12 @@ void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &vel
                 axi += term1X + term2X + term3X;
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
+                // std::cout << ", axi = " << axi << ", ayi = " << ayi << ", azi = " << azi << std::endl;
+                // std::cout << " " << std::endl;
             }
         }
-        // std::cout << ", axi = " << axi << ", ayi = " << ayi << ", azi = " << azi << std::endl;
-        // std::cout << " " << std::endl;
-        xDotInteg[6*i+3] += axi;
-        xDotInteg[6*i+4] += ayi;
-        xDotInteg[6*i+5] += azi;
+        accInteg[3*i+0] += axi;
+        accInteg[3*i+1] += ayi;
+        accInteg[3*i+2] += azi;
     }
 }

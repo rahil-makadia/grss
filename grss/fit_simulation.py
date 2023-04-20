@@ -6,6 +6,7 @@ from . import prop
 from .fit_utilities import *
 
 __all__ = [ 'fitSimulation',
+            'create_simulated_obs_arrays',
 ]
 
 class iterationParams:
@@ -572,9 +573,10 @@ class fitSimulation:
         self.iters.append(iterationParams(iter_number, self.x_nom, self.covariance, residuals, self.obs_array, self.observer_codes))
         return None
 
-    def filter_lsq(self):
+    def filter_lsq(self, verbose=True):
         spice.furnsh(self.DEkernelPath)
-        print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
+        if verbose:
+            print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
         for i in range(self.n_iter):
             # get residuals and partials
             residuals, a = self.get_residuals_and_partials()
@@ -600,7 +602,8 @@ class fitSimulation:
             self.covariance = P
             # add iteration
             self.add_iteration(i+1, residuals)
-            print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
+            if verbose:
+                print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
         spice.unload(self.DEkernelPath)
         return None
 
@@ -614,7 +617,7 @@ class fitSimulation:
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print("====================================================")
         print(f"t: MJD {self.t} TDB")
-        print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
+        print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value\t\t\tUncertainty\t\t\t\tChange\t\t\t\tChange (sigma)")
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
         init_sol = self.iters[0].x_nom
@@ -663,3 +666,225 @@ class fitSimulation:
         plt.legend()
         plt.show()
         return None
+
+def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times, optical_obs_types, radar_times, radar_obs_types, DEkernel, DEkernelPath, doppler_freq=8560e6, observatory_code='500'):
+    obs_sigma_dict = {  'astrometry': 1, # arcsec
+                        'occultation': 5e-3, # arcsec
+                        'delay': 2, # microseconds
+                        'delay_hera': 15 /299792458*1e6, # 15 meter (conservative since it is 1m random + 10m systematic) to light microseconds
+                        'doppler': 0.5, # Hz
+                        # 'doppler_hera': 0.1 mm/s to Hz (shift * clight/transmission_freq = 0.1 mm/s)
+    }
+    # check length of times is not zero
+    if len(optical_times) == 0 and len(radar_times) == 0:
+        raise ValueError("Must provide at least one observation time.")
+    # check length of times and obs_types are the same
+    if len(optical_times) != len(optical_obs_types):
+        raise ValueError("Must provide the same number of optical observation times and observation types.")
+    if len(radar_times) != len(radar_obs_types):
+        raise ValueError("Must provide the same number of radar observation times and observation types.")
+    # check that the reference solution has the requisite information and create integration body
+    if 't' not in ref_sol:
+        raise ValueError("Must provide a time for the initial solution.")
+    consts = prop.Constants()
+    nongravParams = prop.NongravParamaters()
+    nongravParams.a1 = ref_ngInfo['a1']
+    nongravParams.a2 = ref_ngInfo['a2']
+    nongravParams.a3 = ref_ngInfo['a3']
+    nongravParams.alpha = ref_ngInfo['alpha']
+    nongravParams.k = ref_ngInfo['k']
+    nongravParams.m = ref_ngInfo['m']
+    nongravParams.n = ref_ngInfo['n']
+    nongravParams.r0_au = ref_ngInfo['r0_au']
+    if all(key in ref_sol for key in ("x", "y", "z", "vx", "vy", "vz")):
+        pos = [ref_sol['x'], ref_sol['y'], ref_sol['z']]
+        vel = [ref_sol['vx'], ref_sol['vy'], ref_sol['vz']]
+        targetBody = prop.IntegBody("body_simulated_obs", ref_sol['t'], ref_sol['mass'], ref_sol['radius'], pos, vel, ref_cov, nongravParams, consts)
+    elif all(key in ref_sol for key in ("e", "q", "tp", "om", "w", "i")):
+        e = ref_sol['e']
+        q = ref_sol['q']
+        tp = ref_sol['tp']
+        om = ref_sol['om']
+        w = ref_sol['w']
+        i = ref_sol['i']
+        cometary_elements = [e, q, tp, om*np.pi/180.0, w*np.pi/180.0, i*np.pi/180.0]
+        targetBody = prop.IntegBody(DEkernelPath, "body_simulated_obs", ref_sol['t'], ref_sol['mass'], ref_sol['radius'], cometary_elements, ref_cov, nongravParams, consts)
+    else:
+        raise ValueError("Must provide either a full cartesian or cometary state for the initial solution.")
+    # initialize past and future times and observer codes
+    optical_observer_codes = tuple([observatory_code]*len(optical_times))
+    radar_observer_codes = []
+    for i in range(len(radar_times)):
+        codes = [observatory_code, observatory_code]
+        if radar_obs_types[i].lower() == 'doppler':
+            codes.append(doppler_freq)
+        radar_observer_codes.append(tuple(codes))
+    radar_observer_codes = tuple(radar_observer_codes)
+    obs_times = np.array(optical_times + radar_times)
+    observer_codes = optical_observer_codes + radar_observer_codes
+    obs_types = tuple(optical_obs_types + radar_obs_types)
+    sort_idx = np.argsort(obs_times)
+    obs_times = obs_times[sort_idx]
+    observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
+    obs_types = tuple(np.array(obs_types, dtype=tuple)[sort_idx])
+    pastObsIdx = np.where(obs_times < ref_sol['t'])[0]
+    futureObsIdx = np.where(obs_times > ref_sol['t'])[0]
+    pastObsExist = len(pastObsIdx) > 0
+    futureObsExist = len(futureObsIdx) > 0
+    observerInfo = get_observer_info(observer_codes)
+    if pastObsExist:
+        tEvalPast = obs_times[pastObsIdx]
+        tfPast = np.min(tEvalPast) - 1.0
+        observerInfoPast = tuple(np.array(observerInfo, dtype=tuple)[pastObsIdx])
+    if futureObsExist:
+        tEvalFuture = obs_times[futureObsIdx]
+        tfFuture = np.max(tEvalFuture) + 1.0
+        observerInfoFuture = tuple(np.array(observerInfo, dtype=tuple)[futureObsIdx])
+    # initialize the propagator
+    tEvalUTC = True
+    evalApparentState = True
+    convergedLightTime = True
+    propSimPast = prop.propSimulation(f"simulated_obs_past", ref_sol['t'], DEkernel, DEkernelPath)
+    propSimFuture = prop.propSimulation(f"simulated_obs_future", ref_sol['t'], DEkernel, DEkernelPath)
+    if pastObsExist:
+        propSimPast.set_integration_parameters(tfPast, tEvalPast, tEvalUTC, evalApparentState, convergedLightTime, observerInfoPast)
+        propSimPast.add_integ_body(targetBody)
+    if futureObsExist:
+        propSimFuture.set_integration_parameters(tfFuture, tEvalFuture, tEvalUTC, evalApparentState, convergedLightTime, observerInfoFuture)
+        propSimFuture.add_integ_body(targetBody)
+    # add events
+    if events is not None:
+        for event in events:
+            t_event = event[0]
+            dvx = event[1]
+            dvy = event[2]
+            dvz = event[3]
+            multiplier = event[4]
+            if t_event < ref_sol['t']:
+                propSimPast.add_event(targetBody, t_event, [dvx, dvy, dvz], multiplier)
+            else:
+                propSimFuture.add_event(targetBody, t_event, [dvx, dvy, dvz], multiplier)
+    # propagate
+    if pastObsExist:
+        propSimPast.preprocess()
+        propSimPast.integrate()
+    if futureObsExist:
+        propSimFuture.preprocess()
+        propSimFuture.integrate()
+    # get the propagated solution
+    if pastObsExist and futureObsExist:
+        apparent_states_past = np.array(propSimPast.xIntegEval)
+        apparent_states_future = np.array(propSimFuture.xIntegEval)
+        apparent_states = np.vstack((apparent_states_past, apparent_states_future))
+        radar_observations_past = np.array(propSimPast.radarObsEval)
+        radar_observations_future = np.array(propSimFuture.radarObsEval)
+        radar_observations = np.vstack((radar_observations_past, radar_observations_future))
+    elif pastObsExist:
+        apparent_states_past = np.array(propSimPast.xIntegEval)
+        apparent_states = apparent_states_past
+        radar_observations_past = np.array(propSimPast.radarObsEval)
+        radar_observations = radar_observations_past
+    elif futureObsExist:
+        apparent_states_future = np.array(propSimFuture.xIntegEval)
+        apparent_states = apparent_states_future
+        radar_observations_future = np.array(propSimFuture.radarObsEval)
+        radar_observations = radar_observations_future
+    sim_obs_array = np.nan*np.ones((len(obs_times), 5))
+    for i in range(len(obs_times)):
+        sim_obs_array[i, 0] = obs_times[i]
+        obs_info_len = len(observerInfo[i])
+        if obs_info_len == 4:
+            ra, dec = get_radec(apparent_states[i])
+            sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
+            sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
+            ra_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
+            sim_obs_array[i, 1] = ra + np.random.normal(0, sim_obs_array[i, 3])# + ra_bias
+            dec_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
+            sim_obs_array[i, 2] = dec + np.random.normal(0, sim_obs_array[i, 4])# + dec_bias
+        elif obs_info_len == 8: # delay measurement
+            sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
+            delay_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
+            sim_obs_array[i, 1] = radar_observations[i] + np.random.normal(0, sim_obs_array[i, 3])# + delay_bias
+        elif obs_info_len == 9: # doppler measurement
+            sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
+            doppler_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
+            sim_obs_array[i, 2] = radar_observations[i] + np.random.normal(0, sim_obs_array[i, 4])# + doppler_bias
+    # split sim_obs_array and observer_codes into optical and radar
+    optical_astrometry_obs_idx = np.where(np.array(obs_types) == 'astrometry')[0]
+    optical_occultation_obs_idx = np.where(np.array(obs_types) == 'occultation')[0]
+    optical_obs_idx = np.hstack((optical_astrometry_obs_idx, optical_occultation_obs_idx))
+    radar_delay_obs_idx = np.where(np.array(obs_types) == 'delay')[0]
+    radar_delay_hera_obs_idx = np.where(np.array(obs_types) == 'delay_hera')[0]
+    radar_doppler_obs_idx = np.where(np.array(obs_types) == 'doppler')[0]
+    radar_obs_idx = np.hstack((radar_delay_obs_idx, radar_delay_hera_obs_idx, radar_doppler_obs_idx))
+    if len(optical_obs_idx) == 0:
+        sim_obs_array_optical = None
+        observer_codes_optical = None
+    else:
+        sim_obs_array_optical = sim_obs_array[optical_obs_idx]
+        observer_codes_optical = tuple(np.array(observer_codes, dtype=tuple)[optical_obs_idx])
+    if len(radar_obs_idx) == 0:
+        sim_obs_array_radar = None
+        observer_codes_radar = None
+    else:
+        sim_obs_array_radar = sim_obs_array[radar_obs_idx]
+        observer_codes_radar = tuple(np.array(observer_codes, dtype=tuple)[radar_obs_idx])
+    return sim_obs_array_optical, observer_codes_optical, sim_obs_array_radar, observer_codes_radar
+
+def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_obs_start_time, add_extra_simulated_obs, extra_simulated_obs_info):
+    x_nom, covariance, events, target_radius, nongravInfo, DEkernel, DEkernelPath = simulated_traj_info
+    obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar = real_obs_arrays
+    if add_extra_simulated_obs:
+        extra_simulated_optical_obs_times, extra_simulated_optical_obs_types, extra_simulated_radar_obs_times, extra_simulated_radar_obs_types = extra_simulated_obs_info
+    optical_obs_times = obs_array_optical[:,0]
+    radar_obs_times = obs_array_radar[:,0]
+    simulated_optical_obs_idx = np.where(optical_obs_times >= simulated_obs_start_time)[0]
+    simulated_optical_obs_times = tuple(optical_obs_times[simulated_optical_obs_idx])
+    simulated_optical_obs_types = ['astrometry']*len(simulated_optical_obs_times)
+    if add_extra_simulated_obs:
+        # add extra simulated optical obs times and types
+        simulated_optical_obs_times = simulated_optical_obs_times + extra_simulated_optical_obs_times
+        simulated_optical_obs_types = simulated_optical_obs_types + extra_simulated_optical_obs_types
+        # add extra rows to obs_array_optical
+        extra_simulated_optical_obs_array = np.nan*np.ones((len(extra_simulated_optical_obs_times), 5))
+        obs_array_optical = np.vstack((obs_array_optical, extra_simulated_optical_obs_array))
+        # add indices to simulated_optical_obs_idx
+        simulated_optical_obs_idx = np.hstack((simulated_optical_obs_idx, np.arange(len(optical_obs_times), len(optical_obs_times)+len(extra_simulated_optical_obs_times))))
+        # add extra rows to observer_codes_optical
+        extra_simulated_optical_observer_codes = tuple(['']*len(extra_simulated_optical_obs_times))
+        observer_codes_optical = observer_codes_optical + extra_simulated_optical_observer_codes
+    simulated_radar_obs_idx = np.where(radar_obs_times >= simulated_obs_start_time)[0]
+    simulated_radar_obs_times = tuple(radar_obs_times[simulated_radar_obs_idx])
+    simulated_radar_obs_types = ['delay']*len(simulated_radar_obs_times)
+    if add_extra_simulated_obs:
+        # add extra simulated radar obs times and types
+        simulated_radar_obs_times = simulated_radar_obs_times + extra_simulated_radar_obs_times
+        simulated_radar_obs_types = simulated_radar_obs_types + extra_simulated_radar_obs_types
+        # add extra rows to obs_array_radar
+        extra_simulated_radar_obs_array = np.nan*np.ones((len(extra_simulated_radar_obs_times), 5))
+        obs_array_radar = np.vstack((obs_array_radar, extra_simulated_radar_obs_array))
+        # add indices to simulated_radar_obs_idx
+        simulated_radar_obs_idx = np.hstack((simulated_radar_obs_idx, np.arange(len(radar_obs_times), len(radar_obs_times)+len(extra_simulated_radar_obs_times))))
+        # add extra rows to observer_codes_radar
+        extra_simulated_radar_observer_codes = tuple(['']*len(extra_simulated_radar_obs_times))
+        observer_codes_radar = observer_codes_radar + extra_simulated_radar_observer_codes
+    simulated_obs_ref_sol = x_nom.copy()
+    simulated_obs_ref_sol['mass'] = 0.0
+    simulated_obs_ref_sol['radius'] = target_radius
+    simulated_obs_ref_cov = covariance.copy()
+    simulated_obs_event = events if events is not None else None
+    simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongravInfo, events, simulated_optical_obs_times, simulated_optical_obs_types, simulated_radar_obs_times, simulated_radar_obs_types, DEkernel, DEkernelPath)
+    simulated_obs_array_optical, simulated_observer_codes_optical, simulated_obs_array_radar, simulated_observer_codes_radar = simulated_obs_info
+    if simulated_obs_array_optical is not None:
+        obs_array_optical[simulated_optical_obs_idx,:] = simulated_obs_array_optical
+        observer_codes_optical_temp = list(observer_codes_optical)
+        for idx, code in enumerate(simulated_observer_codes_optical):
+            observer_codes_optical_temp[simulated_optical_obs_idx[idx]] = code
+        observer_codes_optical = tuple(observer_codes_optical_temp)
+    if simulated_obs_array_radar is not None:
+        obs_array_radar[simulated_radar_obs_idx,:] = simulated_obs_array_radar
+        observer_codes_radar_temp = list(observer_codes_radar)
+        for idx, code in enumerate(simulated_observer_codes_radar):
+            observer_codes_radar_temp[simulated_radar_obs_idx[idx]] = code
+        observer_codes_radar = tuple(observer_codes_radar_temp)
+    return obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar

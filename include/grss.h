@@ -10,7 +10,7 @@ void propSimulation::integrate(){
     }
     
     furnsh_c(this->DEkernelPath.c_str());
-    gr15(this->t, this->xInteg, *this);
+    gr15(this);
     unload_c(this->DEkernelPath.c_str());
 
     bool backwardProp = this->integParams.t0 > this->integParams.tf;

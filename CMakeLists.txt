@@ -2,10 +2,10 @@
 cmake_minimum_required(VERSION 3.19.0)
 
 # set C and C++ compilers for Apple M1 - openmp issues
-if (APPLE)
-    set(CMAKE_C_COMPILER "gcc-12")
-    set(CMAKE_CXX_COMPILER "g++-12")
-endif()
+# if (APPLE)
+#     set(CMAKE_C_COMPILER "gcc-12")
+#     set(CMAKE_CXX_COMPILER "g++-12")
+# endif()
 
 # set the project name and version
 project(grss VERSION 0.1.0)
