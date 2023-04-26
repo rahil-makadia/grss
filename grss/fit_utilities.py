@@ -98,7 +98,7 @@ def get_radec(state):
     dec = np.arcsin(pos[2]/dist) # calculate declination
     return ra*180/np.pi*3600, dec*180/np.pi*3600 # ra, dec
 
-@jit('Tuple((float64, float64, float64, float64))(float64, float64, float64)', nopython=True, cache=False)
+@jit('Tuple((float64, float64, float64, float64, float64))(float64, float64, float64)', nopython=True, cache=False)
 def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
     """Convert parallax constants to geodetic latitude, longitude, and altitude.
 
@@ -114,18 +114,18 @@ def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
         alt (float): km, altitude of observer
     """
     # WGS84 ellipsoid parameters
-    re = 6378.1370 # km
+    re = 6378137.0 # km
     f = 1/298.257223563
     rp = re*(1 - f)
     e_sq = f*(2 - f)
     
     lat = np.arctan2(rho_sin_lat, rho_cos_lat)
-    dist = np.sqrt(rho_cos_lat**2 + rho_sin_lat**2)*re
+    rho = np.sqrt(rho_cos_lat**2 + rho_sin_lat**2)*re
     
     geodet_lat = np.arctan( np.tan(lat) / (1 - e_sq) ) # from Hedgley, D. R., Jr. "An Exact Transformation from Geocentric to Geodetic Coordinates for Nonzero Altitudes." NASA TR R-458, March, 1976. https://ntrs.nasa.gov/citations/19760012748
     rellip = np.sqrt(  ( (re**2*np.cos(geodet_lat))**2 + (rp**2*np.sin(geodet_lat))**2 ) / ( (re*np.cos(geodet_lat))**2 + (rp*np.sin(geodet_lat))**2 )  )
-    alt = 1e3*(dist - rellip) # km -> m
-    return lon*np.pi/180, lat, geodet_lat, alt
+    alt = rho - rellip # km -> m
+    return lon*np.pi/180, lat, geodet_lat, alt, rho
 
 def get_codes_dict():
     """Creates a dictionary of MPC codes and their corresponding longitude, geodetic latitude, and altitude
@@ -143,16 +143,16 @@ def get_codes_dict():
             code = codes[i]['Code']
             lon, rho_cos_lat, rho_sin_lat = float(codes[i]['Longitude']), float(codes[i]['cos']), float(codes[i]['sin'])
             # print(code, lon, rho_cos_lat, rho_sin_lat)
-            lon, lat, geodet_lat, alt = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
-            codes_dict[code] = (lon, geodet_lat, alt)
+            lon, lat, geodet_lat, alt, rho = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
+            codes_dict[code] = (lon, lat, rho)
     # from https://www.minorplanetcenter.net/iau/lists/ObsCodes.html
     extra_observatories = { 'Y98': (358.68692, 0.617953, +0.783613),
                             'U94': (246.30250, 0.792006, +0.608864),
                             'Y66': (343.49053, 0.881484, +0.471429),
                             'X06': (289.14649, 0.862374, -0.505110)}
     for code, info in extra_observatories.items():
-        lon, lat, geodet_lat, alt = parallax_constants_to_lat_lon_alt(info[0], info[1], info[2])
-        codes_dict[code] = (lon, geodet_lat, alt)
+        lon, lat, geodet_lat, alt, rho = parallax_constants_to_lat_lon_alt(info[0], info[1], info[2])
+        codes_dict[code] = (lon, lat, rho)
     return codes_dict
 
 def get_observer_info(observer_codes):

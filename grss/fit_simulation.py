@@ -426,9 +426,9 @@ class fitSimulation:
             elif key in ['tp']:
                 fd_pert = 1e-5
             elif key in ['om']:
-                fd_pert = 1e-4
+                fd_pert = 1e-6
             elif key in ['w']:
-                fd_pert = 1e-5
+                fd_pert = 1e-6
             elif key in ['i']:
                 fd_pert = 1e-6
         if key in ['a1', 'a2', 'a3']:
@@ -504,7 +504,7 @@ class fitSimulation:
             propSimFuture.integrate()
         return propSimPast, propSimFuture
 
-    def get_residuals(self, propSimPast, propSimFuture, integBodyIdx):
+    def get_computed_obs(self, propSimPast, propSimFuture, integBodyIdx):
         if self.pastObsExist and self.futureObsExist:
             apparent_states_past = np.array(propSimPast.xIntegEval)
             apparent_states_future = np.array(propSimFuture.xIntegEval)
@@ -527,8 +527,8 @@ class fitSimulation:
         apparent_states = apparent_states[:,integ_body_start_col:integ_body_end_col]
         radar_observations = radar_observations[:,integBodyIdx]
 
-        observed_obs = self.obs_array[:, 1:3]
-        computed_obs = np.nan*np.ones_like(observed_obs)
+        measured_obs = self.obs_array[:, 1:3]
+        computed_obs = np.nan*np.ones_like(measured_obs)
         observerInfo = get_observer_info(self.observer_codes)
         for i in range(len(self.obs_array)):
             obs_info_len = len(observerInfo[i])
@@ -538,7 +538,7 @@ class fitSimulation:
                 computed_obs[i, 0] = radar_observations[i]
             elif obs_info_len == 9: # dopper measurement
                 computed_obs[i, 1] = radar_observations[i]
-        return observed_obs - computed_obs
+        return computed_obs
 
     def get_analytic_partials(self, propSimPast, propSimFuture):
         raise NotImplementedError("Analytic partials not yet implemented. Please use numeric partials.")
@@ -548,13 +548,13 @@ class fitSimulation:
         for i in range(self.n_fit):
             key = list(self.x_nom.keys())[i]
             state_plus, ngParams_plus, events_plus, state_minus, ngParams_minus, events_minus, fd_delta = perturbation_info[i]
-            # get residuals for perturbed states
-            residuals_plus = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=2*i+1)
-            residuals_minus = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=2*i+2)
-            residuals_plus = self.flatten_and_clean(residuals_plus)
-            residuals_minus = self.flatten_and_clean(residuals_minus)
+            # get computed_obs for perturbed states
+            computed_obs_plus = self.get_computed_obs(propSimPast, propSimFuture, integBodyIdx=2*i+1)
+            computed_obs_minus = self.get_computed_obs(propSimPast, propSimFuture, integBodyIdx=2*i+2)
+            computed_obs_plus = self.flatten_and_clean(computed_obs_plus)
+            computed_obs_minus = self.flatten_and_clean(computed_obs_minus)
             # get partials
-            partials[:, i] = (residuals_plus - residuals_minus)/(2*fd_delta)
+            partials[:, i] = (computed_obs_plus - computed_obs_minus)/(2*fd_delta)
         return partials
 
     def get_partials(self, propSimPast, propSimFuture, perturbation_info):
@@ -564,7 +564,8 @@ class fitSimulation:
         perturbation_info = None if self.analytic_partials else self.get_perturbation_info()
         propSimPast, propSimFuture = self.assemble_and_propagate_bodies(perturbation_info)
         # get residuals
-        residuals = self.get_residuals(propSimPast, propSimFuture, integBodyIdx=0)
+        computed_obs = self.get_computed_obs(propSimPast, propSimFuture, integBodyIdx=0)
+        residuals = self.obs_array[:, 1:3] - computed_obs
         # get partials
         partials = self.get_partials(propSimPast, propSimFuture, perturbation_info)
         return residuals, partials
@@ -595,8 +596,9 @@ class fitSimulation:
             P = np.linalg.inv(atwa)
             atwb = a.T @ w @ b
             dx = P @ atwb
+            # dx = np.linalg.solve(atwa, atwb)
             # get new state
-            x = x0 - dx
+            x = x0 + dx
             self.x_nom = dict(zip(self.x_nom.keys(), x))
             # get new covariance
             self.covariance = P
@@ -625,9 +627,9 @@ class fitSimulation:
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
                 if key[:10] == 'multiplier':
-                    print(f"{key}\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/final_variance[i]:+.3f}")
+                    print(f"{key}\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
                 else:
-                    print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/final_variance[i]:+.3f}")
+                    print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}\t\t{final_sol[key]-init_sol[key]:+.11e}\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
         return None
 
     def plot_summary(self):
@@ -667,7 +669,7 @@ class fitSimulation:
         plt.show()
         return None
 
-def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times, optical_obs_types, radar_times, radar_obs_types, DEkernel, DEkernelPath, doppler_freq=8560e6, observatory_code='500'):
+def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times, optical_obs_types, radar_times, radar_obs_types, DEkernel, DEkernelPath, noise, bias, doppler_freq=8560e6, observatory_code='500'):
     obs_sigma_dict = {  'astrometry': 1, # arcsec
                         'occultation': 5e-3, # arcsec
                         'delay': 2, # microseconds
@@ -797,18 +799,38 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times,
             ra, dec = get_radec(apparent_states[i])
             sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
             sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
-            ra_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
-            sim_obs_array[i, 1] = ra + np.random.normal(0, sim_obs_array[i, 3])# + ra_bias
-            dec_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
-            sim_obs_array[i, 2] = dec + np.random.normal(0, sim_obs_array[i, 4])# + dec_bias
+            sim_obs_array[i, 1] = ra
+            if noise:
+                ra_noise = np.random.normal(0, sim_obs_array[i, 3])
+                sim_obs_array[i, 1] += ra_noise
+            if bias:
+                ra_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
+                sim_obs_array[i, 1] += ra_bias
+            sim_obs_array[i, 2] = dec
+            if noise:
+                dec_noise = np.random.normal(0, sim_obs_array[i, 4])
+                sim_obs_array[i, 2] += dec_noise
+            if bias:
+                dec_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
+                sim_obs_array[i, 2] += dec_bias
         elif obs_info_len == 8: # delay measurement
             sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
-            delay_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
-            sim_obs_array[i, 1] = radar_observations[i] + np.random.normal(0, sim_obs_array[i, 3])# + delay_bias
+            sim_obs_array[i, 1] = radar_observations[i]
+            if noise:
+                delay_noise = np.random.normal(0, sim_obs_array[i, 3])
+                sim_obs_array[i, 1] += delay_noise
+            if bias:
+                delay_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
+                sim_obs_array[i, 1] += delay_bias
         elif obs_info_len == 9: # doppler measurement
             sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
-            doppler_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
-            sim_obs_array[i, 2] = radar_observations[i] + np.random.normal(0, sim_obs_array[i, 4])# + doppler_bias
+            sim_obs_array[i, 2] = radar_observations[i]
+            if noise:
+                doppler_noise = np.random.normal(0, sim_obs_array[i, 4])
+                sim_obs_array[i, 2] += doppler_noise
+            if bias:
+                doppler_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
+                sim_obs_array[i, 2] += doppler_bias
     # split sim_obs_array and observer_codes into optical and radar
     optical_astrometry_obs_idx = np.where(np.array(obs_types) == 'astrometry')[0]
     optical_occultation_obs_idx = np.where(np.array(obs_types) == 'occultation')[0]
@@ -831,7 +853,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times,
         observer_codes_radar = tuple(np.array(observer_codes, dtype=tuple)[radar_obs_idx])
     return sim_obs_array_optical, observer_codes_optical, sim_obs_array_radar, observer_codes_radar
 
-def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_obs_start_time, add_extra_simulated_obs, extra_simulated_obs_info):
+def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_obs_start_time, add_extra_simulated_obs, extra_simulated_obs_info, noise, bias):
     x_nom, covariance, events, target_radius, nongravInfo, DEkernel, DEkernelPath = simulated_traj_info
     obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar = real_obs_arrays
     if add_extra_simulated_obs:
@@ -873,7 +895,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     simulated_obs_ref_sol['radius'] = target_radius
     simulated_obs_ref_cov = covariance.copy()
     simulated_obs_event = events if events is not None else None
-    simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongravInfo, events, simulated_optical_obs_times, simulated_optical_obs_types, simulated_radar_obs_times, simulated_radar_obs_types, DEkernel, DEkernelPath)
+    simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongravInfo, events, simulated_optical_obs_times, simulated_optical_obs_types, simulated_radar_obs_times, simulated_radar_obs_types, DEkernel, DEkernelPath, noise, bias)
     simulated_obs_array_optical, simulated_observer_codes_optical, simulated_obs_array_radar, simulated_observer_codes_radar = simulated_obs_info
     if simulated_obs_array_optical is not None:
         obs_array_optical[simulated_optical_obs_idx,:] = simulated_obs_array_optical

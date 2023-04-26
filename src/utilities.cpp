@@ -30,8 +30,8 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
         return;
     }
     real lon = observerInfo[1];
-    real geodetLat = observerInfo[2];
-    real alt = observerInfo[3];
+    real lat = observerInfo[2];
+    real rho = observerInfo[3];
     real t_obs_et;
     real tObsMjdTDB;
     mjd_to_et(tObsMjd, t_obs_et);
@@ -50,14 +50,14 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
     double lt;
     get_spice_state_lt(baseBody, tObsMjdTDB, consts, baseBodyState, lt);
 
-    real a, f;
+    // real a, f;
     ConstSpiceChar *baseBodyFrame;
     switch (baseBody)
     {
     case 399:
         // earth WGS84 ellipsoid
-        a = 6378137.0L;
-        f = 1.0L/298.257223563L;
+        // a = 6378137.0L;
+        // f = 1.0L/298.257223563L;
         baseBodyFrame = "ITRF93";
         break;
     default:
@@ -65,12 +65,15 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
         throw std::invalid_argument("Given base body not supported");
         break;
     }
-    real b = a*(1.0L-f);
-    real eSquared = 1.0L-(b*b)/(a*a);
-    real N = a/sqrt(1.0L-eSquared*sin(geodetLat)*sin(geodetLat));
-    ConstSpiceDouble bodyFixedX = (N+alt)*cos(geodetLat)*cos(lon)/consts.du2m;
-    ConstSpiceDouble bodyFixedY = (N+alt)*cos(geodetLat)*sin(lon)/consts.du2m;
-    ConstSpiceDouble bodyFixedZ = (N*(1.0L-eSquared)+alt)*sin(geodetLat)/consts.du2m;
+    // real b = a*(1.0L-f);
+    // real eSquared = 1.0L-(b*b)/(a*a);
+    // real N = a/sqrt(1.0L-eSquared*sin(geodetLat)*sin(geodetLat));
+    // ConstSpiceDouble bodyFixedX = (N+alt)*cos(geodetLat)*cos(lon)/consts.du2m;
+    // ConstSpiceDouble bodyFixedY = (N+alt)*cos(geodetLat)*sin(lon)/consts.du2m;
+    // ConstSpiceDouble bodyFixedZ = (N*(1.0L-eSquared)+alt)*sin(geodetLat)/consts.du2m;
+    ConstSpiceDouble bodyFixedX = rho*cos(lat)*cos(lon)/consts.du2m;
+    ConstSpiceDouble bodyFixedY = rho*cos(lat)*sin(lon)/consts.du2m;
+    ConstSpiceDouble bodyFixedZ = rho*sin(lat)/consts.du2m;
     ConstSpiceDouble bodyFixedPos[3] = {bodyFixedX, bodyFixedY, bodyFixedZ};
     ConstSpiceChar *outFrame = "J2000";
 

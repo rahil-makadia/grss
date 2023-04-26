@@ -12,11 +12,12 @@ from .fit_utilities import *
 __all__ = [ 'get_optical_obs_array',
 ]
 
-def get_optical_data(body_id, t_max_tdb=None, verbose=False):
+def get_optical_data(body_id, t_min_tdb=None, t_max_tdb=None, verbose=False):
     """Get observation data for a given body.
 
     Args:
         body_id (int or str): Target id, numbers are interpreted as asteroids, append 'P' for comets, start with comet type and a '/' for comet designations
+        t_min_tdb (float or None, optional): Minimum date to cap the optical observation epochs. Defaults to None.
         t_max_tdb (float or None, optional): Maximum date to cap the optical observation epochs. Defaults to None.
         verbose (bool, optional): Toggle for whether to print out information about the observations. Defaults to False.
 
@@ -25,8 +26,12 @@ def get_optical_data(body_id, t_max_tdb=None, verbose=False):
         star_catalog_codes (tuple): Star star_catalog_codes used for reducing the observations in obs_array_optical
         observer_codes_optical (tuple): Observer locations for each observation in obs_array_optical
     """
+    if t_min_tdb is None:
+        t_min_utc = -np.inf
+    else:
+        t_min_utc = Time(t_min_tdb, format='mjd', scale='tdb').utc.mjd
     if t_max_tdb is None:
-        t_max_utc = 1e6
+        t_max_utc = np.inf
     else:
         t_max_utc = Time(t_max_tdb, format='mjd', scale='tdb').utc.mjd
     obs_raw = MPC.get_observations(body_id, get_mpcformat=True, cache=False)
@@ -40,11 +45,11 @@ def get_optical_data(body_id, t_max_tdb=None, verbose=False):
         data = row['obs']
         date = data[15:32]
         obs_time_mjd = Time(date[:-7].replace(' ','-'), format='iso', scale='utc').utc.mjd+float(date[-7:])
-        ra = get_ra_from_hms(data[32:44])
-        dec = get_dec_from_dms(data[44:56])
         obs_code = data[77:80]
         disallowed_observation = obs_code in roving_observatory_codes or obs_code in space_observatory_codes or obs_code in non_geocentric_occultation_codes
-        if (not disallowed_observation) and obs_time_mjd <= t_max_utc:
+        if (not disallowed_observation) and obs_time_mjd >= t_min_utc and obs_time_mjd <= t_max_utc:
+            ra = get_ra_from_hms(data[32:44])
+            dec = get_dec_from_dms(data[44:56])
             obs_array_optical[i, 0] = obs_time_mjd
             obs_array_optical[i, 1] = ra
             obs_array_optical[i, 2] = dec
@@ -284,11 +289,12 @@ def eliminate_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
         print(f"Removed {len(obs_array_optical)-len(obs_array_eliminated)} observations as part of elimination scheme.")
     return obs_array_eliminated, tuple(catalog_eliminated), tuple(observer_loc_eliminated)
 
-def get_optical_obs_array(body_id, t_max_tdb=None, debias=True, debias_lowres=False, deweight=True, eliminate=False, max_obs_per_night=5, verbose=False):
+def get_optical_obs_array(body_id, t_min_tdb=None, t_max_tdb=None, debias=True, debias_lowres=False, deweight=True, eliminate=False, max_obs_per_night=5, verbose=False):
     """Assemble the optical observations for a given body into an array for an orbit fit.
 
     Args:
         body_id (int or str): Target id, numbers are interpreted as asteroids, append 'P' for comets, start with comet type and a '/' for comet designations
+        t_min_tdb (float or None, optional): Minimum date to cap the optical observation epochs. Defaults to None.
         t_max_tdb (float or None, optional): Maximum date to cap the optical observation epochs. Defaults to None.
         debias (bool, optional): Toggle for whether to use the debiasing scheme. Defaults to True.
         debias_lowres (bool, optional): Toggle for whether to use the low resolution debiasing scheme. Defaults to False.
@@ -316,7 +322,7 @@ def get_optical_obs_array(body_id, t_max_tdb=None, debias=True, debias_lowres=Fa
     elif not debias and not debias_lowres:
         raise ValueError('Must debias or debias_lowres.')
     
-    obs_array_optical, star_catalog_codes, observer_codes_optical = get_optical_data(body_id, t_max_tdb, verbose)
+    obs_array_optical, star_catalog_codes, observer_codes_optical = get_optical_data(body_id, t_min_tdb, t_max_tdb, verbose)
     if debias:
         obs_array_optical, star_catalog_codes, observer_codes_optical = apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes_optical, debias_lowres, verbose)
     obs_array_optical = apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical, verbose)
