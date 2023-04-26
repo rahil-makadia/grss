@@ -96,7 +96,7 @@ void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &
             massj = forceParams.masses[j];
             gm = G*massj;
             gmOverC2 = gm/c2;
-            if (i != j && massj != 0.0 && forceParams.isPPNList[j]){
+            if (i != j && massj != 0.0 && forceParams.spiceIdList[j]==10){
                 dx = x - posAll[3*j];
                 dy = y - posAll[3*j+1];
                 dz = z - posAll[3*j+2];
@@ -317,26 +317,20 @@ void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &vel
                 const real term1X = -muj/rRelij3*dxij*term1Fac;
                 const real term1Y = -muj/rRelij3*dyij*term1Fac;
                 const real term1Z = -muj/rRelij3*dzij*term1Fac;
-                // std::cout << " " << std::endl;
-                // std::cout << "term1Fac = " << term1Fac << ", term1X = " << term1X << ", term1Y = " << term1Y << ", term1Z = " << term1Z << std::endl;
 
                 const real term2DotProduct = dxij*((2.0+2.0*gamma)*vxi-(1.0+2.0*gamma)*vxj) + dyij*((2.0+2.0*gamma)*vyi-(1.0+2.0*gamma)*vyj) + dzij*((2.0+2.0*gamma)*vzi-(1.0+2.0*gamma)*vzj);
                 const real term2Fac = oneOverC2*muj/rRelij3*term2DotProduct;
                 const real term2X = term2Fac*dvxij;
                 const real term2Y = term2Fac*dvyij;
                 const real term2Z = term2Fac*dvzij;
-                // std::cout << "term2X = " << term2X << ", term2Y = " << term2Y << ", term2Z = " << term2Z << std::endl;
 
                 const real term3X = (3.0+4.0*gamma)*0.5*oneOverC2*muj/rRelij*axj;
                 const real term3Y = (3.0+4.0*gamma)*0.5*oneOverC2*muj/rRelij*ayj;
                 const real term3Z = (3.0+4.0*gamma)*0.5*oneOverC2*muj/rRelij*azj;
-                // std::cout << "term3X = " << term3X << ", term3Y = " << term3Y << ", term3Z = " << term3Z << std::endl;
 
                 axi += term1X + term2X + term3X;
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
-                // std::cout << ", axi = " << axi << ", ayi = " << ayi << ", azi = " << azi << std::endl;
-                // std::cout << " " << std::endl;
             }
         }
         accInteg[3*i+0] += axi;

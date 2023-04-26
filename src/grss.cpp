@@ -151,7 +151,7 @@ PYBIND11_MODULE(cppgrss, m) {
         .def("remove_body", &propSimulation::remove_body, py::arg("name"))
         .def("add_event", &propSimulation::add_event, py::arg("body"), py::arg("tEvent"), py::arg("deltaV"), py::arg("multiplier")=1.0L)
         .def("set_sim_constants", &propSimulation::set_sim_constants, py::arg("du2m")=149597870700.0L, py::arg("tu2sec")=86400.0L, py::arg("G")=6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L, py::arg("clight")=299792458.0L/149597870700.0L*86400.0L)
-        .def("set_integration_parameters", &propSimulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("tEvalUTC")=false, py::arg("evalApparentState")=false, py::arg("convergedLightTims")=false, py::arg("observerInfo")=std::vector< std::vector<real> >(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=7.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
+        .def("set_integration_parameters", &propSimulation::set_integration_parameters, py::arg("tf"), py::arg("tEval")=std::vector<real>(), py::arg("tEvalUTC")=false, py::arg("evalApparentState")=false, py::arg("convergedLightTims")=false, py::arg("observerInfo")=std::vector< std::vector<real> >(), py::arg("adaptiveTimestep")=true, py::arg("dt0")=0.0L, py::arg("dtMax")=6.0L, py::arg("dtMin")=5.0e-3L, py::arg("dtChangeFactor")=0.25L, py::arg("tolInteg")=1.0e-6L, py::arg("tolPC")=1.0e-16L)
         .def("get_sim_constants", &propSimulation::get_sim_constants)
         .def("get_integration_parameters", &propSimulation::get_integration_parameters)
         .def("preprocess", &propSimulation::preprocess)
