@@ -381,11 +381,11 @@ class fitSimulation:
         nongravParams.a1 = a1
         nongravParams.a2 = a2
         nongravParams.a3 = a3
-        nongravParams.alpha = 1.0
-        nongravParams.k = 0.0
-        nongravParams.m = 2.0
-        nongravParams.n = 0.0
-        nongravParams.r0_au = 1.0
+        nongravParams.alpha = self.fixed_propSim_params['alpha']
+        nongravParams.k = self.fixed_propSim_params['k']
+        nongravParams.m = self.fixed_propSim_params['m']
+        nongravParams.n = self.fixed_propSim_params['n']
+        nongravParams.r0_au = self.fixed_propSim_params['r0_au']
         return nongravParams
 
     def x_dict_to_events(self, x_dict):
