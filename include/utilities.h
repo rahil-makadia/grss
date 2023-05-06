@@ -19,6 +19,9 @@ using std::tan;
 using std::asin;
 using std::acos;
 using std::atan2;
+using std::sinh;
+using std::cosh;
+using std::tanh;
 using std::log;
 
 #include "SpiceUsr.h"
@@ -118,7 +121,8 @@ void rot_mat_x(const real &theta, std::vector<std::vector<real> > &R);
 void rot_mat_y(const real &theta, std::vector<std::vector<real> > &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real> > &R);
 
-void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-15L, const int &max_iter=100);
+void kepler_solve(const real &M, const real &e, real &E, const real &tol=1.0e-14L, const int &max_iter=100);
+void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp, const real &tol=1.0e-12L, const int &max_iter=100);
 void cometary_to_keplerian(const real &epochMjd, const std::vector<real> &cometaryState, std::vector<real> &keplerianState, const real GM=2.959122082855911e-4L);
 void keplerian_to_cometary(const real &epochMjd, const std::vector<real> &keplerianState, std::vector<real> &cometaryState, const real GM=2.959122082855911e-4L);
 void keplerian_to_cartesian(const std::vector<real> &keplerianState, std::vector<real> &cartesianState, const real GM=2.959122082855911e-4L);

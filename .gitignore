@@ -211,3 +211,6 @@ extern/cspice
 
 # beta fit results directory
 multi_fit/
+
+# lsst custom spice kernels
+examples/lsst/data/

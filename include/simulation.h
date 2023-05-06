@@ -38,6 +38,7 @@ class IntegBody: public Body{
 
     public:
         bool isInteg=true;
+        bool isThrusting=false;
         std::vector< std::vector<real> > covariance;
         NongravParamaters ngParams;
         // constructors
@@ -80,6 +81,8 @@ class propSimulation
 
         // integration parameters
         IntegrationParameters integParams;
+        std::vector<real> tStep;
+        std::vector< std::vector<real> > xIntegStep;
 
         // bodies and events
         std::vector<SpiceBody> spiceBodies;

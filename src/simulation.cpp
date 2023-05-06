@@ -635,6 +635,7 @@ void propSimulation::preprocess(){
         this->forceParams.isNongravList.push_back(integBodies[i].isNongrav);
         this->forceParams.ngParamsList.push_back(integBodies[i].ngParams);
         this->forceParams.isMajorList.push_back(integBodies[i].isMajor);
+        this->forceParams.isThrustingList.push_back(integBodies[i].isThrusting);
     }
     for (size_t i = 0; i < this->integParams.nSpice; i++){
         this->forceParams.masses.push_back(spiceBodies[i].mass);
@@ -646,6 +647,8 @@ void propSimulation::preprocess(){
         this->forceParams.obliquityList.push_back(spiceBodies[i].obliquityToEcliptic);
         this->forceParams.isMajorList.push_back(spiceBodies[i].isMajor);
     }
+    this->tStep.push_back(t);
+    this->xIntegStep.push_back(xInteg);
 }
 
 void propSimulation::extend(real tf, std::vector<real> tEvalNew, std::vector< std::vector<real> > xObserverNew){

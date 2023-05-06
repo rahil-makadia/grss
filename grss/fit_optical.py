@@ -1,5 +1,7 @@
+import os
+file_path = os.path.dirname(os.path.abspath(__file__))
 import sys
-sys.path.append('../extern/')
+sys.path.append(f'{file_path}/../extern/')
 import astrocat_debiasing.debias as ad
 
 from astropy.time import Time

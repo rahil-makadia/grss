@@ -78,7 +78,8 @@ PYBIND11_MODULE(cppgrss, m) {
         .def_readwrite("J2List", &ForceParameters::J2List)
         .def_readwrite("obliquityList", &ForceParameters::obliquityList)
         .def_readwrite("isNongravList", &ForceParameters::isNongravList)
-        .def_readwrite("isMajorList", &ForceParameters::isMajorList);
+        .def_readwrite("isMajorList", &ForceParameters::isMajorList)
+        .def_readwrite("isThrustingList", &ForceParameters::isThrustingList);
 
     // from simulation.h
     py::class_<Body>(m, "Body")
@@ -105,6 +106,7 @@ PYBIND11_MODULE(cppgrss, m) {
         .def(py::init<std::string, std::string, real, real, real, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants>(), py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("cometaryState"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
         .def(py::init<std::string, real, real, real, std::vector<real>, std::vector<real>, std::vector< std::vector<real> >, NongravParamaters, Constants>(), py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"), py::arg("pos"), py::arg("vel"), py::arg("covariance"), py::arg("ngParams"), py::arg("constants"))
         .def_readwrite("isInteg", &IntegBody::isInteg)
+        .def_readwrite("isThrusting", &IntegBody::isThrusting)
         .def_readwrite("covariance", &IntegBody::covariance)
         .def_readwrite("ngParams", &IntegBody::ngParams);
 
@@ -126,6 +128,8 @@ PYBIND11_MODULE(cppgrss, m) {
         .def_readwrite("DEkernelPath", &propSimulation::DEkernelPath)
         .def_readwrite("consts", &propSimulation::consts)
         .def_readwrite("integParams", &propSimulation::integParams)
+        .def_readwrite("tStep", &propSimulation::tStep)
+        .def_readwrite("xIntegStep", &propSimulation::xIntegStep)
         .def_readwrite("spiceBodies", &propSimulation::spiceBodies)
         .def_readwrite("integBodies", &propSimulation::integBodies)
         .def_readwrite("events", &propSimulation::events)
