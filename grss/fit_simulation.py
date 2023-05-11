@@ -863,7 +863,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     simulated_optical_obs_idx = np.where(optical_obs_times >= simulated_obs_start_time)[0]
     simulated_optical_obs_times = tuple(optical_obs_times[simulated_optical_obs_idx])
     simulated_optical_obs_types = ['astrometry']*len(simulated_optical_obs_times)
-    if add_extra_simulated_obs:
+    if add_extra_simulated_obs and extra_simulated_optical_obs_times is not None and extra_simulated_optical_obs_types is not None and len(extra_simulated_optical_obs_times) == len(extra_simulated_optical_obs_types):
         # add extra simulated optical obs times and types
         simulated_optical_obs_times = simulated_optical_obs_times + extra_simulated_optical_obs_times
         simulated_optical_obs_types = simulated_optical_obs_types + extra_simulated_optical_obs_types
@@ -878,7 +878,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     simulated_radar_obs_idx = np.where(radar_obs_times >= simulated_obs_start_time)[0]
     simulated_radar_obs_times = tuple(radar_obs_times[simulated_radar_obs_idx])
     simulated_radar_obs_types = ['delay']*len(simulated_radar_obs_times)
-    if add_extra_simulated_obs:
+    if add_extra_simulated_obs and extra_simulated_radar_obs_times is not None and extra_simulated_radar_obs_types is not None and len(extra_simulated_radar_obs_times) == len(extra_simulated_radar_obs_types):
         # add extra simulated radar obs times and types
         simulated_radar_obs_times = simulated_radar_obs_times + extra_simulated_radar_obs_times
         simulated_radar_obs_types = simulated_radar_obs_types + extra_simulated_radar_obs_types
