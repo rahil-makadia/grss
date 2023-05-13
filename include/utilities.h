@@ -25,6 +25,7 @@ using std::tanh;
 using std::log;
 
 #include "SpiceUsr.h"
+#include "spk.h"
 
 #ifndef LONGDOUBLE
     #define LONGDOUBLE  // use long double instead of double

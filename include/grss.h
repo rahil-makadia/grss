@@ -25,4 +25,5 @@ void propSimulation::integrate(){
         std::reverse(this->radarObsEval.begin(), this->radarObsEval.end());
     }
 }
+
 #endif

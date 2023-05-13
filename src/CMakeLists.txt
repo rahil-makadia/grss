@@ -3,6 +3,7 @@ force.cpp
 gr15.cpp
 interpolate.cpp
 simulation.cpp
+spk.cpp
 utilities.cpp
 )
 

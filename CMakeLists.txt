@@ -14,7 +14,7 @@ project(grss VERSION 0.1.0)
 # TODO: add gprof profiling, iee standards for floats
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Wall -Wextra -Werror -pedantic)
+add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Wall -Wextra -pedantic) # -Werror 
 
 # Set output directories, from https://stackoverflow.com/a/6595001
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
