@@ -5,8 +5,7 @@ void get_spice_state_lt(const int &spiceID, const real &t0_mjd, const Constants 
     mjd_to_et(t0_mjd, t0_et);
     SpiceInt center = 0; // 0 = solar system barycenter
     ConstSpiceChar *frame="J2000"; // Earth mean equator and equinox of J2000, states output will be ICRF-EME2000 frame
-    ConstSpiceChar *abcorr="NONE"; // No aberration correction
-    spkez_c(spiceID, t0_et, frame, abcorr, center, state, &lt);
+    spkgeo_c(spiceID, t0_et, frame, center, state, &lt);
     // std::cout << "state: " << state[0] << " " << state[1] << " " << state[2] << " " << state[3] << " " << state[4] << " " << state[5] << std::endl;
     // std::cout << "du2m: " << consts.du2m << std::endl;
     // std::cout << "tu2sec: " << consts.tu2sec << std::endl;
