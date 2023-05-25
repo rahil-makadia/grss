@@ -53,6 +53,7 @@ def get_radar_obs_array(tdes):
     data = raw_data['data']
     obs_array_radar = np.zeros((num_obs, 5))
     observer_codes_radar = []
+    rows_to_delete = []
     for i in range(num_obs):
         obs = data[num_obs-i-1]
         date = Time(obs[1], format='iso', scale='utc')
@@ -72,10 +73,15 @@ def get_radar_obs_array(tdes):
             obs_array_radar[i,4] = np.nan
             observer_codes_radar.append((radar_observer_map[tx], radar_observer_map[rx]))
         elif doppler:
+            # skip doppler observations for now
+            rows_to_delete.append(i)
             continue
             obs_array_radar[i,1] = np.nan
             obs_array_radar[i,2] = obs_val
             obs_array_radar[i,3] = np.nan
             obs_array_radar[i,4] = obs_sigma
             observer_codes_radar.append(((radar_observer_map[rx], radar_observer_map[tx]), freq))
+        else:
+            raise ValueError("Observation type not recognized")
+    obs_array_radar = np.delete(obs_array_radar, rows_to_delete, axis=0)
     return obs_array_radar, tuple(observer_codes_radar)

@@ -43,6 +43,7 @@ def get_optical_data(body_id, t_min_tdb=None, t_max_tdb=None, verbose=False):
     roving_observatory_codes = ['270', '247']
     space_observatory_codes = ['245', '249', '250', '258', '274', 'C49', 'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59',]
     non_geocentric_occultation_codes = ['275']
+    skip_counter = 0
     for i, row in enumerate(obs_raw):
         data = row['obs']
         date = data[15:32]
@@ -59,14 +60,17 @@ def get_optical_data(body_id, t_min_tdb=None, t_max_tdb=None, verbose=False):
             star_catalog_codes.append(star_catalog)
             observer_codes_optical.append(obs_code)
         else:
-            if verbose:
-                if disallowed_observation:
-                    print(f"Skipping observation {i} because it is disallowed observation (roving observer or space-based observer).")
-                else:
-                    print(f"Skipping observation {i} because it is past the maximum observation epoch limit.")
+            # if verbose:
+            #     if disallowed_observation:
+            #         print(f"Skipping observation {i} because it is disallowed observation (roving observer or space-based observer).")
+            #     else:
+            #         print(f"Skipping observation {i} because it is past the maximum or minimum observation epoch limit.")
+            skip_counter += 1
             obs_array_optical[i, :] = np.nan
             star_catalog_codes.append(np.nan)
             observer_codes_optical.append(np.nan)
+    if verbose:
+        print(f"Skipped {skip_counter} observations because they are either roving or space-based observers or past the observation epoch limit.")
     star_catalog_codes = tuple(np.array(star_catalog_codes)[~np.isnan(obs_array_optical[:, 0])])
     observer_codes_optical = tuple(np.array(observer_codes_optical)[~np.isnan(obs_array_optical[:, 0])])
     obs_array_optical = obs_array_optical[~np.isnan(obs_array_optical[:, 0])]
@@ -109,6 +113,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
         nside = 256
     biasdf = pd.read_csv(biasfile,sep='\s+',skiprows=23,names=columns)
     skip_counter = 0
+    skip_catalogs = []
     for i, row in enumerate(obs_array_optical):
         obs_time_jd = Time(row[0], format='mjd', scale='utc').tt.jd
         ra = row[1]/3600*np.pi/180
@@ -126,13 +131,14 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
                 print(f"Debiased observation {i} from observatory {observer_codes_optical[i]} using star_catalog_codes {star_catalog}. RA bias = {np.rad2deg(ra_new-ra)*3600:0.4f} arcsec, DEC bias = {np.rad2deg(dec_new-dec)*3600:0.4f} arcsec")
         else:
             skip_counter += 1
+            skip_catalogs.append(star_catalog)
             obs_array_optical[i, :] = np.nan
             star_catalog_codes[i] = np.nan
             observer_codes_optical[i] = np.nan
-            if verbose:
-                print(f"Skipping observation {i} because it is not in a biased MPC star_catalog_codes (star_catalog_codes '{star_catalog}') and debiasing is turned on.")
+            # if verbose:
+            #     print(f"Skipping observation {i} because it is not in a biased MPC catalog (catalog '{star_catalog}') and debiasing is turned on.")
     if verbose:
-        print(f"Skipped {skip_counter} observations because no star star_catalog_codes information available")
+        print(f"Skipped {skip_counter} observations because no star catalog information available for catalogs {np.unique(skip_catalogs)}")
     star_catalog_codes = tuple(np.array(star_catalog_codes)[~np.isnan(obs_array_optical[:, 0])])
     observer_codes_optical = tuple(np.array(observer_codes_optical)[~np.isnan(obs_array_optical[:, 0])])
     obs_array_optical = obs_array_optical[~np.isnan(obs_array_optical[:, 0])]
@@ -155,14 +161,14 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
     for i in range(len(obs_array_optical)):
         star_catalog = star_catalog_codes[i]
         obs_code = observer_codes_optical[i]
-        obs_date_jd = obs_array_optical[i, 0]
+        obs_date_mjd = obs_array_optical[i, 0]
         # table 2
         if obs_code == '703':
-            obs_array_optical[i, 3:5] = 0.8 if obs_date_jd >= Time('2014-01-01', format='iso', scale='utc').jd else 1.0
+            obs_array_optical[i, 3:5] = 0.8 if obs_date_mjd >= Time('2014-01-01', format='iso', scale='utc').mjd else 1.0
         elif obs_code == '691':
-            obs_array_optical[i, 3:5] = 0.5 if obs_date_jd >= Time('2003-01-01', format='iso', scale='utc').jd else 0.6
+            obs_array_optical[i, 3:5] = 0.5 if obs_date_mjd >= Time('2003-01-01', format='iso', scale='utc').mjd else 0.6
         elif obs_code == '644':
-            obs_array_optical[i, 3:5] = 0.4 if obs_date_jd >= Time('2003-09-01', format='iso', scale='utc').jd else 0.6
+            obs_array_optical[i, 3:5] = 0.4 if obs_date_mjd >= Time('2003-09-01', format='iso', scale='utc').mjd else 0.6
         # table 3
         elif obs_code in ['704', 'C51', 'J75']:
             obs_array_optical[i, 3:5] = 1.0
@@ -318,7 +324,8 @@ def get_optical_obs_array(body_id, t_min_tdb=None, t_max_tdb=None, debias=True, 
     if eliminate and deweight:
         raise ValueError('Cannot deweight and eliminate observations at the same time.')
     elif not eliminate and not deweight:
-        raise ValueError('Must deweight or eliminate observations.')
+        print('WARNING: No deweighting or elimination scheme applied for observations during the same night.')
+        # raise ValueError('Must deweight or eliminate observations.')
     if debias and debias_lowres:
         raise ValueError('Cannot debias and debias_lowres at the same time.')
     elif not debias and not debias_lowres:

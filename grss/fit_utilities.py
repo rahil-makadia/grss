@@ -146,10 +146,18 @@ def get_codes_dict():
             lon, lat, geodet_lat, alt, rho = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
             codes_dict[code] = (lon, lat, rho)
     # from https://www.minorplanetcenter.net/iau/lists/ObsCodes.html
-    extra_observatories = { 'Y98': (358.68692, 0.617953, +0.783613),
+    extra_observatories = { 'M14': (  8.78939, 0.699981, +0.711832),
+                            'M48': ( 15.09222, 0.794277, +0.605535),
+                            'M50': ( 11.56375, 0.738663, +0.671862),
+                            'N83': ( 86.23504, 0.749549, +0.659927),
+                            'P22': (117.57588, 0.762782, +0.644702),
+                            'Q10': (137.32944, 0.821623, +0.568142),
                             'U94': (246.30250, 0.792006, +0.608864),
+                            'X06': (289.14649, 0.862374, -0.505110),
+                            'Y65': (343.49042, 0.881484, +0.471429),
                             'Y66': (343.49053, 0.881484, +0.471429),
-                            'X06': (289.14649, 0.862374, -0.505110)}
+                            'Y98': (358.68692, 0.617953, +0.783613),
+                            }
     for code, info in extra_observatories.items():
         lon, lat, geodet_lat, alt, rho = parallax_constants_to_lat_lon_alt(info[0], info[1], info[2])
         codes_dict[code] = (lon, lat, rho)

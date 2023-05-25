@@ -10,7 +10,7 @@ __all__ = [ 'fitSimulation',
 ]
 
 class iterationParams:
-    def __init__(self, iter_number, x_nom, covariance, residuals, obs_array, observer_codes):
+    def __init__(self, iter_number, x_nom, covariance, residuals, obs_array, observer_codes, rejection_flags):
         self.iter_number = iter_number
         self.x_nom = x_nom
         self.covariance = covariance
@@ -19,6 +19,8 @@ class iterationParams:
         self.residuals = residuals
         self.obs_array = obs_array
         self.observer_codes = observer_codes
+        self.is_accepted = np.where(np.logical_not(rejection_flags) == True)[0]
+        self.is_rejected = np.where(np.logical_not(rejection_flags) == False)[0]
         self.sigmas = obs_array[:, 3:5]
         self.weight_matrix = np.diag(1/self.flatten_and_clean(self.sigmas)**2)
         self.calculate_rms()
@@ -31,22 +33,23 @@ class iterationParams:
         return arr
 
     def calculate_rms(self):
-        residual_arr = self.flatten_and_clean(self.residuals)
+        residual_arr = self.flatten_and_clean(self.residuals[self.is_accepted])
         n_obs = len(residual_arr)
         self.unweighted_rms = float(np.sqrt(residual_arr.T @ residual_arr/n_obs))
-        self.weighted_rms = float(np.sqrt(residual_arr.T @ self.weight_matrix @ residual_arr/n_obs))
+        w = np.diag(1/self.flatten_and_clean(self.sigmas[self.is_accepted])**2)
+        self.weighted_rms = float(np.sqrt(residual_arr.T @ w @ residual_arr/n_obs))
         return None
 
     def calculate_chis(self):
-        residual_arr = self.flatten_and_clean(self.residuals)
+        residual_arr = self.flatten_and_clean(self.residuals[self.is_accepted])
         n_obs = len(residual_arr)
         n_fit = len(self.x_nom)
-        sigmas = self.flatten_and_clean(self.sigmas)
+        sigmas = self.flatten_and_clean(self.sigmas[self.is_accepted])
         self.chi = residual_arr/sigmas
         self.chi_squared = np.sum(self.chi**2)
         self.reduced_chi_squared = self.chi_squared/(n_obs-n_fit)
         return None
-    
+
     # adapted from https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_hist.html
     def scatter_hist(self, x, y, ax, ax_histx, ax_histy, size, show_logarithmic):
         color = 'C0'
@@ -80,16 +83,20 @@ class iterationParams:
         ax_histy.hist(y, bins=bins, orientation='horizontal', color=color, edgecolor=color, linewidth=0.75, fill=fill, histtype='step')
         return None
 
-    def plot_residuals(self, t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname):
+    def plot_residuals(self, t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname):
         # sourcery skip: extract-duplicate-method
+        is_rejected = self.is_rejected
+        is_accepted = self.is_accepted
         fig = plt.figure(figsize=(21,6), dpi=150)
         iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
         iter_string = title if title is not None else iter_string
         plt.suptitle(iter_string, y=0.95)
         gs = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
         ax1 = fig.add_subplot(gs[0, 0])
-        ax1.plot(t_arr_optical, ra_residuals, '.', label='RA', markersize=markersize)
-        ax1.plot(t_arr_optical, dec_residuals, '.', label='Dec', markersize=markersize)
+        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize)
+        ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize)
+        ax1.plot(t_arr[is_rejected], ra_residuals[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
+        ax1.plot(t_arr[is_rejected], dec_residuals[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
         ax1.legend()
         ax1.set_xlabel('MJD [UTC]')
         ax1.set_ylabel('Residuals, O-C [arcsec]')
@@ -101,14 +108,15 @@ class iterationParams:
         ax2histx = fig.add_subplot(ax2[0,0], sharex=ax2main)
         ax2histy = fig.add_subplot(ax2[1,1], sharey=ax2main)
         self.scatter_hist(ra_cosdec_residuals, dec_residuals, ax2main, ax2histx, ax2histy, markersize, show_logarithmic)
+        ax2main.plot(ra_cosdec_residuals[is_rejected], dec_residuals[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
         ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
         ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
         ax2main.grid(True, which='both', axis='both', alpha=0.2, zorder=-100)
         if show_logarithmic: ax2main.set_yscale('log'); ax2main.set_xscale('log')
         
         ax3 = fig.add_subplot(gs[0, 2])
-        ax3.plot(t_arr_radar, delay_residuals, '.', mfc='C2', mec='C2', label='Delay', markersize=radar_scale*markersize)
-        ax3.plot(t_arr_radar, doppler_residuals, '.', mfc='C3', mec='C3', label='Doppler', markersize=radar_scale*markersize)
+        ax3.plot(t_arr, delay_residuals, '.', mfc='C2', mec='C2', label='Delay', markersize=radar_scale*markersize)
+        ax3.plot(t_arr, doppler_residuals, '.', mfc='C3', mec='C3', label='Doppler', markersize=radar_scale*markersize)
         ax3.legend()
         ax3.set_xlabel('MJD [UTC]')
         ax3.set_ylabel('Residuals, O-C [$\mu$s, Hz]')
@@ -119,17 +127,25 @@ class iterationParams:
             plt.savefig(f'{figname}_residuals.pdf', bbox_inches='tight')
         plt.show()
 
-    def plot_chi(self, t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname):
+    def plot_chi(self, t_arr, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname):
+        is_rejected = self.is_rejected
+        is_accepted = self.is_accepted
+        # opticalIdx is where neither the ra nor dec residuals are NaN
+        opticalIdx = np.where(~np.isnan(self.residuals[:, 0]) & ~np.isnan(self.residuals[:, 1]))[0]
+        # radarIdx is where either the ra or dec residuals are NaN
+        radarIdx = np.where(np.isnan(self.residuals[:, 0]) | np.isnan(self.residuals[:, 1]))[0]
         # plot chi values
         plt.figure(figsize=(21,6), dpi=150)
         iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
         iter_string = title if title is not None else iter_string
-        plt.suptitle(f'{iter_string}. Chi Squared: RA={np.sum(ra_chi_squared):.2f}, Dec={np.sum(dec_chi_squared):.2f}, Delay={np.sum(delay_chi_squared):.2f}, Doppler={np.sum(doppler_chi_squared):.2f}', y=0.95)
+        plt.suptitle(f'{iter_string}. Chi Squared: RA={np.sum(ra_chi_squared[np.intersect1d(is_accepted, opticalIdx)]):.2f}, Dec={np.sum(dec_chi_squared[np.intersect1d(is_accepted, opticalIdx)]):.2f}, Delay={np.sum(delay_chi_squared[np.intersect1d(is_accepted, radarIdx)]):.2f}, Doppler={np.sum(doppler_chi_squared[np.intersect1d(is_accepted, radarIdx)]):.2f}', y=0.95)
         plt.subplot(1,2,1)
-        plt.plot(t_arr_optical, ra_chi, '.', markersize=markersize, label='RA')
-        plt.plot(t_arr_optical, dec_chi, '.', markersize=markersize, label='Dec')
-        plt.plot(t_arr_radar, delay_chi, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
-        plt.plot(t_arr_radar, doppler_chi, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
+        plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
+        plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
+        plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
+        plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
+        plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
+        plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
         plt.axhline(-sigma_limit, c='khaki', linestyle='--', alpha=1.0, label=f'$\pm{sigma_limit:.0f}\sigma$')
         plt.axhline(sigma_limit, c='khaki', linestyle='--', alpha=1.0)
         plt.axhline(-2*sigma_limit, c='red', linestyle='--', alpha=0.5, label=f'$\pm{2*sigma_limit:.0f}\sigma$')
@@ -141,10 +157,12 @@ class iterationParams:
         if show_logarithmic: plt.yscale('log')
 
         plt.subplot(1,2,2)
-        plt.plot(t_arr_optical, ra_chi_squared, '.', markersize=markersize, label='RA')
-        plt.plot(t_arr_optical, dec_chi_squared, '.', markersize=markersize, label='Dec')
-        plt.plot(t_arr_radar, delay_chi_squared, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
-        plt.plot(t_arr_radar, doppler_chi_squared, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
+        plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')
+        plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize, label='Dec')
+        plt.plot(t_arr[is_rejected], ra_chi_squared[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
+        plt.plot(t_arr[is_rejected], dec_chi_squared[is_rejected], 'ro', markersize=2*markersize, markerfacecolor='none')
+        plt.plot(t_arr, delay_chi_squared, '.', mfc='C2', mec='C2', markersize=radar_scale*markersize, label='Delay')
+        plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3', markersize=radar_scale*markersize, label='Doppler')
         plt.legend(ncol=2)
         plt.xlabel('MJD [UTC]')
         plt.ylabel('$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
@@ -169,13 +187,17 @@ class iterationParams:
         # radarIdx is where either the ra or dec residuals are NaN
         radarIdx = np.where(np.isnan(residuals[:, 0]) | np.isnan(residuals[:, 1]))[0]
         
-        t_arr_optical = obs_array[opticalIdx, 0]
-        ra_obs = obs_array[opticalIdx, 1]
-        dec_obs = obs_array[opticalIdx, 2]
-        ra_noise = obs_array[opticalIdx, 3]
-        dec_noise = obs_array[opticalIdx, 4]
-        ra_residuals = residuals[opticalIdx, 0]
-        dec_residuals = residuals[opticalIdx, 1]
+        t_arr = obs_array[:, 0]
+        optical_info = obs_array.copy()
+        optical_info[radarIdx, :] = np.nan
+        ra_obs = optical_info[:, 1]
+        dec_obs = optical_info[:, 2]
+        ra_noise = optical_info[:, 3]
+        dec_noise = optical_info[:, 4]
+        optical_residuals = residuals.copy()
+        optical_residuals[radarIdx, :] = np.nan
+        ra_residuals = optical_residuals[:, 0]
+        dec_residuals = optical_residuals[:, 1]
         ra_computed = ra_obs - ra_residuals
         dec_computed = dec_obs - dec_residuals
         ra_cosdec_residuals = ( (ra_obs/3600*np.pi/180*np.cos(dec_obs/3600*np.pi/180)) - (ra_computed/3600*np.pi/180*np.cos(dec_computed/3600*np.pi/180)) )*180/np.pi*3600
@@ -192,12 +214,16 @@ class iterationParams:
         dec_chi_squared = np.abs(dec_chi_squared) if show_logarithmic else dec_chi_squared
         
         t_arr_radar = obs_array[radarIdx, 0]
-        delay_obs = obs_array[radarIdx, 1]
-        doppler_obs = obs_array[radarIdx, 2]
-        delay_noise = obs_array[radarIdx, 3]
-        doppler_noise = obs_array[radarIdx, 4]
-        delay_residuals = residuals[radarIdx, 0]
-        doppler_residuals = residuals[radarIdx, 1]
+        radar_info = obs_array.copy()
+        radar_info[opticalIdx, :] = np.nan
+        delay_obs = radar_info[:, 1]
+        doppler_obs = radar_info[:, 2]
+        delay_noise = radar_info[:, 3]
+        doppler_noise = radar_info[:, 4]
+        radar_residuals = residuals.copy()
+        radar_residuals[opticalIdx, :] = np.nan
+        delay_residuals = radar_residuals[:, 0]
+        doppler_residuals = radar_residuals[:, 1]
         delay_computed = delay_obs - delay_residuals
         doppler_computed = doppler_obs - doppler_residuals
         delay_chi = delay_residuals/delay_noise
@@ -209,8 +235,8 @@ class iterationParams:
         delay_chi = np.abs(delay_chi) if show_logarithmic else delay_chi
         doppler_chi = np.abs(doppler_chi) if show_logarithmic else doppler_chi
         
-        self.plot_residuals(t_arr_optical, t_arr_radar, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname)
-        self.plot_chi(t_arr_optical, t_arr_radar, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname)
+        self.plot_residuals(t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname)
+        self.plot_chi(t_arr, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname)
         return None
 
 class fitSimulation:
@@ -303,8 +329,10 @@ class fitSimulation:
             self.obs_array = self.obs_array_radar
             self.observer_codes = self.observer_codes_radar
         self.n_obs = np.count_nonzero(~np.isnan(self.obs_array[:, 1:3])) # number of observations is the number of non-nan values in the second and third columns of the observation array
+        self.rejection_flag = [False]*len(self.obs_array)
         self.sigmas = self.obs_array[:, 3:5]
         self.weight_matrix = np.diag(1/self.flatten_and_clean(self.sigmas)**2)
+        self.obs_cov_matrix = np.diag(self.flatten_and_clean(self.sigmas)**2)
         self.pastObsIdx = np.where(self.obs_array[:, 0] < self.t)[0]
         self.pastObsExist = len(self.pastObsIdx) > 0
         self.futureObsIdx = np.where(self.obs_array[:, 0] >= self.t)[0]
@@ -538,6 +566,8 @@ class fitSimulation:
                 computed_obs[i, 0] = radar_observations[i]
             elif obs_info_len == 9: # dopper measurement
                 computed_obs[i, 1] = radar_observations[i]
+            else:
+                raise ValueError("Observer info length not recognized.")
         return computed_obs
 
     def get_analytic_partials(self, propSimPast, propSimFuture):
@@ -570,31 +600,89 @@ class fitSimulation:
         partials = self.get_partials(propSimPast, propSimFuture, perturbation_info)
         return residuals, partials
 
+    def reject_outliers(self, a, w, b):
+        chi_reject = 3.0
+        chi_recover = 2.8
+        full_cov = np.linalg.inv(a.T @ self.weight_matrix @ a)
+        observerInfo = get_observer_info(self.observer_codes)
+        j = 0
+        residual_chi_squared = np.zeros(len(self.obs_array))
+        rejected_indices = []
+        resid_cov_full = self.obs_cov_matrix - a @ full_cov @ a.T
+        for i in range(len(self.obs_array)):
+            obs_info_len = len(observerInfo[i])
+            if obs_info_len == 4:
+                size = 2
+            elif obs_info_len in {8, 9}:
+                size = 1
+                j += size
+                continue
+            else:
+                raise ValueError("Observer info length not recognized.")
+            # calculate chi-squared for each residual
+            resid = b[j:j+size].reshape((1, size))
+            partials = a[j:j+size, :]
+            covs = self.obs_cov_matrix[j:j+size, j:j+size]
+            # resid_cov = covs - partials @ full_cov @ partials.T
+            resid_cov = resid_cov_full[j:j+size, j:j+size]
+            residual_chi_squared[i] = resid @ np.linalg.inv(resid_cov) @ resid.T
+            # outlier rejection
+            if residual_chi_squared[i] > chi_reject**2 and size == 2: # only reject RA/Dec measurements
+                self.rejection_flag[i] = True
+            if self.rejection_flag[i] and residual_chi_squared[i] < chi_recover**2:
+                self.rejection_flag[i] = False
+                print("Recovered observation at time", self.obs_array[i, 0])
+            # # sigma clipping
+            # if abs(resid[0, 0])/self.obs_array[i,3] >= chi_reject or abs(resid[0, 1])/self.obs_array[i,4] >= chi_reject:
+            #     self.rejection_flag[i] = True
+            # if self.rejection_flag[i] and (abs(resid[0, 0])/self.obs_array[i,3] < chi_recover and abs(resid[0, 1])/self.obs_array[i,4] < chi_recover):
+            #     self.rejection_flag[i] = False
+            #     print("Recovered observation at time", self.obs_array[i, 0])
+            if self.rejection_flag[i]:
+                rejected_indices.extend((j, j+1))
+            j += size
+        # remove rejected residuals from a, w, and b
+        a = np.delete(a, rejected_indices, axis=0)
+        w = np.delete(w, rejected_indices, axis=0)
+        w = np.delete(w, rejected_indices, axis=1)
+        b = np.delete(b, rejected_indices, axis=0)
+        # print(rejected_indices)
+        print(f'Rejected {len(rejected_indices)//2} observations.')
+        self.residual_chi_squared = residual_chi_squared
+        return a, w, b, residual_chi_squared
+
     def add_iteration(self, iter_number, residuals):
-        self.iters.append(iterationParams(iter_number, self.x_nom, self.covariance, residuals, self.obs_array, self.observer_codes))
+        self.iters.append(iterationParams(iter_number, self.x_nom, self.covariance, residuals, self.obs_array, self.observer_codes, self.rejection_flag))
         return None
 
     def filter_lsq(self, verbose=True):
+        rejection_start_iter = 5
         spice.furnsh(self.DEkernelPath)
         if verbose:
             print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
         for i in range(self.n_iter):
             # get residuals and partials
             residuals, a = self.get_residuals_and_partials()
+            w = self.weight_matrix
             if i == 0:
                 # add prefit iteration
                 prefit_residuals = residuals.copy()
                 self.add_iteration(0, prefit_residuals)
             b = self.flatten_and_clean(residuals)
+            # reject outliers here
+            if i >= rejection_start_iter:
+                a_rej, w_rej, b_rej, residual_chi_squared = self.reject_outliers(a, w, b)
+            else:
+                a_rej, w_rej, b_rej = a, w, b
+            # a_rej, w_rej, b_rej = a, w, b
             # get initial guess
             x0 = np.array(list(self.x_nom.values()))
             # get covariance
             cov = self.covariance
             # get state correction
-            w = self.weight_matrix
-            atwa = a.T @ w @ a
+            atwa = a_rej.T @ w_rej @ a_rej
             P = np.linalg.inv(atwa)
-            atwb = a.T @ w @ b
+            atwb = a_rej.T @ w_rej @ b_rej
             dx = P @ atwb
             # dx = np.linalg.solve(atwa, atwb)
             # get new state
@@ -612,12 +700,13 @@ class fitSimulation:
     def print_summary(self, iter_idx=-1):
         data = self.iters[iter_idx]
         print(f"Summary of the orbit fit calculations at iteration {data.iter_number} (of {self.n_iter}):")
-        print("====================================================")
+        print("=======================================================")
         print(f"RMS unweighted: {data.unweighted_rms}")
         print(f"RMS weighted: {data.weighted_rms}")
         print(f"chi-squared: {data.chi_squared}")
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
-        print("====================================================")
+        print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
+        print("=======================================================")
         print(f"t: MJD {self.t} TDB")
         print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value\t\t\tUncertainty\t\t\t\tChange\t\t\t\tChange (sigma)")
         init_variance = np.sqrt(np.diag(self.covariance_init))
