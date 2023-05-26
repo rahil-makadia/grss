@@ -178,12 +178,15 @@ def get_observer_info(observer_codes):
         info_list = [399]
         # check if code is a tuple - corresponds to a radar observation
         if isinstance(code, tuple) and len(code) in {2, 3}:
-            receiver_info = codes_dict[code[0]]
-            info_list.extend((receiver_info[0], receiver_info[1], receiver_info[2]))
-            transmitter_info = codes_dict[code[1]]
-            info_list.extend((399, transmitter_info[0], transmitter_info[1], transmitter_info[2]))
+            tx_code = code[0][0]
+            rx_code = code[0][1]
+            bp = code[1]
+            receiver_info = codes_dict[tx_code]
+            transmitter_info = codes_dict[rx_code]
+            info_list.extend((receiver_info[0], receiver_info[1], receiver_info[2], 399, transmitter_info[0], transmitter_info[1], transmitter_info[2], bp))
             if len(code) == 3: # add tranmission frequency if dopppler observation
-                info_list.append(code[2])
+                freq = code[2]
+                info_list.append(freq)
         else:
             info = codes_dict[code]
             info_list.extend((info[0], info[1], info[2]))

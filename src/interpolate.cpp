@@ -129,12 +129,13 @@ void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVec
 void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, std::vector<real> &lightTime, std::vector<real> &xInterpApparent){
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
+    bool bouncePointAtLeadingEdge = false;
     bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
     bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
     for (size_t i = 0; i < propSim->integParams.nInteg; i++){
         real lightTimeTemp;
         std::vector<real> xInterpApparentTemp(numStates, 0.0);
-        get_lightTimeOneBody(i, tInterpGeom, xInterpGeom, xObserver, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, lightTimeTemp);
+        get_lightTimeOneBody(i, tInterpGeom, xInterpGeom, xObserver, bouncePointAtLeadingEdge, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, lightTimeTemp);
         if ( (forwardIntegrate && (tInterpGeom-lightTimeTemp < tVecForInterp[0] && tInterpGeom != propSim->integParams.t0))
             || (backwardIntegrate && (tInterpGeom-lightTimeTemp > tVecForInterp[0] && tInterpGeom != propSim->integParams.t0)) ){
             evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterpPrev, coeffsPrev, xInterpApparentTemp);
@@ -148,7 +149,7 @@ void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom,
     }
 }
 
-void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<real> xInterpGeom, std::vector<real> xObserver, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, real &lightTimeOneBody){
+void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<real> xInterpGeom, std::vector<real> xObserver, const bool bouncePointAtLeadingEdge, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, real &lightTimeOneBody){
     size_t numStates = xInterpGeom.size();
     std::vector<real> xInterpApparentTemp(numStates, 0.0);
     std::vector<real> xRelativeOneBody(6, 0.0);
@@ -158,7 +159,9 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<r
         xRelativeOneBody[j] = xInterpGeom[6*i+j] - xObserver[j];
     }
     vnorm({xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]}, distRelativeOneBody);
-    distRelativeOneBody -= propSim->forceParams.radii[i];
+    if (bouncePointAtLeadingEdge){
+        distRelativeOneBody -= propSim->forceParams.radii[i];
+    }
     lightTimeOneBody = distRelativeOneBody/propSim->consts.clight;
     bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
     bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
@@ -179,7 +182,9 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<r
                 xRelativeOneBody[j] = xInterpApparentTemp[6*i+j] - xObserver[j];
             }
             vnorm({xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]}, distRelativeOneBody);
-            distRelativeOneBody -= propSim->forceParams.radii[i];
+            if (bouncePointAtLeadingEdge){
+                distRelativeOneBody -= propSim->forceParams.radii[i];
+            }
             lightTimeOneBodyPrev = lightTimeOneBody;
             lightTimeOneBody = distRelativeOneBody/propSim->consts.clight;
             iter++;
@@ -188,8 +193,8 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<r
 }
 
 void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, std::vector<real> &delayMeasurement){
-    if (propSim->observerInfo[interpIdx].size() !=8){
-        throw std::runtime_error("Error: observerInfo must be a 8-element vector for delay measurement.");
+    if (propSim->observerInfo[interpIdx].size() !=9){
+        throw std::runtime_error("Error: observerInfo must be a 9-element vector for delay measurement.");
     }
     size_t numStates = xInterpGeom.size();
     real receiveTimeTDB = tInterpGeom;
@@ -201,6 +206,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
     std::vector<real> xObserverBarycentricTransmitTime(6, 0.0);
     std::vector<real> transmitterInfo = {propSim->observerInfo[interpIdx][4], propSim->observerInfo[interpIdx][5], propSim->observerInfo[interpIdx][6], propSim->observerInfo[interpIdx][7]};
 
+    bool bouncePointAtLeadingEdge = propSim->observerInfo[interpIdx][8] == 1.0;
     bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
     bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
     for (size_t i = 0; i < propSim->integParams.nInteg; i++){
@@ -211,7 +217,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
         std::vector<real> xTargetBarycentricBounceTimeAllBody(numStates, 0.0);
         std::vector<real> xTargetBarycentricBounceTime(6, 0.0);
         // get downleg delay
-        get_lightTimeOneBody(i, receiveTimeTDB, xTargetBarycentricReceiveTime, xObserverBarycentricReceiveTime, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, delayDownleg);
+        get_lightTimeOneBody(i, receiveTimeTDB, xTargetBarycentricReceiveTime, xObserverBarycentricReceiveTime, bouncePointAtLeadingEdge, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, delayDownleg);
         bounceTimeTDB = receiveTimeTDB-delayDownleg;
         if ( (forwardIntegrate && (bounceTimeTDB < tVecForInterp[0] && receiveTimeTDB != propSim->integParams.t0))
             || (backwardIntegrate && (bounceTimeTDB > tVecForInterp[0] && receiveTimeTDB != propSim->integParams.t0)) ){
@@ -238,7 +244,9 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
                 transmitTimeTDB = bounceTimeTDB-delayUpleg;
                 get_observer_state(transmitTimeTDB, transmitterInfo, propSim->consts, false, xObserverBarycentricTransmitTime);
                 vnorm({xTargetBarycentricBounceTime[0]-xObserverBarycentricTransmitTime[0], xTargetBarycentricBounceTime[1]-xObserverBarycentricTransmitTime[1], xTargetBarycentricBounceTime[2]-xObserverBarycentricTransmitTime[2]}, distRelativeUpleg);
-                distRelativeUpleg -= propSim->forceParams.radii[i];
+                if (bouncePointAtLeadingEdge){
+                    distRelativeUpleg -= propSim->forceParams.radii[i];
+                }
                 delayUplegPrev = delayUpleg;
                 delayUpleg = distRelativeUpleg/propSim->consts.clight;
                 iter++;

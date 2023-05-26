@@ -562,9 +562,9 @@ class fitSimulation:
             obs_info_len = len(observerInfo[i])
             if obs_info_len == 4:
                 computed_obs[i, :] = get_radec(apparent_states[i])
-            elif obs_info_len == 8: # delay measurement
+            elif obs_info_len == 9: # delay measurement
                 computed_obs[i, 0] = radar_observations[i]
-            elif obs_info_len == 9: # dopper measurement
+            elif obs_info_len == 10: # dopper measurement
                 computed_obs[i, 1] = radar_observations[i]
             else:
                 raise ValueError("Observer info length not recognized.")
@@ -902,7 +902,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times,
             if bias:
                 dec_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
                 sim_obs_array[i, 2] += dec_bias
-        elif obs_info_len == 8: # delay measurement
+        elif obs_info_len == 9: # delay measurement
             sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
             sim_obs_array[i, 1] = radar_observations[i]
             if noise:
@@ -911,7 +911,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times,
             if bias:
                 delay_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
                 sim_obs_array[i, 1] += delay_bias
-        elif obs_info_len == 9: # doppler measurement
+        elif obs_info_len == 10: # doppler measurement
             sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
             sim_obs_array[i, 2] = radar_observations[i]
             if noise:

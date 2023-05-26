@@ -64,6 +64,8 @@ def get_radar_obs_array(tdes):
         freq = float(obs[5])*1e6 # MHz -> Hz
         tx = obs[6]
         rx = obs[7]
+        bounce_point = obs[8]
+        bp = 0 if bounce_point == 'C' else 1
 
         obs_array_radar[i,0] = date.mjd
         if delay:
@@ -71,7 +73,7 @@ def get_radar_obs_array(tdes):
             obs_array_radar[i,2] = np.nan
             obs_array_radar[i,3] = obs_sigma
             obs_array_radar[i,4] = np.nan
-            observer_codes_radar.append((radar_observer_map[tx], radar_observer_map[rx]))
+            observer_codes_radar.append(((radar_observer_map[tx], radar_observer_map[rx]), bp))
         elif doppler:
             # skip doppler observations for now
             rows_to_delete.append(i)
@@ -80,7 +82,7 @@ def get_radar_obs_array(tdes):
             obs_array_radar[i,2] = obs_val
             obs_array_radar[i,3] = np.nan
             obs_array_radar[i,4] = obs_sigma
-            observer_codes_radar.append(((radar_observer_map[rx], radar_observer_map[tx]), freq))
+            observer_codes_radar.append(((radar_observer_map[rx], radar_observer_map[tx]), bp, freq))
         else:
             raise ValueError("Observation type not recognized")
     obs_array_radar = np.delete(obs_array_radar, rows_to_delete, axis=0)
