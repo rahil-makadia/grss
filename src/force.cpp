@@ -24,13 +24,15 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
         velAll[3*i+2] = xSpice_i[5];
     }
 
+    // std::cout << "t: " << t << std::endl;
+    // std::cout << xInteg[0] << " " << xInteg[1] << " " << xInteg[2] << " " << xInteg[3] << " " << xInteg[4] << " " << xInteg[5] << std::endl;
     force_newton(posAll, accInteg, forceParams, integParams, consts);
     // force_ppn_simple(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_ppn_eih(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_J2(posAll, accInteg, forceParams, integParams, consts);
     force_nongrav(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_thruster(velAll, accInteg, forceParams, integParams, consts);
-
+    // std::cout << "total acc: " << accInteg[0] << " " << accInteg[1] << " " << accInteg[2] << std::endl;
     return accInteg;
 }
 
@@ -59,6 +61,7 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg, 
                 ax -= G*massj*dx/rRel3;
                 ay -= G*massj*dy/rRel3;
                 az -= G*massj*dz/rRel3;
+                // std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << -G*massj*dx/rRel3 << " " << -G*massj*dy/rRel3 << " " << -G*massj*dz/rRel3 << std::endl;
             }
         }
         accInteg[3*i+0] += ax;
@@ -115,6 +118,7 @@ void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &
                 ax += fac1*(fac2*dx + fac3*dvx);
                 ay += fac1*(fac2*dy + fac3*dvy);
                 az += fac1*(fac2*dz + fac3*dvz);
+                // std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << fac1*(fac2*dx + fac3*dvx) << " " << fac1*(fac2*dy + fac3*dvy) << " " << fac1*(fac2*dz + fac3*dvz) << std::endl;
             }
         }
         accInteg[3*i+0] += ax;
@@ -144,7 +148,7 @@ void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &vel
         real axj, ayj, azj;
         for (size_t j=0; j<integParams.nTotal; j++){
             const real massj = forceParams.masses[j];
-            if (i != j && massj != 0.0 && forceParams.isPPNList[j]){ // 
+            if (i != j && massj != 0.0 && forceParams.isPPNList[j]){
                 const real muj = G*massj;
                 const real xj = posAll[3*j];
                 const real yj = posAll[3*j+1];
@@ -175,7 +179,7 @@ void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &vel
                 azj = 0.0;
                 for (size_t k=0; k<integParams.nTotal; k++){
                     const real massk = forceParams.masses[k];
-                    if (massk != 0.0 && forceParams.isMajorList[k]){ // 
+                    if (massk != 0.0 && forceParams.isMajorList[k]){
                         const real muk = G*massk;
                         const real xk = posAll[3*k];
                         const real yk = posAll[3*k+1];
@@ -221,6 +225,7 @@ void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &vel
                 axi += term1X + term2X + term3X;
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
+                // std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dxij << " " << dyij << " " << dzij << " " << term1X + term2X + term3X << " " << term1Y + term2Y + term3Y << " " << term1Z + term2Z + term3Z << std::endl;
             }
         }
         accInteg[3*i+0] += axi;
@@ -275,6 +280,7 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg, cons
                 ax += aEquat[0];
                 ay += aEquat[1];
                 az += aEquat[2];
+                // std::cout << forceParams.spiceIdList[j] << " " << forceParams.J2List[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << aEquat[0] << " " << aEquat[1] << " " << aEquat[2] << std::endl;
             }
         }
         accInteg[3*i+0] += ax;
@@ -308,7 +314,6 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
         az = 0.0;
         for (size_t j=0; j<integParams.nTotal; j++){
             if (forceParams.spiceIdList[j]==10 && forceParams.isNongravList[i]){ // j is Sun index (value 10) in spiceIdList
-                // std::cout<< "Sun found at j = " << j << std::endl;
                 a1 = forceParams.ngParamsList[i].a1;
                 a2 = forceParams.ngParamsList[i].a2;
                 a3 = forceParams.ngParamsList[i].a3;
@@ -332,6 +337,7 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
                 ax += g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]);
                 ay += g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]);
                 az += g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]);
+                // std::cout << forceParams.spiceIdList[j] << " " << g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]) << " " << g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]) << " " << g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]) << std::endl;
             }
         }
         accInteg[3*i+0] += ax;
