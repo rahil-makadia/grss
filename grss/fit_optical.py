@@ -138,7 +138,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
             # if verbose:
             #     print(f"Skipping observation {i} because it is not in a biased MPC catalog (catalog '{star_catalog}') and debiasing is turned on.")
     if verbose:
-        print(f"Skipped {skip_counter} observations because no star catalog information available for catalogs {np.unique(skip_catalogs)}")
+        print(f"Skipped {skip_counter} observations because no star catalog debiasing information available for catalogs {np.unique(skip_catalogs)}")
     star_catalog_codes = tuple(np.array(star_catalog_codes)[~np.isnan(obs_array_optical[:, 0])])
     observer_codes_optical = tuple(np.array(observer_codes_optical)[~np.isnan(obs_array_optical[:, 0])])
     obs_array_optical = obs_array_optical[~np.isnan(obs_array_optical[:, 0])]

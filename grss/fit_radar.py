@@ -23,7 +23,7 @@ def get_radar_raw_data(tdes):
 
     return loads(r.text)
 
-def get_radar_obs_array(tdes):
+def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
     """Get radar observations from JPL small-body radar API entry for desired small body
 
     Args:
@@ -33,6 +33,14 @@ def get_radar_obs_array(tdes):
         obs_array_radar (np.ndarray): Radar observation data for the given body
         observer_codes_radar (tuple): Observer locations for each observation in obs_array_radar
     """
+    if t_min_tdb is None:
+        t_min_utc = -np.inf
+    else:
+        t_min_utc = Time(t_min_tdb, format='mjd', scale='tdb').utc.mjd
+    if t_max_tdb is None:
+        t_max_utc = np.inf
+    else:
+        t_max_utc = Time(t_max_tdb, format='mjd', scale='tdb').utc.mjd
     # map to MPC code for radar observatories if it exists (otherwise use JPL code)
     radar_observer_map = {  '-1': '251', # Arecibo (300-m, 1963 to 2020)
                             '-2': '254', # Haystack (37-m)
@@ -57,23 +65,27 @@ def get_radar_obs_array(tdes):
     for i in range(num_obs):
         obs = data[num_obs-i-1]
         date = Time(obs[1], format='iso', scale='utc')
+        if date.utc.mjd < t_min_utc or date.utc.mjd > t_max_utc:
+            rows_to_delete.append(i)
+            continue
         obs_val = float(obs[2])
         obs_sigma = float(obs[3])
         delay = obs[4] == 'us'
         doppler = obs[4] == 'Hz'
         freq = float(obs[5])*1e6 # MHz -> Hz
+        # transmitter and receiver codes, use radar_observer_map if you want to use MPC station info (less accurate in my experience)
         tx = obs[6]
         rx = obs[7]
         bounce_point = obs[8]
         bp = 0 if bounce_point == 'C' else 1
 
-        obs_array_radar[i,0] = date.mjd
+        obs_array_radar[i,0] = date.utc.mjd
         if delay:
             obs_array_radar[i,1] = obs_val
             obs_array_radar[i,2] = np.nan
             obs_array_radar[i,3] = obs_sigma
             obs_array_radar[i,4] = np.nan
-            observer_codes_radar.append(((radar_observer_map[tx], radar_observer_map[rx]), bp))
+            observer_codes_radar.append(((tx, rx), bp))
         elif doppler:
             # skip doppler observations for now
             rows_to_delete.append(i)
@@ -82,7 +94,7 @@ def get_radar_obs_array(tdes):
             obs_array_radar[i,2] = obs_val
             obs_array_radar[i,3] = np.nan
             obs_array_radar[i,4] = obs_sigma
-            observer_codes_radar.append(((radar_observer_map[rx], radar_observer_map[tx]), bp, freq))
+            observer_codes_radar.append(((tx, rx), bp, freq))
         else:
             raise ValueError("Observation type not recognized")
     obs_array_radar = np.delete(obs_array_radar, rows_to_delete, axis=0)
