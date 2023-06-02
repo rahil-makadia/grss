@@ -25,6 +25,7 @@ class iterationParams:
         self.weight_matrix = np.diag(1/self.flatten_and_clean(self.sigmas)**2)
         self.calculate_rms()
         self.calculate_chis()
+        self.assemble_info()
         return None
 
     def flatten_and_clean(self, arr):
@@ -48,6 +49,61 @@ class iterationParams:
         self.chi = residual_arr/sigmas
         self.chi_squared = np.sum(self.chi**2)
         self.reduced_chi_squared = self.chi_squared/(n_obs-n_fit)
+        return None
+
+    def assemble_info(self):
+        # sourcery skip: extract-duplicate-method
+        # opticalIdx is where neither the ra nor dec residuals are NaN
+        opticalIdx = np.where(~np.isnan(self.residuals[:, 0]) & ~np.isnan(self.residuals[:, 1]))[0]
+        # radarIdx is where either the ra or dec residuals are NaN
+        radarIdx = np.where(np.isnan(self.residuals[:, 0]) | np.isnan(self.residuals[:, 1]))[0]
+
+        optical_info = self.obs_array.copy()
+        optical_info[radarIdx, :] = np.nan
+        ra_obs = optical_info[:, 1]
+        dec_obs = optical_info[:, 2]
+        ra_noise = optical_info[:, 3]
+        dec_noise = optical_info[:, 4]
+        optical_residuals = self.residuals.copy()
+        optical_residuals[radarIdx, :] = np.nan
+
+        radar_info = self.obs_array.copy()
+        radar_info[opticalIdx, :] = np.nan
+        delay_obs = radar_info[:, 1]
+        doppler_obs = radar_info[:, 2]
+        delay_noise = radar_info[:, 3]
+        doppler_noise = radar_info[:, 4]
+        radar_residuals = self.residuals.copy()
+        radar_residuals[opticalIdx, :] = np.nan
+
+        self.all_info = {
+            'ra_res': optical_residuals[:, 0],
+            'dec_res': optical_residuals[:, 1],
+            'ra_obs': ra_obs,
+            'dec_obs': dec_obs,
+            'ra_noise': ra_noise,
+            'dec_noise': dec_noise,
+            'ra_comp': ra_obs - optical_residuals[:, 0],
+            'dec_comp': dec_obs - optical_residuals[:, 1],
+            'delay_res': radar_residuals[:, 0],
+            'doppler_res': radar_residuals[:, 1],
+            'delay_obs': delay_obs,
+            'doppler_obs': doppler_obs,
+            'delay_noise': delay_noise,
+            'doppler_noise': doppler_noise,
+            'delay_comp': delay_obs - radar_residuals[:, 0],
+            'doppler_comp': doppler_obs - radar_residuals[:, 1],
+        }
+        # self.all_info['ra_cosdec_res'] = ( (ra_obs/3600*np.pi/180*np.cos(dec_obs/3600*np.pi/180)) - (self.all_info['ra_comp']/3600*np.pi/180*np.cos(self.all_info['dec_comp']/3600*np.pi/180)) )*180/np.pi*3600
+        self.all_info['ra_cosdec_res'] = self.all_info['ra_res']*np.cos(dec_obs/3600*np.pi/180)
+        self.all_info['ra_chi'] = self.all_info['ra_res']/self.all_info['ra_noise']
+        self.all_info['dec_chi'] = self.all_info['dec_res']/self.all_info['dec_noise']
+        self.all_info['ra_chi_squared'] = self.all_info['ra_chi']**2
+        self.all_info['dec_chi_squared'] = self.all_info['dec_chi']**2
+        self.all_info['delay_chi'] = self.all_info['delay_res']/self.all_info['delay_noise']
+        self.all_info['doppler_chi'] = self.all_info['doppler_res']/self.all_info['doppler_noise']
+        self.all_info['delay_chi_squared'] = self.all_info['delay_chi']**2
+        self.all_info['doppler_chi_squared'] = self.all_info['doppler_chi']**2
         return None
 
     # adapted from https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_hist.html
@@ -122,6 +178,7 @@ class iterationParams:
         ax3.set_ylabel('Residuals, O-C [$\mu$s, Hz]')
         ax3.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic: ax3.set_yscale('log')
+        plt.tight_layout()
         if savefig:
             figname = f'residuals_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_residuals.pdf', bbox_inches='tight')
@@ -167,7 +224,9 @@ class iterationParams:
         plt.xlabel('MJD [UTC]')
         plt.ylabel('$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
-        if show_logarithmic: plt.yscale('log')
+        # if show_logarithmic: plt.yscale('log')
+        plt.yscale('log')
+        plt.tight_layout()
         if savefig:
             figname = f'chi_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_chi.pdf', bbox_inches='tight')
@@ -180,60 +239,21 @@ class iterationParams:
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
         
-        obs_array = self.obs_array
-        residuals = self.residuals
-        # opticalIdx is where neither the ra nor dec residuals are NaN
-        opticalIdx = np.where(~np.isnan(residuals[:, 0]) & ~np.isnan(residuals[:, 1]))[0]
-        # radarIdx is where either the ra or dec residuals are NaN
-        radarIdx = np.where(np.isnan(residuals[:, 0]) | np.isnan(residuals[:, 1]))[0]
+        t_arr = self.obs_array[:, 0]
+        ra_residuals = np.abs(self.all_info['ra_res']) if show_logarithmic else self.all_info['ra_res']
+        dec_residuals = np.abs(self.all_info['dec_res']) if show_logarithmic else self.all_info['dec_res']
+        ra_cosdec_residuals = np.abs(self.all_info['ra_cosdec_res']) if show_logarithmic else self.all_info['ra_cosdec_res']
+        ra_chi = np.abs(self.all_info['ra_chi']) if show_logarithmic else self.all_info['ra_chi']
+        dec_chi = np.abs(self.all_info['dec_chi']) if show_logarithmic else self.all_info['dec_chi']
+        ra_chi_squared = self.all_info['ra_chi_squared']
+        dec_chi_squared = self.all_info['dec_chi_squared']
         
-        t_arr = obs_array[:, 0]
-        optical_info = obs_array.copy()
-        optical_info[radarIdx, :] = np.nan
-        ra_obs = optical_info[:, 1]
-        dec_obs = optical_info[:, 2]
-        ra_noise = optical_info[:, 3]
-        dec_noise = optical_info[:, 4]
-        optical_residuals = residuals.copy()
-        optical_residuals[radarIdx, :] = np.nan
-        ra_residuals = optical_residuals[:, 0]
-        dec_residuals = optical_residuals[:, 1]
-        ra_computed = ra_obs - ra_residuals
-        dec_computed = dec_obs - dec_residuals
-        ra_cosdec_residuals = ( (ra_obs/3600*np.pi/180*np.cos(dec_obs/3600*np.pi/180)) - (ra_computed/3600*np.pi/180*np.cos(dec_computed/3600*np.pi/180)) )*180/np.pi*3600
-        ra_chi = ra_residuals/ra_noise
-        dec_chi = dec_residuals/dec_noise
-        ra_chi_squared = ra_chi**2
-        dec_chi_squared = dec_chi**2
-        ra_residuals = np.abs(ra_residuals) if show_logarithmic else ra_residuals
-        dec_residuals = np.abs(dec_residuals) if show_logarithmic else dec_residuals
-        ra_cosdec_residuals = np.abs(ra_cosdec_residuals) if show_logarithmic else ra_cosdec_residuals
-        ra_chi = np.abs(ra_chi) if show_logarithmic else ra_chi
-        dec_chi = np.abs(dec_chi) if show_logarithmic else dec_chi
-        ra_chi_squared = np.abs(ra_chi_squared) if show_logarithmic else ra_chi_squared
-        dec_chi_squared = np.abs(dec_chi_squared) if show_logarithmic else dec_chi_squared
-        
-        t_arr_radar = obs_array[radarIdx, 0]
-        radar_info = obs_array.copy()
-        radar_info[opticalIdx, :] = np.nan
-        delay_obs = radar_info[:, 1]
-        doppler_obs = radar_info[:, 2]
-        delay_noise = radar_info[:, 3]
-        doppler_noise = radar_info[:, 4]
-        radar_residuals = residuals.copy()
-        radar_residuals[opticalIdx, :] = np.nan
-        delay_residuals = radar_residuals[:, 0]
-        doppler_residuals = radar_residuals[:, 1]
-        delay_computed = delay_obs - delay_residuals
-        doppler_computed = doppler_obs - doppler_residuals
-        delay_chi = delay_residuals/delay_noise
-        doppler_chi = doppler_residuals/doppler_noise
-        delay_chi_squared = delay_chi**2
-        doppler_chi_squared = doppler_chi**2
-        delay_residuals = np.abs(delay_residuals) if show_logarithmic else delay_residuals
-        doppler_residuals = np.abs(doppler_residuals) if show_logarithmic else doppler_residuals
-        delay_chi = np.abs(delay_chi) if show_logarithmic else delay_chi
-        doppler_chi = np.abs(doppler_chi) if show_logarithmic else doppler_chi
+        delay_residuals = np.abs(self.all_info['delay_res']) if show_logarithmic else self.all_info['delay_res']
+        doppler_residuals = np.abs(self.all_info['doppler_res']) if show_logarithmic else self.all_info['doppler_res']
+        delay_chi = np.abs(self.all_info['delay_chi']) if show_logarithmic else self.all_info['delay_chi']
+        doppler_chi = np.abs(self.all_info['doppler_chi']) if show_logarithmic else self.all_info['doppler_chi']
+        delay_chi_squared = self.all_info['delay_chi_squared']
+        doppler_chi_squared = self.all_info['doppler_chi_squared']
         
         self.plot_residuals(t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals, delay_residuals, doppler_residuals, radar_scale, markersize, show_logarithmic, title, savefig, figname)
         self.plot_chi(t_arr, ra_chi, dec_chi, delay_chi, doppler_chi, ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared, sigma_limit, radar_scale, markersize, show_logarithmic, title, savefig, figname)
@@ -447,18 +467,19 @@ class fitSimulation:
             elif key in ['vx', 'vy', 'vz']:
                 fd_pert = 1e-10
         elif self.fit_cometary:
-            if key in ['q']:
-                fd_pert = 5e-5
-            elif key in ['e']:
-                fd_pert = 5e-4
-            elif key in ['tp']:
-                fd_pert = 1e-5
-            elif key in ['om']:
-                fd_pert = 1e-6
-            elif key in ['w']:
-                fd_pert = 1e-6
-            elif key in ['i']:
-                fd_pert = 1e-6
+            fd_pert = 1e-8
+            # if key in ['q']:
+            #     fd_pert = 5e-5
+            # elif key in ['e']:
+            #     fd_pert = 5e-4
+            # elif key in ['tp']:
+            #     fd_pert = 1e-5
+            # elif key in ['om']:
+            #     fd_pert = 1e-6
+            # elif key in ['w']:
+            #     fd_pert = 1e-6
+            # elif key in ['i']:
+            #     fd_pert = 1e-6
         if key in ['a1', 'a2', 'a3']:
             fd_pert = 1e-3
         if key[:10] == 'multiplier':
@@ -647,7 +668,11 @@ class fitSimulation:
         w = np.delete(w, rejected_indices, axis=1)
         b = np.delete(b, rejected_indices, axis=0)
         # print(rejected_indices)
-        print(f'Rejected {len(rejected_indices)//2} observations.')
+        num_rejected = len(rejected_indices)//2
+        num_total = len(self.obs_array)
+        print(f'Rejected {num_rejected} observations out of {num_total} total.')
+        if num_rejected/num_total > 0.25:
+            print("WARNING: More than 25% of observations rejected. Consider changing chi_reject and chi_recover values, or turning off outlier rejection altogether.")
         self.residual_chi_squared = residual_chi_squared
         return a, w, b, residual_chi_squared
 
@@ -806,7 +831,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times,
     optical_observer_codes = tuple([observatory_code]*len(optical_times))
     radar_observer_codes = []
     for i in range(len(radar_times)):
-        codes = [observatory_code, observatory_code]
+        codes = [(observatory_code, observatory_code), 0]
         if radar_obs_types[i].lower() == 'doppler':
             codes.append(doppler_freq)
         radar_observer_codes.append(tuple(codes))
