@@ -286,6 +286,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
             else:
                 obs_array_optical[i, 3:5] = 1.5
         elif obs_type in ['c', 'C', 'V', 'n', 'B']:
+            obs_array_optical[i, 3:5] = 1.0
             if obs_type in ['c', 'C']:
                 if obs_code in ['F51', 'F52']:
                     obs_array_optical[i, 3:5] = 0.2
@@ -513,7 +514,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
         else:
             raise ValueError(f"apply_weights: Observation type {obs_type} not recognized.")
     if verbose:
-        print(f"Applied default weight of 1 arcsec to {default_weight_counter} observations")
+        print(f"Applied default weight of 1 arcsec to {default_weight_counter} CCD observations")
         # find where the weights are 0
         zero_weight_indices = np.where(obs_array_optical[:, 3] == 0)[0]
         if len(zero_weight_indices) > 0:
