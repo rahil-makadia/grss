@@ -1,4 +1,5 @@
 #include "force.h"
+// #define PRINT_FORCES 1
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, const ForceParameters &forceParams, const IntegrationParameters &integParams, const Constants &consts){
     std::vector<real> posAll(3*integParams.nTotal, 0.0);
@@ -24,15 +25,19 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg, 
         velAll[3*i+2] = xSpice_i[5];
     }
 
-    // std::cout << "t: " << t << std::endl;
-    // std::cout << xInteg[0] << " " << xInteg[1] << " " << xInteg[2] << " " << xInteg[3] << " " << xInteg[4] << " " << xInteg[5] << std::endl;
+    #ifdef PRINT_FORCES
+    std::cout << "t: " << t << std::endl;
+    std::cout << xInteg[0] << " " << xInteg[1] << " " << xInteg[2] << " " << xInteg[3] << " " << xInteg[4] << " " << xInteg[5] << std::endl;
+    #endif
     force_newton(posAll, accInteg, forceParams, integParams, consts);
     // force_ppn_simple(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_ppn_eih(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_J2(posAll, accInteg, forceParams, integParams, consts);
     force_nongrav(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_thruster(velAll, accInteg, forceParams, integParams, consts);
-    // std::cout << "total acc: " << accInteg[0] << " " << accInteg[1] << " " << accInteg[2] << std::endl;
+    #ifdef PRINT_FORCES
+    std::cout << "total acc: " << accInteg[0] << " " << accInteg[1] << " " << accInteg[2] << std::endl;
+    #endif
     return accInteg;
 }
 
@@ -61,7 +66,9 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg, 
                 ax -= G*massj*dx/rRel3;
                 ay -= G*massj*dy/rRel3;
                 az -= G*massj*dz/rRel3;
-                // std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << -G*massj*dx/rRel3 << " " << -G*massj*dy/rRel3 << " " << -G*massj*dz/rRel3 << std::endl;
+                #ifdef PRINT_FORCES
+                std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << -G*massj*dx/rRel3 << " " << -G*massj*dy/rRel3 << " " << -G*massj*dz/rRel3 << std::endl;
+                #endif
             }
         }
         accInteg[3*i+0] += ax;
@@ -118,7 +125,9 @@ void force_ppn_simple(const std::vector<real> &posAll, const std::vector<real> &
                 ax += fac1*(fac2*dx + fac3*dvx);
                 ay += fac1*(fac2*dy + fac3*dvy);
                 az += fac1*(fac2*dz + fac3*dvz);
-                // std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << fac1*(fac2*dx + fac3*dvx) << " " << fac1*(fac2*dy + fac3*dvy) << " " << fac1*(fac2*dz + fac3*dvz) << std::endl;
+                #ifdef PRINT_FORCES
+                std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << fac1*(fac2*dx + fac3*dvx) << " " << fac1*(fac2*dy + fac3*dvy) << " " << fac1*(fac2*dz + fac3*dvz) << std::endl;
+                #endif
             }
         }
         accInteg[3*i+0] += ax;
@@ -225,9 +234,14 @@ void force_ppn_eih(const std::vector<real> &posAll, const std::vector<real> &vel
                 axi += term1X + term2X + term3X;
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
-                // std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dxij << " " << dyij << " " << dzij << " " << term1X + term2X + term3X << " " << term1Y + term2Y + term3Y << " " << term1Z + term2Z + term3Z << std::endl;
+                #ifdef PRINT_FORCES
+                std::cout << forceParams.spiceIdList[j] << " " << G*massj << " " << dxij << " " << dyij << " " << dzij << " " << term1X + term2X + term3X << " " << term1Y + term2Y + term3Y << " " << term1Z + term2Z + term3Z << std::endl;
+                #endif
             }
         }
+        #ifdef PRINT_FORCES
+        std::cout << "EIH" << " integ" << i << " " << axi << " " << ayi << " " << azi << std::endl;
+        #endif
         accInteg[3*i+0] += axi;
         accInteg[3*i+1] += ayi;
         accInteg[3*i+2] += azi;
@@ -280,7 +294,9 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg, cons
                 ax += aEquat[0];
                 ay += aEquat[1];
                 az += aEquat[2];
-                // std::cout << forceParams.spiceIdList[j] << " " << forceParams.J2List[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << aEquat[0] << " " << aEquat[1] << " " << aEquat[2] << std::endl;
+                #ifdef PRINT_FORCES
+                std::cout << forceParams.spiceIdList[j] << " " << forceParams.J2List[j] << " " << G*massj << " " << dx << " " << dy << " " << dz << " " << aEquat[0] << " " << aEquat[1] << " " << aEquat[2] << std::endl;
+                #endif
             }
         }
         accInteg[3*i+0] += ax;
@@ -337,7 +353,9 @@ void force_nongrav(const std::vector<real> &posAll, const std::vector<real> &vel
                 ax += g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]);
                 ay += g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]);
                 az += g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]);
-                // std::cout << forceParams.spiceIdList[j] << " " << g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]) << " " << g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]) << " " << g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]) << std::endl;
+                #ifdef PRINT_FORCES
+                std::cout << forceParams.spiceIdList[j] << " " << g*(a1*eRHat[0] + a2*eTHat[0] + a3*eNHat[0]) << " " << g*(a1*eRHat[1] + a2*eTHat[1] + a3*eNHat[1]) << " " << g*(a1*eRHat[2] + a2*eTHat[2] + a3*eNHat[2]) << std::endl;
+                #endif
             }
         }
         accInteg[3*i+0] += ax;
@@ -363,6 +381,9 @@ void force_thruster(const std::vector<real> &velAll, std::vector<real> &accInteg
             ax += acc_thruster*vHat[0];
             ay += acc_thruster*vHat[1];
             az += acc_thruster*vHat[2];
+            #ifdef PRINT_FORCES
+            std::cout << "THRUSTER " << acc_thruster*vHat[0] << " " << acc_thruster*vHat[1] << " " << acc_thruster*vHat[2] << std::endl;
+            #endif
         }
         accInteg[3*i+0] += ax;
         accInteg[3*i+1] += ay;
