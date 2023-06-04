@@ -463,7 +463,7 @@ class fitSimulation:
     def get_perturbed_state(self, key):
         if self.fit_cartesian:
             if key in ['x', 'y', 'z']:
-                fd_pert = 1e-7
+                fd_pert = 1e-8
             elif key in ['vx', 'vy', 'vz']:
                 fd_pert = 1e-10
         elif self.fit_cometary:

@@ -285,7 +285,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                 obs_array_optical[i, 3:5] = 0.2
             else:
                 obs_array_optical[i, 3:5] = 1.5
-        elif obs_type in ['c', 'C', 'V', 'n', 'B']:
+        elif obs_type in ['c', 'C', 'V', 'n', 'B', 'X', 'x']:
             obs_array_optical[i, 3:5] = 1.0
             if obs_type in ['c', 'C']:
                 if obs_code in ['F51', 'F52']:

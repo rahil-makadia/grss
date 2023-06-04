@@ -294,7 +294,10 @@ def get_sbdb_elems(tdes, cov_elems=True):
         # epoch of orbital elements at reference time [JD -> MJD]
         epoch_mjd = float(raw_data['orbit']['covariance']['epoch']) - 2400000.5
         # cometary elements at epoch_mjd
-        elem = raw_data['orbit']['covariance']['elements']
+        if epoch_mjd == float(raw_data['orbit']['epoch']) - 2400000.5:
+            elem = raw_data['orbit']['elements']
+        else:
+            elem = raw_data['orbit']['covariance']['elements']
     else:
         # epoch of orbital elements at reference time [JD -> MJD]
         epoch_mjd = float(raw_data['orbit']['epoch']) - 2400000.5
