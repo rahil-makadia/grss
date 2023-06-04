@@ -229,7 +229,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
             xTargetBarycentricBounceTime[j] = xTargetBarycentricBounceTimeAllBody[6*i+j];
         }
         real downlegDeltaDelayRelativistic;
-        get_delta_delay_relativistic(receiveTimeTDB, xTargetBarycentricBounceTime, propSim->consts, downlegDeltaDelayRelativistic);
+        get_delta_delay_relativistic(propSim, receiveTimeTDB, xTargetBarycentricBounceTime, propSim->consts, downlegDeltaDelayRelativistic);
         // std::cout<< "downlegDeltaDelayRelativistic (receiveTime)= " << downlegDeltaDelayRelativistic*86400.0L*1e6 << " microseconds" << std::endl;
         delayDownleg += downlegDeltaDelayRelativistic;
         // iterate to get upleg delay
@@ -255,7 +255,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
         transmitTimeTDB = bounceTimeTDB-delayUpleg;
         get_observer_state(transmitTimeTDB, transmitterInfo, propSim->consts, false, xObserverBarycentricTransmitTime);
         real uplegDeltaDelayRelativistic;
-        get_delta_delay_relativistic(transmitTimeTDB, xTargetBarycentricBounceTime, propSim->consts, uplegDeltaDelayRelativistic);
+        get_delta_delay_relativistic(propSim, transmitTimeTDB, xTargetBarycentricBounceTime, propSim->consts, uplegDeltaDelayRelativistic);
         // std::cout<< "uplegDeltaDelayRelativistic (transmitTime)= " << uplegDeltaDelayRelativistic*86400.0L*1e6 << " microseconds" << std::endl;
         delayUpleg += uplegDeltaDelayRelativistic;
         // get delay measurement
@@ -274,7 +274,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
     }
 }
 
-void get_delta_delay_relativistic(const real &tForSpice, const std::vector<real> &targetState, const Constants &consts, real &deltaDelayRelativistic){
+void get_delta_delay_relativistic(const propSimulation *propSim, const real &tForSpice, const std::vector<real> &targetState, const Constants &consts, real &deltaDelayRelativistic){
     // from Standish (1990), https://ui.adsabs.harvard.edu/abs/1990A&A...233..252S
     SpiceDouble sunState[6];
     SpiceDouble sunLightTime;
@@ -294,7 +294,15 @@ void get_delta_delay_relativistic(const real &tForSpice, const std::vector<real>
     vnorm(earthTargetPos, earthTargetDist);
 
     real G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
-    real sunGM = consts.G*(2.9591220828411956e-04L/G);
+    real sunGM = 0;
+    for (size_t i=propSim->integParams.nInteg; i<propSim->integParams.nTotal; i++){
+        if (propSim->forceParams.spiceIdList[i]==10){
+            sunGM = G*propSim->forceParams.masses[i];
+        }
+    }
+    if (sunGM==0){
+        throw std::runtime_error("Sun GM not found in get_delta_delay_relativistic");
+    }
     real c = consts.clight;
     real gamma = 1.0L; // PPN parameter
 
