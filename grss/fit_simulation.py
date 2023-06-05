@@ -260,11 +260,12 @@ class iterationParams:
         return None
 
 class fitSimulation:
-    def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None, obs_array_radar=None, observer_codes_radar=None, n_iter=5, DEkernel=441, DEkernelPath='', radius=0.0, nongravInfo=None, events=None):
+    def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None, obs_array_radar=None, observer_codes_radar=None, n_iter_max=10, DEkernel=441, DEkernelPath='', radius=0.0, nongravInfo=None, events=None):
         self.check_initial_solution(x_init, cov_init)
         self.check_input_observation_arrays(obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar)
         self.assemble_observation_arrays()
-        self.n_iter = n_iter
+        self.n_iter = 0
+        self.n_iter_max = n_iter_max
         self.iters = []
         self.DEkernel = DEkernel
         self.DEkernelPath = DEkernelPath
@@ -670,7 +671,6 @@ class fitSimulation:
         # print(rejected_indices)
         num_rejected = len(rejected_indices)//2
         num_total = len(self.obs_array)
-        print(f'Rejected {num_rejected} observations out of {num_total} total.')
         if num_rejected/num_total > 0.25:
             print("WARNING: More than 25% of observations rejected. Consider changing chi_reject and chi_recover values, or turning off outlier rejection altogether.")
         self.residual_chi_squared = residual_chi_squared
@@ -680,12 +680,24 @@ class fitSimulation:
         self.iters.append(iterationParams(iter_number, self.x_nom, self.covariance, residuals, self.obs_array, self.observer_codes, self.rejection_flag))
         return None
 
+    def check_convergence(self):
+        if self.n_iter > 1:
+            del_rms_convergence = 1e-3
+            curr_rms = self.iters[-1].unweighted_rms
+            prev_rms = self.iters[-2].unweighted_rms
+            del_rms = abs(prev_rms - curr_rms)/prev_rms
+            if del_rms < del_rms_convergence:
+                self.converged = True
+        return None
+
     def filter_lsq(self, verbose=True):
-        rejection_start_iter = 5
+        self.converged = False
+        start_rejecting = False
         spice.furnsh(self.DEkernelPath)
         if verbose:
             print("Iteration\t\tUnweighted RMS\t\tWeighted RMS\t\tChi-squared\t\tReduced Chi-squared")
-        for i in range(self.n_iter):
+        for i in range(self.n_iter_max):
+            self.n_iter = i+1
             # get residuals and partials
             residuals, a = self.get_residuals_and_partials()
             w = self.weight_matrix
@@ -695,7 +707,7 @@ class fitSimulation:
                 self.add_iteration(0, prefit_residuals)
             b = self.flatten_and_clean(residuals)
             # reject outliers here
-            if i >= rejection_start_iter:
+            if start_rejecting:
                 a_rej, w_rej, b_rej, residual_chi_squared = self.reject_outliers(a, w, b)
             else:
                 a_rej, w_rej, b_rej = a, w, b
@@ -719,6 +731,15 @@ class fitSimulation:
             self.add_iteration(i+1, residuals)
             if verbose:
                 print("%d%s\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f\t\t\t%.3f" % (self.iters[-1].iter_number, "", self.iters[-1].unweighted_rms, self.iters[-1].weighted_rms, self.iters[-1].chi_squared, self.iters[-1].reduced_chi_squared))
+            self.check_convergence()
+            if self.converged:
+                if start_rejecting:
+                    print("Converged after rejecting outliers.")
+                    break
+                else:
+                    print("Converged without rejecting outliers. Starting outlier rejection now...")
+                    start_rejecting = True
+                    self.converged = False
         spice.unload(self.DEkernelPath)
         return None
 
