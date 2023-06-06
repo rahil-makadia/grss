@@ -1,4 +1,5 @@
 #include "interpolate.h"
+// #include <fstream>
 
 void interpolate(const real &t, const real &dt, const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, const std::vector< std::vector<real> > &b, propSimulation *propSim){
     size_t nh = 8;
@@ -147,6 +148,27 @@ void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom,
             xInterpApparent[6*i+j] = xInterpApparentTemp[6*i+j] - xObserver[j];
         }
     }
+    // generate an outfile with tInterpGeom, xInterpGeom, xObserver, lightTime, xInterpApparent+xObserver
+    // std::ofstream outfile;
+    // outfile.open("lightTimeAndxRelative.txt", std::ios_base::app);
+    // outfile << std::setprecision(17) << tInterpGeom+2400000.5 << " ";
+    // for (size_t i = 0; i < propSim->integParams.nInteg; i++){
+    //     if (propSim->integBodies[i].name == "integBody_nom"){
+    //     for (size_t j = 0; j < 3; j++){
+    //         outfile << std::setprecision(16) << xInterpApparent[6*i+j] + xObserver[j] << " ";
+    //     }
+    //     }
+    // }
+    // for (size_t i = 0; i < 3; i++){
+    //     outfile << std::setprecision(16) << xObserver[i] << " ";
+    // }
+    // for (size_t i = 0; i < propSim->integParams.nInteg; i++){
+    //     if (propSim->integBodies[i].name == "integBody_nom"){
+    //     outfile << std::setprecision(16) << lightTime[i] << " ";
+    //     }
+    // }
+    // outfile << std::endl;
+    // outfile.close();
 }
 
 void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<real> xInterpGeom, std::vector<real> xObserver, const bool bouncePointAtLeadingEdge, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, real &lightTimeOneBody){

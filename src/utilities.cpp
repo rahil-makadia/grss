@@ -77,7 +77,7 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
     ConstSpiceChar *outFrame = "J2000";
 
     SpiceDouble rotMat[3][3];
-    pxform_c(baseBodyFrame, outFrame, t_obs_et, rotMat);
+    pxform_c(baseBodyFrame, outFrame, t_obs_et, rotMat); // look into using sxform_c instead
     SpiceDouble observerPos[3];
     mxv_c(rotMat, bodyFixedPos, observerPos);
     observerState[0] = baseBodyState[0] + (real) observerPos[0];

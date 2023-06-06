@@ -151,9 +151,9 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
             ra_new, dec_new = ad.debiasRADec(ra, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
             obs_array_optical[i, 1] = ra_new*180/np.pi*3600
             obs_array_optical[i, 2] = dec_new*180/np.pi*3600
-            margin = 1
-            if (verbose and (np.rad2deg(ra_new - ra) > margin or np.rad2deg(dec_new - dec) > margin)):
-                print(f"Debiased observation {i} from observatory {observer_codes_optical[i]} using star_catalog_codes {star_catalog}. RA bias = {np.rad2deg(ra_new-ra)*3600:0.4f} arcsec, DEC bias = {np.rad2deg(dec_new-dec)*3600:0.4f} arcsec")
+            margin = 1.5
+            if (verbose and (np.rad2deg(abs(ra - ra_new))*3600 >= margin or np.rad2deg(abs(dec - dec_new))*3600 >= margin)):
+                print(f"Debiased observation {i+1} at JD {obs_time_jd} from observatory {observer_codes_optical[i]} using catalog {star_catalog}. RA bias = {np.rad2deg(ra-ra_new)*3600:0.4f} arcsec, DEC bias = {np.rad2deg(dec-dec_new)*3600:0.4f} arcsec")
         # else:
             # skip_counter += 1
             # skip_catalogs.append(star_catalog)
@@ -637,7 +637,7 @@ def get_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_max_
         raise ValueError('Must debias or debias_lowres.')
     
     obs_array_optical, star_catalog_codes, observer_codes_optical, observation_type_codes, observer_program_codes = get_optical_data(body_id, optical_obs_file, t_min_tdb, t_max_tdb, verbose)
-    if debias:
+    if debias or debias_lowres:
         obs_array_optical, star_catalog_codes, observer_codes_optical = apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes_optical, debias_lowres, verbose)
     if old_weights:
         print('WARNING: Using old weighting scheme.')
