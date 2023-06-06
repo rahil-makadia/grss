@@ -190,6 +190,7 @@ cython_debug/
 
 # data file for astrometric catalog debiasing
 bias*.dat
+tiles*.dat
 
 # VS code setup directory
 .vscode/

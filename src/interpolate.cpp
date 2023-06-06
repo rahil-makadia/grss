@@ -150,7 +150,7 @@ void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom,
     }
     // generate an outfile with tInterpGeom, xInterpGeom, xObserver, lightTime, xInterpApparent+xObserver
     // std::ofstream outfile;
-    // outfile.open("lightTimeAndxRelative.txt", std::ios_base::app);
+    // outfile.open("/Users/rahil/Downloads/lightTimeAndxRelative.txt", std::ios_base::app);
     // outfile << std::setprecision(17) << tInterpGeom+2400000.5 << " ";
     // for (size_t i = 0; i < propSim->integParams.nInteg; i++){
     //     if (propSim->integBodies[i].name == "integBody_nom"){

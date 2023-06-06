@@ -130,11 +130,14 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
         columns.extend([f"{cat}_ra", f"{cat}_dec", f"{cat}_pm_ra", f'{cat}_pm_dec'])
     if lowres:
         biasfile = 'bias_lowres.dat'
+        tilefile = 'tiles_lowres.dat'
         nside = 64
     else:
         biasfile = 'bias.dat'
+        tilefile = 'tiles.dat'
         nside = 256
     biasdf = pd.read_csv(biasfile,sep='\s+',skiprows=23,names=columns)
+    tiledf = pd.read_csv(tilefile,sep='\s+',skiprows=2,names=['tileID', 'ra', 'dec'])
     unbias_counter = 0
     debias_counter = 0
     for i, row in enumerate(obs_array_optical):
@@ -148,7 +151,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
         elif star_catalog in biased_catalogs:
             debias_counter += 1
             # apply debiasing from Eggl et al. 2020, https://doi.org/10.1016/j.icarus.2019.113596
-            ra_new, dec_new = ad.debiasRADec(ra, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
+            ra_new, dec_new = ad.debiasRADec(ra, dec, obs_time_jd, star_catalog, biasdf, tiledf, nside=nside)
             obs_array_optical[i, 1] = ra_new*180/np.pi*3600
             obs_array_optical[i, 2] = dec_new*180/np.pi*3600
             margin = 1.5
