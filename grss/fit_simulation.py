@@ -806,7 +806,7 @@ class fitSimulation:
 
 def _generate_simulated_obs(ref_sol, ref_cov, ref_ngInfo, events, optical_times, optical_obs_types, radar_times, radar_obs_types, DEkernel, DEkernelPath, noise, bias, doppler_freq=8560e6, observatory_code='500'):
     obs_sigma_dict = {  'astrometry': 1, # arcsec
-                        'occultation': 5e-3, # arcsec
+                        'occultation': 2.5e-3, # arcsec
                         'delay': 2, # microseconds
                         'delay_hera': 15 /299792458*1e6, # 15 meter (conservative since it is 1m random + 10m systematic) to light microseconds
                         'doppler': 0.5, # Hz
@@ -1030,7 +1030,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     simulated_obs_ref_sol['radius'] = target_radius
     simulated_obs_ref_cov = covariance.copy()
     simulated_obs_event = events if events is not None else None
-    simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongravInfo, events, simulated_optical_obs_times, simulated_optical_obs_types, simulated_radar_obs_times, simulated_radar_obs_types, DEkernel, DEkernelPath, noise, bias)
+    simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongravInfo, simulated_obs_event, simulated_optical_obs_times, simulated_optical_obs_types, simulated_radar_obs_times, simulated_radar_obs_types, DEkernel, DEkernelPath, noise, bias)
     simulated_obs_array_optical, simulated_observer_codes_optical, simulated_obs_array_radar, simulated_observer_codes_radar = simulated_obs_info
     if simulated_obs_array_optical is not None:
         obs_array_optical[simulated_optical_obs_idx,:] = simulated_obs_array_optical
