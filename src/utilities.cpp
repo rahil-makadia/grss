@@ -54,9 +54,6 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
     switch (baseBody)
     {
     case 399:
-        // earth WGS84 ellipsoid
-        // a = 6378137.0L;
-        // f = 1.0L/298.257223563L;
         baseBodyFrame = "ITRF93";
         break;
     default:
@@ -64,38 +61,26 @@ void get_observer_state(const real &tObsMjd, const std::vector<real> &observerIn
         throw std::invalid_argument("Given base body not supported");
         break;
     }
-    // real b = a*(1.0L-f);
-    // real eSquared = 1.0L-(b*b)/(a*a);
-    // real N = a/sqrt(1.0L-eSquared*sin(geodetLat)*sin(geodetLat));
-    // ConstSpiceDouble bodyFixedX = (N+alt)*cos(geodetLat)*cos(lon)/consts.du2m;
-    // ConstSpiceDouble bodyFixedY = (N+alt)*cos(geodetLat)*sin(lon)/consts.du2m;
-    // ConstSpiceDouble bodyFixedZ = (N*(1.0L-eSquared)+alt)*sin(geodetLat)/consts.du2m;
-    ConstSpiceDouble bodyFixedX = rho*cos(lat)*cos(lon)/consts.du2m;
-    ConstSpiceDouble bodyFixedY = rho*cos(lat)*sin(lon)/consts.du2m;
-    ConstSpiceDouble bodyFixedZ = rho*sin(lat)/consts.du2m;
-    ConstSpiceDouble bodyFixedPos[3] = {bodyFixedX, bodyFixedY, bodyFixedZ};
-    ConstSpiceChar *outFrame = "J2000";
-
-    SpiceDouble rotMat[3][3];
-    pxform_c(baseBodyFrame, outFrame, t_obs_et, rotMat); // look into using sxform_c instead
-    SpiceDouble observerPos[3];
-    mxv_c(rotMat, bodyFixedPos, observerPos);
-    observerState[0] = baseBodyState[0] + (real) observerPos[0];
-    observerState[1] = baseBodyState[1] + (real) observerPos[1];
-    observerState[2] = baseBodyState[2] + (real) observerPos[2];
-
-    SpiceDouble rotMatOffset[3][3];
-    real offset = 1e-3L/consts.tu2sec; // 1 millisecond offset to calculate derivative of observer position
-    pxform_c(baseBodyFrame, outFrame, t_obs_et+offset, rotMatOffset);
-    SpiceDouble observerPosOffset[3];
-    SpiceDouble observerVel[3];
-    mxv_c(rotMatOffset, bodyFixedPos, observerPosOffset);
-    observerVel[0] = (observerPosOffset[0]-observerPos[0])/offset;
-    observerVel[1] = (observerPosOffset[1]-observerPos[1])/offset;
-    observerVel[2] = (observerPosOffset[2]-observerPos[2])/offset;
-    observerState[3] = baseBodyState[3] + (real) observerVel[0];
-    observerState[4] = baseBodyState[4] + (real) observerVel[1];
-    observerState[5] = baseBodyState[5] + (real) observerVel[2];
+    ConstSpiceDouble bodyFixedX = rho*cos(lat)*cos(lon)/1.0e3L;
+    ConstSpiceDouble bodyFixedY = rho*cos(lat)*sin(lon)/1.0e3L;
+    ConstSpiceDouble bodyFixedZ = rho*sin(lat)/1.0e3L;
+    ConstSpiceDouble bodyFixedState[6] = {bodyFixedX, bodyFixedY, bodyFixedZ, 0.0, 0.0, 0.0};
+    SpiceDouble observerStateInertial[6];
+    SpiceDouble rotMat[6][6];
+    sxform_c(baseBodyFrame, "J2000", t_obs_et, rotMat);
+    mxvg_c(rotMat, bodyFixedState, 6, 6, observerStateInertial);
+    observerStateInertial[0] *= (real) 1.0e3L/consts.du2m;
+    observerStateInertial[1] *= (real) 1.0e3L/consts.du2m;
+    observerStateInertial[2] *= (real) 1.0e3L/consts.du2m;
+    observerStateInertial[3] *= (real) 1.0e3L/consts.du2m*consts.tu2sec;
+    observerStateInertial[4] *= (real) 1.0e3L/consts.du2m*consts.tu2sec;
+    observerStateInertial[5] *= (real) 1.0e3L/consts.du2m*consts.tu2sec;
+    observerState[0] = baseBodyState[0] + observerStateInertial[0];
+    observerState[1] = baseBodyState[1] + observerStateInertial[1];
+    observerState[2] = baseBodyState[2] + observerStateInertial[2];
+    observerState[3] = baseBodyState[3] + observerStateInertial[3];
+    observerState[4] = baseBodyState[4] + observerStateInertial[4];
+    observerState[5] = baseBodyState[5] + observerStateInertial[5];
 }
 
 void jd_to_et(const real jd, real &et){
