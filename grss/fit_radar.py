@@ -1,9 +1,7 @@
-import numpy as np
-from astropy.time import Time
 from json import loads
 from requests import request
-
-from .fit_utilities import *
+from astropy.time import Time
+import numpy as np
 
 __all__ = [ 'get_radar_obs_array',
 ]
@@ -18,12 +16,11 @@ def get_radar_raw_data(tdes):
         raw_data: JSON output of small body information query from JPL small-body radar API
     """
     url = f"https://ssd-api.jpl.nasa.gov/sb_radar.api?des={tdes}"
-    
-    r = request("GET",url)
-
-    return loads(r.text)
+    req = request("GET", url, timeout=30)
+    return loads(req.text)
 
 def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
+    # sourcery skip: low-code-quality
     """Get radar observations from JPL small-body radar API entry for desired small body
 
     Args:
@@ -42,6 +39,7 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
     else:
         t_max_utc = Time(t_max_tdb, format='mjd', scale='tdb').utc.mjd
     # map to MPC code for radar observatories if it exists (otherwise use JPL code)
+    use_mpc_mapping = False
     radar_observer_map = {  '-1': '251', # Arecibo (300-m, 1963 to 2020)
                             '-2': '254', # Haystack (37-m)
                             '-9': '256', # Green Bank Telescope (100-m, GBT)
@@ -73,11 +71,12 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
         delay = obs[4] == 'us'
         doppler = obs[4] == 'Hz'
         freq = float(obs[5])*1e6 # MHz -> Hz
-        # transmitter and receiver codes, use radar_observer_map if you want to use MPC station info (less accurate in my experience)
-        tx = obs[6]
-        rx = obs[7]
+        # transmitter and receiver codes, use radar_observer_map if you
+        # want to use MPC station info (less accurate in my experience)
+        tx_code = radar_observer_map[obs[6]] if use_mpc_mapping else obs[6]
+        rx_code = radar_observer_map[obs[7]] if use_mpc_mapping else obs[7]
         bounce_point = obs[8]
-        bp = 0 if bounce_point == 'C' else 1
+        bounce_point_int = 0 if bounce_point == 'C' else 1
 
         obs_array_radar[i,0] = date.utc.mjd
         if delay:
@@ -85,17 +84,16 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
             obs_array_radar[i,2] = np.nan
             obs_array_radar[i,3] = obs_sigma
             obs_array_radar[i,4] = np.nan
-            observer_codes_radar.append(((tx, rx), bp))
+            observer_codes_radar.append(((tx_code, rx_code), bounce_point_int))
         elif doppler:
-            # skip doppler observations for now
-            rows_to_delete.append(i)
-            continue
             obs_array_radar[i,1] = np.nan
             obs_array_radar[i,2] = obs_val
             obs_array_radar[i,3] = np.nan
             obs_array_radar[i,4] = obs_sigma
-            observer_codes_radar.append(((tx, rx), bp, freq))
+            observer_codes_radar.append(((tx_code, rx_code), bounce_point_int, freq))
         else:
             raise ValueError("Observation type not recognized")
+    if verbose:
+        print(f"Deleted {len(rows_to_delete)} radar observations outside of time range")
     obs_array_radar = np.delete(obs_array_radar, rows_to_delete, axis=0)
     return obs_array_radar, tuple(observer_codes_radar)

@@ -1,5 +1,5 @@
 #include "interpolate.h"
-// #include <fstream>
+#include <fstream>
 
 void interpolate(const real &t, const real &dt, const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, const std::vector< std::vector<real> > &b, propSimulation *propSim){
     size_t nh = 8;
@@ -44,16 +44,31 @@ void get_coeffs(const std::vector<real> &tVecForInterp, const std::vector< std::
     }
 }
 
-void evaluate_one_interpolation(const real &tInterp, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, std::vector<real> &xInterp){
+void evaluate_one_interpolation(const propSimulation *propSim, const real &tInterp, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, std::vector<real> &xInterp){
+    bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
+    bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
     size_t tLen = tVecForInterp.size();
     size_t numStates = xInterp.size();
     size_t n = tLen-1;
+
+    std::vector< std::vector<real> > coeffsToUse;
+    std::vector<real> tVecForInterpToUse;
+    if ( (forwardIntegrate && (tInterp < tVecForInterp[0] && tInterp != propSim->integParams.t0))
+            || (backwardIntegrate && (tInterp > tVecForInterp[0] && tInterp != propSim->integParams.t0)) ){
+        coeffsToUse = coeffsPrev;
+        tVecForInterpToUse = tVecForInterpPrev;
+    }
+    else{
+        coeffsToUse = coeffs;
+        tVecForInterpToUse = tVecForInterp;
+    }
+
     for (size_t i = 0; i < numStates; i++){
-        xInterp[i] = coeffs[i][n];
+        xInterp[i] = coeffsToUse[i][n];
     }
     for (size_t i = 1; i < n+1; i++){
         for (size_t j = 0; j < numStates; j++){
-            xInterp[j] = coeffs[j][n-i] + (tInterp-tVecForInterp[n-i])*xInterp[j];
+            xInterp[j] = coeffsToUse[j][n-i] + (tInterp-tVecForInterpToUse[n-i])*xInterp[j];
         }
     }
 }
@@ -96,18 +111,15 @@ void one_timestep_interpolation(const real &tNext, const std::vector<real> &tVec
             tInterpGeom = propSim->tEval[interpIdx];
         }
         std::vector<real> xInterpGeom(numStates, 0.0);
-        evaluate_one_interpolation(tInterpGeom, tVecForInterp, coeffs, xInterpGeom);
+        evaluate_one_interpolation(propSim, tInterpGeom, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, xInterpGeom);
         if (propSim->evalApparentState){
             std::vector<real> lightTime(propSim->integParams.nInteg, 0.0);
             std::vector<real> xInterpApparent(numStates, 0.0);
             std::vector<real> radarMeasurement(propSim->integParams.nInteg, std::numeric_limits<real>::quiet_NaN());
             get_lightTime_and_xRelative(interpIdx, tInterpGeom, xInterpGeom, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, lightTime, xInterpApparent);
-            if (propSim->radarObserver[interpIdx] == 1){
+            if (propSim->radarObserver[interpIdx] == 1 || propSim->radarObserver[interpIdx] == 2){
                 radarMeasurement = std::vector<real>(propSim->integParams.nInteg, 0.0);
                 get_radar_measurement(interpIdx, tInterpGeom, xInterpGeom, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, radarMeasurement);
-            }
-            else if (propSim->radarObserver[interpIdx] == 2){
-                throw std::runtime_error("Doppler measurements not implemented yet. Will be added to get_radar_measurement()");
             }
             propSim->lightTimeEval.push_back(lightTime);
             propSim->xIntegEval.push_back(xInterpApparent);
@@ -131,18 +143,14 @@ void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom,
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
     bool bouncePointAtLeadingEdge = false;
-    bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
-    bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
+    if (propSim->observerInfo[interpIdx].size() == 9 || propSim->observerInfo[interpIdx].size() == 10){
+        bouncePointAtLeadingEdge = propSim->observerInfo[interpIdx][8] == 1.0;
+    }
     for (size_t i = 0; i < propSim->integParams.nInteg; i++){
         real lightTimeTemp;
         std::vector<real> xInterpApparentTemp(numStates, 0.0);
         get_lightTimeOneBody(i, tInterpGeom, xInterpGeom, xObserver, bouncePointAtLeadingEdge, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, lightTimeTemp);
-        if ( (forwardIntegrate && (tInterpGeom-lightTimeTemp < tVecForInterp[0] && tInterpGeom != propSim->integParams.t0))
-            || (backwardIntegrate && (tInterpGeom-lightTimeTemp > tVecForInterp[0] && tInterpGeom != propSim->integParams.t0)) ){
-            evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterpPrev, coeffsPrev, xInterpApparentTemp);
-        } else {
-            evaluate_one_interpolation(tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, xInterpApparentTemp);
-        }
+        evaluate_one_interpolation(propSim, tInterpGeom-lightTimeTemp, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, xInterpApparentTemp);
         lightTime[i] = lightTimeTemp;
         for (size_t j = 0; j < 6; j++){
             xInterpApparent[6*i+j] = xInterpApparentTemp[6*i+j] - xObserver[j];
@@ -173,7 +181,8 @@ void get_lightTime_and_xRelative(const size_t interpIdx, const real tInterpGeom,
 
 void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<real> xInterpGeom, std::vector<real> xObserver, const bool bouncePointAtLeadingEdge, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, real &lightTimeOneBody){
     size_t numStates = xInterpGeom.size();
-    std::vector<real> xInterpApparentTemp(numStates, 0.0);
+    std::vector<real> xInterpApparentFull(numStates, 0.0);
+    std::vector<real> xInterpApparent(6, 0.0);
     std::vector<real> xRelativeOneBody(6, 0.0);
     real distRelativeOneBody;
 
@@ -185,113 +194,112 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<r
         distRelativeOneBody -= propSim->forceParams.radii[i];
     }
     lightTimeOneBody = distRelativeOneBody/propSim->consts.clight;
-    bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
-    bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
     if (propSim->convergedLightTime){
         real lightTimeTol = 1e-16/86400.0L;
         real lightTimeOneBodyPrev = 0.0L;
+        real deltaLightTimeRelativistic;
         size_t maxIter = 20;
         size_t iter = 0;
         // keep iterating until max iterations or light time tolerance is met
         while (iter < maxIter && fabs(lightTimeOneBody - lightTimeOneBodyPrev) > lightTimeTol){
-            if ( (forwardIntegrate && (tInterpGeom-lightTimeOneBody < tVecForInterp[0] && tInterpGeom != propSim->integParams.t0))
-                || (backwardIntegrate && (tInterpGeom-lightTimeOneBody > tVecForInterp[0] && tInterpGeom != propSim->integParams.t0)) ){
-                evaluate_one_interpolation(tInterpGeom-lightTimeOneBody, tVecForInterpPrev, coeffsPrev, xInterpApparentTemp);
-            } else {
-                evaluate_one_interpolation(tInterpGeom-lightTimeOneBody, tVecForInterp, coeffs, xInterpApparentTemp);
-            }
+            evaluate_one_interpolation(propSim, tInterpGeom-lightTimeOneBody, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, xInterpApparentFull);
             for (size_t j = 0; j < 6; j++){
-                xRelativeOneBody[j] = xInterpApparentTemp[6*i+j] - xObserver[j];
+                xRelativeOneBody[j] = xInterpApparentFull[6*i+j] - xObserver[j];
+                xInterpApparent[j] = xInterpApparentFull[6*i+j];
             }
             vnorm({xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]}, distRelativeOneBody);
             if (bouncePointAtLeadingEdge){
                 distRelativeOneBody -= propSim->forceParams.radii[i];
             }
             lightTimeOneBodyPrev = lightTimeOneBody;
-            lightTimeOneBody = distRelativeOneBody/propSim->consts.clight;
+            get_delta_delay_relativistic(propSim, tInterpGeom-lightTimeOneBody, xInterpApparent, propSim->consts, deltaLightTimeRelativistic);
+            lightTimeOneBody = distRelativeOneBody/propSim->consts.clight + deltaLightTimeRelativistic;
             iter++;
         }
     }
 }
 
-void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, std::vector<real> &delayMeasurement){
-    if (propSim->observerInfo[interpIdx].size() !=9){
-        throw std::runtime_error("Error: observerInfo must be a 9-element vector for delay measurement.");
+void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const std::vector<real> &xInterpGeom, const std::vector<real> &tVecForInterp, const std::vector< std::vector<real> > &coeffs, const std::vector<real> &tVecForInterpPrev, const std::vector< std::vector<real> > &coeffsPrev, const propSimulation *propSim, std::vector<real> &radarMeasurement){
+    if (propSim->observerInfo[interpIdx].size() !=9 && propSim->observerInfo[interpIdx].size() !=10){
+        throw std::runtime_error("Error: observerInfo must be a 9 or 10 element vector for radar measurements");
     }
     size_t numStates = xInterpGeom.size();
     real receiveTimeTDB = tInterpGeom;
-    std::vector<real> xTargetBarycentricReceiveTime = xInterpGeom;
-    std::vector<real> xObserverBarycentricReceiveTime(6, 0.0);
+    std::vector<real> xTrgtBaryRcv = xInterpGeom;
+    std::vector<real> xObsBaryRcv(6, 0.0);
     std::vector<real> receiverInfo = {propSim->observerInfo[interpIdx][0], propSim->observerInfo[interpIdx][1], propSim->observerInfo[interpIdx][2], propSim->observerInfo[interpIdx][3]};
-    get_observer_state(receiveTimeTDB, receiverInfo, propSim->consts, false, xObserverBarycentricReceiveTime);
+    get_observer_state(receiveTimeTDB, receiverInfo, propSim->consts, false, xObsBaryRcv);
 
-    std::vector<real> xObserverBarycentricTransmitTime(6, 0.0);
+    std::vector<real> xObsBaryTx(6, 0.0);
     std::vector<real> transmitterInfo = {propSim->observerInfo[interpIdx][4], propSim->observerInfo[interpIdx][5], propSim->observerInfo[interpIdx][6], propSim->observerInfo[interpIdx][7]};
 
     bool bouncePointAtLeadingEdge = propSim->observerInfo[interpIdx][8] == 1.0;
-    bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[1];
-    bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[1];
+    real transmitFreq = 0.0;
+    if (propSim->radarObserver[interpIdx] == 2){
+        transmitFreq = propSim->observerInfo[interpIdx][9];
+    }
     for (size_t i = 0; i < propSim->integParams.nInteg; i++){
         real delayDownleg;
         real bounceTimeTDB;
         real delayUpleg;
         real transmitTimeTDB;
-        std::vector<real> xTargetBarycentricBounceTimeAllBody(numStates, 0.0);
-        std::vector<real> xTargetBarycentricBounceTime(6, 0.0);
+        real delayMeasurement;
+        std::vector<real> xTrgtBaryBounceAllBody(numStates, 0.0);
+        std::vector<real> xTrgtBaryBounce(6, 0.0);
         // get downleg delay
-        get_lightTimeOneBody(i, receiveTimeTDB, xTargetBarycentricReceiveTime, xObserverBarycentricReceiveTime, bouncePointAtLeadingEdge, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, delayDownleg);
+        get_lightTimeOneBody(i, receiveTimeTDB, xTrgtBaryRcv, xObsBaryRcv, bouncePointAtLeadingEdge, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, propSim, delayDownleg);
         bounceTimeTDB = receiveTimeTDB-delayDownleg;
-        if ( (forwardIntegrate && (bounceTimeTDB < tVecForInterp[0] && receiveTimeTDB != propSim->integParams.t0))
-            || (backwardIntegrate && (bounceTimeTDB > tVecForInterp[0] && receiveTimeTDB != propSim->integParams.t0)) ){
-            evaluate_one_interpolation(bounceTimeTDB, tVecForInterpPrev, coeffsPrev, xTargetBarycentricBounceTimeAllBody);
-        } else {
-            evaluate_one_interpolation(bounceTimeTDB, tVecForInterp, coeffs, xTargetBarycentricBounceTimeAllBody);
-        }
+        evaluate_one_interpolation(propSim, bounceTimeTDB, tVecForInterp, coeffs, tVecForInterpPrev, coeffsPrev, xTrgtBaryBounceAllBody);
         for (size_t j = 0; j < 6; j++){
-            xTargetBarycentricBounceTime[j] = xTargetBarycentricBounceTimeAllBody[6*i+j];
+            xTrgtBaryBounce[j] = xTrgtBaryBounceAllBody[6*i+j];
         }
-        real downlegDeltaDelayRelativistic;
-        get_delta_delay_relativistic(propSim, receiveTimeTDB, xTargetBarycentricBounceTime, propSim->consts, downlegDeltaDelayRelativistic);
-        // std::cout<< "downlegDeltaDelayRelativistic (receiveTime)= " << downlegDeltaDelayRelativistic*86400.0L*1e6 << " microseconds" << std::endl;
-        delayDownleg += downlegDeltaDelayRelativistic;
         // iterate to get upleg delay
         delayUpleg = delayDownleg;
         if (propSim->convergedLightTime){
             real distRelativeUpleg;
             real lightTimeTol = 1e-16/86400.0L;
             real delayUplegPrev = 0.0L;
+            real deltaDelayUplegRelativistic;
             size_t maxIter = 20;
             size_t iter = 0;
             while (iter < maxIter && fabs(delayUpleg - delayUplegPrev) > lightTimeTol){
-                transmitTimeTDB = bounceTimeTDB-delayUpleg;
-                get_observer_state(transmitTimeTDB, transmitterInfo, propSim->consts, false, xObserverBarycentricTransmitTime);
-                vnorm({xTargetBarycentricBounceTime[0]-xObserverBarycentricTransmitTime[0], xTargetBarycentricBounceTime[1]-xObserverBarycentricTransmitTime[1], xTargetBarycentricBounceTime[2]-xObserverBarycentricTransmitTime[2]}, distRelativeUpleg);
+                get_observer_state(bounceTimeTDB-delayUpleg, transmitterInfo, propSim->consts, false, xObsBaryTx);
+                std::vector<real> xRelativeOneBody(6, 0.0);
+                for (size_t j = 0; j < 6; j++){
+                    xRelativeOneBody[j] = xTrgtBaryBounce[j] - xObsBaryTx[j];
+                }
+                vnorm({xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]}, distRelativeUpleg);
                 if (bouncePointAtLeadingEdge){
                     distRelativeUpleg -= propSim->forceParams.radii[i];
                 }
                 delayUplegPrev = delayUpleg;
-                delayUpleg = distRelativeUpleg/propSim->consts.clight;
+                get_delta_delay_relativistic(propSim, bounceTimeTDB-delayUpleg, xTrgtBaryBounce, propSim->consts, deltaDelayUplegRelativistic);
+                delayUpleg = distRelativeUpleg/propSim->consts.clight + deltaDelayUplegRelativistic;
                 iter++;
             }
         }
         transmitTimeTDB = bounceTimeTDB-delayUpleg;
-        get_observer_state(transmitTimeTDB, transmitterInfo, propSim->consts, false, xObserverBarycentricTransmitTime);
-        real uplegDeltaDelayRelativistic;
-        get_delta_delay_relativistic(propSim, transmitTimeTDB, xTargetBarycentricBounceTime, propSim->consts, uplegDeltaDelayRelativistic);
-        // std::cout<< "uplegDeltaDelayRelativistic (transmitTime)= " << uplegDeltaDelayRelativistic*86400.0L*1e6 << " microseconds" << std::endl;
-        delayUpleg += uplegDeltaDelayRelativistic;
+        get_observer_state(transmitTimeTDB, transmitterInfo, propSim->consts, false, xObsBaryTx);
         // get delay measurement
-        delayMeasurement[i] = (delayDownleg + delayUpleg)*86400.0L*1e6; // days -> seconds -> microseconds
+        delayMeasurement = (delayDownleg + delayUpleg)*86400.0L*1e6; // days -> seconds -> microseconds
         if (propSim->tEvalUTC){
             SpiceDouble etMinusUtcReceiveTime;
-            SpiceDouble etMinusUtcTransmitTime; 
+            SpiceDouble etMinusUtcTransmitTime;
             real receiveTimeET;
             real transmitTimeET;
             mjd_to_et(receiveTimeTDB, receiveTimeET);
             mjd_to_et(transmitTimeTDB, transmitTimeET);
             deltet_c(receiveTimeET, "ET", &etMinusUtcReceiveTime);
             deltet_c(transmitTimeET, "ET", &etMinusUtcTransmitTime);
-            delayMeasurement[i] += (etMinusUtcTransmitTime-etMinusUtcReceiveTime)*1e6;
+            delayMeasurement += (etMinusUtcTransmitTime-etMinusUtcReceiveTime)*1e6;
+        }
+        if (propSim->radarObserver[interpIdx] == 1){
+            radarMeasurement[i] = delayMeasurement;
+        }
+        else if (propSim->radarObserver[interpIdx] == 2){
+            real dopplerMeasurement;
+            get_doppler_measurement(propSim, receiveTimeTDB, transmitTimeTDB, xObsBaryRcv, xTrgtBaryBounce, xObsBaryTx, transmitFreq, dopplerMeasurement);
+            radarMeasurement[i] = dopplerMeasurement;
         }
     }
 }
@@ -315,7 +323,7 @@ void get_delta_delay_relativistic(const propSimulation *propSim, const real &tFo
     real earthTargetDist;
     vnorm(earthTargetPos, earthTargetDist);
 
-    real G = 6.6743e-11L/(149597870700.0L*149597870700.0L*149597870700.0L)*86400.0L*86400.0L; // default kg au^3 / day^2
+    real G = consts.G;
     real sunGM = 0;
     for (size_t i=propSim->integParams.nInteg; i<propSim->integParams.nTotal; i++){
         if (propSim->forceParams.spiceIdList[i]==10){
@@ -329,4 +337,110 @@ void get_delta_delay_relativistic(const propSimulation *propSim, const real &tFo
     real gamma = 1.0L; // PPN parameter
 
     deltaDelayRelativistic = (1+gamma)*sunGM*pow(c, -3)*log((sunEarthDist+sunTargetDist+earthTargetDist)/(sunEarthDist+sunTargetDist-earthTargetDist));
+}
+
+void get_doppler_measurement(const propSimulation *propSim, const real receiveTimeTDB, const real transmitTimeTDB, const std::vector<real> xObsBaryRcv, const std::vector<real> xTrgtBaryBounce, const std::vector<real> xObsBaryTx, const real transmitFreq, real &dopplerMeasurement){
+    std::ofstream outfile;
+    outfile.precision(16);
+    outfile.open("/Users/rahil/Downloads/doppler.txt", std::ios_base::app);
+    // print receiveTimeTDB, transmitTimeTDB, xObsBaryRcv, xObsBaryTx, freq
+    outfile << "transmitTimeTDB: " << transmitTimeTDB << std::endl;
+    outfile << "transmitFreq: " << transmitFreq << std::endl;
+    outfile << "xObsBaryTx: " << xObsBaryTx[0] << ", " << xObsBaryTx[1] << ", " << xObsBaryTx[2] << ", " << xObsBaryTx[3] << ", " << xObsBaryTx[4] << ", " << xObsBaryTx[5] << std::endl;
+    outfile << "xTrgtBaryBounce: " << xTrgtBaryBounce[0] << ", " << xTrgtBaryBounce[1] << ", " << xTrgtBaryBounce[2] << ", " << xTrgtBaryBounce[3] << ", " << xTrgtBaryBounce[4] << ", " << xTrgtBaryBounce[5] << std::endl;
+    outfile << "receiveTimeTDB: " << receiveTimeTDB << std::endl;
+    outfile << "xObsBaryRcv: " << xObsBaryRcv[0] << ", " << xObsBaryRcv[1] << ", " << xObsBaryRcv[2] << ", " << xObsBaryRcv[3] << ", " << xObsBaryRcv[4] << ", " << xObsBaryRcv[5] << std::endl;
+    outfile << std::endl;
+    outfile.close();
+
+    SpiceDouble lt0, lt1;
+    SpiceDouble xSunBaryRcv[6];
+    get_spice_state_lt(10, receiveTimeTDB, propSim->consts, xSunBaryRcv, lt0);
+    SpiceDouble xSunBaryTx[6];
+    get_spice_state_lt(10, transmitTimeTDB, propSim->consts, xSunBaryTx, lt1);
+
+    std::vector<real> posObsSunRcv(3), velObsSunRcv(3), posObsSunTx(3), velObsSunTx(3);
+    posObsSunRcv[0] = xObsBaryRcv[0] - xSunBaryRcv[0];
+    posObsSunRcv[1] = xObsBaryRcv[1] - xSunBaryRcv[1];
+    posObsSunRcv[2] = xObsBaryRcv[2] - xSunBaryRcv[2];
+    velObsSunRcv[0] = xObsBaryRcv[3] - xSunBaryRcv[3];
+    velObsSunRcv[1] = xObsBaryRcv[4] - xSunBaryRcv[4];
+    velObsSunRcv[2] = xObsBaryRcv[5] - xSunBaryRcv[5];
+    posObsSunTx[0] = xObsBaryTx[0] - xSunBaryTx[0];
+    posObsSunTx[1] = xObsBaryTx[1] - xSunBaryTx[1];
+    posObsSunTx[2] = xObsBaryTx[2] - xSunBaryTx[2];
+    velObsSunTx[0] = xObsBaryTx[3] - xSunBaryTx[3];
+    velObsSunTx[1] = xObsBaryTx[4] - xSunBaryTx[4];
+    velObsSunTx[2] = xObsBaryTx[5] - xSunBaryTx[5];
+
+    real rObsSunRcv, vObsSunRcv, rObsSunTx, vObsSunTx;
+    vnorm(posObsSunRcv, rObsSunRcv);
+    vnorm(velObsSunRcv, vObsSunRcv);
+    vnorm(posObsSunTx, rObsSunTx);
+    vnorm(velObsSunTx, vObsSunTx);
+
+    std::vector<real> xTrgtObsRcv(6), posTrgtObsRcv(3), velTrgtObsRcv(3), xTrgtObsTx(6), posTrgtObsTx(3), velTrgtObsTx(3);
+    vsub(xTrgtBaryBounce, xObsBaryRcv, xTrgtObsRcv);
+    posTrgtObsRcv = {xTrgtObsRcv[0], xTrgtObsRcv[1], xTrgtObsRcv[2]};
+    velTrgtObsRcv = {xTrgtObsRcv[3], xTrgtObsRcv[4], xTrgtObsRcv[5]};
+    vsub(xTrgtBaryBounce, xObsBaryTx, xTrgtObsTx);
+    posTrgtObsTx = {xTrgtObsTx[0], xTrgtObsTx[1], xTrgtObsTx[2]};
+    velTrgtObsTx = {xTrgtObsTx[3], xTrgtObsTx[4], xTrgtObsTx[5]};
+
+    real rTrgtObsRcv, rTrgtObsTx;
+    vnorm(posTrgtObsRcv, rTrgtObsRcv);
+    vnorm(posTrgtObsTx, rTrgtObsTx);
+
+    real posDotVelTrgtObsRcv, posDotVelTrgtObsTx;
+    vdot(posTrgtObsRcv, velTrgtObsRcv, posDotVelTrgtObsRcv);
+    vdot(posTrgtObsTx, velTrgtObsTx, posDotVelTrgtObsTx);
+
+    real rdotTrgtObsRcv, rdotTrgtObsTx;
+    rdotTrgtObsRcv = posDotVelTrgtObsRcv/rTrgtObsRcv;
+    rdotTrgtObsTx = posDotVelTrgtObsTx/rTrgtObsTx;
+
+    std::vector<real> velObsBaryRcv(3), velObsBaryTx(3);
+    velObsBaryRcv[0] = xObsBaryRcv[3];
+    velObsBaryRcv[1] = xObsBaryRcv[4];
+    velObsBaryRcv[2] = xObsBaryRcv[5];
+    velObsBaryTx[0] = xObsBaryTx[3];
+    velObsBaryTx[1] = xObsBaryTx[4];
+    velObsBaryTx[2] = xObsBaryTx[5];
+
+    real vObsBaryRcv, vObsBaryTx;
+    vnorm(velObsBaryRcv, vObsBaryRcv);
+    vnorm(velObsBaryTx, vObsBaryTx);
+
+    real posTrgtObsRcvDotVelObsBaryRcv, posTrgtObsTxDotVelObsBaryTx;
+    vdot(posTrgtObsRcv, velObsBaryRcv, posTrgtObsRcvDotVelObsBaryRcv);
+    vdot(posTrgtObsTx, velObsBaryTx, posTrgtObsTxDotVelObsBaryTx);
+
+    real G = propSim->consts.G;
+    real sunGM = 0;
+    for (size_t i=propSim->integParams.nInteg; i<propSim->integParams.nTotal; i++){
+        if (propSim->forceParams.spiceIdList[i]==10){
+            sunGM = G*propSim->forceParams.masses[i];
+        }
+    }
+    if (sunGM==0){
+        throw std::runtime_error("Sun GM not found in get_doppler_measurement");
+    }
+    real c = propSim->consts.clight;
+
+    real fac1, term1;
+    fac1 = -transmitFreq/c;
+    term1 = fac1*(rdotTrgtObsTx+rdotTrgtObsRcv);
+
+    real fac2, term2, term2a, term2b, term2c, term2d, term2e;
+    fac2 = -transmitFreq/c/c;
+    term2a = rdotTrgtObsTx*posTrgtObsTxDotVelObsBaryTx/rTrgtObsTx;
+    term2b = -rdotTrgtObsRcv*posTrgtObsRcvDotVelObsBaryRcv/rTrgtObsRcv;
+    term2c = -rdotTrgtObsTx*rdotTrgtObsRcv;
+    term2d = sunGM*(1/rObsSunTx - 1/rObsSunRcv);
+    term2e = 0.5L*(vObsBaryTx*vObsBaryTx - vObsBaryRcv*vObsBaryRcv);
+    term2 = fac2*(term2a + term2b + term2c + term2d + term2e);
+
+    real dopplerShift;
+    dopplerShift = term1 + term2;
+    dopplerMeasurement = dopplerShift;
 }

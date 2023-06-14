@@ -195,7 +195,7 @@ class iterationParams:
         plt.figure(figsize=(21,6), dpi=150)
         iter_string = f'Iteration {self.iter_number} (prefit)' if self.iter_number == 0 else f'Iteration {self.iter_number}'
         iter_string = title if title is not None else iter_string
-        plt.suptitle(f'{iter_string}. Chi Squared: RA={np.sum(ra_chi_squared[np.intersect1d(is_accepted, opticalIdx)]):.2f}, Dec={np.sum(dec_chi_squared[np.intersect1d(is_accepted, opticalIdx)]):.2f}, Delay={np.sum(delay_chi_squared[np.intersect1d(is_accepted, radarIdx)]):.2f}, Doppler={np.sum(doppler_chi_squared[np.intersect1d(is_accepted, radarIdx)]):.2f}', y=0.95)
+        plt.suptitle(f'{iter_string}. Chi Squared: RA={np.sum(ra_chi_squared[np.intersect1d(is_accepted, opticalIdx)]):.2f}, Dec={np.sum(dec_chi_squared[np.intersect1d(is_accepted, opticalIdx)]):.2f}, Delay={np.nansum(delay_chi_squared[np.intersect1d(is_accepted, radarIdx)]):.2f}, Doppler={np.nansum(doppler_chi_squared[np.intersect1d(is_accepted, radarIdx)]):.2f}', y=0.95)
         plt.subplot(1,2,1)
         plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
         plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
@@ -635,7 +635,7 @@ class fitSimulation:
             obs_info_len = len(observerInfo[i])
             if obs_info_len == 4:
                 size = 2
-            elif obs_info_len in {8, 9}:
+            elif obs_info_len in {9, 10}:
                 size = 1
                 j += size
                 continue
@@ -740,6 +740,8 @@ class fitSimulation:
                     print("Converged without rejecting outliers. Starting outlier rejection now...")
                     start_rejecting = True
                     self.converged = False
+        if self.n_iter == self.n_iter_max and not self.converged:
+            print("WARNING: Maximum number of iterations reached without converging.")
         spice.unload(self.DEkernelPath)
         return None
 
