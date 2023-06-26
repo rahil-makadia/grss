@@ -344,11 +344,11 @@ class fitSimulation:
         if self.fit_optical and self.fit_radar:
             self.merge_observation_arrays()
         elif self.fit_optical:
-            self.obs_array = self.obs_array_optical
-            self.observer_codes = self.observer_codes_optical
+            self.obs_array, sort_idx = self.sort_array_by_another(self.obs_array_optical, self.obs_array_optical[:, 0])
+            self.observer_codes = tuple(np.array(self.observer_codes_optical, dtype=tuple)[sort_idx])
         elif self.fit_radar:
-            self.obs_array = self.obs_array_radar
-            self.observer_codes = self.observer_codes_radar
+            self.obs_array, sort_idx = self.sort_array_by_another(self.obs_array_radar, self.obs_array_radar[:, 0])
+            self.observer_codes = tuple(np.array(self.observer_codes_radar, dtype=tuple)[sort_idx])
         self.n_obs = np.count_nonzero(~np.isnan(self.obs_array[:, 1:3])) # number of observations is the number of non-nan values in the second and third columns of the observation array
         self.rejection_flag = [False]*len(self.obs_array)
         self.sigmas = self.obs_array[:, 3:5]
@@ -359,14 +359,17 @@ class fitSimulation:
         self.futureObsIdx = np.where(self.obs_array[:, 0] >= self.t)[0]
         self.futureObsExist = len(self.futureObsIdx) > 0
         return None
+    
+    def sort_array_by_another(self, array, sort_by):
+        sort_idx = np.argsort(sort_by)
+        return array[sort_idx], sort_idx
 
     def merge_observation_arrays(self):
         # merge optical and radar arrays
         obs_array = np.vstack((self.obs_array_optical, self.obs_array_radar))
         observer_codes = self.observer_codes_optical + self.observer_codes_radar
         # sort by time
-        sort_idx = np.argsort(obs_array[:,0])
-        self.obs_array = obs_array[sort_idx]
+        self.obs_array, sort_idx = self.sort_array_by_another(obs_array, obs_array[:, 0])
         self.observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
         return None
 
