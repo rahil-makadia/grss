@@ -1,5 +1,4 @@
 #include "interpolate.h"
-#include <fstream>
 
 void interpolate(const real &t, const real &dt, const std::vector<real> &xInteg0, const std::vector<real> &accInteg0, const std::vector< std::vector<real> > &b, propSimulation *propSim){
     size_t nh = 8;
@@ -195,7 +194,7 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<r
     }
     lightTimeOneBody = distRelativeOneBody/propSim->consts.clight;
     if (propSim->convergedLightTime){
-        real lightTimeTol = 1e-16/86400.0L;
+        real lightTimeTol = 1e-10/86400.0L;
         real lightTimeOneBodyPrev = 0.0L;
         real deltaLightTimeRelativistic;
         size_t maxIter = 20;
@@ -215,6 +214,9 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom, std::vector<r
             get_delta_delay_relativistic(propSim, tInterpGeom-lightTimeOneBody, xInterpApparent, propSim->consts, deltaLightTimeRelativistic);
             lightTimeOneBody = distRelativeOneBody/propSim->consts.clight + deltaLightTimeRelativistic;
             iter++;
+        }
+        if (iter >= maxIter){
+            std::cout << "Warning: Downleg light time did not converge for body " << propSim->integBodies[i].name << " at time " << tInterpGeom << ", change from previous iteration was " << fabs(lightTimeOneBody - lightTimeOneBodyPrev) << std::endl;
         }
     }
 }
@@ -257,7 +259,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
         delayUpleg = delayDownleg;
         if (propSim->convergedLightTime){
             real distRelativeUpleg;
-            real lightTimeTol = 1e-16/86400.0L;
+            real lightTimeTol = 1e-10/86400.0L;
             real delayUplegPrev = 0.0L;
             real deltaDelayUplegRelativistic;
             size_t maxIter = 20;
@@ -276,6 +278,9 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom, const
                 get_delta_delay_relativistic(propSim, bounceTimeTDB-delayUpleg, xTrgtBaryBounce, propSim->consts, deltaDelayUplegRelativistic);
                 delayUpleg = distRelativeUpleg/propSim->consts.clight + deltaDelayUplegRelativistic;
                 iter++;
+            }
+            if (iter >= maxIter){
+                std::cout << "Warning: Upleg light time did not converge for body " << propSim->integBodies[i].name << " at time " << tInterpGeom << ", change from previous iteration was " << fabs(delayUpleg - delayUplegPrev) << std::endl;
             }
         }
         transmitTimeTDB = bounceTimeTDB-delayUpleg;
@@ -340,80 +345,80 @@ void get_delta_delay_relativistic(const propSimulation *propSim, const real &tFo
 }
 
 void get_doppler_measurement(const propSimulation *propSim, const real receiveTimeTDB, const real transmitTimeTDB, const std::vector<real> xObsBaryRcv, const std::vector<real> xTrgtBaryBounce, const std::vector<real> xObsBaryTx, const real transmitFreq, real &dopplerMeasurement){
-    std::ofstream outfile;
-    outfile.precision(16);
-    outfile.open("/Users/rahil/Downloads/doppler.txt", std::ios_base::app);
-    // print receiveTimeTDB, transmitTimeTDB, xObsBaryRcv, xObsBaryTx, freq
-    outfile << "transmitTimeTDB: " << transmitTimeTDB << std::endl;
-    outfile << "transmitFreq: " << transmitFreq << std::endl;
-    outfile << "xObsBaryTx: " << xObsBaryTx[0] << ", " << xObsBaryTx[1] << ", " << xObsBaryTx[2] << ", " << xObsBaryTx[3] << ", " << xObsBaryTx[4] << ", " << xObsBaryTx[5] << std::endl;
-    outfile << "xTrgtBaryBounce: " << xTrgtBaryBounce[0] << ", " << xTrgtBaryBounce[1] << ", " << xTrgtBaryBounce[2] << ", " << xTrgtBaryBounce[3] << ", " << xTrgtBaryBounce[4] << ", " << xTrgtBaryBounce[5] << std::endl;
-    outfile << "receiveTimeTDB: " << receiveTimeTDB << std::endl;
-    outfile << "xObsBaryRcv: " << xObsBaryRcv[0] << ", " << xObsBaryRcv[1] << ", " << xObsBaryRcv[2] << ", " << xObsBaryRcv[3] << ", " << xObsBaryRcv[4] << ", " << xObsBaryRcv[5] << std::endl;
-    outfile << std::endl;
-    outfile.close();
+    // based on "Mathematical Formulation of the Double-Precision Orbit Determination Program (DPODP)" by T.D.Moyer (1971), https://ntrs.nasa.gov/citations/19710017134
+    std::vector<real> pos3(3), vel3(3);
+    std::vector<real> pos2(3), vel2(3);
+    std::vector<real> pos1(3), vel1(3);
+    pos3 = {xObsBaryRcv[0], xObsBaryRcv[1], xObsBaryRcv[2]};
+    vel3 = {xObsBaryRcv[3], xObsBaryRcv[4], xObsBaryRcv[5]};
+    pos2 = {xTrgtBaryBounce[0], xTrgtBaryBounce[1], xTrgtBaryBounce[2]};
+    vel2 = {xTrgtBaryBounce[3], xTrgtBaryBounce[4], xTrgtBaryBounce[5]};
+    pos1 = {xObsBaryTx[0], xObsBaryTx[1], xObsBaryTx[2]};
+    vel1 = {xObsBaryTx[3], xObsBaryTx[4], xObsBaryTx[5]};
 
-    SpiceDouble lt0, lt1;
-    SpiceDouble xSunBaryRcv[6];
-    get_spice_state_lt(10, receiveTimeTDB, propSim->consts, xSunBaryRcv, lt0);
-    SpiceDouble xSunBaryTx[6];
-    get_spice_state_lt(10, transmitTimeTDB, propSim->consts, xSunBaryTx, lt1);
+    real r3, r2, r1;
+    vnorm(pos3, r3);
+    vnorm(pos2, r2);
+    vnorm(pos1, r1);
+    real v3, v1;
+    vnorm(vel3, v3);
+    vnorm(vel1, v1);
 
-    std::vector<real> posObsSunRcv(3), velObsSunRcv(3), posObsSunTx(3), velObsSunTx(3);
-    posObsSunRcv[0] = xObsBaryRcv[0] - xSunBaryRcv[0];
-    posObsSunRcv[1] = xObsBaryRcv[1] - xSunBaryRcv[1];
-    posObsSunRcv[2] = xObsBaryRcv[2] - xSunBaryRcv[2];
-    velObsSunRcv[0] = xObsBaryRcv[3] - xSunBaryRcv[3];
-    velObsSunRcv[1] = xObsBaryRcv[4] - xSunBaryRcv[4];
-    velObsSunRcv[2] = xObsBaryRcv[5] - xSunBaryRcv[5];
-    posObsSunTx[0] = xObsBaryTx[0] - xSunBaryTx[0];
-    posObsSunTx[1] = xObsBaryTx[1] - xSunBaryTx[1];
-    posObsSunTx[2] = xObsBaryTx[2] - xSunBaryTx[2];
-    velObsSunTx[0] = xObsBaryTx[3] - xSunBaryTx[3];
-    velObsSunTx[1] = xObsBaryTx[4] - xSunBaryTx[4];
-    velObsSunTx[2] = xObsBaryTx[5] - xSunBaryTx[5];
+    real rdot1, rdot2, rdot3;
+    vdot(pos1, vel1, rdot1);
+    rdot1 /= r1;
+    vdot(pos2, vel2, rdot2);
+    rdot2 /= r2;
+    vdot(pos3, vel3, rdot3);
+    rdot3 /= r3;
 
-    real rObsSunRcv, vObsSunRcv, rObsSunTx, vObsSunTx;
-    vnorm(posObsSunRcv, rObsSunRcv);
-    vnorm(velObsSunRcv, vObsSunRcv);
-    vnorm(posObsSunTx, rObsSunTx);
-    vnorm(velObsSunTx, vObsSunTx);
+    SpiceDouble lt;
+    SpiceDouble xSun3[6];
+    get_spice_state_lt(10, receiveTimeTDB, propSim->consts, xSun3, lt);
+    SpiceDouble xSun1[6];
+    get_spice_state_lt(10, transmitTimeTDB, propSim->consts, xSun1, lt);
 
-    std::vector<real> xTrgtObsRcv(6), posTrgtObsRcv(3), velTrgtObsRcv(3), xTrgtObsTx(6), posTrgtObsTx(3), velTrgtObsTx(3);
-    vsub(xTrgtBaryBounce, xObsBaryRcv, xTrgtObsRcv);
-    posTrgtObsRcv = {xTrgtObsRcv[0], xTrgtObsRcv[1], xTrgtObsRcv[2]};
-    velTrgtObsRcv = {xTrgtObsRcv[3], xTrgtObsRcv[4], xTrgtObsRcv[5]};
-    vsub(xTrgtBaryBounce, xObsBaryTx, xTrgtObsTx);
-    posTrgtObsTx = {xTrgtObsTx[0], xTrgtObsTx[1], xTrgtObsTx[2]};
-    velTrgtObsTx = {xTrgtObsTx[3], xTrgtObsTx[4], xTrgtObsTx[5]};
+    std::vector<real> posHelio3(3), velHelio3(3), posHelio1(3), velHelio1(3);
+    posHelio3[0] = pos3[0] - xSun3[0];
+    posHelio3[1] = pos3[1] - xSun3[1];
+    posHelio3[2] = pos3[2] - xSun3[2];
+    velHelio3[0] = vel3[0] - xSun3[3];
+    velHelio3[1] = vel3[1] - xSun3[4];
+    velHelio3[2] = vel3[2] - xSun3[5];
+    posHelio1[0] = pos1[0] - xSun1[0];
+    posHelio1[1] = pos1[1] - xSun1[1];
+    posHelio1[2] = pos1[2] - xSun1[2];
+    velHelio1[0] = vel1[0] - xSun1[3];
+    velHelio1[1] = vel1[1] - xSun1[4];
+    velHelio1[2] = vel1[2] - xSun1[5];
+    real rHelio3, vHelio3, rHelio1, vHelio1;
+    vnorm(posHelio3, rHelio3);
+    vnorm(velHelio3, vHelio3);
+    vnorm(posHelio1, rHelio1);
+    vnorm(velHelio1, vHelio1);
 
-    real rTrgtObsRcv, rTrgtObsTx;
-    vnorm(posTrgtObsRcv, rTrgtObsRcv);
-    vnorm(posTrgtObsTx, rTrgtObsTx);
+    std::vector<real> pos23(3), vel23(3);
+    std::vector<real> pos12(3), vel12(3);
+    vsub(pos3, pos2, pos23);
+    vsub(vel3, vel2, vel23);
+    vsub(pos2, pos1, pos12);
+    vsub(vel2, vel1, vel12);
 
-    real posDotVelTrgtObsRcv, posDotVelTrgtObsTx;
-    vdot(posTrgtObsRcv, velTrgtObsRcv, posDotVelTrgtObsRcv);
-    vdot(posTrgtObsTx, velTrgtObsTx, posDotVelTrgtObsTx);
+    real r23, r12;
+    vnorm(pos23, r23);
+    vnorm(pos12, r12);
 
-    real rdotTrgtObsRcv, rdotTrgtObsTx;
-    rdotTrgtObsRcv = posDotVelTrgtObsRcv/rTrgtObsRcv;
-    rdotTrgtObsTx = posDotVelTrgtObsTx/rTrgtObsTx;
+    real rdot23, rdot12;
+    vdot(pos23, vel23, rdot23);
+    rdot23 /= r23;
+    vdot(pos12, vel12, rdot12);
+    rdot12 /= r12;
 
-    std::vector<real> velObsBaryRcv(3), velObsBaryTx(3);
-    velObsBaryRcv[0] = xObsBaryRcv[3];
-    velObsBaryRcv[1] = xObsBaryRcv[4];
-    velObsBaryRcv[2] = xObsBaryRcv[5];
-    velObsBaryTx[0] = xObsBaryTx[3];
-    velObsBaryTx[1] = xObsBaryTx[4];
-    velObsBaryTx[2] = xObsBaryTx[5];
-
-    real vObsBaryRcv, vObsBaryTx;
-    vnorm(velObsBaryRcv, vObsBaryRcv);
-    vnorm(velObsBaryTx, vObsBaryTx);
-
-    real posTrgtObsRcvDotVelObsBaryRcv, posTrgtObsTxDotVelObsBaryTx;
-    vdot(posTrgtObsRcv, velObsBaryRcv, posTrgtObsRcvDotVelObsBaryRcv);
-    vdot(posTrgtObsTx, velObsBaryTx, posTrgtObsTxDotVelObsBaryTx);
+    real pdot23, pdot12;
+    vdot(pos23, vel2, pdot23);
+    pdot23 /= r23;
+    vdot(pos12, vel1, pdot12);
+    pdot12 /= r12;
 
     real G = propSim->consts.G;
     real sunGM = 0;
@@ -429,18 +434,30 @@ void get_doppler_measurement(const propSimulation *propSim, const real receiveTi
 
     real fac1, term1;
     fac1 = -transmitFreq/c;
-    term1 = fac1*(rdotTrgtObsTx+rdotTrgtObsRcv);
+    term1 = fac1*(rdot12+rdot23);
 
     real fac2, term2, term2a, term2b, term2c, term2d, term2e;
     fac2 = -transmitFreq/c/c;
-    term2a = rdotTrgtObsTx*posTrgtObsTxDotVelObsBaryTx/rTrgtObsTx;
-    term2b = -rdotTrgtObsRcv*posTrgtObsRcvDotVelObsBaryRcv/rTrgtObsRcv;
-    term2c = -rdotTrgtObsTx*rdotTrgtObsRcv;
-    term2d = sunGM*(1/rObsSunTx - 1/rObsSunRcv);
-    term2e = 0.5L*(vObsBaryTx*vObsBaryTx - vObsBaryRcv*vObsBaryRcv);
+    term2a = rdot12*pdot12;
+    term2b = rdot23*pdot23;
+    term2c = -rdot12*rdot23;
+    term2d = sunGM*(1/rHelio1 - 1/rHelio3);
+    term2e = 0.5L*(v1*v1 - v3*v3);
     term2 = fac2*(term2a + term2b + term2c + term2d + term2e);
 
+    real fac3, term3, term3a, term3b, term3c, term3d, term3e, gamma, eps12, eps23;
+    fac3 = -transmitFreq/c/c/c;
+    term3a = rdot12*pdot12*pdot12;
+    term3b = rdot23*pdot23*pdot23;
+    term3c = -rdot12*rdot23*(pdot12+pdot23);
+    term3d = (rdot12 + rdot23)*( sunGM*(1/rHelio1-1/rHelio3) + 0.5L*(v1*v1 - v3*v3) );
+    gamma = 1.0L;
+    eps12 = (rdot1+rdot2-rdot12)/(r1+r2-r12) - (rdot1+rdot2+rdot12)/(r1+r2+r12);
+    eps23 = (rdot2+rdot3-rdot23)/(r2+r3-r23) - (rdot2+rdot3+rdot23)/(r2+r3+r23);
+    term3e = (1+gamma)*sunGM*(eps12 + eps23);
+    term3 = fac3*(term3a + term3b + term3c + term3d + term3e);
+
     real dopplerShift;
-    dopplerShift = term1 + term2;
+    dopplerShift = term1 + term2 + term3;
     dopplerMeasurement = dopplerShift;
 }

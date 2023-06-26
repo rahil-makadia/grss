@@ -329,19 +329,22 @@ propSimulation::propSimulation(std::string name, const propSimulation &simRef){
 }
 
 void propSimulation::prepare_for_evaluation(std::vector<real> &tEval, std::vector< std::vector<real> > &observerInfo){
-    bool forwardProp = this->integParams.t0 < this->integParams.tf;
-    bool backwardProp = this->integParams.t0 > this->integParams.tf;
+    bool forwardProp = this->integParams.t0 <= this->integParams.tf;
+    bool backwardProp = this->integParams.t0 >= this->integParams.tf;
     if (forwardProp && backwardProp){
         throw std::invalid_argument("The initial and final times must be different.");
     }
     // sort tEval and corresponding observerInfo into ascending order or descending order based on the integration direction
+    sort_vector(tEval, forwardProp);
     if (observerInfo.size() != 0){
         if (observerInfo.size() != tEval.size()){
             throw std::invalid_argument("The number of tEval values and the number of observerInfo vectors must be equal.");
         }
         sort_vector_by_another(observerInfo, tEval, forwardProp);
+        if (backwardProp){
+            std::reverse(observerInfo.begin(), observerInfo.end());
+        }
     }
-    sort_vector(tEval, forwardProp);
     if (forwardProp){
         int removeCounter = 0;
         while (tEval[0] < this->integParams.t0 - this->tEvalMargin){
