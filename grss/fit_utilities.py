@@ -1,8 +1,8 @@
+from json import loads
+from requests import request
 import numpy as np
 from numba import jit
 from astroquery.mpc import MPC
-from json import loads
-from requests import request
 
 __all__ = [ 'get_ra_from_hms',
             'get_dec_from_dms',
@@ -22,12 +22,12 @@ def get_ra_from_hms(ra_hms):
         ra_hms (str): Right ascension in HH:MM:SS.SSS format
 
     Returns:
-        ra: Right ascension in radians
+        r_asc: Right ascension in radians
     """
     # convert right ascension from HH:MM:SS.SSS to radians
     ra_split = ra_hms.split(' ')
-    ra = 15*(float(ra_split[0])+float(ra_split[1])/60+float(ra_split[2])/3600)
-    return ra*3600 # np.deg2rad(ra)
+    r_asc = 15*(float(ra_split[0])+float(ra_split[1])/60+float(ra_split[2])/3600)
+    return r_asc*3600 # np.deg2rad(r_asc)
 
 def get_dec_from_dms(dec_dms):
     """Convert declination from deg MM:SS.SSS to radians.
@@ -40,13 +40,13 @@ def get_dec_from_dms(dec_dms):
     """
     # convert declination from deg MM:SS.SSS to radians
     dec_split = dec_dms.replace('+','').replace('-','').split(' ')
-    dec = (float(dec_split[0])+float(dec_split[1])/60+float(dec_split[2])/3600)
+    dec = float(dec_split[0])+float(dec_split[1])/60+float(dec_split[2])/3600
     if dec_dms[0] == '-':
         dec *= -1
     return dec*3600 # np.deg2rad(dec)
 
 @jit('float64(float64)', nopython=True, cache=True)
-def mjd2et(MJD):
+def mjd2et(mjd):
     """
     Converts modified Julian Date to JPL NAIF SPICE Ephemeris time.
     Only valid for TDB timescales.
@@ -59,10 +59,10 @@ def mjd2et(MJD):
     --------
     ET  ... Ephemeris time (ephemeris seconds beyond epoch J2000)
     """
-    return (MJD+2400000.5-2451545.0)*86400
+    return (mjd+2400000.5-2451545.0)*86400
 
 @jit('float64(float64)', nopython=True, cache=True)
-def et2mjd(et):
+def et2mjd(ephem_time):
     """
     Converts JPL NAIF SPICE Ephemeris time to Modified Julian Date.
     Only valid for TDB timescales.
@@ -75,7 +75,7 @@ def et2mjd(et):
     --------
     MJD ... Modified Julian Day
     """
-    return et/86400-2400000.5+2451545.0
+    return ephem_time/86400-2400000.5+2451545.0
 
 @jit('Tuple((float64, float64))(float64[:])', nopython=True, cache=True)
 def get_radec(state):
@@ -85,18 +85,18 @@ def get_radec(state):
         state (vector): 6-element cartesian state vector
 
     Returns:
-        ra (float): right ascension in radians
+        r_asc (float): right ascension in radians
         dec (float): declination in radians
     """
     pos = state[:3]
     # vel = state[3:6]
     dist = np.linalg.norm(pos) # calculate distance
-    ra = np.arctan2(pos[1], pos[0])
-    if ra < 0:
-        ra = ra + 2*np.pi
+    r_asc = np.arctan2(pos[1], pos[0])
+    if r_asc < 0:
+        r_asc = r_asc + 2*np.pi
     # end if
     dec = np.arcsin(pos[2]/dist) # calculate declination
-    return ra*180/np.pi*3600, dec*180/np.pi*3600 # ra, dec
+    return r_asc*180/np.pi*3600, dec*180/np.pi*3600 # r_asc, dec
 
 @jit('Tuple((float64, float64, float64, float64, float64))(float64, float64, float64)', nopython=True, cache=False)
 def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
@@ -114,16 +114,14 @@ def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
         alt (float): km, altitude of observer
     """
     # WGS84 ellipsoid parameters
-    re = 6378137.0 # m
-    f = 1/298.257223563
-    rp = re*(1 - f)
-    e_sq = f*(2 - f)
-    
+    r_eq = 6378137.0 # m
+    flatness = 1/298.257223563
+    r_po = r_eq*(1 - flatness)
+    e_sq = flatness*(2 - flatness)
     lat = np.arctan2(rho_sin_lat, rho_cos_lat)
-    rho = np.sqrt(rho_cos_lat**2 + rho_sin_lat**2)*re
-    
+    rho = np.sqrt(rho_cos_lat**2 + rho_sin_lat**2)*r_eq
     geodet_lat = np.arctan( np.tan(lat) / (1 - e_sq) ) # from Hedgley, D. R., Jr. "An Exact Transformation from Geocentric to Geodetic Coordinates for Nonzero Altitudes." NASA TR R-458, March, 1976. https://ntrs.nasa.gov/citations/19760012748
-    rellip = np.sqrt(  ( (re**2*np.cos(geodet_lat))**2 + (rp**2*np.sin(geodet_lat))**2 ) / ( (re*np.cos(geodet_lat))**2 + (rp*np.sin(geodet_lat))**2 )  )
+    rellip = np.sqrt(  ( (r_eq**2*np.cos(geodet_lat))**2 + (r_po**2*np.sin(geodet_lat))**2 ) / ( (r_eq*np.cos(geodet_lat))**2 + (r_po*np.sin(geodet_lat))**2 )  )
     alt = rho - rellip # km -> m
     return lon*np.pi/180, lat, geodet_lat, alt, rho
 
@@ -210,14 +208,15 @@ def get_codes_dict():
     Returns:
         codes_dict (dict): dictionary of MPC codes and their corresponding longitude, geocentric latitude, and distance from the geocenter
     """
+    # pylint: disable=no-member
     codes = MPC.get_observatory_codes()
     codes_dict = {}
-    for i in range(len(codes)):
-        if np.isnan(codes[i]['Longitude'])==False:
-            code = codes[i]['Code']
-            lon, rho_cos_lat, rho_sin_lat = float(codes[i]['Longitude']), float(codes[i]['cos']), float(codes[i]['sin'])
+    for code_info in codes:
+        if np.isfinite(code_info['Longitude']):
+            code = code_info['Code']
+            lon, rho_cos_lat, rho_sin_lat = float(code_info['Longitude']), float(code_info['cos']), float(code_info['sin'])
             # print(code, lon, rho_cos_lat, rho_sin_lat)
-            lon, lat, geodet_lat, alt, rho = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
+            lon, lat, _, _, rho = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
             codes_dict[code] = (lon, lat, rho)
     # from https://www.minorplanetcenter.net/iau/lists/ObsCodes.html
     extra_observatories = { 'M14': (  8.78939, 0.699981, +0.711832),
@@ -233,7 +232,7 @@ def get_codes_dict():
                             'Y98': (358.68692, 0.617953, +0.783613),
                             }
     for code, info in extra_observatories.items():
-        lon, lat, geodet_lat, alt, rho = parallax_constants_to_lat_lon_alt(info[0], info[1], info[2])
+        lon, lat, _, _, rho = parallax_constants_to_lat_lon_alt(info[0], info[1], info[2])
         codes_dict[code] = (lon, lat, rho)
     radar_codes_dict = get_radar_codes_dict()
     for code, info in radar_codes_dict.items():
@@ -257,10 +256,10 @@ def get_observer_info(observer_codes):
         if isinstance(code, tuple) and len(code) in {2, 3}:
             tx_code = code[0][0]
             rx_code = code[0][1]
-            bp = code[1]
+            bounce_point = code[1]
             receiver_info = codes_dict[rx_code]
             transmitter_info = codes_dict[tx_code]
-            info_list.extend((receiver_info[0], receiver_info[1], receiver_info[2], 399, transmitter_info[0], transmitter_info[1], transmitter_info[2], bp))
+            info_list.extend((receiver_info[0], receiver_info[1], receiver_info[2], 399, transmitter_info[0], transmitter_info[1], transmitter_info[2], bounce_point))
             if len(code) == 3: # add tranmission frequency if dopppler observation
                 freq = code[2]
                 info_list.append(freq)
@@ -278,8 +277,8 @@ def get_sbdb_raw_data(tdes):
         raw_data (dict): JSON output of small body information query from SBDB
     """
     url = f"https://ssd-api.jpl.nasa.gov/sbdb.api?sstr={tdes}&cov=mat&phys-par=true&full-prec=true"
-    r = request("GET",url)
-    return loads(r.text)
+    req = request("GET", url, timeout=30)
+    return loads(req.text)
 
 def get_sbdb_elems(tdes, cov_elems=True):
     """Get a set of desired elements for small body from SBDB API
@@ -305,14 +304,13 @@ def get_sbdb_elems(tdes, cov_elems=True):
         elem = raw_data['orbit']['elements']
     hdr = []
     val = []
-    for i in range(len(elem)):
-        hdr.append(elem[i]['name'])
-        val.append(float(elem[i]['value']))
+    for ele in elem:
+        hdr.append(ele['name'])
+        val.append(float(ele['value']))
     full_elements_dict = dict(zip(hdr, val))
     # cometary elements
     # eccentricity, perihelion distance, time of periapse passage (JD), longitude of the ascending node, argument of perihelion, inclination
     keys = ['e', 'q', 'tp', 'om', 'w', 'i']
-    values = [full_elements_dict[key] for key in keys]
     elements = {'t': epoch_mjd}
     # add every element key to elements dictionary
     for key in keys:

@@ -33,6 +33,7 @@ def get_optical_data(body_id, optical_obs_file, t_min_tdb=None, t_max_tdb=None, 
     else:
         t_max_utc = Time(t_max_tdb, format='mjd', scale='tdb').utc.mjd
     if optical_obs_file is None:
+        # pylint: disable=no-member
         obs_raw = MPC.get_observations(body_id, get_mpcformat=True, cache=False)['obs']
     else:
         with open(optical_obs_file, 'r', encoding='utf-8') as file:
@@ -63,10 +64,10 @@ def get_optical_data(body_id, optical_obs_file, t_min_tdb=None, t_max_tdb=None, 
         disallow_time = obs_time_mjd < t_min_utc or obs_time_mjd > t_max_utc
         if not disallow_code and not disallow_type and not disallow_time:
             observer_program = data[13]
-            right_asc = get_ra_from_hms(data[32:44])
+            r_asc = get_ra_from_hms(data[32:44])
             dec = get_dec_from_dms(data[44:56])
             obs_array_optical[i, 0] = obs_time_mjd
-            obs_array_optical[i, 1] = right_asc
+            obs_array_optical[i, 1] = r_asc
             obs_array_optical[i, 2] = dec
             star_catalog = data[71]
             star_catalog_codes.append(star_catalog)
@@ -138,7 +139,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
     debias_counter = 0
     for i, row in enumerate(obs_array_optical):
         obs_time_jd = Time(row[0], format='mjd', scale='utc').tt.jd
-        right_asc = row[1]/3600*np.pi/180
+        r_asc = row[1]/3600*np.pi/180
         dec = row[2]/3600*np.pi/180
         star_catalog = star_catalog_codes[i]
         if star_catalog in unbiased_catalogs:
@@ -147,12 +148,12 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
         elif star_catalog in biased_catalogs:
             debias_counter += 1
             # apply debiasing from Eggl et al. 2020, https://doi.org/10.1016/j.icarus.2019.113596
-            ra_new, dec_new = debias_obs(right_asc, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
+            ra_new, dec_new = debias_obs(r_asc, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
             obs_array_optical[i, 1] = ra_new*180/np.pi*3600
             obs_array_optical[i, 2] = dec_new*180/np.pi*3600
             margin = 1.5
-            if (verbose and (np.rad2deg(abs(right_asc - ra_new))*3600 >= margin or np.rad2deg(abs(dec - dec_new))*3600 >= margin)):
-                print(f"Debiased observation {i+1} at JD {obs_time_jd} from observatory {observer_codes_optical[i]} using catalog {star_catalog}. RA bias = {np.rad2deg(right_asc-ra_new)*3600:0.4f} arcsec, DEC bias = {np.rad2deg(dec-dec_new)*3600:0.4f} arcsec")
+            if (verbose and (np.rad2deg(abs(r_asc - ra_new))*3600 >= margin or np.rad2deg(abs(dec - dec_new))*3600 >= margin)):
+                print(f"Debiased observation {i+1} at JD {obs_time_jd} from observatory {observer_codes_optical[i]} using catalog {star_catalog}. RA bias = {np.rad2deg(r_asc-ra_new)*3600:0.4f} arcsec, DEC bias = {np.rad2deg(dec-dec_new)*3600:0.4f} arcsec")
         # else:
             # skip_counter += 1
             # skip_catalogs.append(star_catalog)
