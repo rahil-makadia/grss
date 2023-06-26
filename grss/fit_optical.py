@@ -1,13 +1,9 @@
-import os
-import sys
 from astropy.time import Time
 from astroquery.mpc import MPC
 import numpy as np
 import pandas as pd
 
-file_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(f'{file_path}/../extern/')
-from astrocat_debiasing import debias as ad
+from .debias import debias_obs, debias_lowres_path, debias_hires_path
 from .fit_utilities import get_ra_from_hms, get_dec_from_dms
 
 __all__ = [ 'get_optical_obs_array',
@@ -132,10 +128,10 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
     for cat in biased_catalogs:
         columns.extend([f"{cat}_ra", f"{cat}_dec", f"{cat}_pm_ra", f'{cat}_pm_dec'])
     if lowres:
-        biasfile = 'bias_lowres.dat'
+        biasfile = f'{debias_lowres_path}/bias.dat'
         nside = 64
     else:
-        biasfile = 'bias.dat'
+        biasfile = f'{debias_hires_path}/bias.dat'
         nside = 256
     biasdf = pd.read_csv(biasfile,sep=r'\s+',skiprows=23,names=columns)
     unbias_counter = 0
@@ -151,7 +147,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
         elif star_catalog in biased_catalogs:
             debias_counter += 1
             # apply debiasing from Eggl et al. 2020, https://doi.org/10.1016/j.icarus.2019.113596
-            ra_new, dec_new = ad.debiasRADec(right_asc, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
+            ra_new, dec_new = debias_obs(right_asc, dec, obs_time_jd, star_catalog, biasdf, nside=nside)
             obs_array_optical[i, 1] = ra_new*180/np.pi*3600
             obs_array_optical[i, 2] = dec_new*180/np.pi*3600
             margin = 1.5

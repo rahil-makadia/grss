@@ -54,6 +54,7 @@ Thumbs.db
 *.jar
 *.rar
 *.tar
+*.tgz
 *.zip
 
 ################################### Python file extensions
@@ -215,3 +216,7 @@ multi_fit/
 
 # lsst custom spice kernels
 examples/lsst/data/
+
+# debiasing data directories
+grss/debias/hires_data
+grss/debias/lowres_data

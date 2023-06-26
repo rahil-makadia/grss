@@ -2,7 +2,3 @@
 	path = extern/pybind11
 	url = git@github.com:pybind/pybind11.git
 	branch = stable
-[submodule "extern/astrocat_debiasing"]
-	path = extern/astrocat_debiasing
-	url = git@github.com:rahil-makadia/astrocat_debiasing.git
-	branch = main
