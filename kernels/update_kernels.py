@@ -2,7 +2,6 @@
 # the PATH_VALUES variable to point to the same directory as this script
 
 import os
-import sys
 
 # get the path to the directory containing this script
 script_dir = os.path.dirname(os.path.realpath(__file__))
