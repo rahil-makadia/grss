@@ -3,9 +3,11 @@
     Custom meta-kernel that loads de431 planetary and big16 asteroid perturber
     ephemerides and naif0012 leapseconds kernel.
 
+    The path_values variable is written by the update_kernels.py script.
+
 \begindata
 
-    PATH_VALUES  = ( '/Users/rahil/grad/projects/keyholes/grss/kernels' )
+    PATH_VALUES  = ( placeholder )
  
     PATH_SYMBOLS = ( 'GRSS' )
 

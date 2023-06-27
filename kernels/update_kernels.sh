@@ -10,3 +10,5 @@ wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_7
 # predicted earth pck
 wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990628_predict.bpc
 wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990628_predict.cmt
+
+python update_kernels.py
