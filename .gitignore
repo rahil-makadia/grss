@@ -208,8 +208,8 @@ extern/cspice
 !planets_big16_de441_1950_2350.bsp
 !planets_big16_de431_1950_2350.log
 !planets_big16_de441_1950_2350.log
-!planets_big16_de431_1950_2350.tm
-!planets_big16_de441_1950_2350.tm
+# !planets_big16_de431_1950_2350.tm
+# !planets_big16_de441_1950_2350.tm
 
 # beta fit results directory
 multi_fit/

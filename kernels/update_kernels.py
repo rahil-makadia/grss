@@ -1,4 +1,4 @@
-# open the spice meta-kernels and update the line that defines 
+# open the spice meta-kernels and update the line that defines
 # the PATH_VALUES variable to point to the same directory as this script
 
 import os
