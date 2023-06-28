@@ -9,4 +9,10 @@ python3 -m pip install --upgrade build twine
 
 python3 -m build > release.log
 
-python3 -m twine upload --repository testpypi dist/*
+# if file run with -pypi then upload to pypi, else upload to testpypi
+server=$1
+if [ "$server" = "-pypi" ]; then
+    python3 -m twine upload dist/*
+else
+    python3 -m twine upload --repository testpypi dist/*
+fi
