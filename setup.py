@@ -46,9 +46,6 @@ class CMakeBuild(build_ext):
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
-        # In this example, we pass in the version to C++. You might not need to.
-        cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]
-
         # Using Ninja-build since it a) is available as a wheel and b)
         # multithreads automatically. MSVC would require all variables be
         # exported for Ninja to pick it up, which is a little tricky to do.
@@ -87,43 +84,16 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
         )
 
-# The information here can also be placed in setup.cfg - better separation of
-# logic and declaration, and simpler if you include description/version in a file.
+# get version from version.txt
+with open("version.txt", "r", encoding="utf-8") as f:
+    ver = f.read().strip()
 setup(
-    name="grss",
-    version="0.1.0",
-    url="https://github.com/rahil-makadia/grss",
-    author="Rahil Makadia",
-    author_email="makadia2@illinois.edu",
-    license="GPL",
-    description="GRSS build test using pybind11, cmake, and setup.py",
-    long_description="",
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering :: Astronomy",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Programming Language :: Python :: 3",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: POSIX :: Linux",
-        "Operating System :: Unix",
-    ],
-    keywords="astronomy astrophysics nbody integrator",
-    packages=["grss"],
+    version=ver,
+    packages=["grss", "grss.debias", "grss.kernels"],
     ext_modules=[CMakeExtension("cppgrss")],
-    package_data={"grss": [ "debias/*", "debias/*data/*", "kernels/*"]},
+    package_data={"grss": [ "debias/*.py",
+                            "kernels/*.py", "kernels/*.txt", "kernels/*.tm",
+                            "kernels/*.log", ],}, # "kernels/*.bsp"
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    python_requires=">=3.7",
-    install_requires=[
-        "astropy>=5.0",
-        "astroquery>=0.4.0",
-        "healpy>=1.16.0",
-        "matplotlib>=3.3.0",
-        "numba>=0.55.0",
-        "numpy>=1.22.0",
-        "pandas>=1.5.0",
-        "requests>=2.22.0",
-        "spiceypy>=5.0.0",
-    ],
 )

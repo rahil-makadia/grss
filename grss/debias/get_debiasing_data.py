@@ -14,3 +14,7 @@ os.system(f'rm -f {cwd}/lowres_data/*')
 os.system(f'rm -f {cwd}/hires_data/*')
 os.system(f'tar -xzf {cwd}/lowres_data.tgz -C {cwd}/lowres_data')
 os.system(f'tar -xzf {cwd}/hires_data.tgz -C {cwd}/hires_data')
+
+# remove the tarballs
+os.system(f'rm -f {cwd}/lowres_data.tgz')
+os.system(f'rm -f {cwd}/hires_data.tgz')

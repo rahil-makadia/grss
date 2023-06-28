@@ -25,5 +25,5 @@ def initialize():
     # run the get_debiasing_data.py script
     os.system(f'python {cwd}/debias/get_debiasing_data.py')
     # run the get_kernels.py script
-    os.system(f'python {cwd}/kernels/update_kernels.py')
+    os.system(f'python {cwd}/kernels/get_kernels.py')
     return None

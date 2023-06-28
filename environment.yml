@@ -12,6 +12,6 @@ dependencies:
   - numba>=0.55.0
   - numpy>=1.22.0
   - pandas>=1.5.0
-  - python=3.10
+  - python>=3.7
   - requests>=2.22.0
   - spiceypy>=5.0.0
