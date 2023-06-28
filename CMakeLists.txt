@@ -14,12 +14,7 @@ project(grss VERSION 0.1.0)
 # TODO: add gprof profiling, iee standards for floats
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Wall -Wextra -pedantic) # -Werror 
-
-# Set output directories, from https://stackoverflow.com/a/6595001
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME})
+add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable)
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -40,3 +35,9 @@ include(CPack)
 pybind11_add_module(cpp${PROJECT_NAME} src/${PROJECT_NAME}.cpp)
 target_link_libraries(cpp${PROJECT_NAME} PRIVATE ${PROJECT_NAME})
 target_compile_definitions(cpp${PROJECT_NAME} PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})
+
+# copy pybind11 module to grss directory
+add_custom_command(TARGET cpp${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cpp${PROJECT_NAME}> ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/$<TARGET_FILE_NAME:cpp${PROJECT_NAME}>
+    # COMMENT "Copying pybind11 module to grss directory"
+)

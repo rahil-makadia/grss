@@ -203,7 +203,7 @@ tiles*.dat
 extern/cspice
 
 # excepted/custom portable spice kernels and their log files
-!naif0012.tls
+!latest_leapseconds.tls
 !planets_big16_de431_1950_2350.bsp
 !planets_big16_de441_1950_2350.bsp
 !planets_big16_de431_1950_2350.log
