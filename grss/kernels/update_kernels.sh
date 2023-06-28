@@ -8,10 +8,10 @@ wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/latest_
 wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_latest_high_prec.bpc
 wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_latest_high_prec.cmt
 # historical earth pck
-wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_070426.bpc
-wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_070426.cmt
+wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_230601.bpc
+wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_230601.cmt
 # predicted earth pck
-wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990628_predict.bpc
-wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990628_predict.cmt
+wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990825_predict.bpc
+wget --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990825_predict.cmt
 
 python update_kernels.py

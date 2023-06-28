@@ -13,11 +13,11 @@ os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/ge
 os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_latest_high_prec.bpc -O {script_dir}/earth_latest_high_prec.bpc')
 os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_latest_high_prec.cmt -O {script_dir}/earth_latest_high_prec.cmt')
 # historical earth pck
-os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_070426.bpc -O {script_dir}/earth_720101_070426.bpc')
-os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_070426.cmt -O {script_dir}/earth_720101_070426.cmt')
+os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_230601.bpc -O {script_dir}/earth_720101_230601.bpc')
+os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_720101_230601.cmt -O {script_dir}/earth_720101_230601.cmt')
 # predicted earth pck
-os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990628_predict.bpc -O {script_dir}/earth_200101_990628_predict.bpc')
-os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990628_predict.cmt -O {script_dir}/earth_200101_990628_predict.cmt')
+os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990825_predict.bpc -O {script_dir}/earth_200101_990825_predict.bpc')
+os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_200101_990825_predict.cmt -O {script_dir}/earth_200101_990825_predict.cmt')
 
 # open the meta-kernel
 meta_kernels = [f'{script_dir}/planets_big16_de431_1950_2350.tm', f'{script_dir}/planets_big16_de441_1950_2350.tm']
