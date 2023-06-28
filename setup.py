@@ -8,16 +8,6 @@ from pathlib import Path
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
-from setuptools.command.install import install
-
-class RunTheseScriptsLast(install):
-    def run(self):
-        install.run(self)
-        cwd = Path(__file__).parent.resolve()
-        print(f'cwd: {cwd}')
-        # run python scripts that need to be run after installation
-        subprocess.run([sys.executable, f'{cwd}/grss/debias/get_debiasing_data.py'], check=True)
-        # subprocess.run([sys.executable, f'{cwd}/grss/kernels/get_kernels.py'], check=True)
 
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
@@ -101,15 +91,29 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="grss",
-    version="0.0.1",
+    version="0.1.0",
+    url="https://github.com/rahil-makadia/grss",
     author="Rahil Makadia",
     author_email="makadia2@illinois.edu",
+    license="GPL",
     description="GRSS build test using pybind11, cmake, and setup.py",
     long_description="",
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Astronomy",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Programming Language :: Python :: 3",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: Unix",
+    ],
+    keywords="astronomy astrophysics nbody integrator",
     packages=["grss"],
     ext_modules=[CMakeExtension("cppgrss")],
     package_data={"grss": [ "debias/*", "debias/*data/*", "kernels/*"]},
-    cmdclass={"build_ext": CMakeBuild,},
+    cmdclass={"build_ext": CMakeBuild},
+    zip_safe=False,
     python_requires=">=3.7",
     install_requires=[
         "astropy>=5.0",
