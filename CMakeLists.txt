@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.19.0)
 
 # set the project name and get version from version.txt
-file(READ "version.txt" ver)
+file(READ "grss/version.txt" ver)
 message(STATUS "GRSS version: ${ver}")
 project(grss VERSION ${ver})
 
@@ -27,6 +27,6 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # create pybind11 module
-pybind11_add_module(cpp${PROJECT_NAME} src/${PROJECT_NAME}.cpp)
-target_link_libraries(cpp${PROJECT_NAME} PRIVATE ${PROJECT_NAME})
-target_compile_definitions(cpp${PROJECT_NAME} PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})
+pybind11_add_module(prop_simulation src/${PROJECT_NAME}.cpp)
+target_link_libraries(prop_simulation PRIVATE ${PROJECT_NAME})
+target_compile_definitions(prop_simulation PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})

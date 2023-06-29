@@ -6,4 +6,4 @@ recursive-include extern *
 include CMakeLists.txt
 include src/CMakeLists.txt
 
-include version.txt
+include grss/version.txt

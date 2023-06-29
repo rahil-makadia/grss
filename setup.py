@@ -85,13 +85,14 @@ class CMakeBuild(build_ext):
         )
 
 # get version from version.txt
-with open("version.txt", "r", encoding="utf-8") as f:
+with open("grss/version.txt", "r", encoding="utf-8") as f:
     ver = f.read().strip()
 setup(
     version=ver,
     packages=["grss", "grss.debias", "grss.kernels"],
-    ext_modules=[CMakeExtension("cppgrss")],
-    package_data={"grss": [ "debias/*.py",
+    ext_modules=[CMakeExtension("prop_simulation")],
+    package_data={"grss": [ "version.txt"
+                            "debias/*.py",
                             "kernels/*.py", "kernels/*.txt", "kernels/*.tm",
                             "kernels/*.log", ],}, # "kernels/*.bsp"
     cmdclass={"build_ext": CMakeBuild},

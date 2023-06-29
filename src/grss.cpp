@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(cppgrss, m) {
+PYBIND11_MODULE(prop_simulation, m) {
     m.doc() = "pybind11 binding for grss library";
 
     // from utilities.h
