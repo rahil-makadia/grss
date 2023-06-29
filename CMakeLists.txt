@@ -20,7 +20,6 @@ include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
 # Set source code directories
 add_subdirectory(extern/pybind11)
 add_subdirectory(src)
-add_subdirectory(examples)
 
 # Configure CPack for cross-platform packaging
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

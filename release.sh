@@ -2,8 +2,6 @@
 rm -rf build dist grss.egg-info
 pip uninstall grss -y
 
-pip install .
-
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade build twine
 
@@ -15,4 +13,11 @@ if [ "$server" = "-pypi" ]; then
     python3 -m twine upload dist/*
 else
     python3 -m twine upload --repository testpypi dist/*
+fi
+
+# install from pypi or testpypi based on -pypi flag
+if [ "$server" = "-pypi" ]; then
+    python3 -m pip install --upgrade grss
+else
+    python3 -m pip install --upgrade --index-url https://test.pypi.org/simple/ --no-deps grss
 fi

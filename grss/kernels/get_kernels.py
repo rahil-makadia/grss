@@ -6,6 +6,12 @@ import os
 # get the path to the directory containing this script
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
+# get the custom spice kernels if they are not already present
+# de431 planets + big16 1950-2350
+os.system(f'wget --no-verbose --no-clobber https://github.com/rahil-makadia/grss/raw/dev/grss/kernels/planets_big16_de431_1950_2350.bsp -O {script_dir}/planets_big16_de431_1950_2350.bsp')
+# de441 planets + big16 1950-2350
+os.system(f'wget --no-verbose --no-clobber https://github.com/rahil-makadia/grss/raw/dev/grss/kernels/planets_big16_de441_1950_2350.bsp -O {script_dir}/planets_big16_de441_1950_2350.bsp')
+
 # get the latest spice leap second kernel
 os.system(f'wget --no-verbose --no-clobber https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/latest_leapseconds.tls -O {script_dir}/latest_leapseconds.tls')
 # get the earth orientation binary spice kernels and their comments if they are not already present

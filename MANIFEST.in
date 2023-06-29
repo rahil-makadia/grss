@@ -1,12 +1,9 @@
 include include/*.h
-
 include src/*.cpp
 
-include examples/*.cpp
 recursive-include extern *
 
 include CMakeLists.txt
 include src/CMakeLists.txt
-include examples/CMakeLists.txt
 
 include version.txt
