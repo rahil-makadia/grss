@@ -1,3 +1,4 @@
+"""Radar observation handling for the GRSS orbit determination code"""
 from json import loads
 from requests import request
 from astropy.time import Time
@@ -7,13 +8,18 @@ __all__ = [ 'get_radar_obs_array',
 ]
 
 def get_radar_raw_data(tdes):
-    """Get json data from JPL small-body radar API entry for desired small body
+    """
+    Get JSON data from JPL small-body radar API entry for desired small body
 
-    Args:
-        tdes (str/int): IMPORTANT: must be the designation of the small body, not the name.
+    Parameters
+    ----------
+    tdes : str/int
+        IMPORTANT: must be the designation of the small body, not the name.
 
-    Returns:
-        raw_data: JSON output of small body information query from JPL small-body radar API
+    Returns
+    -------
+    raw_data : dict
+        JSON output of small body information query from JPL small-body radar API
     """
     url = f"https://ssd-api.jpl.nasa.gov/sb_radar.api?des={tdes}"
     req = request("GET", url, timeout=30)
@@ -21,14 +27,32 @@ def get_radar_raw_data(tdes):
 
 def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
     # sourcery skip: low-code-quality
-    """Get radar observations from JPL small-body radar API entry for desired small body
+    """
+    Get radar observations from JPL small-body radar API entry for a desired small body
+    and assemble the radar observations for the given body into an array for an orbit fit.
 
-    Args:
-        tdes (str/int): IMPORTANT: must be the designation of the small body, not the name.
+    Parameters
+    ----------
+    tdes : str/int
+        IMPORTANT: must be the designation of the small body, not the name.
+    t_min_tdb : float, optional
+        Minimum time (MJD TDB) for observations to be included, by default None
+    t_max_tdb : float, optional
+        Maximum time (MJD TDB) for observations to be included, by default None
+    verbose : bool, optional
+        Flag to print out information about the observations, by default False
 
-    Returns:
-        obs_array_radar (np.ndarray): Radar observation data for the given body
-        observer_codes_radar (tuple): Observer locations for each observation in obs_array_radar
+    Returns
+    -------
+    obs_array_radar : array
+        Radar observation data for the given body
+    observer_codes_radar : tuple
+        Observer locations for each observation in obs_array_radar
+
+    Raises
+    ------
+    ValueError
+        If the observation type is not recognized
     """
     if t_min_tdb is None:
         t_min_utc = -np.inf

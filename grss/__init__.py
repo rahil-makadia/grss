@@ -1,3 +1,4 @@
+"""GRSS: the Gauss-Radau Small-body Simulator"""
 from . import prop
 from . import fit
 from . import utils

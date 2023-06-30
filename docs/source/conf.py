@@ -17,10 +17,13 @@ with open('../../grss/version.txt', 'r', encoding='utf-8') as f:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.duration',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
+    'sphinx.ext.duration',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
 ]
+autosummary_generate = True
 
 templates_path = ['_templates']
 exclude_patterns = []

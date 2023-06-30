@@ -23,8 +23,10 @@
       get_sbdb_elems
       get_sbdb_info
       get_sbdb_raw_data
+      icrf2radec
       mjd2et
       parallax_constants_to_lat_lon_alt
+      radec2icrf
    
    
 

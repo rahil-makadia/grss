@@ -1,3 +1,4 @@
+"""Utilities for the GRSS orbit determination code"""
 from json import loads
 from requests import request
 import numpy as np
@@ -16,48 +17,59 @@ __all__ = [ 'get_ra_from_hms',
 ]
 
 def get_ra_from_hms(ra_hms):
-    """Convert right ascension from HH:MM:SS.SSS to radians.
-
-    Args:
-        ra_hms (str): Right ascension in HH:MM:SS.SSS format
-
-    Returns:
-        r_asc: Right ascension in radians
     """
-    # convert right ascension from HH:MM:SS.SSS to radians
+    Convert right ascension from HH:MM:SS.SSS to arcseconds.
+
+    Parameters
+    ----------
+    ra_hms : str
+        Right ascension in HH:MM:SS.SSS format
+
+    Returns
+    -------
+    r_asc : float
+        Right ascension in arcseconds
+    """
+    # convert right ascension from HH:MM:SS.SSS to arcseconds
     ra_split = ra_hms.split(' ')
     r_asc = 15*(float(ra_split[0])+float(ra_split[1])/60+float(ra_split[2])/3600)
-    return r_asc*3600 # np.deg2rad(r_asc)
+    return r_asc*3600
 
 def get_dec_from_dms(dec_dms):
-    """Convert declination from deg MM:SS.SSS to radians.
-
-    Args:
-        dec_dms (str): Declination in deg MM:arcSS.SSS format
-
-    Returns:
-        dec: Declination in radians
     """
-    # convert declination from deg MM:SS.SSS to radians
+    Convert declination from deg MM:SS.SSS to arcseconds.
+
+    Parameters
+    ----------
+    dec_dms : str
+        Declination in deg MM:arcSS.SSS format
+
+    Returns
+    -------
+    dec : float
+        Declination in arcseconds
+    """
+    # convert declination from deg MM:SS.SSS to arcseconds
     dec_split = dec_dms.replace('+','').replace('-','').split(' ')
     dec = float(dec_split[0])+float(dec_split[1])/60+float(dec_split[2])/3600
     if dec_dms[0] == '-':
         dec *= -1
-    return dec*3600 # np.deg2rad(dec)
+    return dec*3600
 
 @jit('float64(float64)', nopython=True, cache=True)
 def mjd2et(mjd):
     """
-    Converts modified Julian Date to JPL NAIF SPICE Ephemeris time.
-    Only valid for TDB timescales.
+    Converts Modified Julian Date to JPL NAIF SPICE Ephemeris time.
 
-    Parameters:
-    -----------
-    MJD ... Modified Julian Day
+    Parameters
+    ----------
+    mjd : float
+        Modified Julian Date
 
-    Returns:
-    --------
-    ET  ... Ephemeris time (ephemeris seconds beyond epoch J2000)
+    Returns
+    -------
+    et : float
+        Ephemeris time (ephemeris seconds beyond epoch J2000)
     """
     return (mjd+2400000.5-2451545.0)*86400
 
@@ -65,28 +77,35 @@ def mjd2et(mjd):
 def et2mjd(ephem_time):
     """
     Converts JPL NAIF SPICE Ephemeris time to Modified Julian Date.
-    Only valid for TDB timescales.
 
-    Parameters:
-    -----------
-    ET  ... Ephemeris time (ephemeris seconds beyond epoch J2000)
+    Parameters
+    ----------
+    ephem_time : float
+        Ephemeris time (ephemeris seconds beyond epoch J2000)
 
-    Returns:
-    --------
-    MJD ... Modified Julian Day
+    Returns
+    -------
+    mjd : float
+        Modified Julian Date
     """
     return ephem_time/86400-2400000.5+2451545.0
 
 @jit('Tuple((float64, float64))(float64[:])', nopython=True, cache=True)
 def get_radec(state):
-    """Convert a cartesian state into right ascension and declination
+    """
+    Convert a cartesian state into right ascension and declination
 
-    Args:
-        state (vector): 6-element cartesian state vector
+    Parameters
+    ----------
+    state : vector
+        6-element cartesian state vector
 
-    Returns:
-        r_asc (float): right ascension in radians
-        dec (float): declination in radians
+    Returns
+    -------
+    r_asc : float
+        right ascension in arcseconds
+    dec : float
+        declination in arcseconds
     """
     pos = state[:3]
     # vel = state[3:6]
@@ -96,22 +115,37 @@ def get_radec(state):
         r_asc = r_asc + 2*np.pi
     # end if
     dec = np.arcsin(pos[2]/dist) # calculate declination
-    return r_asc*180/np.pi*3600, dec*180/np.pi*3600 # r_asc, dec
+    return r_asc*180/np.pi*3600, dec*180/np.pi*3600
 
-@jit('Tuple((float64, float64, float64, float64, float64))(float64, float64, float64)', nopython=True, cache=False)
+@jit('Tuple((float64, float64, float64, float64, float64))(float64, float64, float64)',
+        nopython=True, cache=False)
 def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
-    """Convert parallax constants to geodetic latitude, longitude, and altitude.
+    """
+    Convert parallax constants to geodetic latitude, longitude, and altitude.
 
-    Args:
-        lon (float): degrees, longitude of observer
-        rho_cos_lat (float): rho cos phi', where rho is the distance from the geocenter to the observer and phi' is the geocentric latitude of the observer
-        rho_sin_lat (float): rho sin phi', where rho is the distance from the geocenter to the observer and phi' is the geocentric latitude of the observer
+    Parameters
+    ----------
+    lon : float
+        degrees, longitude of observer
+    rho_cos_lat : float
+        rho cos phi', where rho is the distance from the geocenter to the observer
+        and phi' is the geocentric latitude of the observer
+    rho_sin_lat : float
+        rho sin phi', where rho is the distance from the geocenter to the observer
+        and phi' is the geocentric latitude of the observer
 
-    Returns:
-        lon (float): radians, longitude of observer
-        lat (float): radians, geocentric latitude of observer
-        geodet_lat (float): radians, geodetic latitude of observer
-        alt (float): km, altitude of observer
+    Returns
+    -------
+    lon : float
+        radians, longitude of observer
+    lat : float
+        radians, geocentric latitude of observer
+    geodet_lat : float
+        radians, geodetic latitude of observer
+    alt : float
+        altitude of observer, m
+    rho : float
+        distance from the geocenter to the observer, m
     """
     # WGS84 ellipsoid parameters
     r_eq = 6378137.0 # m
@@ -120,20 +154,25 @@ def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
     e_sq = flatness*(2 - flatness)
     lat = np.arctan2(rho_sin_lat, rho_cos_lat)
     rho = np.sqrt(rho_cos_lat**2 + rho_sin_lat**2)*r_eq
-    geodet_lat = np.arctan( np.tan(lat) / (1 - e_sq) ) # from Hedgley, D. R., Jr. "An Exact Transformation from Geocentric to Geodetic Coordinates for Nonzero Altitudes." NASA TR R-458, March, 1976. https://ntrs.nasa.gov/citations/19760012748
-    rellip = np.sqrt(  ( (r_eq**2*np.cos(geodet_lat))**2 + (r_po**2*np.sin(geodet_lat))**2 ) / ( (r_eq*np.cos(geodet_lat))**2 + (r_po*np.sin(geodet_lat))**2 )  )
-    alt = rho - rellip # km -> m
+    # from Hedgley, D. R., Jr., NASA TR R-458, 1976. https://ntrs.nasa.gov/citations/19760012748
+    geodet_lat = np.arctan( np.tan(lat) / (1 - e_sq) )
+    num = (r_eq**2*np.cos(geodet_lat))**2 + (r_po**2*np.sin(geodet_lat))**2
+    den = (r_eq*np.cos(geodet_lat))**2 + (r_po*np.sin(geodet_lat))**2
+    rellip = np.sqrt( num / den )
+    alt = rho - rellip
     return lon*np.pi/180, lat, geodet_lat, alt, rho
 
 def get_radar_codes_dict():
     # sourcery skip: inline-immediately-returned-variable
-    """Creates a dictionary of radar codes and their corresponding longitude, geocentric latitude, and distance from the geocenter
+    """
+    Creates a dictionary of radar codes and their corresponding longitude,
+    geocentric latitude, and distance from the geocenter
 
-    Args:
-        None
-
-    Returns:
-        radar_codes_dict (dict): dictionary of radar codes and their corresponding longitude, geocentric latitude, and distance from the geocenter
+    Returns
+    -------
+    radar_codes_dict : dict
+        dictionary of radar codes and their corresponding longitude,
+        geocentric latitude, and distance from the geocenter
     """
     # from obscodr.dat
     radar_codes_dict = {'-1' : (5.118130907583567, 0.3181656968486174, 6376485.333881727),
@@ -200,13 +239,15 @@ def get_radar_codes_dict():
     return radar_codes_dict
 
 def get_codes_dict():
-    """Creates a dictionary of MPC codes and their corresponding longitude, geocentric latitude, and distance from the geocenter
+    """
+    Creates a dictionary of MPC codes and their corresponding longitude,
+    geocentric latitude, and distance from the geocenter
 
-    Args:
-        None
-
-    Returns:
-        codes_dict (dict): dictionary of MPC codes and their corresponding longitude, geocentric latitude, and distance from the geocenter
+    Returns
+    -------
+    codes_dict : dict
+        dictionary of MPC codes and their corresponding longitude,
+        geocentric latitude, and distance from the geocenter
     """
     # pylint: disable=no-member
     codes = MPC.get_observatory_codes()
@@ -214,7 +255,8 @@ def get_codes_dict():
     for code_info in codes:
         if np.isfinite(code_info['Longitude']):
             code = code_info['Code']
-            lon, rho_cos_lat, rho_sin_lat = float(code_info['Longitude']), float(code_info['cos']), float(code_info['sin'])
+            lon, rho_cos_lat, rho_sin_lat = (float(code_info['Longitude']),
+                                                float(code_info['cos']), float(code_info['sin']))
             # print(code, lon, rho_cos_lat, rho_sin_lat)
             lon, lat, _, _, rho = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
             codes_dict[code] = (lon, lat, rho)
@@ -240,18 +282,27 @@ def get_codes_dict():
     return codes_dict
 
 def get_observer_info(observer_codes):
-    """Creates a list of observer information for each observer code for passing into a grss propSimulation object
+    """
+    Creates a list of observer information for each observer code for
+    passing into a grss propSimulation object
 
-    Args:
-        observer_codes (list): Observer locations for each observation. Shape of each entry changes on type of observation: 1 (optical), 2 (radar), or 3 (doppler).
+    Parameters
+    ----------
+    observer_codes : list
+        Observer locations for each observation. Shape of each entry changes
+        on type of observation: 1 (optical), 2 (radar), or 3 (doppler).
 
-    Returns:
-        observer_info (list): Information about each observer (Spice ID for parent body, longitude, geodetic latitude, and altitude). Shape of each entry changes on type of observation: 4 (optical), 8 (radar), or 9 (doppler).
+    Returns
+    -------
+    observer_info : list
+        Information about each observer (Spice ID for parent body, longitude,
+        geodetic latitude, and altitude). Shape of each entry changes on type
+        of observation: 4 (optical), 8 (radar), or 9 (doppler).
     """
     codes_dict = get_codes_dict()
     observer_info = []
     for code in observer_codes:
-        info_list = [399]
+        info_list = []
         # check if code is a tuple - corresponds to a radar observation
         if isinstance(code, tuple) and len(code) in {2, 3}:
             tx_code = code[0][0]
@@ -259,34 +310,53 @@ def get_observer_info(observer_codes):
             bounce_point = code[1]
             receiver_info = codes_dict[rx_code]
             transmitter_info = codes_dict[tx_code]
-            info_list.extend((receiver_info[0], receiver_info[1], receiver_info[2], 399, transmitter_info[0], transmitter_info[1], transmitter_info[2], bounce_point))
+            info_list.extend((  399, receiver_info[0], receiver_info[1], receiver_info[2],
+                                399, transmitter_info[0], transmitter_info[1], transmitter_info[2],
+                                bounce_point))
             if len(code) == 3: # add tranmission frequency if dopppler observation
                 freq = code[2]
                 info_list.append(freq)
         else:
             info = codes_dict[code]
-            info_list.extend((info[0], info[1], info[2]))
+            info_list.extend((399, info[0], info[1], info[2]))
         observer_info.append(info_list)
     return observer_info
 
 def get_sbdb_raw_data(tdes):
-    """Get json data from JPL SBDB entry for desired small body
-    Args:
-        tdes (str): IMPORTANT: must be the designation of the small body, not the name.
-    Returns:
-        raw_data (dict): JSON output of small body information query from SBDB
+    """
+    Get json data from JPL SBDB entry for desired small body
+
+    Parameters
+    ----------
+    tdes : str
+        IMPORTANT: must be the designation of the small body, not the name.
+
+    Returns
+    -------
+    raw_data : dict
+        JSON output of small body information query from SBDB
     """
     url = f"https://ssd-api.jpl.nasa.gov/sbdb.api?sstr={tdes}&cov=mat&phys-par=true&full-prec=true"
     req = request("GET", url, timeout=30)
     return loads(req.text)
 
 def get_sbdb_elems(tdes, cov_elems=True):
-    """Get a set of desired elements for small body from SBDB API
-    Args:
-        tdes (str): IMPORTANT: must be the designation of the small body, not the name.
-        cov_elems (bool, optional): Boolean for whether to extract element set corresponding to the covariance information (since the nominal set on the webpage might have a different epoch than the full covariance info). Defaults to True.
-    Returns:
-        elements (dict): Dictionary containing desired cometary elements for the small body
+    """
+    Get a set of desired elements for small body from SBDB API
+
+    Parameters
+    ----------
+    tdes : str
+        IMPORTANT: must be the designation of the small body, not the name.
+    cov_elems : bool, optional
+        Boolean for whether to extract element set corresponding to the covariance
+        information (since the nominal set on the webpage might have a different epoch
+        than the full covariance info), by default True
+
+    Returns
+    -------
+    elements : dict
+        Dictionary containing desired cometary elements for the small body
     """
     raw_data = get_sbdb_raw_data(tdes)
     if cov_elems:
@@ -309,7 +379,8 @@ def get_sbdb_elems(tdes, cov_elems=True):
         val.append(float(ele['value']))
     full_elements_dict = dict(zip(hdr, val))
     # cometary elements
-    # eccentricity, perihelion distance, time of periapse passage (JD), longitude of the ascending node, argument of perihelion, inclination
+    # eccentricity, perihelion distance, time of periapse passage (JD),
+    # longitude of the ascending node, argument of perihelion, inclination
     keys = ['e', 'q', 'tp', 'om', 'w', 'i']
     elements = {'t': epoch_mjd}
     # add every element key to elements dictionary
@@ -322,13 +393,23 @@ def get_sbdb_elems(tdes, cov_elems=True):
     return elements
 
 def get_sbdb_info(tdes):
-    """Return small body information from JPL SBDB API
-    Args:
-        tdes (str): IMPORTANT: must be the designation of the small body, not the name.
-    Returns:
-        elements (dict): Dictionary containing desired cometary elements for the small body
-        cov_mat (np.ndarray): Covariance matrix corresponding to cometary elements
-        nongrav_params (dict): Dictionary containing information about nongravitational acceleration constants for target body
+    """
+    Return small body orbit information from JPL SBDB API
+
+    Parameters
+    ----------
+    tdes : str
+        IMPORTANT: must be the designation of the small body, not the name.
+
+    Returns
+    -------
+    elements : dict
+        Dictionary containing desired cometary elements for the small body
+    cov_mat : array
+        Covariance matrix corresponding to cometary elements
+    nongrav_params : dict
+        Dictionary containing information about nongravitational acceleration
+        constants for target body
     """
     # get json info from SBDB entry for small body
     raw_data = get_sbdb_raw_data(tdes)
@@ -343,9 +424,11 @@ def get_sbdb_info(tdes):
     val = [float(param['value']) for param in nongrav_data]
     nongrav_data_dict = dict(zip(hdr, val))
     nongrav_keys = ['A1', 'A2', 'A3', 'ALN', 'NK', 'NM', 'NN', 'R0']
-    nongrav_default_vals = [0.0, 0.0, 0.0, 0.1112620426, 4.6142, 2.15, 5.093, 2.808] # from https://ssd.jpl.nasa.gov/horizons/manual.html
+    # from https://ssd.jpl.nasa.gov/horizons/manual.html
+    nongrav_default_vals = [0.0, 0.0, 0.0, 0.1112620426, 4.6142, 2.15, 5.093, 2.808]
     nongrav_default_dict = dict(zip(nongrav_keys, nongrav_default_vals))
-    nongrav_key_map = {'A1': 'a1', 'A2': 'a2', 'A3': 'a3', 'ALN': 'alpha', 'NK': 'k', 'NM': 'm', 'NN': 'n', 'R0': 'r0_au'}
+    nongrav_key_map = { 'A1': 'a1', 'A2': 'a2', 'A3': 'a3', 'ALN': 'alpha',
+                        'NK': 'k', 'NM': 'm', 'NN': 'n', 'R0': 'r0_au'}
     nongrav_params = {}
     for key in nongrav_keys:
         try:
@@ -355,3 +438,67 @@ def get_sbdb_info(tdes):
         if key in cov_keys:
             elements[nongrav_key_map[key]] = nongrav_data_dict[key]
     return [elements, cov_mat, nongrav_params]
+
+def icrf2radec(pos_x, pos_y, pos_z, deg=False):
+    """
+    Convert ICRF unit vector to Right Ascension and Declination.
+
+    Parameters
+    ----------
+    pos_x : float or array
+        ICRF unit vector x-component.
+    pos_y : float or array
+        ICRF unit vector y-component.
+    pos_z : float or array
+        ICRF unit vector z-component.
+    deg : bool, optional
+        Flag for whether angles are in degrees, by default False
+
+    Returns
+    -------
+    r_asc : float or array
+        Right Ascension in degrees or radians.
+    dec : float or array
+        Declination in degrees or radians.
+    """
+    pos = np.array([pos_x, pos_y, pos_z])
+    dist = np.linalg.norm(pos,axis=0) if (pos.ndim>1) else np.linalg.norm(pos)
+    phi = np.arctan2(pos_y/dist,pos_x/dist)
+    delta = np.arcsin(pos_z/dist)
+    if deg:
+        r_asc = np.mod(np.rad2deg(phi)+360,360)
+        dec = np.rad2deg(delta)
+    else:
+        r_asc = np.mod(phi+2*np.pi,2*np.pi)
+        dec = delta
+    return r_asc, dec
+
+def radec2icrf(r_asc, dec, deg=False):
+    """
+    Convert Right Ascension and Declination to ICRF unit vector.
+
+    Parameters
+    ----------
+    r_asc : float or array
+        Right Ascension in degrees or radians.
+    dec : float or array
+        Declination in degrees or radians.
+    deg : bool, optional
+        Flag for whether angles are in degrees, by default False
+
+    Returns
+    -------
+    unit_vector : array
+        ICRF unit vector.
+    """
+    if deg:
+        alpha = np.deg2rad(r_asc)
+        delta = np.deg2rad(dec)
+    else:
+        alpha = np.array(r_asc)
+        delta = np.array(dec)
+    cosd = np.cos(delta)
+    pos_x = cosd*np.cos(alpha)
+    pos_y = cosd*np.sin(alpha)
+    pos_z = np.sin(delta)
+    return np.array([pos_x, pos_y, pos_z])

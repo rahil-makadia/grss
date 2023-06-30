@@ -1,5 +1,9 @@
 API
 ===
+.. automodule:: grss
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 .. autosummary::
    :toctree: generated

@@ -14,7 +14,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(prop_simulation, m) {
-    m.doc() = "pybind11 binding for grss library";
+    m.doc() = "Simulation classes for the C++ GRSS orbit propagation code";
 
     // from utilities.h
     py::class_<Constants>(m, "Constants")

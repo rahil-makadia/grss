@@ -15,6 +15,7 @@
    
       apply_debiasing_scheme
       apply_weights
+      debias_obs
       deweight_obs
       eliminate_obs
       get_optical_data
