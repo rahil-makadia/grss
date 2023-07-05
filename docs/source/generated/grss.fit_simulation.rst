@@ -23,8 +23,8 @@
 
    .. autosummary::
    
-      fitSimulation
-      iterationParams
+      FitSimulation
+      IterationParams
    
    
 
