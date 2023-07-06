@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# get cspice
+cd ./extern/
+python get_cspice.py
+
 # initialize and update git submodules
-cd ./extern/pybind11/
+cd ./pybind11/
 git submodule init
 cd ../../
 git submodule update
