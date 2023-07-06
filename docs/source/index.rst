@@ -3,9 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-=========================
+=============================================
 Welcome to the GRSS docs!
-=========================
+=============================================
+**GRSS** (pronounced "grass"), the *Gauss-Radau Small-body Simulator* is a Python package with a C++ binding for propagating and fitting the orbits of small bodies in the solar system, such as asteroids and comets. Click on the links below to learn more about the library:
 
 .. toctree::
    :maxdepth: 1
@@ -15,6 +16,18 @@ Welcome to the GRSS docs!
    fit
    examples
    api
+
+----------------
+Acknowledgements
+----------------
+GRSS Development Team:
+
+* Rahil Makadia
+* Steven R. Chesley
+* Siegfried Eggl
+* Davide Farnocchia
+
+The GRSS library was developed as part of Rahil Makadia's PhD dissertation at the University of Illinois at Urbana-Champaign. This work was supported by a NASA Space Technologies Graduate Research Opportunities (NSTGRO) Fellowship, Grant #80NSSC22K1173. The author would like to thank his advisor, Dr. Siegfried Eggl as well as his collaborators, Dr. Steven R. Chesley, and Dr. Davide Farnocchia for their guidance and support.
 
 """"""""""""""""""
 Indices and tables

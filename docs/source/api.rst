@@ -1,16 +1,13 @@
 API
 ===
-.. automodule:: grss
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. autosummary::
-   :toctree: generated
+   :toctree: _autosummary
+   :template: custom-module.rst
+   :recursive:
 
    grss.prop_simulation
    grss.fit_optical
    grss.fit_radar
    grss.fit_simulation
-   grss.fit_utilities
+   grss.fit_utils
    grss.utils
