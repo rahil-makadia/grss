@@ -6,6 +6,6 @@ cd docs
 rm -rf build
 rm -rf source/_autosummary
 make clean html
-make epub
-make latexpdf
+#make epub
+#make latexpdf
 cd ..
