@@ -118,10 +118,10 @@ class IterationParams:
             None
         """
         # sourcery skip: extract-duplicate-method
-        # optical_idx is where neither the r_asc nor dec residuals are NaN
+        # optical_idx is where neither the RA nor dec residuals are NaN
         optical_idx = np.where(~np.isnan(self.residuals[:, 0]) &
                                 ~np.isnan(self.residuals[:, 1]))[0]
-        # radar_idx is where either the r_asc or dec residuals are NaN
+        # radar_idx is where either the RA or dec residuals are NaN
         radar_idx = np.where(np.isnan(self.residuals[:, 0]) |
                                 np.isnan(self.residuals[:, 1]))[0]
         optical_info = self.obs_array.copy()
@@ -278,7 +278,7 @@ class IterationParams:
         plt.suptitle(iter_string, y=0.95)
         grid_spec = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
         ax1 = fig.add_subplot(grid_spec[0, 0])
-        ax1.plot(t_arr, ra_residuals, '.', label='r_asc', markersize=markersize)
+        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize)
         ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize)
         ax1.plot(t_arr[is_rejected], ra_residuals[is_rejected], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
@@ -299,7 +299,7 @@ class IterationParams:
                             markersize, show_logarithmic)
         ax2main.plot(ra_cosdec_residuals[is_rejected], dec_residuals[is_rejected], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
-        ax2main.set_xlabel('r_asc cos(Dec) Residuals, O-C [arcsec]')
+        ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
         ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
         ax2main.grid(True, which='both', axis='both', alpha=0.2, zorder=-100)
         if show_logarithmic:
@@ -325,8 +325,9 @@ class IterationParams:
 
     def plot_chi(self, t_arr, ra_chi, dec_chi, delay_chi, doppler_chi,
                     ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared,
-                    sigma_limit, radar_scale, markersize,
+                    plot_chi_squared, sigma_limit, radar_scale, markersize,
                     show_logarithmic, title, savefig, figname):
+        # sourcery skip: low-code-quality
         """
         Plot the chi and chi-squared values for the residuals
 
@@ -350,6 +351,8 @@ class IterationParams:
             delay chi-squared values
         doppler_chi_squared : vector
             doppler chi-squared values
+        plot_chi_squared : bool
+            Flag to plot the chi-squared values
         sigma_limit : float
             reference sigma limit for plotting the chi values
         radar_scale : float
@@ -372,20 +375,23 @@ class IterationParams:
         """
         is_rejected = self.is_rejected
         is_accepted = self.is_accepted
-        # optical_idx is where neither the r_asc nor dec residuals are NaN
+        # optical_idx is where neither the RA nor dec residuals are NaN
         optical_idx = np.where(~np.isnan(self.residuals[:, 0]) &
                                 ~np.isnan(self.residuals[:, 1]))[0]
-        # radar_idx is where either the r_asc or dec residuals are NaN
+        # radar_idx is where either the RA or dec residuals are NaN
         radar_idx = np.where(np.isnan(self.residuals[:, 0]) |
                                 np.isnan(self.residuals[:, 1]))[0]
         # plot chi values
-        plt.figure(figsize=(21,6), dpi=150)
+        factor = 3 if plot_chi_squared else 1
+        plt.figure(figsize=(factor*7,6), dpi=150)
         if self.iter_number == 0:
             iter_string = f'Iteration {self.iter_number} (prefit)'
         else:
             iter_string = f'Iteration {self.iter_number}'
         iter_string = title if title is not None else iter_string
-        msg = (f'{iter_string}. Chi Squared: '
+        msg = iter_string
+        if plot_chi_squared:
+            msg += ('. Chi Squared: '
                 'RA='
                 f'{np.sum(ra_chi_squared[np.intersect1d(is_accepted, optical_idx)]):.2f}, '
                 'Dec='
@@ -395,8 +401,9 @@ class IterationParams:
                 'Doppler='
                 f'{np.nansum(doppler_chi_squared[np.intersect1d(is_accepted, radar_idx)]):.2f}')
         plt.suptitle(msg, y=0.95)
-        plt.subplot(1,2,1)
-        plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='r_asc')
+        if plot_chi_squared:
+            plt.subplot(1,2,1)
+        plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
         plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
         plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
@@ -418,24 +425,25 @@ class IterationParams:
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
             plt.yscale('log')
-        plt.subplot(1,2,2)
-        plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='r_asc')
-        plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize, label='Dec')
-        plt.plot(t_arr[is_rejected], ra_chi_squared[is_rejected], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
-        plt.plot(t_arr[is_rejected], dec_chi_squared[is_rejected], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
-        plt.plot(t_arr, delay_chi_squared, '.', mfc='C2', mec='C2',
-                    markersize=radar_scale*markersize, label='Delay')
-        plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
-                    markersize=radar_scale*markersize, label='Doppler')
-        plt.legend(ncol=2)
-        plt.xlabel('MJD [UTC]')
-        plt.ylabel(r'$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
-        plt.grid(True, which='both', axis='both', alpha=0.2)
-        # if show_logarithmic: plt.yscale('log')
-        plt.yscale('log')
-        plt.tight_layout()
+        if plot_chi_squared:
+            plt.subplot(1,2,2)
+            plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')
+            plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr[is_rejected], ra_chi_squared[is_rejected], 'ro',
+                        markersize=2*markersize, markerfacecolor='none')
+            plt.plot(t_arr[is_rejected], dec_chi_squared[is_rejected], 'ro',
+                        markersize=2*markersize, markerfacecolor='none')
+            plt.plot(t_arr, delay_chi_squared, '.', mfc='C2', mec='C2',
+                        markersize=radar_scale*markersize, label='Delay')
+            plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
+                        markersize=radar_scale*markersize, label='Doppler')
+            plt.legend(ncol=2)
+            plt.xlabel('MJD [UTC]')
+            plt.ylabel(r'$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
+            plt.grid(True, which='both', axis='both', alpha=0.2)
+            # if show_logarithmic: plt.yscale('log')
+            plt.yscale('log')
+            plt.tight_layout()
         if savefig:
             figname = f'chi_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_chi.pdf', bbox_inches='tight')
@@ -443,7 +451,7 @@ class IterationParams:
         return None
 
     def plot_iteration_summary(self, show_logarithmic=False, title=None,
-                                savefig=False, figname=None):
+                                savefig=False, figname=None, plot_chi_squared=False):
         """
         Plot the summary of the iteration, including residuals, chi values,
         and chi squared values.
@@ -458,6 +466,8 @@ class IterationParams:
             Flag to save the figure, by default False
         figname : str, optional
             Name of the figure, by default None
+        plot_chi_squared : bool, optional
+            Flag to plot the chi squared values, by default False
 
         Returns
         -------
@@ -501,7 +511,7 @@ class IterationParams:
                             show_logarithmic, title, savefig, figname)
         self.plot_chi(t_arr, ra_chi, dec_chi, delay_chi, doppler_chi,
                         ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared,
-                        sigma_limit, radar_scale, markersize,
+                        plot_chi_squared, sigma_limit, radar_scale, markersize,
                         show_logarithmic, title, savefig, figname)
         return None
 
