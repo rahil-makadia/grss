@@ -22,8 +22,7 @@ jobs:
                     conda create -n grss python=3.8
                     $CONDA/bin/activate grss
                     python3 -m pip install --upgrade pip
-                    python3 -m pip install sphinx sphinx-copybutton sphinx-gallery
-                    conda install nbsphinx
+                    python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
                     source initialize.sh
                     pip3 install .
                     cd docs
