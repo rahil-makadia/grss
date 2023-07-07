@@ -1,4 +1,4 @@
-name: build-docs
+name: python-tests
 on: [push, pull_request]
 jobs:
   sphinx:
@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install GRSS (including dependencies) and build docs
+      - name: Install dependencies and build GRSS
         run: |
           brew update
           brew install pandoc
@@ -23,13 +23,8 @@ jobs:
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
           source initialize.sh
           pip3 install .
-          cd docs
-          make clean html
-          cd ..
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build/html
-          force_orphan: true
+      - name: Run tests
+        run: |
+          $CONDA/bin/activate grss
+          jupyter nbconvert --execute --to notebook --inplace tests/prop/*.ipynb
+          jupyter nbconvert --execute --to notebook --inplace tests/fit/*.ipynb
