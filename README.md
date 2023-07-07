@@ -1,5 +1,6 @@
 # grss
 
+[![PyPi Version](https://img.shields.io/pypi/v/grss.svg)](https://pypi.python.org/pypi/grss/)
 [![Build Sphinx docs)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml)
 [![Python unit tests)](https://github.com/rahil-makadia/grss/actions/workflows/python_tests.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/python_tests.yml)
 [![GPL](https://img.shields.io/badge/license-GPL-green.svg?style=flat)](https://github.com/rahil-makadia/grss/blob/main/LICENSE)
