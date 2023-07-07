@@ -1,36 +1,38 @@
 name: sphinx-docs
 on: [push, pull_request]
 jobs:
-    docs:
-        runs-on: macos-latest
-        steps:
-            - uses: conda-incubator/setup-miniconda@v2
-              with:
-                miniconda-version: latest
-                channels: conda-forge, defaults
-                auto-activate-base: false
-            - name: Checkout repo
-              uses: actions/checkout@v3
-              with:
-                submodules: true
-            # - name: Setup python
-            #   uses: actions/setup-python@v3
-            #   with:
-            #     python-version: '3.8'
-            - name: Install dependencies and build GRSS
-              run: |
-                    conda create -n grss python=3.8
-                    $CONDA/bin/activate grss
-                    python3 -m pip install --upgrade pip
-                    python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
-                    source initialize.sh
-                    pip3 install .
-                    cd docs
-                    make clean html
-                    cd ..
-            - name: Deploy
-              uses: peaceiris/actions-gh-pages@v3
-              with:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    BRANCH: gh-pages # The branch the action should deploy to.
-                    FOLDER: docs/_build/html # The folder the action should deploy.
+  docs:
+    runs-on: macos-latest
+    steps:
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: latest
+          channels: conda-forge, defaults
+          auto-activate-base: false
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      # - name: Setup python
+      #   uses: actions/setup-python@v3
+      #   with:
+      #     python-version: '3.8'
+      - name: Install dependencies and build GRSS
+        run: |
+          brew update
+          brew install pandoc
+          conda create -n grss python=3.8
+          $CONDA/bin/activate grss
+          python3 -m pip install --upgrade pip
+          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
+          source initialize.sh
+          pip3 install .
+          cd docs
+          make clean html
+          cd ..
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: docs/_build/html # The folder the action should deploy.
