@@ -19,9 +19,9 @@ CSPICE_NO_PATCH = "CSPICE_NO_PATCH"
 host_OS = platform.system()
 host_arch = platform.machine()
 # Check if platform is supported
-os_supported = host_OS in ("Linux", "Darwin", "FreeBSD", "Windows")
+os_supported = host_OS in ("Linux", "Darwin")
 # Get platform is Unix-like OS or not
-is_unix = host_OS in ("Linux", "Darwin", "FreeBSD")
+is_unix = host_OS in ("Linux", "Darwin")
 # Get current working directory
 ROOT_DIR = str(Path(os.path.realpath(__file__)).parent)
 # Make the directory path for cspice
@@ -59,11 +59,8 @@ class GetCSPICE(object):
         # -------- ----------  -------------------------   ---------
         ("Darwin", "x86_64", "64bit"): ("MacIntel_OSX_AppleC_64bit", "tar.Z"),
         ("Darwin", "arm64", "64bit"): ("MacM1_OSX_clang_64bit", "tar.Z"),
-        # ("cygwin", "x86_64", "64bit"): ("PC_Cygwin_GCC_64bit", "tar.Z"),
-        # ("FreeBSD", "x86_64", "64bit"): ("PC_Linux_GCC_64bit", "tar.Z"),
         ("Linux", "x86_64", "64bit"): ("PC_Linux_GCC_64bit", "tar.Z"),
         ("Linux", "aarch64", "64bit"): ("PC_Linux_GCC_64bit", "tar.Z"),
-        # ("Windows", "x86_64", "64bit"): ("PC_Windows_VisualC_64bit", "zip"),
     }
 
     def __init__(self, version=SPICE_VERSION, dst=None):
@@ -161,15 +158,8 @@ class GetCSPICE(object):
             HTTPS GET call to the NAIF server to download the required CSPICE
             distribution package.
         """
-        #download file as BytesIO if on windows
-        if self._ext=="zip":
-            try:
-                # Send the request to get the CSPICE package (proxy auto detected).
-                response = urllib.request.urlopen(self._rcspice, timeout=10)
-            except urllib.error.URLError as err:
-                raise RuntimeError(err.reason) from err
-            # Convert the response to io.BytesIO and store it in local memory.
-            self._local = io.BytesIO(response.read())
+        cmd = f"wget --no-clobber {self._rcspice}"
+        subprocess.run(cmd,shell=True,check=True)
         return
 
     def _unpack(self):
@@ -177,16 +167,11 @@ class GetCSPICE(object):
         Package could either be the zipfile.ZipFile class for Windows platforms
         or tarfile.TarFile for other platforms.
         """
-        if self._ext == "zip":
-            with ZipFile(self._local, "r") as archive:
-                archive.extractall(self._root)
-                self._local.close()
-        else:
-            opts = 'xfC -' if host_OS == 'FreeBSD' else '-xzC'
-            cmd = (
-                f"curl -s {self._rcspice}| gunzip | tar {opts} {self._root}"
-            )
-            subprocess.run(cmd,shell=True,check=True)
+        cspice = f"cspice.{self._ext}"
+        opts = '-xzf'
+        cmd = f"tar {opts} {cspice} -C {self._root}"
+        subprocess.run(cmd,shell=True,check=True)
+        os.remove(cspice)
         return
 
 
