@@ -17,8 +17,6 @@ if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # Set header file directories
-find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development ${_pybind11_quiet})
-include_directories(${Python3_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
 # include_directories(${CMAKE_SOURCE_DIR}/extern/pybind11/include)

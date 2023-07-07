@@ -1,4 +1,4 @@
-name: Build and Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+name: Publish to PyPI
 on:
   push:
     branches:
@@ -10,7 +10,7 @@ on:
 
 jobs:
     build:
-      name: Build Python 🐍 distributions 📦 to PyPI and TestPyPI
+      name: Build Python distributions
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
@@ -30,9 +30,9 @@ jobs:
         - name: Build python distributions
           run: source build_python.sh
     publish:
-      name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+      name: Publish to PyPI and TestPyPI
       needs: build
-      runs-on: macos-latest
+      runs-on: ubuntu-latest
       steps:
         - name: Checkout repo
           uses: actions/checkout@v3
