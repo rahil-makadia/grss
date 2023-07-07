@@ -2,7 +2,7 @@
 
 # get cspice
 cd ./extern/
-python get_cspice.py
+python3 get_cspice.py
 
 # initialize and update git submodules
 cd ./pybind11/
@@ -11,7 +11,7 @@ cd ../../
 git submodule update
 
 cd ./grss/debias/
-python get_debiasing_data.py
+python3 get_debiasing_data.py
 
 cd ../kernels/
-python get_kernels.py
+python3 get_kernels.py

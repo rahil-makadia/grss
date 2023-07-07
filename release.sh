@@ -1,6 +1,6 @@
 #!/bin/bash
 rm -rf build dist grss.egg-info
-pip uninstall grss -y
+pip3 uninstall grss -y
 
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade build twine
