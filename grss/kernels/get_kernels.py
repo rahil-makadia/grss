@@ -53,3 +53,8 @@ for mk in meta_kernels:
     # write the updated meta-kernel
     with open(mk, 'w', encoding='utf-8') as f:
         f.writelines(lines)
+
+# show the contents of the meta-kernels
+for mk in meta_kernels:
+    with open(mk, 'r', encoding='utf-8') as f:
+        print(f.read())
