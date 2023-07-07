@@ -4,19 +4,24 @@ jobs:
     docs:
         runs-on: macos-latest
         steps:
+            - uses: conda-incubator/setup-miniconda@v2
+              with:
+                activate-environment: test
+                environment-file: environment.yml
+                python-version: 3.8
+                auto-activate-base: false
             - name: Checkout repo
               uses: actions/checkout@v3
               with:
                 submodules: true
-            - name: Setup python
-              uses: actions/setup-python@v3
-              with:
-                python-version: '3.8'
+            # - name: Setup python
+            #   uses: actions/setup-python@v3
+            #   with:
+            #     python-version: '3.8'
             - name: Install dependencies and build GRSS
               run: |
-                    conda env create -f environment.yml
                     python -m pip install --upgrade pip
-                    pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
+                    conda install sphinx sphinx-copybutton sphinx-gallery nbsphinx
                     sh initialize.sh
                     pip install .
                     cd docs
