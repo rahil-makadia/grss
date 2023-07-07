@@ -20,6 +20,6 @@ jobs:
       - name: Run tests
         run: |
           python3 -m pip install jupyter ipykernel
-          python3 -m ipykernel install --user --name grss
+          python3 -m ipykernel install --user
           jupyter nbconvert --execute --to notebook --inplace tests/prop/*.ipynb
           jupyter nbconvert --execute --to notebook --inplace tests/fit/*.ipynb
