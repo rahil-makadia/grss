@@ -29,19 +29,28 @@ jobs:
             source initialize.sh
         - name: Build python distributions
           run: source build_python.sh
+        - name: Upload distribution for next job
+          uses: actions/upload-artifact@master
+          with:
+            name: dist-${{ matrix.os }}
+            path: dist
     publish:
       name: Publish to PyPI and TestPyPI
       needs: build
       runs-on: ubuntu-latest
       steps:
-        - name: Checkout repo
-          uses: actions/checkout@v3
+        - name: Download Ubuntu distribution from previous job
+          uses: actions/download-artifact@master
           with:
-            submodules: true
-        - name: Set up Python
-          uses: actions/setup-python@v4
+            name: dist-ubuntu-latest
+            path: dist
+        - name: Download MacOS distribution from previous job
+          uses: actions/download-artifact@master
           with:
-            python-version: "3.8"
+            name: dist-macos-latest
+            path: dist
+        - name: Show files
+          run: ls -l dist
         - name: Publish to Test PyPI
           uses: pypa/gh-action-pypi-publish@release/v1
           with:
