@@ -1,4 +1,4 @@
-name: build-docs
+name: Build docs
 on: [push, pull_request]
 jobs:
   sphinx:

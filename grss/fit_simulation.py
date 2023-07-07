@@ -231,7 +231,7 @@ class IterationParams:
 
     def plot_residuals(self, t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals,
                         delay_residuals, doppler_residuals, radar_scale, markersize,
-                        show_logarithmic, title, savefig, figname):
+                        show_logarithmic, title, savefig, figname, auto_close):
         """
         Plot the residuals
 
@@ -261,6 +261,8 @@ class IterationParams:
             Flag to save the figure
         figname : str
             Name of the figure to save
+        auto_close : bool, optional
+            Flag to automatically close the figure
 
         Returns
         -------
@@ -320,13 +322,15 @@ class IterationParams:
         if savefig:
             figname = f'residuals_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_residuals.pdf', bbox_inches='tight')
-        plt.show()
+        plt.show(block=False)
+        if auto_close:
+            plt.close(fig)
         return None
 
     def plot_chi(self, t_arr, ra_chi, dec_chi, delay_chi, doppler_chi,
                     ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared,
                     plot_chi_squared, sigma_limit, radar_scale, markersize,
-                    show_logarithmic, title, savefig, figname):
+                    show_logarithmic, title, savefig, figname, auto_close):
         # sourcery skip: low-code-quality
         """
         Plot the chi and chi-squared values for the residuals
@@ -367,6 +371,8 @@ class IterationParams:
             Flag to save the figure
         figname : str
             name of the figure to save
+        auto_close : bool, optional
+            Flag to automatically close the figure
 
         Returns
         -------
@@ -447,11 +453,13 @@ class IterationParams:
         if savefig:
             figname = f'chi_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_chi.pdf', bbox_inches='tight')
-        plt.show()
+        plt.show(block=False)
+        if auto_close:
+            plt.close()
         return None
 
-    def plot_iteration_summary(self, show_logarithmic=False, title=None,
-                                savefig=False, figname=None, plot_chi_squared=False):
+    def plot_iteration_summary(self, show_logarithmic=False, title=None, plot_chi_squared=False,
+                                savefig=False, figname=None, auto_close=False):
         """
         Plot the summary of the iteration, including residuals, chi values,
         and chi squared values.
@@ -462,12 +470,14 @@ class IterationParams:
             Flag to show the plotted values on a logarithmic scale, by default False
         title : str, optional
             Title of the plot, by default None
+        plot_chi_squared : bool, optional
+            Flag to plot the chi squared values, by default False
         savefig : bool, optional
             Flag to save the figure, by default False
         figname : str, optional
             Name of the figure, by default None
-        plot_chi_squared : bool, optional
-            Flag to plot the chi squared values, by default False
+        auto_close : bool, optional
+            Flag to automatically close the figure, by default False
 
         Returns
         -------
@@ -508,11 +518,11 @@ class IterationParams:
         doppler_chi_squared = self.all_info['doppler_chi_squared']
         self.plot_residuals(t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals,
                             delay_residuals, doppler_residuals, radar_scale, markersize,
-                            show_logarithmic, title, savefig, figname)
+                            show_logarithmic, title, savefig, figname, auto_close)
         self.plot_chi(t_arr, ra_chi, dec_chi, delay_chi, doppler_chi,
                         ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared,
                         plot_chi_squared, sigma_limit, radar_scale, markersize,
-                        show_logarithmic, title, savefig, figname)
+                        show_logarithmic, title, savefig, figname, auto_close)
         return None
 
 class FitSimulation:
@@ -1608,9 +1618,14 @@ class FitSimulation:
                                 f"\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
         return None
 
-    def plot_summary(self):
+    def plot_summary(self, auto_close=False):
         """
         Plots a summary of the orbit fit calculations.
+
+        Parameters
+        ----------
+        auto_close : bool, optional
+            Flag to automatically close the figure, by default False
 
         Returns
         -------
@@ -1656,7 +1671,9 @@ class FitSimulation:
         plt.xlabel("Iteration #")
         plt.ylabel(r"Reduced $\chi^2$")
         plt.legend()
-        plt.show()
+        plt.show(block=False)
+        if auto_close:
+            plt.close()
         return None
 
 def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times,
