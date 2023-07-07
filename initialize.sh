@@ -10,8 +10,11 @@ git submodule init
 cd ../../
 git submodule update
 
+# get debiasing data and kernels
 cd ./grss/debias/
 python3 get_debiasing_data.py
-
 cd ../kernels/
 python3 get_kernels.py
+
+# return to root
+cd ../..

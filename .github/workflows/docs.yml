@@ -1,4 +1,4 @@
-name: Docs
+name: sphinx-docs
 on: [push, pull_request]
 jobs:
     docs:
