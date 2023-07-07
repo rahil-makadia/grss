@@ -1,8 +1,8 @@
 name: python-tests
 on: [push, pull_request]
 jobs:
-  sphinx:
-    runs-on: macos-latest
+  test:
+    runs-on: macos-latest, ubuntu-latest
     steps:
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -15,16 +15,15 @@ jobs:
           submodules: true
       - name: Install dependencies and build GRSS
         run: |
-          brew update
-          brew install pandoc
           conda create -n grss python=3.8
           $CONDA/bin/activate grss
           python3 -m pip install --upgrade pip
-          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
+          python3 -m pip install jupyter ipykernel
           source initialize.sh
           pip3 install .
       - name: Run tests
         run: |
           $CONDA/bin/activate grss
+          python3 -m ipykernel install --name grss
           jupyter nbconvert --execute --to notebook --inplace tests/prop/*.ipynb
           jupyter nbconvert --execute --to notebook --inplace tests/fit/*.ipynb
