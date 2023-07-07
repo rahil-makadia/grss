@@ -7,7 +7,7 @@
 
 \begindata
 
-    PATH_VALUES  = ( placeholder )
+    PATH_VALUES  = ( '/Users/rahil/grad/projects/keyholes/grss/grss/kernels' )
 
     PATH_SYMBOLS = ( 'GRSS' )
 

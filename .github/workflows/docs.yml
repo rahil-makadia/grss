@@ -23,7 +23,7 @@ jobs:
                     $CONDA/bin/activate grss
                     python3 -m pip install --upgrade pip
                     conda install sphinx sphinx-copybutton sphinx-gallery nbsphinx
-                    sh initialize.sh
+                    source initialize.sh
                     pip3 install .
                     cd docs
                     make clean html
