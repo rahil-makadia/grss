@@ -4,25 +4,24 @@ jobs:
   sphinx:
     runs-on: macos-latest
     steps:
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: latest
-          channels: conda-forge, defaults
-          auto-activate-base: false
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install GRSS (including dependencies) and build docs
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Install GRSS (including dependencies)
         run: |
-          brew update
-          brew install pandoc
-          conda create -n grss python=3.8
-          $CONDA/bin/activate grss
           python3 -m pip install --upgrade pip
-          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
           source initialize.sh
           pip3 install .
+      - name: Build docs
+        run: |
+          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
+          brew update
+          brew install pandoc
           cd docs
           make clean html
           cd ..

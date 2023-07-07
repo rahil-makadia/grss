@@ -2,28 +2,24 @@ name: python-tests
 on: [push, pull_request]
 jobs:
   test:
-    runs-on: macos-latest, ubuntu-latest
+    runs-on: macos-latest
     steps:
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: latest
-          channels: conda-forge, defaults
-          auto-activate-base: false
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install dependencies and build GRSS
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - name: Install GRSS (including dependencies)
         run: |
-          conda create -n grss python=3.8
-          $CONDA/bin/activate grss
           python3 -m pip install --upgrade pip
-          python3 -m pip install jupyter ipykernel
           source initialize.sh
           pip3 install .
       - name: Run tests
         run: |
-          $CONDA/bin/activate grss
-          python3 -m ipykernel install --name grss
+          python3 -m pip install jupyter ipykernel
+          python3 -m ipykernel install --user --name grss
           jupyter nbconvert --execute --to notebook --inplace tests/prop/*.ipynb
           jupyter nbconvert --execute --to notebook --inplace tests/fit/*.ipynb
