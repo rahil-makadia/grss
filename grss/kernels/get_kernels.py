@@ -45,16 +45,39 @@ for mk in meta_kernels:
     # read the meta-kernel and find the line that defines the PATH_VALUES variable
     with open(mk, 'r', encoding='utf-8') as f:
         lines = f.readlines()
+        num_chunks = 0
         for i, line in enumerate(lines):
-            if 'PATH_VALUES' in line:
+            if 'PATH_VALUES' in line and 'placeholder' in line:
                 # update the path to the directory containing this script
-                lines[i] = f"    PATH_VALUES  = ( '{script_dir}" + "' )\n"
-                break
+                # if script_dir is more that 40 characters long, then break it up
+                # into chunks of 40 characters each
+                cutoff = 40
+                if len(script_dir) > cutoff:
+                    num_chunks, remainder = divmod(len(script_dir), cutoff)
+                    chunks = [script_dir[i*cutoff:(i+1)*cutoff] for i in range(num_chunks)]
+                    if remainder > 0:
+                        chunks.append(script_dir[-remainder:])
+                        num_chunks += 1
+                    lines[i] = f"    PATH_VALUES  = ( '{chunks[0]}',\n"
+                    for chunk in chunks[1:]:
+                        end_char = " )" if chunk == chunks[-1] else ","
+                        lines[i] += f"                     '{chunk}'{end_char}\n"
+                else:
+                    num_chunks = 1
+                    lines[i] = f"    PATH_VALUES  = ( '{script_dir}" + "' )\n"
+            if 'PATH_SYMBOLS' in line and "'GRSS'" in line and num_chunks > 1:
+                # replace PATH_SYMBOLS = ( 'GRSS' ) with PATH_SYMBOLS = ( 'GRSS_1', 'GRSS_2', ... )
+                lines[i] = "    PATH_SYMBOLS = ( 'GRSS1',\n"
+                for j in range(2, num_chunks+1):
+                    end_char = " )" if j == num_chunks else ","
+                    lines[i] += f"                     'GRSS{j}'{end_char}\n"
+            if '$GRSS' in line and num_chunks > 1:
+                # replace '$GRSS' with '$GRSS1$GRSS2$GRSS3...' according to the number of chunks
+                replacement_str = '$GRSS1'
+                for j in range(2, num_chunks+1):
+                    replacement_str += f'$GRSS{j}'
+                lines[i] = line.replace('$GRSS', replacement_str)
+
     # write the updated meta-kernel
     with open(mk, 'w', encoding='utf-8') as f:
         f.writelines(lines)
-
-# show the contents of the meta-kernels
-for mk in meta_kernels:
-    with open(mk, 'r', encoding='utf-8') as f:
-        print(f.read())

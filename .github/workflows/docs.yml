@@ -20,7 +20,6 @@ jobs:
       - name: Build docs
         run: |
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx
-          mkdir docs/source/_static
           brew install pandoc
           cd docs
           make clean html
