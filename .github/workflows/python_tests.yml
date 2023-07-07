@@ -21,5 +21,7 @@ jobs:
         run: |
           python3 -m pip install jupyter ipykernel
           python3 -m ipykernel install --user
-          jupyter nbconvert --execute --to notebook --inplace tests/prop/*.ipynb
-          jupyter nbconvert --execute --to notebook --inplace tests/fit/*.ipynb
+          jupyter nbconvert --to script tests/prop/*.ipynb
+          python3 tests/prop/*.py
+          jupyter nbconvert --to script tests/fit/*.ipynb
+          python3 tests/fit/*.py
