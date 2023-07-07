@@ -19,6 +19,7 @@ jobs:
             #     python-version: '3.8'
             - name: Install dependencies and build GRSS
               run: |
+                    conda init --all
                     conda create -n grss python=3.8
                     conda activate grss
                     python3 -m pip install --upgrade pip
