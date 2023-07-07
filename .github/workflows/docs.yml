@@ -20,9 +20,7 @@ jobs:
             - name: Install dependencies and build GRSS
               run: |
                     conda create -n grss python=3.8
-                    conda init --all
-                    bash
-                    conda activate grss
+                    $CONDA/bin/activate grss
                     python3 -m pip install --upgrade pip
                     conda install sphinx sphinx-copybutton sphinx-gallery nbsphinx
                     sh initialize.sh
