@@ -6,9 +6,8 @@ jobs:
         steps:
             - uses: conda-incubator/setup-miniconda@v2
               with:
-                activate-environment: test
-                environment-file: environment.yml
-                python-version: 3.8
+                miniconda-version: latest
+                channels: conda-forge, defaults
                 auto-activate-base: false
             - name: Checkout repo
               uses: actions/checkout@v3
@@ -20,6 +19,7 @@ jobs:
             #     python-version: '3.8'
             - name: Install dependencies and build GRSS
               run: |
+                    conda create -n grss python=3.8
                     python -m pip install --upgrade pip
                     conda install sphinx sphinx-copybutton sphinx-gallery nbsphinx
                     sh initialize.sh
