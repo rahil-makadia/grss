@@ -1,5 +1,5 @@
 # minimum required CMake version
-cmake_minimum_required(VERSION 3.19.0)
+cmake_minimum_required(VERSION 3.18.0)
 
 # set the project name and get version from version.txt
 file(READ "grss/version.txt" ver)
@@ -10,9 +10,15 @@ project(grss VERSION ${ver})
 # TODO: add gprof profiling, iee standards for floats
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable)
+add_compile_options(-std=c++11 -DLONGDOUBLE -O3 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result)
+# if not clang, add -Wno-maybe-uninitialized 
+if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wno-maybe-uninitialized)
+endif()
 
 # Set header file directories
+find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development ${_pybind11_quiet})
+include_directories(${Python3_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
 # include_directories(${CMAKE_SOURCE_DIR}/extern/pybind11/include)

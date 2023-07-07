@@ -5,9 +5,8 @@ cd ./extern/
 python3 get_cspice.py
 
 # initialize and update git submodules
-cd ./pybind11/
+cd ../
 git submodule init
-cd ../../
 git submodule update
 
 # get debiasing data and kernels

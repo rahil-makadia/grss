@@ -1,5 +1,4 @@
 """Download the CSPICE package from the NAIF FTP server and unpack it."""
-import io
 import platform
 import os
 from pathlib import Path
@@ -7,10 +6,6 @@ import shutil
 import subprocess
 import sys
 import time
-import urllib
-import urllib.request
-import urllib.error
-from zipfile import ZipFile
 
 CSPICE_SRC_DIR = "CSPICE_SRC_DIR"
 CSPICE_SHARED_LIB = "CSPICE_SHARED_LIB"
