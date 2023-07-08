@@ -12,7 +12,7 @@
 There are currently two different ways to install the GRSS library.
 
 * Using the [Python Package Index (PyPI)](https://pypi.org/project/grss/)
-* Using the source code from [this repository](https://www.github.com/rahil-makadia/grss)
+* Using the source code from the [GitHub repository](https://www.github.com/rahil-makadia/grss)
 
 ### Install via PyPI
 
