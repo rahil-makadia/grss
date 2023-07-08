@@ -34,3 +34,7 @@ keywords = ["astronomy", "asteroids", "integrator", "orbit determination"]
 
 [build-system]
 requires = ["setuptools"]
+
+[tool.cibuildwheel]
+# Skip 32-bit Linux builds
+skip = ["*-manylinux_i686"]
