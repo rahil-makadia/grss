@@ -504,7 +504,7 @@ int assist_jpl_calc(jpl_s *jpl, double jd_ref, double jd_rel, int body,
                     double *const out_ax, double *const out_ay,
                     double *const out_az) {
     double t, *z;
-    u_int32_t blk;
+    uint32_t blk;
 
     if (jpl == NULL || jpl->map == NULL) {
         throw std::runtime_error("The JPL ephemeris file has not been found.");
@@ -527,7 +527,7 @@ int assist_jpl_calc(jpl_s *jpl, double jd_ref, double jd_rel, int body,
     }
 
     // compute record number and 'offset' into record
-    blk = (u_int32_t)((jd_ref + jd_rel - jpl->beg) / jpl->inc);
+    blk = (uint32_t)((jd_ref + jd_rel - jpl->beg) / jpl->inc);
     z = (double *)jpl->map + (blk + 2) * jpl->rec / sizeof(double);
     t = ((jd_ref - jpl->beg - (double)blk * jpl->inc) + jd_rel) / jpl->inc;
 
