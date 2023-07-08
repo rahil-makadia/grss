@@ -47,7 +47,7 @@ jobs:
         - name: Download MacOS distribution from previous job
           uses: actions/download-artifact@master
           with:
-            name: dist-macos-latest
+            name: dist-macos-13
             path: dist
         - name: Show files
           run: ls -l dist
