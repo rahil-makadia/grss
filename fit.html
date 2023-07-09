@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GRSS Orbit Determination Module (grss.fit) &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="GRSS Propagator Module (grss.prop)" href="prop.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="grss-orbit-determination-module-grss-fit">
+<h1>GRSS Orbit Determination Module (grss.fit)<a class="headerlink" href="#grss-orbit-determination-module-grss-fit" title="Permalink to this heading">¶</a></h1>
+<p>The orbit determination code within GRSS is completely on the Python side of things, but it heavily relies on the C++ propagator binding. Given a small body orbit that needs to be fitted to a set of observations, the module uses the batch least squares algorithm to solve for an updated nominal orbit.</p>
+<p>The optical measurements are acquired using the <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/mpc/mpc.html">Minor Planet Center API</a> in the <code class="code docutils literal notranslate"><span class="pre">astroquery.MPC</span></code> module, and the radar measurements are acquired using the <a class="reference external" href="https://ssd-api.jpl.nasa.gov/doc/sb_radar.html">JPL Small-body Radar API</a>. The optical astrometry is preprocessed to account for the following :</p>
+<ol class="arabic simple">
+<li><p>Star catalog biases <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></li>
+<li><p>Measurement weighting <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></li>
+</ol>
+<p>Once the optical astrometry has been processed, the radar astrometry has been acquired, and the initial orbit is provided by the user, the least squares filter can be run. As of now, the filter can fit the nominal state, the nongravitational acceleration parameters, and any impulsive maneuver events. Currently the partial derivatives in the normal matrix are calculated using 1<sup>st</sup>-order central differences, but analytical partial derivatives will be implemented in the future. The filter also implements an outlier rejection scheme <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> to make sure any spurious measurements do no contaminate the fit.</p>
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Eggl, S., Farnocchia, D., Chamberlin, A.B., and Chesley, S.R., “Star catalog position and proper motion corrections in asteroid astrometry II: The Gaia era”, Icarus, Volume 339, Pages 1-17, 2020. <a class="reference external" href="https://doi.org/10.1016/j.icarus.2019.113596">https://doi.org/10.1016/j.icarus.2019.113596</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Vereš, P., Farnocchia, D., Chesley, S.R., and Chamberlin, A.B., “Statistical analysis of astrometric errors for the most productive asteroid surveys”, Volume 296, Pages 139-149, 2017. <a class="reference external" href="https://doi.org/10.1016/j.icarus.2017.05.021">https://doi.org/10.1016/j.icarus.2017.05.021</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Carpino, M., Milani, A., and Chesley, S.R., “Error statistics of asteroid optical astrometric observations”, Icarus, Volume 166, Pages 248-270, 2003. <a class="reference external" href="https://doi.org/10.1016/S0019-1035(03)00051-4">https://doi.org/10.1016/S0019-1035(03)00051-4</a>.</p>
+</aside>
+</aside>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="prop.html" title="previous chapter">GRSS Propagator Module (grss.prop)</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/fit.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

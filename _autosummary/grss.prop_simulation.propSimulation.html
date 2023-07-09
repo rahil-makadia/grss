@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>grss.prop_simulation.propSimulation &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="grss.prop_utils" href="grss.prop_utils.html" />
+    <link rel="prev" title="grss.prop_simulation.SpiceBody" href="grss.prop_simulation.SpiceBody.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="grss-prop-simulation-propsimulation">
+<h1>grss.prop_simulation.propSimulation<a class="headerlink" href="#grss-prop-simulation-propsimulation" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">propSimulation</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Class to perform an orbit propagation simulation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.propSimulation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>__init__(self: grss.prop_simulation.propSimulation, name: str, t0: float, defaultSpiceBodies: int, DEkernelPath: str) -&gt; None</p>
+<blockquote>
+<div><p>Constructor for the propSimulation class.</p>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of the simulation.</p>
+</dd>
+<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD TDB time of the simulation.</p>
+</dd>
+<dt>defaultSpiceBodies<span class="classifier">int</span></dt><dd><p>Version of the DE kernel to get the default SPICE bodies from.</p>
+</dd>
+<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>__init__(self: grss.prop_simulation.propSimulation, name: str, simRef: grss.prop_simulation.propSimulation) -&gt; None</p>
+<blockquote>
+<div><p>Constructor for the propSimulation class.</p>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of the simulation.</p>
+</dd>
+<dt>simRef<span class="classifier">propSimulation</span></dt><dd><p>Simulation to copy.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.__init__" title="grss.prop_simulation.propSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_event" title="grss.prop_simulation.propSimulation.add_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_event</span></code></a>(self, body, tEvent, deltaV[, ...])</p></td>
+<td><p>Adds an impulsive delta-V event to the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_integ_body" title="grss.prop_simulation.propSimulation.add_integ_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_integ_body</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_spice_body" title="grss.prop_simulation.propSimulation.add_spice_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_spice_body</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.extend" title="grss.prop_simulation.propSimulation.extend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code></a>(self, tf[, tEvalNew, xObserverNew])</p></td>
+<td><p>Extends the simulation to a new final time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.get_integration_parameters" title="grss.prop_simulation.propSimulation.get_integration_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_integration_parameters</span></code></a>(self)</p></td>
+<td><p>Gets the integration parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.get_sim_constants" title="grss.prop_simulation.propSimulation.get_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sim_constants</span></code></a>(self)</p></td>
+<td><p>Gets the constants of the simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.integrate" title="grss.prop_simulation.propSimulation.integrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code></a>(self)</p></td>
+<td><p>Propagates the simulation using the Gauss-Radau integrator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.preprocess" title="grss.prop_simulation.propSimulation.preprocess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocess</span></code></a>(self)</p></td>
+<td><p>Preprocesses the simulation and assembles the forceParams attribute.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.remove_body" title="grss.prop_simulation.propSimulation.remove_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_body</span></code></a>(self, name)</p></td>
+<td><p>Removes a body from the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.set_integration_parameters" title="grss.prop_simulation.propSimulation.set_integration_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_integration_parameters</span></code></a>(self, tf[, ...])</p></td>
+<td><p>Sets the integration parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.set_sim_constants" title="grss.prop_simulation.propSimulation.set_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sim_constants</span></code></a>(self[, du2m, tu2sec, G, ...])</p></td>
+<td><p>Sets the constants of the simulation.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.DEkernelPath" title="grss.prop_simulation.propSimulation.DEkernelPath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEkernelPath</span></code></a></p></td>
+<td><p>Path to the SPICE DE kernel.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.consts" title="grss.prop_simulation.propSimulation.consts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">consts</span></code></a></p></td>
+<td><p>Constants of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.convergedLightTime" title="grss.prop_simulation.propSimulation.convergedLightTime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convergedLightTime</span></code></a></p></td>
+<td><p>Whether to use converged Newtonian light time correction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.evalApparentState" title="grss.prop_simulation.propSimulation.evalApparentState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evalApparentState</span></code></a></p></td>
+<td><p>Whether to evaluate the apparent state of the integration bodies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.events" title="grss.prop_simulation.propSimulation.events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">events</span></code></a></p></td>
+<td><p>Events of the simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.forceParams" title="grss.prop_simulation.propSimulation.forceParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forceParams</span></code></a></p></td>
+<td><p>Force parameters of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.integBodies" title="grss.prop_simulation.propSimulation.integBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integBodies</span></code></a></p></td>
+<td><p>Integration bodies of the simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.integParams" title="grss.prop_simulation.propSimulation.integParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integParams</span></code></a></p></td>
+<td><p>Integration parameters of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.lightTimeEval" title="grss.prop_simulation.propSimulation.lightTimeEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightTimeEval</span></code></a></p></td>
+<td><p>Light time from the observer to each integration body for each value in propSimulation.tEval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.name" title="grss.prop_simulation.propSimulation.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p>Name of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.observerInfo" title="grss.prop_simulation.propSimulation.observerInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observerInfo</span></code></a></p></td>
+<td><p>Observer information for each value in propSimulation.tEval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.radarObsEval" title="grss.prop_simulation.propSimulation.radarObsEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObsEval</span></code></a></p></td>
+<td><p>Radar observation of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.radarObserver" title="grss.prop_simulation.propSimulation.radarObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObserver</span></code></a></p></td>
+<td><p>Whether the observer for each value in propSimulation.tEval is for radar.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.spiceBodies" title="grss.prop_simulation.propSimulation.spiceBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceBodies</span></code></a></p></td>
+<td><p>SPICE bodies of the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.t" title="grss.prop_simulation.propSimulation.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<td><p>Current time of the simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.tEval" title="grss.prop_simulation.propSimulation.tEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEval</span></code></a></p></td>
+<td><p>MJD Times to evaluate the states of the integrated bodies at.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.tEvalMargin" title="grss.prop_simulation.propSimulation.tEvalMargin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalMargin</span></code></a></p></td>
+<td><p>Margin for allowing evaluation past the propagation start and end times.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.tEvalUTC" title="grss.prop_simulation.propSimulation.tEvalUTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalUTC</span></code></a></p></td>
+<td><p>Whether the MJD evaluation time is in UTC for each value in propSimulation.tEval, as opposed to TDB.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.tStep" title="grss.prop_simulation.propSimulation.tStep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tStep</span></code></a></p></td>
+<td><p>Epochs of each step taken by the propagator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.xInteg" title="grss.prop_simulation.propSimulation.xInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xInteg</span></code></a></p></td>
+<td><p>Current states of each integration body in the simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.xIntegEval" title="grss.prop_simulation.propSimulation.xIntegEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegEval</span></code></a></p></td>
+<td><p>States of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.xIntegStep" title="grss.prop_simulation.propSimulation.xIntegStep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegStep</span></code></a></p></td>
+<td><p>States of each step taken by the propagator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.xObserver" title="grss.prop_simulation.propSimulation.xObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xObserver</span></code></a></p></td>
+<td><p>State of the observer for each value in propSimulation.tEval.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.DEkernelPath">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DEkernelPath</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.DEkernelPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to the SPICE DE kernel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_event">
+<span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.IntegBody.html#grss.prop_simulation.IntegBody" title="grss.prop_simulation.IntegBody"><span class="pre">grss.prop_simulation.IntegBody</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tEvent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaV</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an impulsive delta-V event to the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>body</strong> (<em>str</em>) – Name of the body to apply the delta-V to.</p></li>
+<li><p><strong>tEvent</strong> (<em>real</em>) – MJD Epoch of the event. Must be in TDB.</p></li>
+<li><p><strong>deltaV</strong> (<em>list</em><em> of </em><em>real</em>) – Delta-V to apply to the body.</p></li>
+<li><p><strong>multiplier</strong> (<em>real</em>) – Multiplier to apply to the delta-V.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_integ_body">
+<span class="sig-name descname"><span class="pre">add_integ_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_integ_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>add_integ_body(self: grss.prop_simulation.propSimulation, DEkernelPath: str, name: str, t0: float, mass: float, radius: float, cometaryState: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters, constants: grss.prop_simulation.Constants) -&gt; None</p>
+<blockquote>
+<div><p>Adds an integration body to the simulation.</p>
+<dl class="simple">
+<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
+</dd>
+<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.</p>
+</dd>
+<dt>mass<span class="classifier">real</span></dt><dd><p>Mass of the body.</p>
+</dd>
+<dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
+</dd>
+<dt>cometaryState<span class="classifier">list of real</span></dt><dd><p>Initial Heliocentric Ecliptic Cometary state of the body.</p>
+</dd>
+<dt>covariance<span class="classifier">list of list of real</span></dt><dd><p>Covariance of the initial state.</p>
+</dd>
+<dt>ngParams<span class="classifier">propSimulation.NongravParamaters</span></dt><dd><p>Nongravitational parameters of the body.</p>
+</dd>
+<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>add_integ_body(self: grss.prop_simulation.propSimulation, name: str, t0: float, mass: float, radius: float, pos: List[float], vel: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters, constants: grss.prop_simulation.Constants) -&gt; None</p>
+<blockquote>
+<div><p>Adds an integration body to the simulation.</p>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
+</dd>
+<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.</p>
+</dd>
+<dt>mass<span class="classifier">real</span></dt><dd><p>Mass of the body.</p>
+</dd>
+<dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
+</dd>
+<dt>pos<span class="classifier">list of real</span></dt><dd><p>Initial barycentric Cartesian position of the body.</p>
+</dd>
+<dt>vel<span class="classifier">list of real</span></dt><dd><p>Initial barycentric Cartesian velocity of the body.</p>
+</dd>
+<dt>covariance<span class="classifier">list of list of real</span></dt><dd><p>Covariance of the initial state.</p>
+</dd>
+<dt>ngParams<span class="classifier">propSimulation.NongravParamaters</span></dt><dd><p>Nongravitational parameters of the body.</p>
+</dd>
+<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>add_integ_body(self: grss.prop_simulation.propSimulation, body: grss.prop_simulation.IntegBody) -&gt; None</p>
+<blockquote>
+<div><p>Adds an integration body to the simulation.</p>
+<dl class="simple">
+<dt>body<span class="classifier">propSimulation.IntegBody</span></dt><dd><p>Integration body to add to the simulation.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_spice_body">
+<span class="sig-name descname"><span class="pre">add_spice_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_spice_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>add_spice_body(self: grss.prop_simulation.propSimulation, DEkernelPath: str, name: str, spiceId: int, t0: float, mass: float, radius: float, constants: grss.prop_simulation.Constants) -&gt; None</p>
+<blockquote>
+<div><p>Adds a SPICE body to the simulation.</p>
+<dl class="simple">
+<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
+</dd>
+<dt>spiceId<span class="classifier">int</span></dt><dd><p>SPICE ID of the body.</p>
+</dd>
+<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.</p>
+</dd>
+<dt>mass<span class="classifier">real</span></dt><dd><p>Mass of the body.</p>
+</dd>
+<dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
+</dd>
+<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>add_spice_body(self: grss.prop_simulation.propSimulation, body: grss.prop_simulation.SpiceBody) -&gt; None</p>
+<blockquote>
+<div><p>Adds a SPICE body to the simulation.</p>
+<dl class="simple">
+<dt>body<span class="classifier">propSimulation.SpiceBody</span></dt><dd><p>SPICE body to add to the simulation.</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.consts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">consts</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.consts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constants of the simulation. propSimulation.Constants object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.convergedLightTime">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convergedLightTime</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.convergedLightTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to use converged Newtonian light time correction.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.evalApparentState">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evalApparentState</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.evalApparentState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether to evaluate the apparent state of the integration bodies.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.events">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">events</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Events of the simulation. List of propSimulation.Event objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.extend">
+<span class="sig-name descname"><span class="pre">extend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tEvalNew</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xObserverNew</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.extend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extends the simulation to a new final time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tf</strong> (<em>real</em>) – New final time of integration (MJD TDB).</p></li>
+<li><p><strong>tEvalNew</strong> (<em>list</em><em> of </em><em>real</em>) – Extra MJD Times to evaluate the states of the integrated bodies at.
+Can be TDB or UTC based on tEvalUTC.</p></li>
+<li><p><strong>xObserverNew</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – Extra observer information. Each list at least contains the central body SPICE ID
+(e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
+This information might be repeated for bistatic radar observations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.forceParams">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forceParams</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.forceParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Force parameters of the simulation. propSimulation.ForceParams object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.get_integration_parameters">
+<span class="sig-name descname"><span class="pre">get_integration_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.get_integration_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the integration parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>nInteg</strong> (<em>int</em>) – Number of integrated bodies.</p></li>
+<li><p><strong>nSpice</strong> (<em>int</em>) – Number of bodies with SPICE ephemerides.</p></li>
+<li><p><strong>nTotal</strong> (<em>int</em>) – Total number of bodies. nTotal = nInteg + nSpice.</p></li>
+<li><p><strong>t0</strong> (<em>real</em>) – Initial time of integration (MJD TDB).</p></li>
+<li><p><strong>tf</strong> (<em>real</em>) – Final time of integration (MJD TDB).</p></li>
+<li><p><strong>adaptiveTimestep</strong> (<em>bool</em>) – Flag to use adaptive time step for the propagation.</p></li>
+<li><p><strong>dt0</strong> (<em>real</em>) – Initial time step.</p></li>
+<li><p><strong>dtMax</strong> (<em>real</em>) – Maximum time step.</p></li>
+<li><p><strong>dtMin</strong> (<em>real</em>) – Minimum time step.</p></li>
+<li><p><strong>dtChangeFactor</strong> (<em>real</em>) – Factor by which to limit the change in time step.</p></li>
+<li><p><strong>tolInteg</strong> (<em>real</em>) – Tolerance for integration.</p></li>
+<li><p><strong>tolPC</strong> (<em>real</em>) – Tolerance for predictor-corrector within IAS15.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.get_sim_constants">
+<span class="sig-name descname"><span class="pre">get_sim_constants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.get_sim_constants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the constants of the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>du2m</strong> (<em>real</em>) – Conversion factor from distance units to meters.</p></li>
+<li><p><strong>tu2sec</strong> (<em>real</em>) – Conversion factor from time units to seconds.</p></li>
+<li><p><strong>G</strong> (<em>real</em>) – Gravitational constant.</p></li>
+<li><p><strong>clight</strong> (<em>real</em>) – Speed of light in a vacuum.</p></li>
+<li><p><strong>j2000Jd</strong> (<em>real</em>) – Julian date of J2000 epoch.</p></li>
+<li><p><strong>JdMinusMjd</strong> (<em>real</em>) – Difference between Julian date and modified Julian date.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.integBodies">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integBodies</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.integBodies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integration bodies of the simulation. List of propSimulation.IntegBody objects.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.integParams">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integParams</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.integParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integration parameters of the simulation. propSimulation.IntegParams object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.integrate">
+<span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.integrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Propagates the simulation using the Gauss-Radau integrator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.lightTimeEval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lightTimeEval</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.lightTimeEval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Light time from the observer to each integration body for each value in propSimulation.tEval.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the simulation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.observerInfo">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">observerInfo</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.observerInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Observer information for each value in propSimulation.tEval.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preprocesses the simulation and assembles the forceParams attribute.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.radarObsEval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarObsEval</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.radarObsEval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radar observation of each integration body in the simulation for each value in propSimulation.tEval.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.radarObserver">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarObserver</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.radarObserver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the observer for each value in propSimulation.tEval is for radar.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.remove_body">
+<span class="sig-name descname"><span class="pre">remove_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.remove_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a body from the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Name of the body to remove.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.set_integration_parameters">
+<span class="sig-name descname"><span class="pre">set_integration_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tEval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tEvalUTC</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evalApparentState</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergedLightTims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observerInfo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptiveTimestep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtMax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtMin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtChangeFactor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolInteg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolPC</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-16</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.set_integration_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the integration parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tf</strong> (<em>real</em>) – Final time of integration (MJD TDB).</p></li>
+<li><p><strong>tEval</strong> (<em>list</em><em> of </em><em>real</em>) – MJD Times to evaluate the states of the integrated bodies at.
+Can be TDB or UTC based on tEvalUTC.</p></li>
+<li><p><strong>tEvalUTC</strong> (<em>bool</em>) – Whether the MJD evaluation time is in UTC for each value in
+propSimulation.tEval, as opposed to TDB.</p></li>
+<li><p><strong>evalApparentState</strong> (<em>bool</em>) – Whether to evaluate the apparent state of the integration bodies.</p></li>
+<li><p><strong>convergedLightTimes</strong> (<em>bool</em>) – Whether to use converged Newtonian light time correction.</p></li>
+<li><p><strong>observerInfo</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – Observer information. Each list at least contains the central body SPICE ID
+(e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
+This information might be repeated for bistatic radar observations.</p></li>
+<li><p><strong>adaptiveTimestep</strong> (<em>bool</em>) – Flag to use adaptive time step for the propagation.</p></li>
+<li><p><strong>dt0</strong> (<em>real</em>) – Initial time step.</p></li>
+<li><p><strong>dtMax</strong> (<em>real</em>) – Maximum time step.</p></li>
+<li><p><strong>dtMin</strong> (<em>real</em>) – Minimum time step.</p></li>
+<li><p><strong>dtChangeFactor</strong> (<em>real</em>) – Factor by which to limit the change in time step.</p></li>
+<li><p><strong>tolInteg</strong> (<em>real</em>) – Tolerance for integration.</p></li>
+<li><p><strong>tolPC</strong> (<em>real</em>) – Tolerance for predictor-corrector within IAS15.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.set_sim_constants">
+<span class="sig-name descname"><span class="pre">set_sim_constants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">du2m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">149597870700.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tu2sec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">86400.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.4881851702345195e-34</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">173.14463267424034</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.set_sim_constants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the constants of the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>du2m</strong> (<em>real</em>) – Conversion factor from distance units to meters.</p></li>
+<li><p><strong>tu2sec</strong> (<em>real</em>) – Conversion factor from time units to seconds.</p></li>
+<li><p><strong>G</strong> (<em>real</em>) – Gravitational constant.</p></li>
+<li><p><strong>clight</strong> (<em>real</em>) – Speed of light in a vacuum.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.spiceBodies">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spiceBodies</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.spiceBodies" title="Permalink to this definition">¶</a></dt>
+<dd><p>SPICE bodies of the simulation. List of propSimulation.SpiceBodies objects.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current time of the simulation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.tEval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tEval</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.tEval" title="Permalink to this definition">¶</a></dt>
+<dd><p>MJD Times to evaluate the states of the integrated bodies at.
+Can be TDB or UTC based on propSimulation.tEvalUTC.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.tEvalMargin">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tEvalMargin</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.tEvalMargin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Margin for allowing evaluation past the propagation start and end times.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.tEvalUTC">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tEvalUTC</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.tEvalUTC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the MJD evaluation time is in UTC for each value in propSimulation.tEval,
+as opposed to TDB.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.tStep">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tStep</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.tStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Epochs of each step taken by the propagator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.xInteg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xInteg</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.xInteg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current states of each integration body in the simulation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.xIntegEval">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xIntegEval</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.xIntegEval" title="Permalink to this definition">¶</a></dt>
+<dd><p>States of each integration body in the simulation for each value in propSimulation.tEval.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.xIntegStep">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xIntegStep</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.xIntegStep" title="Permalink to this definition">¶</a></dt>
+<dd><p>States of each step taken by the propagator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.xObserver">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xObserver</span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.xObserver" title="Permalink to this definition">¶</a></dt>
+<dd><p>State of the observer for each value in propSimulation.tEval.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="grss.prop_simulation.html">grss.prop_simulation</a><ul>
+      <li>Previous: <a href="grss.prop_simulation.SpiceBody.html" title="previous chapter">grss.prop_simulation.SpiceBody</a></li>
+      <li>Next: <a href="grss.prop_utils.html" title="next chapter">grss.prop_utils</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/_autosummary/grss.prop_simulation.propSimulation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

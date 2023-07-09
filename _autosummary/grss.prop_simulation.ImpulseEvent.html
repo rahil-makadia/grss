@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>grss.prop_simulation.ImpulseEvent &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="grss.prop_simulation.IntegBody" href="grss.prop_simulation.IntegBody.html" />
+    <link rel="prev" title="grss.prop_simulation.ForceParameters" href="grss.prop_simulation.ForceParameters.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="grss-prop-simulation-impulseevent">
+<h1>grss.prop_simulation.ImpulseEvent<a class="headerlink" href="#grss-prop-simulation-impulseevent" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">ImpulseEvent</span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="grss.prop_simulation.Event.html#grss.prop_simulation.Event" title="grss.prop_simulation.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a></p>
+<p>The ImpulseEvent class contains the properties of an impulsive delta-V event.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent" title="grss.prop_simulation.ImpulseEvent"><span class="pre">grss.prop_simulation.ImpulseEvent</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent.__init__" title="grss.prop_simulation.ImpulseEvent.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent.bodyIndex" title="grss.prop_simulation.ImpulseEvent.bodyIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bodyIndex</span></code></a></p></td>
+<td><p>Index of the integration body to apply the event to.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent.bodyName" title="grss.prop_simulation.ImpulseEvent.bodyName"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bodyName</span></code></a></p></td>
+<td><p>Name of the integration body to apply the event to.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent.deltaV" title="grss.prop_simulation.ImpulseEvent.deltaV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deltaV</span></code></a></p></td>
+<td><p>Delta-V of the event.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent.multiplier" title="grss.prop_simulation.ImpulseEvent.multiplier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiplier</span></code></a></p></td>
+<td><p>Multiplier on the delta-V the event.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ImpulseEvent.t" title="grss.prop_simulation.ImpulseEvent.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<td><p>MJD TDB Time of the event.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent.bodyIndex">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bodyIndex</span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent.bodyIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index of the integration body to apply the event to.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent.bodyName">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bodyName</span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent.bodyName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the integration body to apply the event to.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent.deltaV">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deltaV</span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent.deltaV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delta-V of the event.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent.multiplier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multiplier</span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent.multiplier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplier on the delta-V the event.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.ImpulseEvent.t">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#grss.prop_simulation.ImpulseEvent.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>MJD TDB Time of the event.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="grss.prop_simulation.html">grss.prop_simulation</a><ul>
+      <li>Previous: <a href="grss.prop_simulation.ForceParameters.html" title="previous chapter">grss.prop_simulation.ForceParameters</a></li>
+      <li>Next: <a href="grss.prop_simulation.IntegBody.html" title="next chapter">grss.prop_simulation.IntegBody</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/_autosummary/grss.prop_simulation.ImpulseEvent.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

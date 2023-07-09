@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>grss.prop_simulation.IntegrationParameters &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="grss.prop_simulation.NongravParamaters" href="grss.prop_simulation.NongravParamaters.html" />
+    <link rel="prev" title="grss.prop_simulation.IntegBody" href="grss.prop_simulation.IntegBody.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="grss-prop-simulation-integrationparameters">
+<h1>grss.prop_simulation.IntegrationParameters<a class="headerlink" href="#grss-prop-simulation-integrationparameters" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">IntegrationParameters</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>The IntegrationParameters class contains parameters used in the numerical
+integration of the equations of motion.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters" title="grss.prop_simulation.IntegrationParameters"><span class="pre">grss.prop_simulation.IntegrationParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.__init__" title="grss.prop_simulation.IntegrationParameters.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.adaptiveTimestep" title="grss.prop_simulation.IntegrationParameters.adaptiveTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adaptiveTimestep</span></code></a></p></td>
+<td><p>Flag to use adaptive time step.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dt0" title="grss.prop_simulation.IntegrationParameters.dt0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt0</span></code></a></p></td>
+<td><p>Initial time step.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dtChangeFactor" title="grss.prop_simulation.IntegrationParameters.dtChangeFactor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtChangeFactor</span></code></a></p></td>
+<td><p>Factor by which to limit the change in time step.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dtMax" title="grss.prop_simulation.IntegrationParameters.dtMax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMax</span></code></a></p></td>
+<td><p>Maximum time step.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dtMin" title="grss.prop_simulation.IntegrationParameters.dtMin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMin</span></code></a></p></td>
+<td><p>Minimum time step.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.nInteg" title="grss.prop_simulation.IntegrationParameters.nInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nInteg</span></code></a></p></td>
+<td><p>Number of integrated bodies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.nSpice" title="grss.prop_simulation.IntegrationParameters.nSpice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nSpice</span></code></a></p></td>
+<td><p>Number of bodies with SPICE ephemerides.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.nTotal" title="grss.prop_simulation.IntegrationParameters.nTotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTotal</span></code></a></p></td>
+<td><p>Total number of bodies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.t0" title="grss.prop_simulation.IntegrationParameters.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<td><p>Initial time of integration (MJD TDB).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.tf" title="grss.prop_simulation.IntegrationParameters.tf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tf</span></code></a></p></td>
+<td><p>Final time of integration (MJD TDB).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.timestepCounter" title="grss.prop_simulation.IntegrationParameters.timestepCounter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestepCounter</span></code></a></p></td>
+<td><p>Counter for number of time steps.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.tolInteg" title="grss.prop_simulation.IntegrationParameters.tolInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolInteg</span></code></a></p></td>
+<td><p>Tolerance for integration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.tolPC" title="grss.prop_simulation.IntegrationParameters.tolPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolPC</span></code></a></p></td>
+<td><p>Tolerance for predictor-corrector within IAS15.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.adaptiveTimestep">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">adaptiveTimestep</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.adaptiveTimestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to use adaptive time step.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dt0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt0</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dt0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initial time step.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dtChangeFactor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtChangeFactor</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dtChangeFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factor by which to limit the change in time step.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dtMax">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtMax</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dtMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum time step.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dtMin">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtMin</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dtMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimum time step.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.nInteg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nInteg</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.nInteg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of integrated bodies.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.nSpice">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nSpice</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.nSpice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of bodies with SPICE ephemerides.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.nTotal">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nTotal</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.nTotal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total number of bodies. nTotal = nInteg + nSpice.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.t0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t0</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.t0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initial time of integration (MJD TDB).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.tf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tf</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.tf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Final time of integration (MJD TDB).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.timestepCounter">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestepCounter</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.timestepCounter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counter for number of time steps.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.tolInteg">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tolInteg</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.tolInteg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tolerance for integration.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.tolPC">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tolPC</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.tolPC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tolerance for predictor-corrector within IAS15.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="grss.prop_simulation.html">grss.prop_simulation</a><ul>
+      <li>Previous: <a href="grss.prop_simulation.IntegBody.html" title="previous chapter">grss.prop_simulation.IntegBody</a></li>
+      <li>Next: <a href="grss.prop_simulation.NongravParamaters.html" title="next chapter">grss.prop_simulation.NongravParamaters</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/_autosummary/grss.prop_simulation.IntegrationParameters.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

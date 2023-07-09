@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>grss.prop_simulation.Body &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="grss.prop_simulation.Constants" href="grss.prop_simulation.Constants.html" />
+    <link rel="prev" title="grss.prop_simulation.cometary_to_cartesian" href="grss.prop_simulation.cometary_to_cartesian.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="grss-prop-simulation-body">
+<h1>grss.prop_simulation.Body<a class="headerlink" href="#grss-prop-simulation-body" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">Body</span></span><a class="headerlink" href="#grss.prop_simulation.Body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>The Body class contains the properties of an integrated or SPICE body.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.Body" title="grss.prop_simulation.Body"><span class="pre">grss.prop_simulation.Body</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.Body.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.__init__" title="grss.prop_simulation.Body.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.set_J2" title="grss.prop_simulation.Body.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, obliquityToEcliptic)</p></td>
+<td><p>Set the J2 parameter of the body.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.J2" title="grss.prop_simulation.Body.J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">J2</span></code></a></p></td>
+<td><p>J2 parameter of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.isJ2" title="grss.prop_simulation.Body.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
+<td><p>Whether the body is a J2 body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.isMajor" title="grss.prop_simulation.Body.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
+<td><p>Whether the body is a major body (used for EIH PPN).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.isNongrav" title="grss.prop_simulation.Body.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
+<td><p>Whether the body has non-gravitational accelerations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.isPPN" title="grss.prop_simulation.Body.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
+<td><p>Whether the body is a PPN body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.mass" title="grss.prop_simulation.Body.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
+<td><p>Mass of the body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.name" title="grss.prop_simulation.Body.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p>Name of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.obliquityToEcliptic" title="grss.prop_simulation.Body.obliquityToEcliptic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obliquityToEcliptic</span></code></a></p></td>
+<td><p>Obliquity of the body's orbit to the ecliptic.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.pos" title="grss.prop_simulation.Body.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
+<td><p>Position of the body at the initial time.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.radius" title="grss.prop_simulation.Body.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<td><p>Radius of the body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.t0" title="grss.prop_simulation.Body.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<td><p>Initial MJD TDB time of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.Body.vel" title="grss.prop_simulation.Body.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
+<td><p>Velocity of the body at the initial time.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.J2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">J2</span></span><a class="headerlink" href="#grss.prop_simulation.Body.J2" title="Permalink to this definition">¶</a></dt>
+<dd><p>J2 parameter of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.isJ2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isJ2</span></span><a class="headerlink" href="#grss.prop_simulation.Body.isJ2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the body is a J2 body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.isMajor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isMajor</span></span><a class="headerlink" href="#grss.prop_simulation.Body.isMajor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the body is a major body (used for EIH PPN).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.isNongrav">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isNongrav</span></span><a class="headerlink" href="#grss.prop_simulation.Body.isNongrav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the body has non-gravitational accelerations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.isPPN">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isPPN</span></span><a class="headerlink" href="#grss.prop_simulation.Body.isPPN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the body is a PPN body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.mass">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mass</span></span><a class="headerlink" href="#grss.prop_simulation.Body.mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mass of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#grss.prop_simulation.Body.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.obliquityToEcliptic">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">obliquityToEcliptic</span></span><a class="headerlink" href="#grss.prop_simulation.Body.obliquityToEcliptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obliquity of the body’s orbit to the ecliptic.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.pos">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pos</span></span><a class="headerlink" href="#grss.prop_simulation.Body.pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position of the body at the initial time.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.radius">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#grss.prop_simulation.Body.radius" title="Permalink to this definition">¶</a></dt>
+<dd><p>Radius of the body.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.set_J2">
+<span class="sig-name descname"><span class="pre">set_J2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.Body" title="grss.prop_simulation.Body"><span class="pre">grss.prop_simulation.Body</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">J2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obliquityToEcliptic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.Body.set_J2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the J2 parameter of the body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>J2</strong> (<em>real</em>) – J2 parameter of the body.</p></li>
+<li><p><strong>obliquityToEcliptic</strong> (<em>real</em>) – Obliquity of the body’s orbit to the ecliptic.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NoneType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.t0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t0</span></span><a class="headerlink" href="#grss.prop_simulation.Body.t0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initial MJD TDB time of the body. Same as the initial time of the propagator.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.Body.vel">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vel</span></span><a class="headerlink" href="#grss.prop_simulation.Body.vel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Velocity of the body at the initial time.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="grss.prop_simulation.html">grss.prop_simulation</a><ul>
+      <li>Previous: <a href="grss.prop_simulation.cometary_to_cartesian.html" title="previous chapter">grss.prop_simulation.cometary_to_cartesian</a></li>
+      <li>Next: <a href="grss.prop_simulation.Constants.html" title="next chapter">grss.prop_simulation.Constants</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/_autosummary/grss.prop_simulation.Body.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

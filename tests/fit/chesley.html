@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>(12104) Chesley orbit determination test &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="(28751) Eggl orbit determination test" href="eggl.html" />
+    <link rel="prev" title="(66391) Moshup propagation test" href="../prop/moshup.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="(12104)-Chesley-orbit-determination-test">
+<h1>(12104) Chesley orbit determination test<a class="headerlink" href="#(12104)-Chesley-orbit-determination-test" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import grss
+prop = grss.prop
+fit = grss.fit
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import numpy as np
+np.set_printoptions(precision=40, linewidth=np.inf)
+import matplotlib.pyplot as plt
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>body_id = &#39;12104&#39;
+init_sol, init_cov, nongrav_info = fit.get_sbdb_info(body_id)
+body_radius = 0.0
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>optical_obs_file = None
+t_min_tdb = None
+t_max_tdb = None
+debias = False
+debias_lowres = True
+deweight = True
+eliminate = False
+max_obs_per_night = 4
+verbose = True
+obs_array_optical, observer_codes_optical = fit.get_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
+obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Skipped 28 observations
+         28 of which were non-geocentric occultations or space-based observations,
+         0 were either roving or radar observations (radar is handled separately),
+         0 of which were outside the specified time range.
+No debiasing needed for 1814 observations. Debiased 1273 observations. No biasing information for 10 observations.
+Applied default weight of 1 arcsec to 145 CCD observations
+Deweighted 798 observations as part of deweighting scheme.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>n_iter_max = 10
+de_kernel = 441
+de_kernel_path = grss.utils.default_kernel_path(de_kernel)
+fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar, n_iter_max=n_iter_max, de_kernel=de_kernel, de_kernel_path=de_kernel_path, radius=body_radius, nongrav_info=nongrav_info)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fit_sim.filter_lsq()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
+1                        0.431                   0.478                   1417.257                        0.229
+2                        0.431                   0.478                   1416.553                        0.229
+Converged without rejecting outliers. Starting outlier rejection now.
+3                        0.403                   0.431                   1146.521                        0.186
+4                        0.402                   0.431                   1145.799                        0.186
+Converged after rejecting outliers.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fit_sim.print_summary()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Summary of the orbit fit calculations at iteration 4 (of 4):
+=======================================================
+RMS unweighted: 0.40239410716187474
+RMS weighted: 0.4312844482967084
+chi-squared: 1145.7986561103917
+reduced chi-squared: 0.18618762692726545
+square root of reduced chi-squared: 0.4314946429879118
+=======================================================
+t: MJD 57738.0 TDB
+Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                             Change                          Change (sigma)
+e                       2.41594472929e-02               2.94002577556e-08               2.41594447724e-02               2.81525445232e-08               -2.52044965454e-09              -0.086
+q                       2.93828018638e+00               8.99390539895e-08               2.93828019458e+00               8.62601575784e-08               +8.20120371614e-09              +0.091
+tp                      5.68199558150e+04               3.84031128759e-04               5.68199558169e+04               3.72421493560e-04               +1.86382385436e-06              +0.005
+om                      7.80621777762e+01               1.66301228578e-05               7.80621782966e+01               1.68823031091e-05               +5.20383935054e-07              +0.031
+w                       1.83000116206e+02               7.37415160678e-05               1.83000116024e+02               7.16557110289e-05               -1.82128445658e-07              -0.002
+i                       1.11515692119e+01               3.36526255700e-06               1.11515693820e+01               3.42292148646e-06               +1.70115120213e-07              +0.051
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fit_sim.plot_summary(auto_close=True)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tests_fit_chesley_8_0.png" src="../../_images/tests_fit_chesley_8_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fit_sim.iters[-1].plot_iteration_summary(title=&#39;Postfit Residuals&#39;, auto_close=True)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tests_fit_chesley_9_0.png" src="../../_images/tests_fit_chesley_9_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tests_fit_chesley_9_1.png" src="../../_images/tests_fit_chesley_9_1.png" />
+</div>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../../examples.html">Examples</a><ul>
+      <li>Previous: <a href="../prop/moshup.html" title="previous chapter">(66391) Moshup propagation test</a></li>
+      <li>Next: <a href="eggl.html" title="next chapter">(28751) Eggl orbit determination test</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../../_sources/tests/fit/chesley.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

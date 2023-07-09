@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GRSS Propagator Module (grss.prop) &#8212; GRSS 0.6.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GRSS Orbit Determination Module (grss.fit)" href="fit.html" />
+    <link rel="prev" title="Getting Started" href="start.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="grss-propagator-module-grss-prop">
+<h1>GRSS Propagator Module (grss.prop)<a class="headerlink" href="#grss-propagator-module-grss-prop" title="Permalink to this heading">¶</a></h1>
+<p>The propagator within GRSS is based on the IAS15 algorithm <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, which is a 15th-order integrator based on Gauss-Radau quadrature. The algorithm is adaptive, meaning that the step size is adjusted to ensure that the error is below a certain threshold. However, the integrator can also be run in fixed-step mode, where a user-defined fixed time step is used until the end of the integration.</p>
+<p>The force model includes the following effects:</p>
+<ol class="arabic simple">
+<li><p>Newtonian point-mass gravity</p></li>
+<li><p>Einstein-Infeld-Hoffmann (EIH) formulation of point-mass relativistic gravity <a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p></li>
+<li><p>J<sub>2</sub> zonal harmonic effects from the Sun and the Earth</p></li>
+<li><p>A<sub>1</sub>, A<sub>2</sub>, A<sub>3</sub> nongravitational  acceleration model <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p></li>
+</ol>
+<p>In addition to any integrated bodies defined by the user, the default force model includes effects from the Sun, the planets, the Moon, Pluto, and the Big 16 main-belt asteroids. The states of these bodies are read in from either the JPL DE431 or DE441 ephemerides, based on the user’s choice. The propagator can also interpolate any of the integrated bodies’ states to any time within the integration (or within a margin around the integration time bounds). This interpolation is done via interpolation polynomials based on the Newton divided difference method.</p>
+<p>The propagator module also has the ability to calculate apparent states of any integrated body. This is done through two methods. The first is the simpler of the two, and uses a simple approximation of the light-time between an observer and the integrated body. The second method is more accurate, and uses an iterative method to calculate the light-time between an observer and the integrated body. The second method is slightly more computationally expensive since it requires a few extra interpolations.</p>
+<p>This ability to calculate apparent states is used to calculate optical observables (Right Ascension and Declination). Furthermore, the propagator suite can also calculate range observables (delay and doppler). The delay measurement is trivially returned from the light-time calculation. The doppler measurable, however, is calculated using a dedicated doppler measurement model. This entire codebase is written in C++ and a Python binding is using <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>.</p>
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Rein, H. and Spiegel D.S., “IAS15: a fast, adaptive, high-order integrator for gravitational dynamics, accurate to machine precision over a billion orbits”, Monthly Notices of the Royal Astronomical Society, Volume 446, Issue 2, Pages 1424-1437, 2015. <a class="reference external" href="https://doi.org/10.1093/mnras/stu2164">https://doi.org/10.1093/mnras/stu2164</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Einstein, A., Infeld, L., and Hoffmann, B., “The Gravitational Equations and the Problem of Motion”, Annals of Mathematics, Volume 39, Issue 1, Pages 65-100, 1938. <a class="reference external" href="https://doi.org/10.2307/1968714">https://doi.org/10.2307/1968714</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Moyer, T.D., “Mathematical formulation of the Double Precision Orbit Determination Program (DPODP)”, Jet Propulsion Laboratory Technical Report 32-1527, 1971. <a class="reference external" href="https://ntrs.nasa.gov/citations/19710017134">https://ntrs.nasa.gov/citations/19710017134</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>Marsden, B.G., Sekanina, Z., and Yeomans, D.K., “Comets and nongravitational forces. V”, The Astronomical Journal, Volume 78, Issue 2, Pages 211-225, 1973. <a class="reference external" href="https://doi.org/10.1086/111402">https://doi.org/10.1086/111402</a>.</p>
+</aside>
+</aside>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">GRSS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="start.html" title="previous chapter">Getting Started</a></li>
+      <li>Next: <a href="fit.html" title="next chapter">GRSS Orbit Determination Module (grss.fit)</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Rahil Makadia.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/prop.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
