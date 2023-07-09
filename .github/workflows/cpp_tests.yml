@@ -1,0 +1,23 @@
+name: C++ tests
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  prop-only:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Build GRSS library
+        run: |
+          source initialize.sh
+          source build_cpp.sh -clean
+      - name: Run tests
+        run: |
+          cd tests/cpp/prop
+          source didymos.out

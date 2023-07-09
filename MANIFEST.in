@@ -1,9 +1,10 @@
 include include/*.h
 include src/*.cpp
+include src/CMakeLists.txt
 
 recursive-include extern *
+recursive-include tests *
 
 include CMakeLists.txt
-include src/CMakeLists.txt
 
 include grss/version.txt
