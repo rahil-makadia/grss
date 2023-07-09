@@ -15,6 +15,7 @@ jobs:
           submodules: true
       - name: Build GRSS library
         run: |
+          echo ARCHFLAGS_BEFORE: $ARCHFLAGS
           source initialize.sh
           source build_cpp.sh -clean
       - name: Run tests
