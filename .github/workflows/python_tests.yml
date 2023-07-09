@@ -1,15 +1,12 @@
-name: Python tests
+name: Unit tests
 on:
   push:
     branches:
       - main
       - dev
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  test:
+  python:
     runs-on: macos-latest
     steps:
       - name: Checkout repo
