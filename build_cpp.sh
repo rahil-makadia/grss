@@ -9,7 +9,7 @@ done
 
 # This script is used to build the project.
 if [[ $clean -eq 1 ]]; then
-    rm -r build
+    rm -rf build
     mkdir build
     cd build
     rm ../grss/*.so

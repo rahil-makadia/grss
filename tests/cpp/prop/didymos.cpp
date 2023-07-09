@@ -53,8 +53,10 @@ int main() {
     simTest.preprocess();
     simTest.integrate();
 
-    std::cout << "/////////////////////// Didymos comparison ///////////////////////"
-              << std::endl;
+    std::cout
+        << "/////////////////////// Didymos comparison ///////////////////////"
+        << std::endl
+        << std::endl;
     std::vector<real> sun = {-2.137253647445074E+08, 1.820691741416802E+08,
                              9.084856358728494E+07,  -8.872945056199384E+00,
                              8.222904852571648E-01,  5.360178568968080E-01};
@@ -84,12 +86,15 @@ int main() {
     std::cout << "]" << std::endl;
 
     real distDiff = sqrt(pow(sc[0] - rm[0], 2) + pow(sc[1] - rm[1], 2) +
-                      pow(sc[2] - rm[2], 2));
+                         pow(sc[2] - rm[2], 2));
+    std::cout << "Distance (m): " << distDiff << std::endl;
     // make sure the difference is less than 50m
     assert(distDiff < 50.0L);
 
-    std::cout << "/////////////////////// Didymos comparison ///////////////////////"
-              << std::endl;
+    std::cout
+        << std::endl
+        << "/////////////////////// Didymos comparison ///////////////////////"
+        << std::endl;
 
     // ProfilerStop();
     gettimeofday(&t2, NULL);
