@@ -4,13 +4,10 @@ on:
     branches:
       - main
       - dev
-  pull_request:
-    branches:
-      - main
 
 jobs:
     build:
-      name: Build Python distributions
+      name: build ${{ matrix.os }}
       runs-on: ${{ matrix.os }}
       strategy:
         matrix:
@@ -35,7 +32,6 @@ jobs:
             name: dist-${{ matrix.os }}
             path: dist
     publish:
-      name: Publish to PyPI and TestPyPI
       needs: build
       runs-on: ubuntu-latest
       steps:

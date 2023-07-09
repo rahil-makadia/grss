@@ -4,12 +4,9 @@ on:
     branches:
       - main
       - dev
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  test:
+  prop-and-fit:
     runs-on: macos-latest
     steps:
       - name: Checkout repo
@@ -29,7 +26,7 @@ jobs:
         run: |
           python3 -m pip install jupyter ipykernel
           python3 -m ipykernel install --user
-          jupyter nbconvert --to script tests/prop/*.ipynb
-          python3 tests/prop/*.py
-          jupyter nbconvert --to script tests/fit/*.ipynb
-          python3 tests/fit/*.py
+          jupyter nbconvert --to script tests/python/prop/*.ipynb
+          python3 tests/python/prop/*.py
+          jupyter nbconvert --to script tests/python/fit/*.ipynb
+          python3 tests/python/fit/*.py

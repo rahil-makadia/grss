@@ -34,3 +34,6 @@ include(CPack)
 pybind11_add_module(prop_simulation src/${PROJECT_NAME}.cpp)
 target_link_libraries(prop_simulation PRIVATE ${PROJECT_NAME})
 target_compile_definitions(prop_simulation PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSION})
+
+# compile tests
+add_subdirectory(tests/cpp/prop)
