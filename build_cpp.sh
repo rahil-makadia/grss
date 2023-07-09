@@ -12,7 +12,10 @@ if [[ $clean -eq 1 ]]; then
     rm -rf build
     mkdir build
     cd build
-    rm ../grss/*.so
+    # rm -f ../grss/*.so if exists
+    if [[ -f "../grss/*.so" ]]; then
+        rm -f ../grss/*.so
+    fi
     cmake ..
     make
     cp *.so ../grss/
@@ -22,7 +25,9 @@ else
         mkdir build
     fi
     cd build
-    rm ../grss/*.so
+    if [[ -f "../grss/*.so" ]]; then
+        rm -f ../grss/*.so
+    fi
     cmake ..
     make
     cp *.so ../grss/
