@@ -20,4 +20,4 @@ jobs:
       - name: Run tests
         run: |
           cd tests/cpp/prop
-          source didymos.out
+          ./didymos.out

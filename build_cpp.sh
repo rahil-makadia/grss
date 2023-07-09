@@ -19,6 +19,7 @@ if [[ $clean -eq 1 ]]; then
     cmake ..
     make
     cp *.so ../grss/
+    cd ..
 else
     # if build directory does not exist, create it
     if [[ ! -d "build" ]]; then
@@ -31,4 +32,5 @@ else
     cmake ..
     make
     cp *.so ../grss/
+    cd ..
 fi
