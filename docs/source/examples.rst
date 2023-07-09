@@ -4,15 +4,15 @@ Examples
 .. nbgallery::
    :caption: Orbit Propagation Examples:
 
-   tests/prop/apophis.ipynb
-   tests/prop/didymos.ipynb
-   tests/prop/icarus.ipynb
-   tests/prop/moshup.ipynb
+   tests/python/prop/apophis.ipynb
+   tests/python/prop/didymos.ipynb
+   tests/python/prop/icarus.ipynb
+   tests/python/prop/moshup.ipynb
 
 .. nbgallery::
    :caption: Orbit Determination Examples:
 
-   tests/fit/chesley.ipynb
-   tests/fit/eggl.ipynb
-   tests/fit/farnocchia.ipynb
-   tests/fit/shantanunaidu.ipynb
+   tests/python/fit/chesley.ipynb
+   tests/python/fit/eggl.ipynb
+   tests/python/fit/farnocchia.ipynb
+   tests/python/fit/shantanunaidu.ipynb
