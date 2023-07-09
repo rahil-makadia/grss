@@ -35,5 +35,8 @@ keywords = ["astronomy", "asteroids", "integrator", "orbit determination"]
 [build-system]
 requires = ["setuptools"]
 
-[tool.cibuildwheel]
-skip = ["*-manylinux_i686", "*-musllinux_i686"]
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64"]

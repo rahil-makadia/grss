@@ -9,5 +9,5 @@ fi
 if [ "$server" = "-pypi" ]; then
     python3 -m pip install --upgrade grss
 else
-    python3 -m pip install --upgrade --index-url https://test.pypi.org/simple/ --no-deps grss
+    python3 -m pip install --upgrade --index-url https://test.pypi.org/simple/ --no-deps grss --extra-index-url https://pypi.org/simple
 fi
