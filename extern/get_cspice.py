@@ -1,3 +1,4 @@
+# from the spiceypy cspice downloader
 """Download the CSPICE package from the NAIF FTP server and unpack it."""
 import platform
 import os
@@ -13,8 +14,6 @@ CSPICE_NO_PATCH = "CSPICE_NO_PATCH"
 
 host_OS = platform.system()
 host_arch = platform.machine()
-print("host_OS:", host_OS)
-print("host_arch:", host_arch)
 # Check if platform is supported
 os_supported = host_OS in ("Linux", "Darwin")
 # Get platform is Unix-like OS or not
@@ -68,8 +67,6 @@ class GetCSPICE(object):
             # Get the remote file path for the Python architecture that
             # executes the script.
             distribution, self._ext = self._distribution_info()
-            print("distribution:", distribution)
-            print("self._ext:", self._ext)
         except KeyError:
             print("GRSS currently does not support your system.")
         else:
@@ -117,7 +114,7 @@ class GetCSPICE(object):
         :rtype: tuple (str, str)
 
         :raises: KeyError if the (system, machine) tuple does not correspond
-                    to any of the supported SpiceyPy environments.
+                    to any of the supported GRSS environments.
         """
         print("Gathering information...")
         system = platform.system()
@@ -133,10 +130,9 @@ class GetCSPICE(object):
             machine = "arm64"
         print("SYSTEM:   ", system)
         print("PROCESSOR:", processor)
-        print("MACHINE:  ", cpu_bits, machine)
+        print("MACHINE:  ", machine, cpu_bits)
         if machine in ("i386", "x86_32") or cpu_bits == "32bit":
             raise RuntimeError("32bit bit builds are not supported")
-        print(f"from self._dists: {self._dists[(system, machine, cpu_bits)]}")
         return self._dists[(system, machine, cpu_bits)]
 
     def _download(self):
@@ -282,7 +278,7 @@ def build_cspice():
     ]
     if len(shared_lib_path) != 1:
         os.chdir(cwd)
-        raise RuntimeError(('Could not find built static library of SpiceyPy'
+        raise RuntimeError(('Could not find built static library'
                                 f'in {list(Path(destination).glob("*.*"))}'))
     shared_lib_path = shared_lib_path[0]
     print(shared_lib_path, flush=True)
