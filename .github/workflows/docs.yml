@@ -24,7 +24,7 @@ jobs:
           pip3 install .
       - name: Build docs
         run: |
-          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx renku-sphinx-theme
+          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme
           brew install pandoc
           cd docs
           make clean html
