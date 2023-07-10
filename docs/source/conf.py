@@ -1,5 +1,5 @@
-# Configuration file for the Sphinx documentation builder.
-#
+"""Configuration file for the Sphinx documentation builder."""
+# pylint: disable=invalid-name
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'GRSS'
-copyright = '2023, Rahil Makadia'
+project_copyright = '2023, Rahil Makadia'
 author = 'Rahil Makadia'
 # get release and version from version.txt
 with open('../../grss/version.txt', 'r', encoding='utf-8') as f:
@@ -32,7 +32,7 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'renku'
 html_static_path = ['_static']
 html_favicon = '_static/favicon.ico'
 exclude_patterns = ['**.ipynb_checkpoints']
