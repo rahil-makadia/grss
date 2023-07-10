@@ -1,114 +1,413 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>grss.fit_simulation.FitSimulation &mdash; GRSS 0.6.1 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/fonts.css" type="text/css" />
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>grss.fit_simulation.FitSimulation &#8212; GRSS 0.6.1 documentation</title>
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="../_static/js/theme.js"></script>
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit_simulation.FitSimulation';</script>
+    <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.fit_simulation.IterationParams" href="grss.fit_simulation.IterationParams.html" />
-    <link rel="prev" title="grss.fit_simulation.create_simulated_obs_arrays" href="grss.fit_simulation.create_simulated_obs_arrays.html" /> 
-</head>
+    <link rel="prev" title="grss.fit_simulation.create_simulated_obs_arrays" href="grss.fit_simulation.create_simulated_obs_arrays.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> GRSS
-          </a>
-              <div class="version">
-                0.6.1
-              </div>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">GRSS 0.6.1 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="grss.fit_optical.html">grss.fit_optical</a></li>
-<li class="toctree-l2"><a class="reference internal" href="grss.fit_radar.html">grss.fit_radar</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="grss.fit_simulation.html">grss.fit_simulation</a><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/apophis.html">(99942) Apophis propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/didymos.html">(65803) Didymos propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/icarus.html">(1566) Icarus propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/moshup.html">(66391) Moshup propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/chesley.html">(12104) Chesley orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/eggl.html">(28751) Eggl orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/farnocchia.html">(84100) Farnocchia orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/shantanunaidu.html">(11468) Shantanunaidu orbit determination test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit_optical.html">grss.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.apply_debiasing_scheme.html">grss.fit_optical.apply_debiasing_scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.apply_weights.html">grss.fit_optical.apply_weights</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.debias_obs.html">grss.fit_optical.debias_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.deweight_obs.html">grss.fit_optical.deweight_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_data.html">grss.fit_optical.get_optical_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_obs_array.html">grss.fit_optical.get_optical_obs_array</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit_radar.html">grss.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_radar.get_radar_obs_array.html">grss.fit_radar.get_radar_obs_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_radar.get_radar_raw_data.html">grss.fit_radar.get_radar_raw_data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit_simulation.html">grss.fit_simulation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_simulation.create_simulated_obs_arrays.html">grss.fit_simulation.create_simulated_obs_arrays</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">grss.fit_simulation.FitSimulation</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.fit_simulation.FitSimulation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_simulation.IterationParams.html">grss.fit_simulation.IterationParams</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="grss.fit_utils.html">grss.fit_utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="grss.prop_simulation.html">grss.prop_simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="grss.prop_utils.html">grss.prop_utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="grss.utils.html">grss.utils</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit_utils.html">grss.fit_utils</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.et2mjd.html">grss.fit_utils.et2mjd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_codes_dict.html">grss.fit_utils.get_codes_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_dec_from_dms.html">grss.fit_utils.get_dec_from_dms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_observer_info.html">grss.fit_utils.get_observer_info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_ra_from_hms.html">grss.fit_utils.get_ra_from_hms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_radar_codes_dict.html">grss.fit_utils.get_radar_codes_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_radec.html">grss.fit_utils.get_radec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_sbdb_elems.html">grss.fit_utils.get_sbdb_elems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_sbdb_info.html">grss.fit_utils.get_sbdb_info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.get_sbdb_raw_data.html">grss.fit_utils.get_sbdb_raw_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.icrf2radec.html">grss.fit_utils.icrf2radec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.mjd2et.html">grss.fit_utils.mjd2et</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.parallax_constants_to_lat_lon_alt.html">grss.fit_utils.parallax_constants_to_lat_lon_alt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_utils.radec2icrf.html">grss.fit_utils.radec2icrf</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.prop_simulation.html">grss.prop_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.cartesian_to_cometary.html">grss.prop_simulation.cartesian_to_cometary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.cometary_to_cartesian.html">grss.prop_simulation.cometary_to_cartesian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Body.html">grss.prop_simulation.Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Constants.html">grss.prop_simulation.Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Event.html">grss.prop_simulation.Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.ForceParameters.html">grss.prop_simulation.ForceParameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.ImpulseEvent.html">grss.prop_simulation.ImpulseEvent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.IntegBody.html">grss.prop_simulation.IntegBody</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.IntegrationParameters.html">grss.prop_simulation.IntegrationParameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.NongravParamaters.html">grss.prop_simulation.NongravParamaters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.SpiceBody.html">grss.prop_simulation.SpiceBody</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.propSimulation.html">grss.prop_simulation.propSimulation</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.prop_utils.html">grss.prop_utils</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_utils.plot_solar_system.html">grss.prop_utils.plot_solar_system</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.utils.html">grss.utils</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.default_kernel_path.html">grss.utils.default_kernel_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.initialize.html">grss.utils.initialize</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
-        </div>
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
       </div>
-    </nav>
+      
+      <main id="main-content" class="bd-main">
+        
+        
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">GRSS</a>
-      </nav>
+<div class="sbt-scroll-pixel-helper"></div>
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a></li>
-          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
-          <li class="breadcrumb-item"><a href="grss.fit_simulation.html">grss.fit_simulation</a></li>
-      <li class="breadcrumb-item active">grss.fit_simulation.FitSimulation</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/grss.fit_simulation.FitSimulation.rst.txt" rel="nofollow"> View page source</a>
-      </li>
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_autosummary/grss.fit_simulation.FitSimulation.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
   </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>grss.fit_simulation.FitSimulation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation"><code class="docutils literal notranslate"><span class="pre">FitSimulation</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.__init__"><code class="docutils literal notranslate"><span class="pre">FitSimulation.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.add_iteration"><code class="docutils literal notranslate"><span class="pre">FitSimulation.add_iteration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies"><code class="docutils literal notranslate"><span class="pre">FitSimulation.assemble_and_propagate_bodies()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.assemble_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.assemble_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_and_add_events"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_and_add_events()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_convergence"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_convergence()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_initial_solution"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_initial_solution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_input_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.flatten_and_clean"><code class="docutils literal notranslate"><span class="pre">FitSimulation.flatten_and_clean()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_analytic_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_analytic_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_computed_obs"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_computed_obs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_numeric_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_numeric_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_perturbation_info"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_perturbation_info()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_perturbed_state"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_perturbed_state()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_prop_sim_future"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_prop_sim_future()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_prop_sim_past"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_prop_sim_past()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_prop_sims"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_prop_sims()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_residuals_and_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_residuals_and_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.merge_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.merge_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.plot_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.plot_summary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.print_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.print_summary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.reject_outliers"><code class="docutils literal notranslate"><span class="pre">FitSimulation.reject_outliers()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.sort_array_by_another"><code class="docutils literal notranslate"><span class="pre">FitSimulation.sort_array_by_another()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.x_dict_to_events"><code class="docutils literal notranslate"><span class="pre">FitSimulation.x_dict_to_events()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params"><code class="docutils literal notranslate"><span class="pre">FitSimulation.x_dict_to_nongrav_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.x_dict_to_state"><code class="docutils literal notranslate"><span class="pre">FitSimulation.x_dict_to_state()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section id="grss-fit-simulation-fitsimulation">
-<h1>grss.fit_simulation.FitSimulation<a class="headerlink" href="#grss-fit-simulation-fitsimulation" title="Permalink to this headline"></a></h1>
+<h1>grss.fit_simulation.FitSimulation<a class="headerlink" href="#grss-fit-simulation-fitsimulation" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to perform an orbit fit simulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor of the FitSimulation class.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x_init</strong> (<em>dict</em>) – Initial guess of the state vector.</p></li>
 <li><p><strong>cov_init</strong> (<em>array</em><em>, </em><em>optional</em>) – Initial covariance matrix, by default None</p></li>
@@ -124,21 +423,17 @@
 <li><p><strong>events</strong> (<em>list</em><em>, </em><em>optional</em>) – List of lists containing impulsive maneuvers, by default None</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
 </dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.__init__" title="grss.fit_simulation.FitSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_init[, cov_init, ...])</p></td>
 <td><p>Constructor of the FitSimulation class.</p></td>
@@ -228,19 +523,19 @@
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.add_iteration">
-<span class="sig-name descname"><span class="pre">add_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.add_iteration" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.add_iteration" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds an iteration to the list of iterations in the FitSimulation object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>iter_number</strong> (<em>int</em>) – The iteration number.</p></li>
 <li><p><strong>residuals</strong> (<em>array</em>) – The residuals of the observations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
 </dl>
@@ -248,14 +543,14 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies">
-<span class="sig-name descname"><span class="pre">assemble_and_propagate_bodies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perturbation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">assemble_and_propagate_bodies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perturbation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies" title="Permalink to this definition">#</a></dt>
 <dd><p>Assemble and propagate the body for the orbit fit.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>perturbation_info</strong> (<em>list</em>) – List of tuples containing the perturbation information
 for each nominal state parameter.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – propagated propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – propagated propSimulation object for the future.</p></li>
@@ -267,14 +562,14 @@ for each nominal state parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.assemble_observation_arrays">
-<span class="sig-name descname"><span class="pre">assemble_observation_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.assemble_observation_arrays" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">assemble_observation_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.assemble_observation_arrays" title="Permalink to this definition">#</a></dt>
 <dd><p>Assemble the optical and/or radar observation arrays into a
 single array for orbit fitting.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>NoneType</p>
 </dd>
 </dl>
@@ -282,10 +577,10 @@ single array for orbit fitting.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.check_and_add_events">
-<span class="sig-name descname"><span class="pre">check_and_add_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integ_body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_and_add_events" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_and_add_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integ_body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_and_add_events" title="Permalink to this definition">#</a></dt>
 <dd><p>Check if events are in the past or future and add them to the appropriate prop_sim.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – propSimulation object for the future.</p></li>
@@ -293,7 +588,7 @@ single array for orbit fitting.</p>
 <li><p><strong>events</strong> (<em>list</em>) – List of events for the fitted body.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – propSimulation object for the future.</p></li>
@@ -305,13 +600,13 @@ single array for orbit fitting.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.check_convergence">
-<span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_convergence" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_convergence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_convergence" title="Permalink to this definition">#</a></dt>
 <dd><p>Checks if the orbit fit has converged.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>NoneType</p>
 </dd>
 </dl>
@@ -319,23 +614,23 @@ single array for orbit fitting.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.check_initial_solution">
-<span class="sig-name descname"><span class="pre">check_initial_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_initial_solution" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_initial_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_initial_solution" title="Permalink to this definition">#</a></dt>
 <dd><p>Check the initial solution provided by the user and make
 sure it is valid.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x_init</strong> (<em>dict</em>) – Initial guess of the state vector.</p></li>
 <li><p><strong>cov_init</strong> (<em>array</em>) – Initial covariance matrix.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>ValueError</strong> – If the initial solution does not contain the time.</p></li>
 <li><p><strong>ValueError</strong> – If the initial solution does not contain a full cartesian
@@ -349,11 +644,11 @@ sure it is valid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.check_input_observation_arrays">
-<span class="sig-name descname"><span class="pre">check_input_observation_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">check_input_observation_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays" title="Permalink to this definition">#</a></dt>
 <dd><p>Check the input observation arrays provided by the user and
 make sure they are valid.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_array_optical</strong> (<em>array</em>) – Optical observation data for the orbit fit.</p></li>
 <li><p><strong>observer_codes_optical</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array_optical.</p></li>
@@ -361,13 +656,13 @@ make sure they are valid.</p>
 <li><p><strong>observer_codes_radar</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array_radar.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>ValueError</strong> – If no observation arrays are provided.</p></li>
 <li><p><strong>ValueError</strong> – If optical observations are provided but no observer codes.</p></li>
@@ -385,16 +680,16 @@ make sure they are valid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.filter_lsq">
-<span class="sig-name descname"><span class="pre">filter_lsq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.filter_lsq" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">filter_lsq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.filter_lsq" title="Permalink to this definition">#</a></dt>
 <dd><p>Performs a least-squares fit on the observations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – FLag for printing the iteration information while fitting, by default True.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
 </dl>
@@ -402,16 +697,16 @@ make sure they are valid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.flatten_and_clean">
-<span class="sig-name descname"><span class="pre">flatten_and_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.flatten_and_clean" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">flatten_and_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.flatten_and_clean" title="Permalink to this definition">#</a></dt>
 <dd><p>Flatten an array and remove any NaN values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>arr</strong> (<em>array</em>) – Array to flatten and clean.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>arr</strong> – Flattened and cleaned array.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -419,17 +714,17 @@ make sure they are valid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_analytic_partials">
-<span class="sig-name descname"><span class="pre">get_analytic_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_analytic_partials" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_analytic_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_analytic_partials" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the analytic partials of the observations with respect to the
 initial nominal state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the future.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>NotImplementedError</strong> – Because analytic partials are not yet implemented.</p>
 </dd>
 </dl>
@@ -437,23 +732,23 @@ initial nominal state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_computed_obs">
-<span class="sig-name descname"><span class="pre">get_computed_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integ_body_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_computed_obs" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_computed_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integ_body_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_computed_obs" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the optical and radar observations from the propagated states.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the future.</p></li>
 <li><p><strong>integ_body_idx</strong> (<em>int</em>) – The index of the integ_body to use for calculating the observations.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>computed_obs</strong> – The computed observations from the propagated states.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – If the observer information is not well-defined.</p>
 </dd>
 </dl>
@@ -461,11 +756,11 @@ initial nominal state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_numeric_partials">
-<span class="sig-name descname"><span class="pre">get_numeric_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_numeric_partials" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_numeric_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_numeric_partials" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the numeric partials of the observations with respect to the
 initial nominal state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the future.</p></li>
@@ -473,11 +768,11 @@ initial nominal state.</p>
 for each nominal state parameter.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>partials</strong> – The numeric partials of the observations with respect to the
 initial nominal state.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -485,11 +780,11 @@ initial nominal state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_partials">
-<span class="sig-name descname"><span class="pre">get_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_partials" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_sim_past</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_sim_future</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_partials" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the partials of the observations with respect to the
 initial nominal state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the past.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – The propagated propSimulation object for the future.</p></li>
@@ -497,11 +792,11 @@ initial nominal state.</p>
 for each nominal state parameter.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>partials</strong> – The partials of the observations with respect to the
 initial nominal state.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>array</p>
 </dd>
 </dl>
@@ -509,14 +804,14 @@ initial nominal state.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_perturbation_info">
-<span class="sig-name descname"><span class="pre">get_perturbation_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_perturbation_info" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_perturbation_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_perturbation_info" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the perturbation information for all nominal state parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>perturbation_info</strong> – List of tuples containing the perturbation information
 for each nominal state parameter.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list</p>
 </dd>
 </dl>
@@ -524,13 +819,13 @@ for each nominal state parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_perturbed_state">
-<span class="sig-name descname"><span class="pre">get_perturbed_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_perturbed_state" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_perturbed_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_perturbed_state" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the perturbed state for a given nominal state parameter.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>key</strong> (<em>str</em>) – Key for the nominal state parameter.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>state_plus</strong> (<em>list</em>) – Perturbed state in the positive direction.</p></li>
 <li><p><strong>ng_params_plus</strong> (<em>prop.NongravParamaters object</em>) – Perturbed non-gravitational parameters in the positive direction.</p></li>
@@ -547,10 +842,10 @@ for each nominal state parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_prop_sim_future">
-<span class="sig-name descname"><span class="pre">get_prop_sim_future</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_eval_utc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_apparent_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged_light_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_prop_sim_future" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_prop_sim_future</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_eval_utc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_apparent_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged_light_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_prop_sim_future" title="Permalink to this definition">#</a></dt>
 <dd><p>Get a propSim object for the future observations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<em>str</em>) – Name of the propSim object.</p></li>
 <li><p><strong>t_eval_utc</strong> (<em>bool</em>) – Flag for whether the observation times are in UTC.</p></li>
@@ -559,10 +854,10 @@ for each nominal state parameter.</p>
 <li><p><strong>observer_info</strong> (<em>tuple</em>) – Observer information for each future observation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>prop_sim_future</strong> – propSim object for the future observations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>prop.propSimulation object</p>
 </dd>
 </dl>
@@ -570,10 +865,10 @@ for each nominal state parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_prop_sim_past">
-<span class="sig-name descname"><span class="pre">get_prop_sim_past</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_eval_utc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_apparent_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged_light_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_prop_sim_past" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_prop_sim_past</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_eval_utc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_apparent_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged_light_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_prop_sim_past" title="Permalink to this definition">#</a></dt>
 <dd><p>Get a propSim object for the past observations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<em>str</em>) – Name of the propSim object.</p></li>
 <li><p><strong>t_eval_utc</strong> (<em>bool</em>) – Flag for whether the observation times are in UTC.</p></li>
@@ -582,10 +877,10 @@ for each nominal state parameter.</p>
 <li><p><strong>observer_info</strong> (<em>tuple</em>) – Observer information for each past observation.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>prop_sim_past</strong> – propSim object for the past observations.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>prop.propSimulation object</p>
 </dd>
 </dl>
@@ -593,13 +888,13 @@ for each nominal state parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_prop_sims">
-<span class="sig-name descname"><span class="pre">get_prop_sims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_prop_sims" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_prop_sims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_prop_sims" title="Permalink to this definition">#</a></dt>
 <dd><p>Get propSim objects for the past and future observations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Name of the propSim objects.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>prop_sim_past</strong> (<em>prop.propSimulation object</em>) – propSim object for the past observations.</p></li>
 <li><p><strong>prop_sim_future</strong> (<em>prop.propSimulation object</em>) – propSim object for the future observations.</p></li>
@@ -611,11 +906,11 @@ for each nominal state parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.get_residuals_and_partials">
-<span class="sig-name descname"><span class="pre">get_residuals_and_partials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_residuals_and_partials" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_residuals_and_partials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.get_residuals_and_partials" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the residuals and partials of the observations with respect to the
 initial nominal state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p><strong>residuals</strong> (<em>array</em>) – The residuals of the observations</p></li>
 <li><p><strong>partials</strong> (<em>array</em>) – The partials of the observations with respect to the
@@ -628,14 +923,14 @@ initial nominal state.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.merge_observation_arrays">
-<span class="sig-name descname"><span class="pre">merge_observation_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.merge_observation_arrays" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">merge_observation_arrays</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.merge_observation_arrays" title="Permalink to this definition">#</a></dt>
 <dd><p>Merge the optical and radar observation arrays into a single
 array for orbit fitting.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>NoneType</p>
 </dd>
 </dl>
@@ -643,16 +938,16 @@ array for orbit fitting.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.plot_summary">
-<span class="sig-name descname"><span class="pre">plot_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auto_close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.plot_summary" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">plot_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auto_close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.plot_summary" title="Permalink to this definition">#</a></dt>
 <dd><p>Plots a summary of the orbit fit calculations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>auto_close</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to automatically close the figure, by default False</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
 </dl>
@@ -660,16 +955,16 @@ array for orbit fitting.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.print_summary">
-<span class="sig-name descname"><span class="pre">print_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.print_summary" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">print_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.print_summary" title="Permalink to this definition">#</a></dt>
 <dd><p>Prints a summary of the orbit fit calculations at a given iteration.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>iter_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – The iteration number to print the summary for, by default -1.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>NoneType</p>
 </dd>
 </dl>
@@ -677,10 +972,10 @@ array for orbit fitting.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.reject_outliers">
-<span class="sig-name descname"><span class="pre">reject_outliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.reject_outliers" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reject_outliers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.reject_outliers" title="Permalink to this definition">#</a></dt>
 <dd><p>Outlier rejection algorithm for the residuals.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>partials</strong> (<em>array</em>) – The partials of the observations with respect to the
 initial nominal state.</p></li>
@@ -688,7 +983,7 @@ initial nominal state.</p></li>
 <li><p><strong>residuals</strong> (<em>array</em>) – The residuals of the observations</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>partials</strong> (<em>array</em>) – The partials of the observations with respect to the
 initial nominal state after outlier rejection.</p></li>
@@ -698,7 +993,7 @@ initial nominal state after outlier rejection.</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ValueError</strong> – If the observer information is not well-defined.</p>
 </dd>
 </dl>
@@ -706,16 +1001,16 @@ initial nominal state after outlier rejection.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.sort_array_by_another">
-<span class="sig-name descname"><span class="pre">sort_array_by_another</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.sort_array_by_another" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">sort_array_by_another</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_by</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.sort_array_by_another" title="Permalink to this definition">#</a></dt>
 <dd><p>Sort an array by another array.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>array</strong> (<em>array</em>) – Array to sort.</p></li>
 <li><p><strong>sort_by</strong> (<em>array</em>) – Array to sort by.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>array</strong> (<em>array</em>) – Sorted array.</p></li>
 <li><p><strong>sort_idx</strong> (<em>vector</em>) – Indices of the sorted array.</p></li>
@@ -727,16 +1022,16 @@ initial nominal state after outlier rejection.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.x_dict_to_events">
-<span class="sig-name descname"><span class="pre">x_dict_to_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.x_dict_to_events" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">x_dict_to_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.x_dict_to_events" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a dictionary of nominal state to events.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x_dict</strong> (<em>dict</em>) – Dictionary of the nominal state.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>events</strong> – List of events for the fitted body.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
@@ -744,16 +1039,16 @@ initial nominal state after outlier rejection.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params">
-<span class="sig-name descname"><span class="pre">x_dict_to_nongrav_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">x_dict_to_nongrav_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a dictionary of nominal state to non-gravitational parameters.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x_dict</strong> (<em>dict</em>) – Dictionary of the nominal state.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>nongrav_params</strong> – Non-gravitational parameters for the fitted body.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>prop.NongravParamaters object</p>
 </dd>
 </dl>
@@ -761,19 +1056,19 @@ initial nominal state after outlier rejection.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.x_dict_to_state">
-<span class="sig-name descname"><span class="pre">x_dict_to_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.x_dict_to_state" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">x_dict_to_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.x_dict_to_state" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert a dictionary of nominal state to a state vector.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x_dict</strong> (<em>dict</em>) – Dictionary of the nominal state.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>state</strong> – State vector.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – If the state type is not well-defined.</p>
 </dd>
 </dl>
@@ -784,34 +1079,135 @@ initial nominal state after outlier rejection.</p></li>
 </section>
 
 
-           </div>
-          </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="grss.fit_simulation.create_simulated_obs_arrays.html" class="btn btn-neutral float-left" title="grss.fit_simulation.create_simulated_obs_arrays" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="grss.fit_simulation.IterationParams.html" class="btn btn-neutral float-right" title="grss.fit_simulation.IterationParams" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+                </article>
+              
 
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2023, Rahil Makadia.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="grss.fit_simulation.create_simulated_obs_arrays.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">grss.fit_simulation.create_simulated_obs_arrays</p>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    </a>
+    <a class="right-next"
+       href="grss.fit_simulation.IterationParams.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">grss.fit_simulation.IterationParams</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div></div>
+  
+</div>
 
-</body>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation"><code class="docutils literal notranslate"><span class="pre">FitSimulation</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.__init__"><code class="docutils literal notranslate"><span class="pre">FitSimulation.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.add_iteration"><code class="docutils literal notranslate"><span class="pre">FitSimulation.add_iteration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies"><code class="docutils literal notranslate"><span class="pre">FitSimulation.assemble_and_propagate_bodies()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.assemble_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.assemble_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_and_add_events"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_and_add_events()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_convergence"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_convergence()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_initial_solution"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_initial_solution()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_input_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.flatten_and_clean"><code class="docutils literal notranslate"><span class="pre">FitSimulation.flatten_and_clean()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_analytic_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_analytic_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_computed_obs"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_computed_obs()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_numeric_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_numeric_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_perturbation_info"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_perturbation_info()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_perturbed_state"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_perturbed_state()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_prop_sim_future"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_prop_sim_future()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_prop_sim_past"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_prop_sim_past()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_prop_sims"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_prop_sims()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_residuals_and_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_residuals_and_partials()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.merge_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.merge_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.plot_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.plot_summary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.print_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.print_summary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.reject_outliers"><code class="docutils literal notranslate"><span class="pre">FitSimulation.reject_outliers()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.sort_array_by_another"><code class="docutils literal notranslate"><span class="pre">FitSimulation.sort_array_by_another()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.x_dict_to_events"><code class="docutils literal notranslate"><span class="pre">FitSimulation.x_dict_to_events()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params"><code class="docutils literal notranslate"><span class="pre">FitSimulation.x_dict_to_nongrav_params()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.x_dict_to_state"><code class="docutils literal notranslate"><span class="pre">FitSimulation.x_dict_to_state()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Rahil Makadia
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Rahil Makadia.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
 </html>
