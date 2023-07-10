@@ -1,50 +1,113 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>grss.fit_optical.deweight_obs &#8212; GRSS 0.6.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <link rel="icon" href="../_static/favicon.ico"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>grss.fit_optical.deweight_obs &mdash; GRSS 0.6.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/fonts.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.fit_optical.eliminate_obs" href="grss.fit_optical.eliminate_obs.html" />
-    <link rel="prev" title="grss.fit_optical.debias_obs" href="grss.fit_optical.debias_obs.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="prev" title="grss.fit_optical.debias_obs" href="grss.fit_optical.debias_obs.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> GRSS
+          </a>
+              <div class="version">
+                0.6.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="grss.fit_optical.html">grss.fit_optical</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.apply_debiasing_scheme.html">grss.fit_optical.apply_debiasing_scheme</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.apply_weights.html">grss.fit_optical.apply_weights</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.debias_obs.html">grss.fit_optical.debias_obs</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">grss.fit_optical.deweight_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_data.html">grss.fit_optical.get_optical_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_obs_array.html">grss.fit_optical.get_optical_obs_array</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_radar.html">grss.fit_radar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_simulation.html">grss.fit_simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_utils.html">grss.fit_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.prop_simulation.html">grss.prop_simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.prop_utils.html">grss.prop_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.utils.html">grss.utils</a></li>
+</ul>
+</li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GRSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+          <li class="breadcrumb-item"><a href="grss.fit_optical.html">grss.fit_optical</a></li>
+      <li class="breadcrumb-item active">grss.fit_optical.deweight_obs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/grss.fit_optical.deweight_obs.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="grss-fit-optical-deweight-obs">
-<h1>grss.fit_optical.deweight_obs<a class="headerlink" href="#grss-fit-optical-deweight-obs" title="Permalink to this heading">¶</a></h1>
+<h1>grss.fit_optical.deweight_obs<a class="headerlink" href="#grss-fit-optical-deweight-obs" title="Permalink to this headline"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.fit_optical.deweight_obs">
-<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">deweight_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">star_catalog_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eff_obs_per_night</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.deweight_obs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">deweight_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">star_catalog_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eff_obs_per_night</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.deweight_obs" title="Permalink to this definition"></a></dt>
 <dd><p>Deweight observations that occur on the same night at the same observatory.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obs_array_optical</strong> (<em>array</em>) – Optical observation data for the given body</p></li>
 <li><p><strong>star_catalog_codes</strong> (<em>tuple</em>) – Star catalog codes used for reducing each observation in obs_array_optical</p></li>
@@ -53,7 +116,7 @@
 <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to print out information about the observations, by default False</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>obs_array_deweighted</strong> (<em>array</em>) – Deweighted Optical observation data for the given body</p></li>
 <li><p><strong>catalog_deweighted</strong> (<em>tuple</em>) – Star catalog codes used for reducing each observation in obs_array_deweighted</p></li>
@@ -67,79 +130,34 @@
 </section>
 
 
+           </div>
           </div>
-          
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="grss.fit_optical.debias_obs.html" class="btn btn-neutral float-left" title="grss.fit_optical.debias_obs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="grss.fit_optical.eliminate_obs.html" class="btn btn-neutral float-right" title="grss.fit_optical.eliminate_obs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rahil Makadia.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">GRSS</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="../api.html">API</a><ul>
-  <li><a href="grss.fit_optical.html">grss.fit_optical</a><ul>
-      <li>Previous: <a href="grss.fit_optical.debias_obs.html" title="previous chapter">grss.fit_optical.debias_obs</a></li>
-      <li>Next: <a href="grss.fit_optical.eliminate_obs.html" title="next chapter">grss.fit_optical.eliminate_obs</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2023, Rahil Makadia.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
-      
-      |
-      <a href="../_sources/_autosummary/grss.fit_optical.deweight_obs.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>

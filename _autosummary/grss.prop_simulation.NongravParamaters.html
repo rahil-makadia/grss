@@ -1,57 +1,129 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>grss.prop_simulation.NongravParamaters &#8212; GRSS 0.6.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <link rel="icon" href="../_static/favicon.ico"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>grss.prop_simulation.NongravParamaters &mdash; GRSS 0.6.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/fonts.css" type="text/css" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.prop_simulation.SpiceBody" href="grss.prop_simulation.SpiceBody.html" />
-    <link rel="prev" title="grss.prop_simulation.IntegrationParameters" href="grss.prop_simulation.IntegrationParameters.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="prev" title="grss.prop_simulation.IntegrationParameters" href="grss.prop_simulation.IntegrationParameters.html" /> 
+</head>
 
-  </head><body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> GRSS
+          </a>
+              <div class="version">
+                0.6.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_optical.html">grss.fit_optical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_radar.html">grss.fit_radar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_simulation.html">grss.fit_simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.fit_utils.html">grss.fit_utils</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="grss.prop_simulation.html">grss.prop_simulation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.cartesian_to_cometary.html">grss.prop_simulation.cartesian_to_cometary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.cometary_to_cartesian.html">grss.prop_simulation.cometary_to_cartesian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Body.html">grss.prop_simulation.Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Constants.html">grss.prop_simulation.Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Event.html">grss.prop_simulation.Event</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.ForceParameters.html">grss.prop_simulation.ForceParameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.ImpulseEvent.html">grss.prop_simulation.ImpulseEvent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.IntegBody.html">grss.prop_simulation.IntegBody</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.IntegrationParameters.html">grss.prop_simulation.IntegrationParameters</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">grss.prop_simulation.NongravParamaters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.SpiceBody.html">grss.prop_simulation.SpiceBody</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.propSimulation.html">grss.prop_simulation.propSimulation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="grss.prop_utils.html">grss.prop_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grss.utils.html">grss.utils</a></li>
+</ul>
+</li>
+</ul>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+        </div>
+      </div>
+    </nav>
 
-          <div class="body" role="main">
-            
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GRSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+          <li class="breadcrumb-item"><a href="grss.prop_simulation.html">grss.prop_simulation</a></li>
+      <li class="breadcrumb-item active">grss.prop_simulation.NongravParamaters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/grss.prop_simulation.NongravParamaters.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="grss-prop-simulation-nongravparamaters">
-<h1>grss.prop_simulation.NongravParamaters<a class="headerlink" href="#grss-prop-simulation-nongravparamaters" title="Permalink to this heading">¶</a></h1>
+<h1>grss.prop_simulation.NongravParamaters<a class="headerlink" href="#grss-prop-simulation-nongravparamaters" title="Permalink to this headline"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">NongravParamaters</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">NongravParamaters</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_builtins.pybind11_object</span></code></p>
 <p>The NongravParamaters class contains constants used for calculating the
 non-gravitational accelerations on integrated bodies.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.NongravParamaters" title="grss.prop_simulation.NongravParamaters"><span class="pre">grss.prop_simulation.NongravParamaters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.NongravParamaters" title="grss.prop_simulation.NongravParamaters"><span class="pre">grss.prop_simulation.NongravParamaters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.NongravParamaters.__init__" title="grss.prop_simulation.NongravParamaters.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
 <td><p></p></td>
@@ -60,6 +132,10 @@ non-gravitational accelerations on integrated bodies.</p>
 </table>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.NongravParamaters.a1" title="grss.prop_simulation.NongravParamaters.a1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">a1</span></code></a></p></td>
 <td><p>Radial non-gravitational parameter a1.</p></td>
@@ -89,49 +165,49 @@ non-gravitational accelerations on integrated bodies.</p>
 </table>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.a1">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a1</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.a1" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a1</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.a1" title="Permalink to this definition"></a></dt>
 <dd><p>Radial non-gravitational parameter a1.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.a2">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a2</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.a2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a2</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.a2" title="Permalink to this definition"></a></dt>
 <dd><p>Transverse non-gravitational parameter a2.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.a3">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a3</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.a3" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a3</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.a3" title="Permalink to this definition"></a></dt>
 <dd><p>Normal non-gravitational parameter a3.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.alpha">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.alpha" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.alpha" title="Permalink to this definition"></a></dt>
 <dd><p>Non-gravitational parameter alpha from Marsden et al. (1973).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.k">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.k" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.k" title="Permalink to this definition"></a></dt>
 <dd><p>Non-gravitational parameter k from Marsden et al. (1973).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.m">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">m</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.m" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">m</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.m" title="Permalink to this definition"></a></dt>
 <dd><p>Non-gravitational parameter m from Marsden et al. (1973).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.n">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.n" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.n" title="Permalink to this definition"></a></dt>
 <dd><p>Non-gravitational parameter n from Marsden et al. (1973).</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.NongravParamaters.r0_au">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">r0_au</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.r0_au" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">r0_au</span></span><a class="headerlink" href="#grss.prop_simulation.NongravParamaters.r0_au" title="Permalink to this definition"></a></dt>
 <dd><p>Non-gravitational parameter r0 in AU from Marsden et al. (1973).</p>
 </dd></dl>
 
@@ -140,79 +216,34 @@ non-gravitational accelerations on integrated bodies.</p>
 </section>
 
 
+           </div>
           </div>
-          
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="grss.prop_simulation.IntegrationParameters.html" class="btn btn-neutral float-left" title="grss.prop_simulation.IntegrationParameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="grss.prop_simulation.SpiceBody.html" class="btn btn-neutral float-right" title="grss.prop_simulation.SpiceBody" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rahil Makadia.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">GRSS</a></h1>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-  <li><a href="../api.html">API</a><ul>
-  <li><a href="grss.prop_simulation.html">grss.prop_simulation</a><ul>
-      <li>Previous: <a href="grss.prop_simulation.IntegrationParameters.html" title="previous chapter">grss.prop_simulation.IntegrationParameters</a></li>
-      <li>Next: <a href="grss.prop_simulation.SpiceBody.html" title="next chapter">grss.prop_simulation.SpiceBody</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2023, Rahil Makadia.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
-      
-      |
-      <a href="../_sources/_autosummary/grss.prop_simulation.NongravParamaters.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
-    
-
-    
-  </body>
+</body>
 </html>
