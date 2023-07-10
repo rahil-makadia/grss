@@ -23,11 +23,12 @@ The source code for the GRSS library is available on GitHub and can be downloade
 
    git clone https://www.github.com/rahil-makadia/grss
 
-Once the source code has been downloaded, the library can be installed using the following command:
+Once the source code has been downloaded, the library can be installed using the following commands:
 
 .. code-block:: console
 
-   python setup.py install
+   source initialize.sh
+   python -m pip install .
 
 -----
 Usage
