@@ -24,6 +24,7 @@ grss.fit\_simulation.FitSimulation
         ~FitSimulation.check_convergence
         ~FitSimulation.check_initial_solution
         ~FitSimulation.check_input_observation_arrays
+        ~FitSimulation.create_obs_weight
         ~FitSimulation.filter_lsq
         ~FitSimulation.flatten_and_clean
         ~FitSimulation.get_analytic_partials

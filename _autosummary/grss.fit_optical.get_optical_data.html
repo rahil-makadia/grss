@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit_optical.get_optical_data &#8212; GRSS 0.6.1 documentation</title>
+    <title>grss.fit_optical.get_optical_data &#8212; GRSS 0.6.9 documentation</title>
   
   
   
@@ -58,7 +58,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.fit_optical.get_optical_obs_array" href="grss.fit_optical.get_optical_obs_array.html" />
-    <link rel="prev" title="grss.fit_optical.eliminate_obs" href="grss.fit_optical.eliminate_obs.html" />
+    <link rel="prev" title="grss.fit_optical.get_ades_optical_obs_array" href="grss.fit_optical.get_ades_optical_obs_array.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.6.1 documentation</p>
+    <p class="title logo__title">GRSS v0.6.9 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -163,6 +163,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.debias_obs.html">grss.fit_optical.debias_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.deweight_obs.html">grss.fit_optical.deweight_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_ades_optical_obs_array.html">grss.fit_optical.get_ades_optical_obs_array</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.fit_optical.get_optical_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_obs_array.html">grss.fit_optical.get_optical_obs_array</a></li>
 </ul>
@@ -430,7 +431,7 @@ document.write(`
 <h1>grss.fit_optical.get_optical_data<a class="headerlink" href="#grss-fit-optical-get-optical-data" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.fit_optical.get_optical_data">
-<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_optical_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optical_obs_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.get_optical_data" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_optical_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optical_obs_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.get_optical_data" title="Permalink to this definition">#</a></dt>
 <dd><p>Get optical observation data from the Minor Planet Center for a desired small body
 and assemble the optical observations for the given body into an array for an orbit fit.</p>
 <dl class="field-list simple">
@@ -472,12 +473,12 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit_optical.eliminate_obs.html"
+       href="grss.fit_optical.get_ades_optical_obs_array.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit_optical.eliminate_obs</p>
+        <p class="prev-next-title">grss.fit_optical.get_ades_optical_obs_array</p>
       </div>
     </a>
     <a class="right-next"
@@ -536,7 +537,7 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jul 10, 2023.
+  Last updated on Jul 11, 2023.
   <br/>
 </p>
   </div>

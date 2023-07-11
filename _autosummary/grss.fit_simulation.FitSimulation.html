@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit_simulation.FitSimulation &#8212; GRSS 0.6.1 documentation</title>
+    <title>grss.fit_simulation.FitSimulation &#8212; GRSS 0.6.9 documentation</title>
   
   
   
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.6.1 documentation</p>
+    <p class="title logo__title">GRSS v0.6.9 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -163,6 +163,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.debias_obs.html">grss.fit_optical.debias_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.deweight_obs.html">grss.fit_optical.deweight_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_ades_optical_obs_array.html">grss.fit_optical.get_ades_optical_obs_array</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_data.html">grss.fit_optical.get_optical_data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_obs_array.html">grss.fit_optical.get_optical_obs_array</a></li>
 </ul>
@@ -423,6 +424,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_convergence"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_convergence()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_initial_solution"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_initial_solution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_input_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.create_obs_weight"><code class="docutils literal notranslate"><span class="pre">FitSimulation.create_obs_weight()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.flatten_and_clean"><code class="docutils literal notranslate"><span class="pre">FitSimulation.flatten_and_clean()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_analytic_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_analytic_partials()</span></code></a></li>
@@ -499,7 +501,7 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.__init__" title="grss.fit_simulation.FitSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_init[, cov_init, ...])</p></td>
 <td><p>Constructor of the FitSimulation class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.add_iteration" title="grss.fit_simulation.FitSimulation.add_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_iteration</span></code></a>(iter_number, residuals)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.add_iteration" title="grss.fit_simulation.FitSimulation.add_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_iteration</span></code></a>(iter_number, residuals, ...)</p></td>
 <td><p>Adds an iteration to the list of iterations in the FitSimulation object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies" title="grss.fit_simulation.FitSimulation.assemble_and_propagate_bodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assemble_and_propagate_bodies</span></code></a>(perturbation_info)</p></td>
@@ -520,77 +522,81 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays" title="grss.fit_simulation.FitSimulation.check_input_observation_arrays"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_input_observation_arrays</span></code></a>(...)</p></td>
 <td><p>Check the input observation arrays provided by the user and make sure they are valid.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.filter_lsq" title="grss.fit_simulation.FitSimulation.filter_lsq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_lsq</span></code></a>([verbose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.create_obs_weight" title="grss.fit_simulation.FitSimulation.create_obs_weight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_obs_weight</span></code></a>()</p></td>
+<td><p>Assembles the weight matrix for the orbit fit based on observation uncertainties and correlations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.filter_lsq" title="grss.fit_simulation.FitSimulation.filter_lsq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_lsq</span></code></a>([verbose])</p></td>
 <td><p>Performs a least-squares fit on the observations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.flatten_and_clean" title="grss.fit_simulation.FitSimulation.flatten_and_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten_and_clean</span></code></a>(arr)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.flatten_and_clean" title="grss.fit_simulation.FitSimulation.flatten_and_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten_and_clean</span></code></a>(arr)</p></td>
 <td><p>Flatten an array and remove any NaN values.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_analytic_partials" title="grss.fit_simulation.FitSimulation.get_analytic_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_analytic_partials</span></code></a>(prop_sim_past, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_analytic_partials" title="grss.fit_simulation.FitSimulation.get_analytic_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_analytic_partials</span></code></a>(prop_sim_past, ...)</p></td>
 <td><p>Computes the analytic partials of the observations with respect to the initial nominal state.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_computed_obs" title="grss.fit_simulation.FitSimulation.get_computed_obs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_computed_obs</span></code></a>(prop_sim_past, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_computed_obs" title="grss.fit_simulation.FitSimulation.get_computed_obs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_computed_obs</span></code></a>(prop_sim_past, ...)</p></td>
 <td><p>Computes the optical and radar observations from the propagated states.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_numeric_partials" title="grss.fit_simulation.FitSimulation.get_numeric_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_numeric_partials</span></code></a>(prop_sim_past, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_numeric_partials" title="grss.fit_simulation.FitSimulation.get_numeric_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_numeric_partials</span></code></a>(prop_sim_past, ...)</p></td>
 <td><p>Computes the numeric partials of the observations with respect to the initial nominal state.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_partials" title="grss.fit_simulation.FitSimulation.get_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_partials</span></code></a>(prop_sim_past, prop_sim_future, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_partials" title="grss.fit_simulation.FitSimulation.get_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_partials</span></code></a>(prop_sim_past, prop_sim_future, ...)</p></td>
 <td><p>Computes the partials of the observations with respect to the initial nominal state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_perturbation_info" title="grss.fit_simulation.FitSimulation.get_perturbation_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_perturbation_info</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_perturbation_info" title="grss.fit_simulation.FitSimulation.get_perturbation_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_perturbation_info</span></code></a>()</p></td>
 <td><p>Get the perturbation information for all nominal state parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_perturbed_state" title="grss.fit_simulation.FitSimulation.get_perturbed_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_perturbed_state</span></code></a>(key)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_perturbed_state" title="grss.fit_simulation.FitSimulation.get_perturbed_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_perturbed_state</span></code></a>(key)</p></td>
 <td><p>Get the perturbed state for a given nominal state parameter.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_prop_sim_future" title="grss.fit_simulation.FitSimulation.get_prop_sim_future"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prop_sim_future</span></code></a>(name, t_eval_utc, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_prop_sim_future" title="grss.fit_simulation.FitSimulation.get_prop_sim_future"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prop_sim_future</span></code></a>(name, t_eval_utc, ...)</p></td>
 <td><p>Get a propSim object for the future observations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_prop_sim_past" title="grss.fit_simulation.FitSimulation.get_prop_sim_past"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prop_sim_past</span></code></a>(name, t_eval_utc, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_prop_sim_past" title="grss.fit_simulation.FitSimulation.get_prop_sim_past"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prop_sim_past</span></code></a>(name, t_eval_utc, ...)</p></td>
 <td><p>Get a propSim object for the past observations.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_prop_sims" title="grss.fit_simulation.FitSimulation.get_prop_sims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prop_sims</span></code></a>(name)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_prop_sims" title="grss.fit_simulation.FitSimulation.get_prop_sims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prop_sims</span></code></a>(name)</p></td>
 <td><p>Get propSim objects for the past and future observations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_residuals_and_partials" title="grss.fit_simulation.FitSimulation.get_residuals_and_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_residuals_and_partials</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.get_residuals_and_partials" title="grss.fit_simulation.FitSimulation.get_residuals_and_partials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_residuals_and_partials</span></code></a>()</p></td>
 <td><p>Computes the residuals and partials of the observations with respect to the initial nominal state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.merge_observation_arrays" title="grss.fit_simulation.FitSimulation.merge_observation_arrays"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_observation_arrays</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.merge_observation_arrays" title="grss.fit_simulation.FitSimulation.merge_observation_arrays"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_observation_arrays</span></code></a>()</p></td>
 <td><p>Merge the optical and radar observation arrays into a single array for orbit fitting.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.plot_summary" title="grss.fit_simulation.FitSimulation.plot_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_summary</span></code></a>([auto_close])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.plot_summary" title="grss.fit_simulation.FitSimulation.plot_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_summary</span></code></a>([auto_close])</p></td>
 <td><p>Plots a summary of the orbit fit calculations.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.print_summary" title="grss.fit_simulation.FitSimulation.print_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_summary</span></code></a>([iter_idx])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.print_summary" title="grss.fit_simulation.FitSimulation.print_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_summary</span></code></a>([iter_idx])</p></td>
 <td><p>Prints a summary of the orbit fit calculations at a given iteration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.reject_outliers" title="grss.fit_simulation.FitSimulation.reject_outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reject_outliers</span></code></a>(partials, weights, residuals)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.reject_outliers" title="grss.fit_simulation.FitSimulation.reject_outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reject_outliers</span></code></a>(partials, weights, residuals)</p></td>
 <td><p>Outlier rejection algorithm for the residuals.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.sort_array_by_another" title="grss.fit_simulation.FitSimulation.sort_array_by_another"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_array_by_another</span></code></a>(array, sort_by)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.sort_array_by_another" title="grss.fit_simulation.FitSimulation.sort_array_by_another"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort_array_by_another</span></code></a>(array, sort_by)</p></td>
 <td><p>Sort an array by another array.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.x_dict_to_events" title="grss.fit_simulation.FitSimulation.x_dict_to_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_dict_to_events</span></code></a>(x_dict)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.x_dict_to_events" title="grss.fit_simulation.FitSimulation.x_dict_to_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_dict_to_events</span></code></a>(x_dict)</p></td>
 <td><p>Convert a dictionary of nominal state to events.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params" title="grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_dict_to_nongrav_params</span></code></a>(x_dict)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params" title="grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_dict_to_nongrav_params</span></code></a>(x_dict)</p></td>
 <td><p>Convert a dictionary of nominal state to non-gravitational parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.x_dict_to_state" title="grss.fit_simulation.FitSimulation.x_dict_to_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_dict_to_state</span></code></a>(x_dict)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit_simulation.FitSimulation.x_dict_to_state" title="grss.fit_simulation.FitSimulation.x_dict_to_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">x_dict_to_state</span></code></a>(x_dict)</p></td>
 <td><p>Convert a dictionary of nominal state to a state vector.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.add_iteration">
-<span class="sig-name descname"><span class="pre">add_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.add_iteration" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_iteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_weight_rej</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.add_iteration" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds an iteration to the list of iterations in the FitSimulation object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>iter_number</strong> (<em>int</em>) – The iteration number.</p></li>
 <li><p><strong>residuals</strong> (<em>array</em>) – The residuals of the observations.</p></li>
+<li><p><strong>obs_weight_rej</strong> (<em>array</em>) – Observation weight matrix after outlier rejection.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -735,6 +741,21 @@ make sure they are valid.</p>
 <li><p><strong>ValueError</strong> – If the length of the radar observation array and observer
     code array are not the same.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.fit_simulation.FitSimulation.create_obs_weight">
+<span class="sig-name descname"><span class="pre">create_obs_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_simulation.FitSimulation.create_obs_weight" title="Permalink to this definition">#</a></dt>
+<dd><p>Assembles the weight matrix for the orbit fit based
+on observation uncertainties and correlations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – None</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>NoneType</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1196,6 +1217,7 @@ initial nominal state after outlier rejection.</p></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_convergence"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_convergence()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_initial_solution"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_initial_solution()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.check_input_observation_arrays"><code class="docutils literal notranslate"><span class="pre">FitSimulation.check_input_observation_arrays()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.create_obs_weight"><code class="docutils literal notranslate"><span class="pre">FitSimulation.create_obs_weight()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.flatten_and_clean"><code class="docutils literal notranslate"><span class="pre">FitSimulation.flatten_and_clean()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_simulation.FitSimulation.get_analytic_partials"><code class="docutils literal notranslate"><span class="pre">FitSimulation.get_analytic_partials()</span></code></a></li>
@@ -1246,7 +1268,7 @@ initial nominal state after outlier rejection.</p></li>
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jul 10, 2023.
+  Last updated on Jul 11, 2023.
   <br/>
 </p>
   </div>
