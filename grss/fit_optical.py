@@ -5,13 +5,15 @@ from astroquery.mpc import MPC
 import healpy as hp
 import numpy as np
 import pandas as pd
+import spiceypy as spice
 
-from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec
+from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec, mjd2et
 
-__all__ = [ 'get_optical_obs_array',
+__all__ = [ 'get_ades_optical_obs_array',
+            'get_optical_obs_array',
 ]
 
-def get_optical_data(body_id, optical_obs_file, t_min_tdb=None, t_max_tdb=None, verbose=False):
+def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None, verbose=False):
     # sourcery skip: low-code-quality
     """
     Get optical observation data from the Minor Planet Center for a desired small body
@@ -59,7 +61,7 @@ def get_optical_data(body_id, optical_obs_file, t_min_tdb=None, t_max_tdb=None, 
         with open(optical_obs_file, 'r', encoding='utf-8') as file:
             obs_raw = file.readlines()
             obs_raw = [x[:-1] for x in obs_raw] # remove \n at the end of each line
-    obs_array_optical = np.zeros((len(obs_raw), 5))
+    obs_array_optical = np.zeros((len(obs_raw), 6))
     star_catalog_codes = []
     observer_codes_optical = []
     observation_type_codes = []
@@ -124,6 +126,77 @@ def get_optical_data(body_id, optical_obs_file, t_min_tdb=None, t_max_tdb=None, 
     obs_array_optical = obs_array_optical[non_nan_idx]
     return (obs_array_optical, star_catalog_codes,
             observer_codes_optical, observation_type_codes, observer_program_codes)
+
+def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_path=None):
+    """
+    Assemble the optical observations for a given body into an array for an orbit fit,
+    from the ADES PSV observation file.
+
+    Parameters
+    ----------
+    psv_obs_file : str
+        Path to the ADES PSV observation file
+    occultation_obs : bool, optional
+        Flag for whether file is made of occultation measurement data, by default False
+    de_kernel_path : str, optional
+        Path to the DE kernel file, by default None
+
+    Returns
+    -------
+    obs_array_optical : array
+        Optical observation data for the given body
+    observer_codes_optical : tuple
+        Observer locations for each observation in obs_array_optical
+    """
+    if occultation_obs and de_kernel_path is None:
+        raise ValueError(("Must specify path to DE kernel file to calculate"
+                            "body-fixed coordinates for occultation observations."))
+    obs_df = pd.read_csv(psv_obs_file, sep='|')
+    obs_df.columns = obs_df.columns.str.strip()
+    obs_array_optical = np.zeros((len(obs_df), 6))
+    obs_times = Time(obs_df.obsTime.to_numpy(dtype=str),
+                                    format='isot', scale='utc')
+    obs_array_optical[:, 0] = obs_times.utc.mjd
+    if occultation_obs:
+        ra_star = obs_df.raStar.to_numpy(dtype=float)
+        delta_ra = obs_df.deltaRA.to_numpy(dtype=float)
+        obs_array_optical[:, 1] = ra_star+delta_ra
+        dec_star = obs_df.decStar.to_numpy(dtype=float)
+        delta_dec = obs_df.deltaDec.to_numpy(dtype=float)
+        obs_array_optical[:, 2] = dec_star+delta_dec
+    else:
+        obs_array_optical[:, 1] = obs_df.ra.to_numpy(dtype=float)
+        obs_array_optical[:, 2] = obs_df.dec.to_numpy(dtype=float)
+    obs_array_optical[:, 1:3] *= 3600.0
+    obs_array_optical[:, 3] = obs_df.rmsRA.to_numpy(dtype=float)
+    obs_array_optical[:, 4] = obs_df.rmsDec.to_numpy(dtype=float)
+    obs_array_optical[:, 5] = obs_df.rmsCorr.to_numpy(dtype=float)
+    observer_codes_optical = []
+    spice.furnsh(de_kernel_path)
+    for i, obs in obs_df.iterrows():
+        if str(obs['stn'])=='275':
+            pos_x = float(obs['pos1'])
+            pos_y = float(obs['pos2'])
+            pos_z = float(obs['pos3'])
+            rot_mat = spice.pxform('J2000', 'ITRF93', mjd2et(obs_times[i].tdb.mjd))
+            observer_state_j2000 = [pos_x, pos_y, pos_z]
+            rho = np.linalg.norm(observer_state_j2000)*1e3
+            observer_state_itrf93 = np.dot(rot_mat, observer_state_j2000)
+            lon = np.arctan2(observer_state_itrf93[1], observer_state_itrf93[0])
+            lat = np.arcsin(observer_state_itrf93[2]/np.linalg.norm(observer_state_itrf93))
+            observer_codes_optical.append(('275', lon, lat, rho))
+            # x = rho*np.cos(lat)*np.cos(lon)
+            # y = rho*np.cos(lat)*np.sin(lon)
+            # z = rho*np.sin(lat)
+            # vx = vy = vz = 0.0
+            # rot_mat2 = spice.sxform('ITRF93', 'J2000', mjd2et(obs_times[i].tdb.mjd))
+            # observer_state_j2000_2 = np.dot(rot_mat2, [x, y, z, vx, vy, vz])
+            # print(observer_state_j2000_2)
+            # print(np.linalg.norm(observer_state_j2000 - observer_state_j2000_2[:3]))
+        else:
+            observer_codes_optical.append(obs['stn'])
+    spice.kclear()
+    return obs_array_optical, tuple(observer_codes_optical)
 
 def debias_obs(r_asc, dec, epoch, catalog, biasdf, nside=256):
     """
@@ -558,7 +631,9 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
     if verbose:
         print(f"Applied default weight of 1 arcsec to {default_weight_counter} CCD observations")
         # find where the weights are 0
-        zero_weight_indices = np.where(obs_array_optical[:, 3] == 0)[0]
+        zero_weight_indices_ra = np.where(obs_array_optical[:, 3] == 0)[0]
+        zero_weight_indices_dec = np.where(obs_array_optical[:, 4] == 0)[0]
+        zero_weight_indices = np.concatenate((zero_weight_indices_ra, zero_weight_indices_dec))
         if len(zero_weight_indices) > 0:
             raise ValueError(f"apply_weights: Found {len(zero_weight_indices)} observations",
                                     "with zero weight. Check the star_catalog_codes and observer",

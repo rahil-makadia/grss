@@ -303,6 +303,10 @@ def get_observer_info(observer_codes):
     observer_info = []
     for code in observer_codes:
         info_list = []
+        # for geocentric occultations code is a tuple but needs to be decomposed
+        if isinstance(code, tuple) and code[0] == '275':
+            codes_dict['275'] = (code[1], code[2], code[3])
+            code = '275'
         # check if code is a tuple - corresponds to a radar observation
         if isinstance(code, tuple) and len(code) in {2, 3}:
             tx_code = code[0][0]
