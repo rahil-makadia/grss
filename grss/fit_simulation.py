@@ -18,7 +18,7 @@ class IterationParams:
     and chi-squared values for each iteration.
     """
     def __init__(self, iter_number, x_nom, covariance, residuals,
-                    obs_array, observer_codes, rejection_flags):
+                    obs_array, obs_weight_rej, observer_codes, rejection_flags):
         """
         Constructor for the IterationParams class
 
@@ -34,6 +34,8 @@ class IterationParams:
             Residuals at the current iteration
         obs_array : array
             Observation array for the orbit fit
+        obs_weight_rej : array
+            Observation weight matrix after outlier rejection
         observer_codes : tuple
             Observer locations for each observation in obs_array
         rejection_flags : list
@@ -50,7 +52,7 @@ class IterationParams:
         self.is_accepted = np.where(np.logical_not(rejection_flags))[0]
         self.is_rejected = np.where(rejection_flags)[0]
         self.sigmas = obs_array[:, 3:5]
-        self.weight_matrix = np.diag(1/self.flatten_and_clean(self.sigmas)**2)
+        self.obs_weight_rej = obs_weight_rej
         self.calculate_rms()
         self.calculate_chis()
         self.assemble_info()
@@ -83,11 +85,10 @@ class IterationParams:
         None : NoneType
             None
         """
-        residual_arr = self.flatten_and_clean(self.residuals[self.is_accepted])
-        n_obs = len(residual_arr)
-        self.unweighted_rms = float(np.sqrt(residual_arr.T @ residual_arr/n_obs))
-        weights = np.diag(1/self.flatten_and_clean(self.sigmas[self.is_accepted])**2)
-        self.weighted_rms = float(np.sqrt(residual_arr.T @ weights @ residual_arr/n_obs))
+        resid_arr = self.flatten_and_clean(self.residuals[self.is_accepted])
+        n_obs = len(resid_arr)
+        self.unweighted_rms = float(np.sqrt(resid_arr.T @ resid_arr/n_obs))
+        self.weighted_rms = float(np.sqrt(resid_arr.T @ self.obs_weight_rej @ resid_arr/n_obs))
         return None
 
     def calculate_chis(self):
@@ -99,11 +100,11 @@ class IterationParams:
         None : NoneType
             None
         """
-        residual_arr = self.flatten_and_clean(self.residuals[self.is_accepted])
-        n_obs = len(residual_arr)
+        resid_arr = self.flatten_and_clean(self.residuals[self.is_accepted])
+        n_obs = len(resid_arr)
         n_fit = len(self.x_nom)
         sigmas = self.flatten_and_clean(self.sigmas[self.is_accepted])
-        self.chi = residual_arr/sigmas
+        self.chi = resid_arr/sigmas
         self.chi_squared = np.sum(self.chi**2)
         self.reduced_chi_squared = self.chi_squared/(n_obs-n_fit)
         return None
@@ -574,6 +575,9 @@ class FitSimulation:
         self.check_initial_solution(x_init, cov_init)
         self.check_input_observation_arrays(obs_array_optical, observer_codes_optical,
                                             obs_array_radar, observer_codes_radar)
+        self.sigmas = None
+        self.obs_cov = None
+        self.obs_weight = None
         self.assemble_observation_arrays()
         self.n_iter = 0
         self.n_iter_max = n_iter_max
@@ -768,13 +772,48 @@ class FitSimulation:
         # in the second and third columns of the observation array
         self.n_obs = np.count_nonzero(~np.isnan(self.obs_array[:, 1:3]))
         self.rejection_flag = [False]*len(self.obs_array)
-        self.sigmas = self.obs_array[:, 3:5]
-        self.weight_matrix = np.diag(1/self.flatten_and_clean(self.sigmas)**2)
-        self.obs_cov_matrix = np.diag(self.flatten_and_clean(self.sigmas)**2)
+        self.create_obs_weight()
         self.past_obs_idx = np.where(self.obs_array[:, 0] < self.t_sol)[0]
         self.past_obs_exist = len(self.past_obs_idx) > 0
         self.future_obs_idx = np.where(self.obs_array[:, 0] >= self.t_sol)[0]
         self.future_obs_exist = len(self.future_obs_idx) > 0
+        return None
+
+    def create_obs_weight(self):
+        """
+        Assembles the weight matrix for the orbit fit based
+        on observation uncertainties and correlations.
+
+        Returns
+        -------
+        None : NoneType
+            None
+        """
+        self.sigmas = self.obs_array[:, 3:5]
+        sigma_corr = self.obs_array[:, 5]
+        obs_cov = np.zeros((self.sigmas.size, self.sigmas.size))
+        idx_to_remove = []
+        for i in range(self.sigmas.shape[0]):
+            sig_1, sig_2 = self.sigmas[i]
+            sig_1_nan = np.isnan(sig_1)
+            sig_2_nan = np.isnan(sig_2)
+            sig_corr = sigma_corr[i]
+            sig_corr_nan = np.isnan(sig_corr)
+            off_diag = 0.0 if (sig_1_nan or sig_2_nan or sig_corr_nan) else sig_corr*sig_1*sig_2
+            sub_cov = np.array([[sig_1**2, off_diag],
+                                    [off_diag, sig_2**2]])
+            obs_cov[2*i:2*i+2, 2*i:2*i+2] = sub_cov
+            if sig_1_nan:
+                idx_to_remove.append(2*i)
+            if sig_2_nan:
+                idx_to_remove.append(2*i+1)
+            if sig_1_nan and sig_2_nan:
+                raise ValueError("Both sigmas cannot be NaN.")
+        # remove all rows and columns with NaN values from the obs_cov
+        obs_cov = np.delete(obs_cov, idx_to_remove, axis=0)
+        obs_cov = np.delete(obs_cov, idx_to_remove, axis=1)
+        self.obs_cov = obs_cov
+        self.obs_weight = np.linalg.inv(self.obs_cov)
         return None
 
     def sort_array_by_another(self, array, sort_by):
@@ -1002,7 +1041,7 @@ class FitSimulation:
             event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else event[1]
             event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else event[2]
             event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else event[3]
-            event[4] = x_dict[f"multiplier{i}"] if f"multiplier{i}" in x_dict.keys() else event[4]
+            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else event[4]
             events.append(tuple(event))
         return events
 
@@ -1087,7 +1126,7 @@ class FitSimulation:
             #     fd_pert = 1e-6
         if key in ['a1', 'a2', 'a3']:
             fd_pert = 1e-3
-        if key[:10] == 'multiplier':
+        if key[:4] == 'mult':
             fd_pert = 1e0
         if key[:3] in ['dvx', 'dvy', 'dvz']:
             fd_pert = 1e-4
@@ -1414,12 +1453,12 @@ class FitSimulation:
         """
         chi_reject = 3.0
         chi_recover = 2.8
-        full_cov = np.linalg.inv(partials.T @ self.weight_matrix @ partials)
+        full_cov = np.linalg.inv(partials.T @ self.obs_weight @ partials)
         observer_info = get_observer_info(self.observer_codes)
         j = 0
         residual_chi_squared = np.zeros(len(self.obs_array))
         rejected_indices = []
-        resid_cov_full = self.obs_cov_matrix - partials @ full_cov @ partials.T
+        resid_cov_full = self.obs_cov - partials @ full_cov @ partials.T
         for i in range(len(self.obs_array)):
             obs_info_len = len(observer_info[i])
             if obs_info_len == 4:
@@ -1466,7 +1505,7 @@ class FitSimulation:
         self.residual_chi_squared = residual_chi_squared
         return partials, weights, residuals, residual_chi_squared
 
-    def add_iteration(self, iter_number, residuals):
+    def add_iteration(self, iter_number, residuals, obs_weight_rej):
         """
         Adds an iteration to the list of iterations in the FitSimulation object.
 
@@ -1476,6 +1515,8 @@ class FitSimulation:
             The iteration number.
         residuals : array
             The residuals of the observations.
+        obs_weight_rej : array
+            Observation weight matrix after outlier rejection.
 
         Returns
         -------
@@ -1483,7 +1524,8 @@ class FitSimulation:
             None
         """
         self.iters.append(IterationParams(iter_number, self.x_nom, self.covariance, residuals,
-                                        self.obs_array, self.observer_codes, self.rejection_flag))
+                                            self.obs_array, obs_weight_rej, self.observer_codes,
+                                            self.rejection_flag))
         return None
 
     def check_convergence(self):
@@ -1527,11 +1569,11 @@ class FitSimulation:
             self.n_iter = i+1
             # get residuals and partials
             residuals, partials = self.get_residuals_and_partials()
-            weights = self.weight_matrix
+            weights = self.obs_weight
             if i == 0:
                 # add prefit iteration
                 prefit_residuals = residuals.copy()
-                self.add_iteration(0, prefit_residuals)
+                self.add_iteration(0, prefit_residuals, weights)
             clean_residuals = self.flatten_and_clean(residuals)
             # reject outliers here
             if start_rejecting:
@@ -1552,7 +1594,7 @@ class FitSimulation:
             # get new covariance
             self.covariance = cov
             # add iteration
-            self.add_iteration(i+1, residuals)
+            self.add_iteration(i+1, residuals, w_rej)
             if verbose:
                 print(f"{self.iters[-1].iter_number}\t\t\t",
                         f"{self.iters[-1].unweighted_rms:.3f}\t\t\t",
@@ -1599,23 +1641,17 @@ class FitSimulation:
         print("=======================================================")
         print(f"t: MJD {self.t_sol} TDB")
         print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
-                    "\t\t\tUncertainty\t\t\t\tChange\t\t\t\tChange (sigma)")
+                    "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
         init_sol = self.iters[0].x_nom
         final_sol = data.x_nom
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
-                if key[:10] == 'multiplier':
-                    print(f"{key}\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}",
-                                f"\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}"
-                                f"\t\t{final_sol[key]-init_sol[key]:+.11e}"
-                                f"\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
-                else:
-                    print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}",
-                                f"\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}",
-                                f"\t\t{final_sol[key]-init_sol[key]:+.11e}"
-                                f"\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
+                print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}",
+                        f"\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}",
+                        f"\t\t{final_sol[key]-init_sol[key]:+.11e}"
+                        f"\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
         return None
 
     def plot_summary(self, auto_close=False):
@@ -1877,7 +1913,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
         apparent_states = apparent_states_future
         radar_observations_future = np.array(prop_sim_future.radarObsEval)
         radar_observations = radar_observations_future
-    sim_obs_array = np.nan*np.ones((len(obs_times), 5))
+    sim_obs_array = np.nan*np.ones((len(obs_times), 6))
     for i, obs_time in enumerate(obs_times):
         sim_obs_array[i, 0] = obs_time
         obs_info_len = len(observer_info[i])
@@ -1899,6 +1935,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
             if bias:
                 dec_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
                 sim_obs_array[i, 2] += dec_bias
+            sim_obs_array[i, 5] = 0.0
         elif obs_info_len == 9: # delay measurement
             sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
             sim_obs_array[i, 1] = radar_observations[i]
@@ -1908,6 +1945,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
             if bias:
                 delay_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
                 sim_obs_array[i, 1] += delay_bias
+            sim_obs_array[i, 5] = np.nan
         elif obs_info_len == 10: # doppler measurement
             sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
             sim_obs_array[i, 2] = radar_observations[i]
@@ -1917,6 +1955,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
             if bias:
                 doppler_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
                 sim_obs_array[i, 2] += doppler_bias
+            sim_obs_array[i, 5] = np.nan
     # split sim_obs_array and observer_codes into optical and radar
     optical_astrometry_obs_idx = np.where(np.array(obs_types) == 'astrometry')[0]
     optical_occultation_obs_idx = np.where(np.array(obs_types) == 'occultation')[0]
@@ -1995,7 +2034,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
         simulated_optical_obs_times = simulated_optical_obs_times+extra_simulated_optical_obs_times
         simulated_optical_obs_types = simulated_optical_obs_types+extra_simulated_optical_obs_types
         # add extra rows to obs_array_optical
-        extra_simulated_optical_obs_array = np.nan*np.ones((num_extra_optical_obs, 5))
+        extra_simulated_optical_obs_array = np.nan*np.ones((num_extra_optical_obs, 6))
         obs_array_optical = np.vstack((obs_array_optical, extra_simulated_optical_obs_array))
         # add indices to simulated_optical_obs_idx
         simulated_optical_obs_idx = np.hstack((simulated_optical_obs_idx,
@@ -2016,7 +2055,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
         simulated_radar_obs_times = simulated_radar_obs_times + extra_simulated_radar_obs_times
         simulated_radar_obs_types = simulated_radar_obs_types + extra_simulated_radar_obs_types
         # add extra rows to obs_array_radar
-        extra_simulated_radar_obs_array = np.nan*np.ones((num_extra_radar_obs, 5))
+        extra_simulated_radar_obs_array = np.nan*np.ones((num_extra_radar_obs, 6))
         obs_array_radar = np.vstack((obs_array_radar, extra_simulated_radar_obs_array))
         # add indices to simulated_radar_obs_idx
         simulated_radar_obs_idx = np.hstack((simulated_radar_obs_idx,

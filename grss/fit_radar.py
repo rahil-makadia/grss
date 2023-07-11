@@ -81,7 +81,7 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
         return None, None
     num_obs = int(raw_data['count'])
     data = raw_data['data']
-    obs_array_radar = np.zeros((num_obs, 5))
+    obs_array_radar = np.zeros((num_obs, 6))
     observer_codes_radar = []
     rows_to_delete = []
     for i in range(num_obs):
@@ -103,6 +103,7 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
         bounce_point_int = 0 if bounce_point == 'C' else 1
 
         obs_array_radar[i,0] = date.utc.mjd
+        obs_array_radar[i,5] = np.nan
         if delay:
             obs_array_radar[i,1] = obs_val
             obs_array_radar[i,2] = np.nan
