@@ -26,6 +26,7 @@ void get_observer_state(const real &tObsMjd,
                         const Constants &consts, const bool &tObsInUTC,
                         std::vector<real> &observerState) {
     SpiceInt baseBody = observerInfo[0];
+    if (observerInfo[0] == 500) baseBody = 399;
     if (baseBody == 0) {
         observerState[0] = 0.0L;
         observerState[1] = 0.0L;
@@ -35,9 +36,6 @@ void get_observer_state(const real &tObsMjd,
         observerState[5] = 0.0L;
         return;
     }
-    real lon = observerInfo[1];
-    real lat = observerInfo[2];
-    real rho = observerInfo[3];
     real t_obs_et;
     real tObsMjdTDB;
     mjd_to_et(tObsMjd, t_obs_et);
@@ -59,15 +57,27 @@ void get_observer_state(const real &tObsMjd,
 
     // real a, f;
     ConstSpiceChar *baseBodyFrame;
-    switch (baseBody) {
+    switch ((int)observerInfo[0]) {
         case 399:
             baseBodyFrame = "ITRF93";
+            break;
+        case 500:
+            observerState[0] = (real) baseBodyState[0] + observerInfo[1]/consts.du2m;
+            observerState[1] = (real) baseBodyState[1] + observerInfo[2]/consts.du2m;
+            observerState[2] = (real) baseBodyState[2] + observerInfo[3]/consts.du2m;
+            observerState[3] = (real) baseBodyState[3] + observerInfo[4]/consts.du2m*consts.tu2sec;
+            observerState[4] = (real) baseBodyState[4] + observerInfo[5]/consts.du2m*consts.tu2sec;
+            observerState[5] = (real) baseBodyState[5] + observerInfo[6]/consts.du2m*consts.tu2sec;
+            return;
             break;
         default:
             std::cout << "Given base body: " << baseBody << std::endl;
             throw std::invalid_argument("Given base body not supported");
             break;
     }
+    real lon = observerInfo[1];
+    real lat = observerInfo[2];
+    real rho = observerInfo[3];
     ConstSpiceDouble bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
     ConstSpiceDouble bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
     ConstSpiceDouble bodyFixedZ = rho * sin(lat) / 1.0e3L;
