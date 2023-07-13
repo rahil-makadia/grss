@@ -216,6 +216,7 @@ void get_lightTime_and_xRelative(
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         real lightTimeTemp;
         std::vector<real> xInterpApparentTemp(numStates, 0.0);
+        std::vector<real> xInterpApparentBary(6, 0.0);
         get_lightTimeOneBody(i, tInterpGeom, xInterpGeom, xObserver,
                              bouncePointAtLeadingEdge, tVecForInterp, coeffs,
                              tVecForInterpPrev, coeffsPrev, propSim,
@@ -225,8 +226,13 @@ void get_lightTime_and_xRelative(
                                    coeffsPrev, xInterpApparentTemp);
         lightTime[i] = lightTimeTemp;
         for (size_t j = 0; j < 6; j++) {
-            xInterpApparent[6 * i + j] =
-                xInterpApparentTemp[6 * i + j] - xObserver[j];
+            xInterpApparentBary[j] = xInterpApparentTemp[6 * i + j];
+        }
+        // if (propSim->observerInfo[interpIdx].size() == 7){ // if observer location is manually specified
+            get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
+        // }
+        for (size_t j = 0; j < 6; j++) {
+            xInterpApparent[6 * i + j] = xInterpApparentBary[j] - xObserver[j];
         }
     }
     // generate an outfile with tInterpGeom, xInterpGeom, xObserver, lightTime,
@@ -318,6 +324,87 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
                 << fabs(lightTimeOneBody - lightTimeOneBodyPrev) << std::endl;
         }
     }
+}
+
+void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
+                        std::vector<real> &xInterpApparentBary) {
+    Constants consts = propSim->consts;
+    SpiceDouble sunState[6];
+    SpiceDouble sunLightTime;
+    get_spice_state_lt(10, tInterpGeom, consts, sunState, sunLightTime);
+    SpiceDouble earthState[6];
+    SpiceDouble earthLightTime;
+    get_spice_state_lt(399, tInterpGeom, consts, earthState, earthLightTime);
+
+    std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
+                                     earthState[1] - sunState[1],
+                                     earthState[2] - sunState[2]};
+    real sunEarthDist;
+    vnorm(sunEarthPos, sunEarthDist);
+    std::vector<real> sunTargetPos = {xInterpApparentBary[0] - sunState[0],
+                                      xInterpApparentBary[1] - sunState[1],
+                                      xInterpApparentBary[2] - sunState[2]};
+    real sunTargetDist;
+    vnorm(sunTargetPos, sunTargetDist);
+    std::vector<real> earthTargetPos = {xInterpApparentBary[0] - earthState[0],
+                                        xInterpApparentBary[1] - earthState[1],
+                                        xInterpApparentBary[2] - earthState[2]};
+    real earthTargetDist;
+    vnorm(earthTargetPos, earthTargetDist);
+
+    real G = consts.G;
+    real sunGM = 0;
+    for (size_t i = propSim->integParams.nInteg;
+         i < propSim->integParams.nTotal; i++) {
+        if (propSim->forceParams.spiceIdList[i] == 10) {
+            sunGM = G * propSim->forceParams.masses[i];
+        }
+    }
+    if (sunGM == 0) {
+        throw std::runtime_error(
+            "Sun GM not found in get_delta_delay_relativistic");
+    }
+    real c = consts.clight;
+
+    // from section 7.2.4 in the Explanatory Supplement to the Astronomical
+    // Almanac, 3rd edition
+    std::vector<real> e(3, 0.0);
+    vunit(sunEarthPos, e);
+    std::vector<real> q(3, 0.0);
+    vunit(sunTargetPos, q);
+    std::vector<real> p(3, 0.0);
+    vunit(earthTargetPos, p);
+    std::vector<real> deltaP1Targ(3, 0.0);
+    std::vector<real> deltaP1Star(3, 0.0);
+    std::vector<real> p1(3, 0.0);
+
+    real pDotQ, eDotP, qDotE;
+    vdot(p, q, pDotQ);
+    vdot(e, p, eDotP);
+    vdot(q, e, qDotE);
+
+    real g1 = 2 * sunGM / c / c / sunEarthDist;
+    real g2 = 1.0L + qDotE;
+
+    deltaP1Targ[0] = g1 * (pDotQ * e[0] - eDotP * q[0]) / g2;
+    deltaP1Targ[1] = g1 * (pDotQ * e[1] - eDotP * q[1]) / g2;
+    deltaP1Targ[2] = g1 * (pDotQ * e[2] - eDotP * q[2]) / g2;
+
+    deltaP1Star[0] = g1 * (e[0] - eDotP * p[0]) / (1 + eDotP);
+    deltaP1Star[1] = g1 * (e[1] - eDotP * p[1]) / (1 + eDotP);
+    deltaP1Star[2] = g1 * (e[2] - eDotP * p[2]) / (1 + eDotP);
+
+    p1[0] = p[0] - deltaP1Star[0] - deltaP1Targ[0]; // -,- >> -,+
+    p1[1] = p[1] - deltaP1Star[1] - deltaP1Targ[1];
+    p1[2] = p[2] - deltaP1Star[2] - deltaP1Targ[2];
+
+    earthTargetPos[0] = earthTargetDist * p1[0];
+    earthTargetPos[1] = earthTargetDist * p1[1];
+    earthTargetPos[2] = earthTargetDist * p1[2];
+
+    xInterpApparentBary[0] = earthState[0] + earthTargetPos[0];
+    xInterpApparentBary[1] = earthState[1] + earthTargetPos[1];
+    xInterpApparentBary[2] = earthState[2] + earthTargetPos[2];
 }
 
 void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
