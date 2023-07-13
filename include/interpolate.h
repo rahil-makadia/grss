@@ -44,6 +44,8 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
                           const std::vector<std::vector<real>> &coeffsPrev,
                           const propSimulation *propSim,
                           real &lightTimeOneBody);
+void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
+                        std::vector<real> &xInterpApparentBary);
 void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            const std::vector<real> &tVecForInterp,

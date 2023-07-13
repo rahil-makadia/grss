@@ -179,18 +179,21 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
             pos_y = float(obs['pos2'])
             pos_z = float(obs['pos3'])
             rot_mat = spice.pxform('J2000', 'ITRF93', mjd2et(obs_times[i].tdb.mjd))
-            observer_state_j2000 = [pos_x, pos_y, pos_z]
-            rho = np.linalg.norm(observer_state_j2000)*1e3
-            observer_state_itrf93 = np.dot(rot_mat, observer_state_j2000)
-            lon = np.arctan2(observer_state_itrf93[1], observer_state_itrf93[0])
-            lat = np.arcsin(observer_state_itrf93[2]/np.linalg.norm(observer_state_itrf93))
-            observer_codes_optical.append(('275', lon, lat, rho))
-            # x = rho*np.cos(lat)*np.cos(lon)
-            # y = rho*np.cos(lat)*np.sin(lon)
-            # z = rho*np.sin(lat)
-            # vx = vy = vz = 0.0
+            observer_pos_j2000 = np.array([pos_x, pos_y, pos_z])
+            rho = np.linalg.norm(observer_pos_j2000)
+            observer_pos_itrf93 = np.dot(rot_mat, observer_pos_j2000)
+            lon = np.arctan2(observer_pos_itrf93[1], observer_pos_itrf93[0])
+            lat = np.arcsin(observer_pos_itrf93[2]/np.linalg.norm(observer_pos_itrf93))
+            observer_codes_optical.append(('275', lon, lat, 1e3*rho))
+            # pos_itrf_x = rho*np.cos(lat)*np.cos(lon)
+            # pos_itrf_y = rho*np.cos(lat)*np.sin(lon)
+            # pos_itrf_z = rho*np.sin(lat)
             # rot_mat2 = spice.sxform('ITRF93', 'J2000', mjd2et(obs_times[i].tdb.mjd))
-            # observer_state_j2000_2 = np.dot(rot_mat2, [x, y, z, vx, vy, vz])
+            # observer_state_j2000_2 = np.dot(rot_mat2, [pos_itrf_x, pos_itrf_y, pos_itrf_z,
+            #                                             0.0, 0.0, 0.0])
+            # pos_x, pos_y, pos_z = 1e3*observer_pos_j2000
+            # vel_x, vel_y, vel_z = 1e3*observer_state_j2000_2[3:]
+            # observer_codes_optical.append(('275', pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
             # print(observer_state_j2000_2)
             # print(np.linalg.norm(observer_state_j2000 - observer_state_j2000_2[:3]))
         else:
@@ -277,7 +280,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
     observer_codes_optical = list(observer_codes_optical)
     # MPC star_catalog_codes codes, https://www.minorplanetcenter.net/iau/info/CatalogueCodes.html
     biased_catalogs = ['a', 'b', 'c', 'd', 'e', 'g', 'i', 'j', 'l', 'm', 'n', 'o', 'p',
-                        'q', 'r', 't', 'u', 'v', 'w', 'L', 'N', 'Q', 'R', 'S', 'U', 'W']
+                        'q', 'r', 't', 'u', 'v', 'w', 'L', 'N', 'Q', 'R', 'S', 'U', 'Y']
     unbiased_catalogs = [   'g', # Tycho-2
                             'l', # ACT
                             'U', # Gaia DR1

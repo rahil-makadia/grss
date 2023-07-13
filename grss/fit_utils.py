@@ -301,12 +301,9 @@ def get_observer_info(observer_codes):
     """
     codes_dict = get_codes_dict()
     observer_info = []
+    body_id = 399 # default to Earth
     for code in observer_codes:
         info_list = []
-        # for geocentric occultations code is a tuple but needs to be decomposed
-        if isinstance(code, tuple) and code[0] == '275':
-            codes_dict['275'] = (code[1], code[2], code[3])
-            code = '275'
         # check if code is a tuple - corresponds to a radar observation
         if isinstance(code, tuple) and len(code) in {2, 3}:
             tx_code = code[0][0]
@@ -314,15 +311,19 @@ def get_observer_info(observer_codes):
             bounce_point = code[1]
             receiver_info = codes_dict[rx_code]
             transmitter_info = codes_dict[tx_code]
-            info_list.extend((  399, receiver_info[0], receiver_info[1], receiver_info[2],
-                                399, transmitter_info[0], transmitter_info[1], transmitter_info[2],
+            info_list.extend((body_id,receiver_info[0],receiver_info[1],receiver_info[2],
+                                body_id,transmitter_info[0],transmitter_info[1],transmitter_info[2],
                                 bounce_point))
             if len(code) == 3: # add tranmission frequency if dopppler observation
                 freq = code[2]
                 info_list.append(freq)
+        # for geocentric occultations code is a tuple but needs to be decomposed
+        elif isinstance(code, tuple) and code[0] == '275':
+            info_list.extend((body_id, code[1], code[2], code[3]))
+            # info_list.extend((500, code[1], code[2], code[3], code[4], code[5], code[6]))
         else:
             info = codes_dict[code]
-            info_list.extend((399, info[0], info[1], info[2]))
+            info_list.extend((body_id, info[0], info[1], info[2]))
         observer_info.append(info_list)
     return observer_info
 

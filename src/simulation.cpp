@@ -572,7 +572,7 @@ void propSimulation::prepare_for_evaluation(
     std::cout.precision(22);
     if (tEval.size() != 0) {
         for (size_t i = 0; i < tEval.size(); i++) {
-            if (observerInfo[i].size() == 4) {
+            if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
                 radarObserver[i] = 0;
             } else if (observerInfo[i].size() == 9) {
                 radarObserver[i] = 1;
@@ -580,7 +580,7 @@ void propSimulation::prepare_for_evaluation(
                 radarObserver[i] = 2;
             } else {
                 throw std::invalid_argument(
-                    "The observerInfo vector must have 4 (optical), 9 (radar "
+                    "The observerInfo vector must have 4/7 (optical), 9 (radar "
                     "delay), or 10 elements (radar doppler).");
             }
             get_observer_state(tEval[i], observerInfo[i], this->consts,

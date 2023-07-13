@@ -1306,7 +1306,7 @@ class FitSimulation:
         observer_info = get_observer_info(self.observer_codes)
         for i in range(len(self.obs_array)):
             obs_info_len = len(observer_info[i])
-            if obs_info_len == 4:
+            if obs_info_len in {4, 7}:
                 computed_obs[i, :] = get_radec(apparent_states[i])
             elif obs_info_len == 9: # delay measurement
                 computed_obs[i, 0] = radar_observations[i]
@@ -1461,7 +1461,7 @@ class FitSimulation:
         resid_cov_full = self.obs_cov - partials @ full_cov @ partials.T
         for i in range(len(self.obs_array)):
             obs_info_len = len(observer_info[i])
-            if obs_info_len == 4:
+            if obs_info_len in {4, 7}:
                 size = 2
             elif obs_info_len in {9, 10}:
                 size = 1
@@ -1917,7 +1917,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
     for i, obs_time in enumerate(obs_times):
         sim_obs_array[i, 0] = obs_time
         obs_info_len = len(observer_info[i])
-        if obs_info_len == 4:
+        if obs_info_len in {4, 7}:
             r_asc, dec = get_radec(apparent_states[i])
             sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
             sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
