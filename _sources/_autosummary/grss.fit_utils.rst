@@ -17,6 +17,7 @@
         et2mjd
         get_codes_dict
         get_dec_from_dms
+        get_mpc_observatory_info
         get_observer_info
         get_ra_from_hms
         get_radar_codes_dict
