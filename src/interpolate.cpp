@@ -1,5 +1,4 @@
 #include "interpolate.h"
-#include "fstream"
 
 void interpolate(const real &t, const real &dt,
                  const std::vector<real> &xInteg0,
@@ -22,9 +21,6 @@ void interpolate(const real &t, const real &dt,
         approx_xInteg(xInteg0, accInteg0, xIntegForInterp[hIdx], dt, hVec[hIdx],
                       b, propSim->integParams.nInteg);
     }
-    // tVecForInterp.push_back(t+dt);
-    // xIntegForInterp.push_back(xInteg);
-
     one_timestep_interpolation(t + dt, tVecForInterp, xIntegForInterp,
                                tVecForInterpPrev, xIntegForInterpPrev, propSim);
     tVecForInterpPrev = tVecForInterp;
@@ -181,8 +177,6 @@ void one_timestep_interpolation(
             }
             propSim->lightTimeEval.push_back(lightTime);
             propSim->xIntegEval.push_back(xInterpApparent);
-            // std::cout << "tEval = " << propSim->tEval[interpIdx] <<
-            // std::endl;
             propSim->radarObsEval.push_back(radarMeasurement);
         } else {
             propSim->xIntegEval.push_back(xInterpGeom);
@@ -229,36 +223,11 @@ void get_lightTime_and_xRelative(
         for (size_t j = 0; j < 6; j++) {
             xInterpApparentBary[j] = xInterpApparentTemp[6 * i + j];
         }
-        // if (propSim->observerInfo[interpIdx].size() == 7){ // if observer location is manually specified
-            get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
-        // }
+        get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
         for (size_t j = 0; j < 6; j++) {
             xInterpApparent[6 * i + j] = xInterpApparentBary[j] - xObserver[j];
         }
     }
-    // generate an outfile with tInterpGeom, xInterpGeom, xObserver, lightTime,
-    // xInterpApparent+xObserver std::ofstream outfile;
-    // outfile.open("/Users/rahil/Downloads/lightTimeAndxRelative.txt",
-    // std::ios_base::app); outfile << std::setprecision(17) <<
-    // tInterpGeom+2400000.5 << " "; for (size_t i = 0; i <
-    // propSim->integParams.nInteg; i++){
-    //     if (propSim->integBodies[i].name == "integBody_nom"){
-    //     for (size_t j = 0; j < 3; j++){
-    //         outfile << std::setprecision(16) << xInterpApparent[6*i+j] +
-    //         xObserver[j] << " ";
-    //     }
-    //     }
-    // }
-    // for (size_t i = 0; i < 3; i++){
-    //     outfile << std::setprecision(16) << xObserver[i] << " ";
-    // }
-    // for (size_t i = 0; i < propSim->integParams.nInteg; i++){
-    //     if (propSim->integBodies[i].name == "integBody_nom"){
-    //     outfile << std::setprecision(16) << lightTime[i] << " ";
-    //     }
-    // }
-    // outfile << std::endl;
-    // outfile.close();
 }
 
 void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
@@ -403,30 +372,9 @@ void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
     earthTargetPos[1] = earthTargetDist * p1[1];
     earthTargetPos[2] = earthTargetDist * p1[2];
 
-// need to add xObserver as a parameter for the following outfile
-    // if (tInterpGeom > 59860){
-    //     real ra, dec;
-    //     ra = atan2(xInterpApparentBary[1]-xObserver[1], xInterpApparentBary[0]-xObserver[0]);
-    //     dec = asin((xInterpApparentBary[2]-xObserver[2])/sqrt(pow(xInterpApparentBary[0]-xObserver[0],2)+pow(xInterpApparentBary[1]-xObserver[1],2)+pow(xInterpApparentBary[2]-xObserver[2],2)));
-
-    //     std::ofstream outfile;
-    //     outfile.open("/Users/rahil/Downloads/glb.txt", std::ios_base::app);
-    //     outfile << std::setprecision(16) << "pre: " << tInterpGeom << " " << ra << " " << dec << std::endl;
-    // }
-
     xInterpApparentBary[0] = earthState[0] + earthTargetPos[0];
     xInterpApparentBary[1] = earthState[1] + earthTargetPos[1];
     xInterpApparentBary[2] = earthState[2] + earthTargetPos[2];
-
-    // if (tInterpGeom > 59860){
-    //     real ra, dec;
-    //     ra = atan2(xInterpApparentBary[1]-xObserver[1], xInterpApparentBary[0]-xObserver[0]);
-    //     dec = asin((xInterpApparentBary[2]-xObserver[2])/sqrt(pow(xInterpApparentBary[0]-xObserver[0],2)+pow(xInterpApparentBary[1]-xObserver[1],2)+pow(xInterpApparentBary[2]-xObserver[2],2)));
-
-    //     std::ofstream outfile;
-    //     outfile.open("/Users/rahil/Downloads/glb.txt", std::ios_base::app);
-    //     outfile << std::setprecision(16) << "post: " << tInterpGeom << " " << ra << " " << dec << std::endl;
-    // }
 }
 
 void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
