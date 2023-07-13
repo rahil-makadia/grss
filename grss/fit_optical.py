@@ -184,15 +184,16 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
             observer_pos_itrf93 = np.dot(rot_mat, observer_pos_j2000)
             lon = np.arctan2(observer_pos_itrf93[1], observer_pos_itrf93[0])
             lat = np.arcsin(observer_pos_itrf93[2]/np.linalg.norm(observer_pos_itrf93))
-            pos_itrf_x = rho*np.cos(lat)*np.cos(lon)
-            pos_itrf_y = rho*np.cos(lat)*np.sin(lon)
-            pos_itrf_z = rho*np.sin(lat)
-            rot_mat2 = spice.sxform('ITRF93', 'J2000', mjd2et(obs_times[i].tdb.mjd))
-            observer_state_j2000_2 = np.dot(rot_mat2, [pos_itrf_x, pos_itrf_y, pos_itrf_z,
-                                                        0.0, 0.0, 0.0])
-            pos_x, pos_y, pos_z = 1e3*observer_pos_j2000
-            vel_x, vel_y, vel_z = 1e3*observer_state_j2000_2[3:]
-            observer_codes_optical.append(('275', pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
+            observer_codes_optical.append(('275', lon, lat, 1e3*rho))
+            # pos_itrf_x = rho*np.cos(lat)*np.cos(lon)
+            # pos_itrf_y = rho*np.cos(lat)*np.sin(lon)
+            # pos_itrf_z = rho*np.sin(lat)
+            # rot_mat2 = spice.sxform('ITRF93', 'J2000', mjd2et(obs_times[i].tdb.mjd))
+            # observer_state_j2000_2 = np.dot(rot_mat2, [pos_itrf_x, pos_itrf_y, pos_itrf_z,
+            #                                             0.0, 0.0, 0.0])
+            # pos_x, pos_y, pos_z = 1e3*observer_pos_j2000
+            # vel_x, vel_y, vel_z = 1e3*observer_state_j2000_2[3:]
+            # observer_codes_optical.append(('275', pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
             # print(observer_state_j2000_2)
             # print(np.linalg.norm(observer_state_j2000 - observer_state_j2000_2[:3]))
         else:
