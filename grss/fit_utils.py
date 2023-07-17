@@ -1,4 +1,5 @@
 """Utilities for the GRSS orbit determination code"""
+import os
 from json import loads
 from requests import request
 import numpy as np
@@ -171,14 +172,12 @@ def get_mpc_observatory_info():
         dictionary of observatory codes and their corresponding longitude,
         rho*cos(latitude), and rho*sin(latitude)
     """
-    url = "https://www.minorplanetcenter.net/iau/lists/ObsCodes.html"
-    req = request("GET", url, timeout=30).text
-    req = req.replace('<pre>','').replace('</pre>','')
-    req = req.split('\n')
-    while '' in req:
-        req.remove('')
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(f"{file_dir}/obs_codes.txt", "r", encoding='utf-8') as obs_code_file:
+        data = obs_code_file.read()
+    data = data.split('\n')[2:]
     mpc_info_dict = {}
-    for line in req[1:]: # skip header
+    for line in data:
         lon_deg = line[4:13]
         # if lon_deg only has spaces, continue
         if lon_deg.strip() == '':
