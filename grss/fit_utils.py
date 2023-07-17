@@ -1,9 +1,9 @@
 """Utilities for the GRSS orbit determination code"""
+import os
 from json import loads
 from requests import request
 import numpy as np
 from numba import jit
-from astroquery.mpc import MPC
 
 __all__ = [ 'get_ra_from_hms',
             'get_dec_from_dms',
@@ -162,6 +162,30 @@ def parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
     alt = rho - rellip
     return lon*np.pi/180, lat, geodet_lat, alt, rho
 
+def get_mpc_observatory_info():
+    """
+    Get the MPC observatory codes and return them as a dictionary.
+
+    Returns
+    -------
+    codes_dict : dict
+        dictionary of observatory codes and their corresponding longitude,
+        rho*cos(latitude), and rho*sin(latitude)
+    """
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(f"{file_dir}/obs_codes.txt", "r", encoding='utf-8') as obs_code_file:
+        data = obs_code_file.read()
+    data = data.split('\n')[2:]
+    mpc_info_dict = {}
+    for line in data:
+        lon_deg = line[4:13]
+        # if lon_deg only has spaces, continue
+        if lon_deg.strip() == '':
+            continue
+        code = str(line[:3])
+        mpc_info_dict[code] = float(lon_deg), float(line[13:21]), float(line[21:30])
+    return mpc_info_dict
+
 def get_radar_codes_dict():
     # sourcery skip: inline-immediately-returned-variable
     """
@@ -249,31 +273,9 @@ def get_codes_dict():
         dictionary of MPC codes and their corresponding longitude,
         geocentric latitude, and distance from the geocenter
     """
-    # pylint: disable=no-member
-    codes = MPC.get_observatory_codes()
     codes_dict = {}
-    for code_info in codes:
-        if np.isfinite(code_info['Longitude']):
-            code = code_info['Code']
-            lon, rho_cos_lat, rho_sin_lat = (float(code_info['Longitude']),
-                                                float(code_info['cos']), float(code_info['sin']))
-            # print(code, lon, rho_cos_lat, rho_sin_lat)
-            lon, lat, _, _, rho = parallax_constants_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat)
-            codes_dict[code] = (lon, lat, rho)
-    # from https://www.minorplanetcenter.net/iau/lists/ObsCodes.html
-    extra_observatories = { 'M14': (  8.78939, 0.699981, +0.711832),
-                            'M48': ( 15.09222, 0.794277, +0.605535),
-                            'M50': ( 11.56375, 0.738663, +0.671862),
-                            'N83': ( 86.23504, 0.749549, +0.659927),
-                            'P22': (117.57588, 0.762782, +0.644702),
-                            'Q10': (137.32944, 0.821623, +0.568142),
-                            'U94': (246.30250, 0.792006, +0.608864),
-                            'X06': (289.14649, 0.862374, -0.505110),
-                            'Y65': (343.49042, 0.881484, +0.471429),
-                            'Y66': (343.49053, 0.881484, +0.471429),
-                            'Y98': (358.68692, 0.617953, +0.783613),
-                            }
-    for code, info in extra_observatories.items():
+    mpc_info_dict = get_mpc_observatory_info()
+    for code, info in mpc_info_dict.items():
         lon, lat, _, _, rho = parallax_constants_to_lat_lon_alt(info[0], info[1], info[2])
         codes_dict[code] = (lon, lat, rho)
     radar_codes_dict = get_radar_codes_dict()

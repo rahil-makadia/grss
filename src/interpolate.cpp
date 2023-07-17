@@ -21,9 +21,6 @@ void interpolate(const real &t, const real &dt,
         approx_xInteg(xInteg0, accInteg0, xIntegForInterp[hIdx], dt, hVec[hIdx],
                       b, propSim->integParams.nInteg);
     }
-    // tVecForInterp.push_back(t+dt);
-    // xIntegForInterp.push_back(xInteg);
-
     one_timestep_interpolation(t + dt, tVecForInterp, xIntegForInterp,
                                tVecForInterpPrev, xIntegForInterpPrev, propSim);
     tVecForInterpPrev = tVecForInterp;
@@ -180,8 +177,6 @@ void one_timestep_interpolation(
             }
             propSim->lightTimeEval.push_back(lightTime);
             propSim->xIntegEval.push_back(xInterpApparent);
-            // std::cout << "tEval = " << propSim->tEval[interpIdx] <<
-            // std::endl;
             propSim->radarObsEval.push_back(radarMeasurement);
         } else {
             propSim->xIntegEval.push_back(xInterpGeom);
@@ -228,36 +223,11 @@ void get_lightTime_and_xRelative(
         for (size_t j = 0; j < 6; j++) {
             xInterpApparentBary[j] = xInterpApparentTemp[6 * i + j];
         }
-        // if (propSim->observerInfo[interpIdx].size() == 7){ // if observer location is manually specified
-            get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
-        // }
+        get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
         for (size_t j = 0; j < 6; j++) {
             xInterpApparent[6 * i + j] = xInterpApparentBary[j] - xObserver[j];
         }
     }
-    // generate an outfile with tInterpGeom, xInterpGeom, xObserver, lightTime,
-    // xInterpApparent+xObserver std::ofstream outfile;
-    // outfile.open("/Users/rahil/Downloads/lightTimeAndxRelative.txt",
-    // std::ios_base::app); outfile << std::setprecision(17) <<
-    // tInterpGeom+2400000.5 << " "; for (size_t i = 0; i <
-    // propSim->integParams.nInteg; i++){
-    //     if (propSim->integBodies[i].name == "integBody_nom"){
-    //     for (size_t j = 0; j < 3; j++){
-    //         outfile << std::setprecision(16) << xInterpApparent[6*i+j] +
-    //         xObserver[j] << " ";
-    //     }
-    //     }
-    // }
-    // for (size_t i = 0; i < 3; i++){
-    //     outfile << std::setprecision(16) << xObserver[i] << " ";
-    // }
-    // for (size_t i = 0; i < propSim->integParams.nInteg; i++){
-    //     if (propSim->integBodies[i].name == "integBody_nom"){
-    //     outfile << std::setprecision(16) << lightTime[i] << " ";
-    //     }
-    // }
-    // outfile << std::endl;
-    // outfile.close();
 }
 
 void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
@@ -394,9 +364,9 @@ void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
     deltaP1Star[1] = g1 * (e[1] - eDotP * p[1]) / (1 + eDotP);
     deltaP1Star[2] = g1 * (e[2] - eDotP * p[2]) / (1 + eDotP);
 
-    p1[0] = p[0] - deltaP1Star[0] - deltaP1Targ[0]; // -,- >> -,+
-    p1[1] = p[1] - deltaP1Star[1] - deltaP1Targ[1];
-    p1[2] = p[2] - deltaP1Star[2] - deltaP1Targ[2];
+    p1[0] = p[0] - deltaP1Star[0] + deltaP1Targ[0];
+    p1[1] = p[1] - deltaP1Star[1] + deltaP1Targ[1];
+    p1[2] = p[2] - deltaP1Star[2] + deltaP1Targ[2];
 
     earthTargetPos[0] = earthTargetDist * p1[0];
     earthTargetPos[1] = earthTargetDist * p1[1];

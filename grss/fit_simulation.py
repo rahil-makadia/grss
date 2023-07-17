@@ -1539,8 +1539,8 @@ class FitSimulation:
         """
         if self.n_iter > 1:
             del_rms_convergence = 1e-3
-            curr_rms = self.iters[-1].unweighted_rms
-            prev_rms = self.iters[-2].unweighted_rms
+            curr_rms = self.iters[-1].weighted_rms
+            prev_rms = self.iters[-2].weighted_rms
             del_rms = abs(prev_rms - curr_rms)/prev_rms
             if del_rms < del_rms_convergence:
                 self.converged = True
