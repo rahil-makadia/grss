@@ -74,7 +74,6 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
     out_of_range_counter = 0
     skip_counter = 0
     for i, data in enumerate(obs_raw):
-        data = obs_raw[i]
         obs_type = 'P' if data[14] == ' ' else data[14]
         date = data[15:32]
         date_main = date[:-7].replace(' ','-')

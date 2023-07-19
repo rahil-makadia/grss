@@ -323,7 +323,8 @@ class IterationParams:
         if savefig:
             figname = f'residuals_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_residuals.pdf', bbox_inches='tight')
-        plt.show(block=False)
+        block = not auto_close
+        plt.show(block=block)
         if auto_close:
             plt.close(fig)
         return None
@@ -454,7 +455,8 @@ class IterationParams:
         if savefig:
             figname = f'chi_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_chi.pdf', bbox_inches='tight')
-        plt.show(block=False)
+        block = not auto_close
+        plt.show(block=block)
         if auto_close:
             plt.close()
         return None
@@ -1707,7 +1709,8 @@ class FitSimulation:
         plt.xlabel("Iteration #")
         plt.ylabel(r"Reduced $\chi^2$")
         plt.legend()
-        plt.show(block=False)
+        block = not auto_close
+        plt.show(block=block)
         if auto_close:
             plt.close()
         return None
