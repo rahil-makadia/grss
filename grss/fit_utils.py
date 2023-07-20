@@ -326,7 +326,7 @@ def get_observer_info(observer_codes):
                 freq = code[2]
                 info_list.append(freq)
         # for geocentric occultations code is a tuple but needs to be decomposed
-        elif isinstance(code, tuple) and code[0] == '275':
+        elif isinstance(code, tuple) and code[0] in {'275', 'S/C'}:
             info_list.extend((body_id, code[1], code[2], code[3]))
             # info_list.extend((500, code[1], code[2], code[3], code[4], code[5], code[6]))
         else:

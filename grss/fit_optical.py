@@ -173,7 +173,7 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
     observer_codes_optical = []
     spice.furnsh(de_kernel_path)
     for i, obs in obs_df.iterrows():
-        if str(obs['stn'])=='275':
+        if str(obs['stn']) in {'275', 'S/C'}:
             pos_x = float(obs['pos1'])
             pos_y = float(obs['pos2'])
             pos_z = float(obs['pos3'])
@@ -183,7 +183,7 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
             observer_pos_itrf93 = np.dot(rot_mat, observer_pos_j2000)
             lon = np.arctan2(observer_pos_itrf93[1], observer_pos_itrf93[0])
             lat = np.arcsin(observer_pos_itrf93[2]/np.linalg.norm(observer_pos_itrf93))
-            observer_codes_optical.append(('275', lon, lat, 1e3*rho))
+            observer_codes_optical.append((str(obs['stn']), lon, lat, 1e3*rho))
             # pos_itrf_x = rho*np.cos(lat)*np.cos(lon)
             # pos_itrf_y = rho*np.cos(lat)*np.sin(lon)
             # pos_itrf_z = rho*np.sin(lat)
@@ -322,7 +322,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
             if (verbose and
                 (np.rad2deg(abs(r_asc - ra_new))*3600 >= margin or
                 np.rad2deg(abs(dec - dec_new))*3600 >= margin)):
-                print(f"Debiased observation {i+1} at JD {obs_time_jd} from observatory",
+                print(f"Debiased observation {i+1} at MJD {row[0]} UTC from observatory",
                         f"{observer_codes_optical[i]} using catalog {star_catalog}.",
                         f"RA bias = {np.rad2deg(r_asc-ra_new)*3600:0.4f} arcsec,",
                         f"DEC bias = {np.rad2deg(dec-dec_new)*3600:0.4f} arcsec")
