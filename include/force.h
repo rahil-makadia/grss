@@ -10,7 +10,8 @@ struct ForceParameters {
     std::vector<bool> isPPNList;
     std::vector<bool> isJ2List;
     std::vector<real> J2List;
-    std::vector<real> obliquityList;
+    std::vector<real> poleRAList;
+    std::vector<real> poleDecList;
     std::vector<bool> isNongravList;
     std::vector<bool> isMajorList;
     std::vector<bool> isThrustingList;

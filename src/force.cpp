@@ -1,5 +1,9 @@
 #include "force.h"
 // #define PRINT_FORCES 1
+#ifdef PRINT_FORCES
+#include <iomanip>
+#include <fstream>
+#endif
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
                                 const ForceParameters &forceParams,
@@ -27,11 +31,19 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
         velAll[3 * i + 1] = xSpice_i[4];
         velAll[3 * i + 2] = xSpice_i[5];
     }
-
 #ifdef PRINT_FORCES
-    std::cout << "t: " << t << std::endl;
-    std::cout << xInteg[0] << " " << xInteg[1] << " " << xInteg[2] << " "
-              << xInteg[3] << " " << xInteg[4] << " " << xInteg[5] << std::endl;
+    std::ofstream forceFile;
+    forceFile.precision(8);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+    forceFile << "time (MJD): " << std::setw(16) << t << " state:";
+    forceFile.precision(16);
+    for (size_t i = 0; i<6; i++){
+        forceFile << std::setw(25) << xInteg[i];
+    }
+    forceFile << std::endl;
+    forceFile.close();
 #endif
     force_newton(posAll, accInteg, forceParams, integParams, consts);
     // force_ppn_simple(posAll, velAll, accInteg, forceParams, integParams,
@@ -41,8 +53,10 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     force_nongrav(posAll, velAll, accInteg, forceParams, integParams, consts);
     force_thruster(velAll, accInteg, forceParams, integParams, consts);
 #ifdef PRINT_FORCES
-    std::cout << "total acc: " << accInteg[0] << " " << accInteg[1] << " "
+    forceFile.open("cpp.11", std::ios::app);
+    forceFile << std::setw(10) << "total acc:" << std::setw(25) << accInteg[0] << std::setw(25) << accInteg[1] << std::setw(25)
               << accInteg[2] << std::endl;
+    forceFile.close();
 #endif
     return accInteg;
 }
@@ -51,6 +65,13 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg,
                   const ForceParameters &forceParams,
                   const IntegrationParameters &integParams,
                   const Constants &consts) {
+#ifdef PRINT_FORCES
+    std::ofstream forceFile;
+    forceFile.precision(16);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+#endif
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
@@ -76,10 +97,10 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg,
                 ay -= G * massj * dy / rRel3;
                 az -= G * massj * dz / rRel3;
 #ifdef PRINT_FORCES
-                std::cout << forceParams.spiceIdList[j] << " " << G * massj
-                          << " " << dx << " " << dy << " " << dz << " "
-                          << -G * massj * dx / rRel3 << " "
-                          << -G * massj * dy / rRel3 << " "
+                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25) << G * massj
+                          << std::setw(25) << dx << std::setw(25) << dy << std::setw(25) << dz << std::setw(25)
+                          << -G * massj * dx / rRel3 << std::setw(25)
+                          << -G * massj * dy / rRel3 << std::setw(25)
                           << -G * massj * dz / rRel3 << std::endl;
 #endif
             }
@@ -88,6 +109,9 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg,
         accInteg[3 * i + 1] += ay;
         accInteg[3 * i + 2] += az;
     }
+#ifdef PRINT_FORCES
+    forceFile.close();
+#endif
 }
 
 void force_ppn_simple(const std::vector<real> &posAll,
@@ -96,6 +120,13 @@ void force_ppn_simple(const std::vector<real> &posAll,
                       const ForceParameters &forceParams,
                       const IntegrationParameters &integParams,
                       const Constants &consts) {
+#ifdef PRINT_FORCES
+    std::ofstream forceFile;
+    forceFile.precision(16);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+#endif
     real G = consts.G;
     real c = consts.clight;
     real c2 = c * c;
@@ -145,10 +176,9 @@ void force_ppn_simple(const std::vector<real> &posAll,
                 ay += fac1 * (fac2 * dy + fac3 * dvy);
                 az += fac1 * (fac2 * dz + fac3 * dvz);
 #ifdef PRINT_FORCES
-                std::cout << forceParams.spiceIdList[j] << " " << G * massj
-                          << " " << dx << " " << dy << " " << dz << " "
-                          << fac1 * (fac2 * dx + fac3 * dvx) << " "
-                          << fac1 * (fac2 * dy + fac3 * dvy) << " "
+                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25) << G * massj << std::setw(25)
+                          << fac1 * (fac2 * dx + fac3 * dvx) << std::setw(25)
+                          << fac1 * (fac2 * dy + fac3 * dvy) << std::setw(25)
                           << fac1 * (fac2 * dz + fac3 * dvz) << std::endl;
 #endif
             }
@@ -157,6 +187,9 @@ void force_ppn_simple(const std::vector<real> &posAll,
         accInteg[3 * i + 1] += ay;
         accInteg[3 * i + 2] += az;
     }
+#ifdef PRINT_FORCES
+    forceFile.close();
+#endif
 }
 
 void force_ppn_eih(const std::vector<real> &posAll,
@@ -168,6 +201,13 @@ void force_ppn_eih(const std::vector<real> &posAll,
     // formalism see eqn 27 in
     // https://iopscience.iop.org/article/10.3847/1538-3881/abd414/pdf (without
     // the factor of 1 in the first big summation)
+#ifdef PRINT_FORCES
+    std::ofstream forceFile;
+    forceFile.precision(16);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+#endif
     real G = consts.G;
     real c2 = consts.clight * consts.clight;
     real oneOverC2 = 1.0 / c2;
@@ -283,42 +323,50 @@ void force_ppn_eih(const std::vector<real> &posAll,
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
 #ifdef PRINT_FORCES
-                std::cout << forceParams.spiceIdList[j] << " " << G * massj
-                          << " " << dxij << " " << dyij << " " << dzij << " "
-                          << term1X + term2X + term3X << " "
-                          << term1Y + term2Y + term3Y << " "
+                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25)
+                          << term1X + term2X + term3X << std::setw(25)
+                          << term1Y + term2Y + term3Y << std::setw(25)
                           << term1Z + term2Z + term3Z << std::endl;
 #endif
             }
         }
 #ifdef PRINT_FORCES
-        std::cout << "EIH"
-                  << " integ" << i << " " << axi << " " << ayi << " " << azi
-                  << std::endl;
+        forceFile << std::setw(10) << "EIH" << std::setw(25) << axi << std::setw(25)
+        << ayi << std::setw(25) << azi << std::endl;
 #endif
         accInteg[3 * i + 0] += axi;
         accInteg[3 * i + 1] += ayi;
         accInteg[3 * i + 2] += azi;
     }
+#ifdef PRINT_FORCES
+    forceFile.close();
+#endif
 }
 
 void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg,
               const ForceParameters &forceParams,
               const IntegrationParameters &integParams,
               const Constants &consts) {
+#ifdef PRINT_FORCES
+    std::ofstream forceFile;
+    forceFile.precision(16);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+#endif
     real G = consts.G;
     real x, y, z;
     real dx, dy, dz;
+    real dxBody, dyBody, dzBody;
     real rRel, rRel2, rRel5;
     real radius;
     real ax, ay, az;
-    real massj;
+    real massj, poleRA, poleDec;
+    real sinRA, cosRA, sinDec, cosDec;
     std::vector<std::vector<real>> R1(3, std::vector<real>(3));
     std::vector<std::vector<real>> R2(3, std::vector<real>(3));
     std::vector<std::vector<real>> R(3, std::vector<real>(3));
     std::vector<std::vector<real>> Rinv(3, std::vector<real>(3));
-    std::vector<real> dPosBody(3);
-    std::vector<real> aEquat(3);
     for (size_t i = 0; i < integParams.nInteg; i++) {
         x = posAll[3 * i];
         y = posAll[3 * i + 1];
@@ -336,30 +384,30 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg,
                 rRel2 = rRel * rRel;
                 rRel5 = rRel2 * rRel2 * rRel;
                 radius = forceParams.radii[j];
-                rot_mat_x(-EARTH_OBLIQUITY, R1);  // equatorial to ecliptic
-                rot_mat_x(forceParams.obliquityList[j],
-                          R2);           // ecliptic to body equator
-                mat_mat_mul(R1, R2, R);  // equatorial to body equator
-                mat_vec_mul(R, {dx, dy, dz}, dPosBody);
-                dx = dPosBody[0];
-                dy = dPosBody[1];
-                dz = dPosBody[2];
-                real axBody = 3 * G * massj * forceParams.J2List[j] * radius *
-                    radius * (5 * dz * dz / rRel2 - 1) * dx / (2 * rRel5);
-                real ayBody = 3 * G * massj * forceParams.J2List[j] * radius *
-                    radius * (5 * dz * dz / rRel2 - 1) * dy / (2 * rRel5);
-                real azBody = 3 * G * massj * forceParams.J2List[j] * radius *
-                    radius * (5 * dz * dz / rRel2 - 3) * dz / (2 * rRel5);
-                mat3_inv(R, Rinv);
-                mat_vec_mul(Rinv, {axBody, ayBody, azBody}, aEquat);
-                ax += aEquat[0];
-                ay += aEquat[1];
-                az += aEquat[2];
+                poleRA = forceParams.poleRAList[j];
+                sinRA = sin(poleRA);
+                cosRA = cos(poleRA);
+                poleDec = forceParams.poleDecList[j];
+                sinDec = sin(poleDec);
+                cosDec = cos(poleDec);
+                dxBody = -dx*sinRA + dy*cosRA;
+                dyBody = -dx*cosRA*sinDec - dy*sinRA*sinDec + dz*cosDec;
+                dzBody =  dx*cosRA*cosDec + dy*sinRA*cosDec + dz*sinDec;
+                real fac1 = 3 * G * massj * forceParams.J2List[j] * radius *
+                    radius / (2 * rRel5);
+                real fac2 = 5 * dzBody * dzBody / rRel2 - 1;
+                real axBody = fac1 * fac2 * dxBody;
+                real ayBody = fac1 * fac2 * dyBody;
+                real azBody = fac1 * (fac2 - 2) * dzBody;
+                real axEquat = -axBody*sinRA - ayBody*cosRA*sinDec + azBody*cosRA*cosDec;
+                real ayEquat =  axBody*cosRA - ayBody*sinRA*sinDec + azBody*sinRA*cosDec;
+                real azEquat =  ayBody*cosDec + azBody*sinDec;
+                ax += axEquat;
+                ay += ayEquat;
+                az += azEquat;
 #ifdef PRINT_FORCES
-                std::cout << forceParams.spiceIdList[j] << " "
-                          << forceParams.J2List[j] << " " << G * massj << " "
-                          << dx << " " << dy << " " << dz << " " << aEquat[0]
-                          << " " << aEquat[1] << " " << aEquat[2] << std::endl;
+                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25) << axEquat
+                          << std::setw(25) << ayEquat << std::setw(25) << azEquat << std::endl;
 #endif
             }
         }
@@ -367,6 +415,9 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg,
         accInteg[3 * i + 1] += ay;
         accInteg[3 * i + 2] += az;
     }
+#ifdef PRINT_FORCES
+    forceFile.close();
+#endif
 }
 
 void force_nongrav(const std::vector<real> &posAll,
@@ -374,6 +425,13 @@ void force_nongrav(const std::vector<real> &posAll,
                    const ForceParameters &forceParams,
                    const IntegrationParameters &integParams,
                    const Constants &consts) {
+#ifdef PRINT_FORCES
+    std::ofstream forceFile;
+    forceFile.precision(16);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+#endif
     real a1, a2, a3;
     real alpha, k, m, n;
     real r0;
@@ -424,11 +482,11 @@ void force_nongrav(const std::vector<real> &posAll,
                 ay += g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
                 az += g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
 #ifdef PRINT_FORCES
-                std::cout << forceParams.spiceIdList[j] << " "
+                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25)
                           << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])
-                          << " "
+                          << std::setw(25)
                           << g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1])
-                          << " "
+                          << std::setw(25)
                           << g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2])
                           << std::endl;
 #endif
@@ -438,6 +496,9 @@ void force_nongrav(const std::vector<real> &posAll,
         accInteg[3 * i + 1] += ay;
         accInteg[3 * i + 2] += az;
     }
+#ifdef PRINT_FORCES
+    forceFile.close();
+#endif
 }
 
 void force_thruster(const std::vector<real> &velAll,
@@ -445,6 +506,13 @@ void force_thruster(const std::vector<real> &velAll,
                     const ForceParameters &forceParams,
                     const IntegrationParameters &integParams,
                     const Constants &consts) {
+#ifdef PRINT_FORCES
+    std::ofstream forceFile;
+    forceFile.precision(16);
+    forceFile.setf(std::ios::scientific);
+    forceFile.setf(std::ios::right, std::ios::adjustfield);
+    forceFile.open("cpp.11", std::ios::app);
+#endif
     real vx, vy, vz;
     real ax, ay, az;
     std::vector<real> vHat(3);
@@ -462,8 +530,8 @@ void force_thruster(const std::vector<real> &velAll,
             ay += acc_thruster * vHat[1];
             az += acc_thruster * vHat[2];
 #ifdef PRINT_FORCES
-            std::cout << "THRUSTER " << acc_thruster * vHat[0] << " "
-                      << acc_thruster * vHat[1] << " " << acc_thruster * vHat[2]
+            forceFile << "THRUSTER " << acc_thruster * vHat[0] << std::setw(25)
+                      << acc_thruster * vHat[1] << std::setw(25) << acc_thruster * vHat[2]
                       << std::endl;
 #endif
         }
@@ -471,4 +539,7 @@ void force_thruster(const std::vector<real> &velAll,
         accInteg[3 * i + 1] += ay;
         accInteg[3 * i + 2] += az;
     }
+#ifdef PRINT_FORCES
+    forceFile.close();
+#endif
 }
