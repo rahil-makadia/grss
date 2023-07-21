@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop_simulation.IntegBody &#8212; GRSS 0.7.1 documentation</title>
+    <title>grss.prop_simulation.IntegBody &#8212; GRSS 0.8.0 documentation</title>
   
   
   
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.7.1 documentation</p>
+    <p class="title logo__title">GRSS v0.8.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -430,7 +430,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.mass"><code class="docutils literal notranslate"><span class="pre">IntegBody.mass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.name"><code class="docutils literal notranslate"><span class="pre">IntegBody.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.ngParams"><code class="docutils literal notranslate"><span class="pre">IntegBody.ngParams</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.obliquityToEcliptic"><code class="docutils literal notranslate"><span class="pre">IntegBody.obliquityToEcliptic</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleDec"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleDec</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleRA"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleRA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.pos"><code class="docutils literal notranslate"><span class="pre">IntegBody.pos</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
@@ -520,7 +521,7 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.__init__" title="grss.prop_simulation.IntegBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.set_J2" title="grss.prop_simulation.IntegBody.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, obliquityToEcliptic)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.set_J2" title="grss.prop_simulation.IntegBody.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, poleRA, poleDec)</p></td>
 <td><p>Set the J2 parameter of the body.</p></td>
 </tr>
 </tbody>
@@ -561,19 +562,22 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.ngParams" title="grss.prop_simulation.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
 <td><p>Non-gravitational parameters of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.obliquityToEcliptic" title="grss.prop_simulation.IntegBody.obliquityToEcliptic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obliquityToEcliptic</span></code></a></p></td>
-<td><p>Obliquity of the body's orbit to the ecliptic.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.poleDec" title="grss.prop_simulation.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
+<td><p>Declination of the pole of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.pos" title="grss.prop_simulation.IntegBody.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.poleRA" title="grss.prop_simulation.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
+<td><p>Right ascension of the pole of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.pos" title="grss.prop_simulation.IntegBody.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
 <td><p>Position of the body at the initial time.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.radius" title="grss.prop_simulation.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.radius" title="grss.prop_simulation.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
 <td><p>Radius of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.t0" title="grss.prop_simulation.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.t0" title="grss.prop_simulation.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
 <td><p>Initial MJD TDB time of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.vel" title="grss.prop_simulation.IntegBody.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.vel" title="grss.prop_simulation.IntegBody.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
 <td><p>Velocity of the body at the initial time.</p></td>
 </tr>
 </tbody>
@@ -645,9 +649,15 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.obliquityToEcliptic">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">obliquityToEcliptic</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.obliquityToEcliptic" title="Permalink to this definition">#</a></dt>
-<dd><p>Obliquity of the body’s orbit to the ecliptic.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.poleDec">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poleDec</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.poleDec" title="Permalink to this definition">#</a></dt>
+<dd><p>Declination of the pole of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.poleRA">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poleRA</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.poleRA" title="Permalink to this definition">#</a></dt>
+<dd><p>Right ascension of the pole of the body.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -664,13 +674,14 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.set_J2">
-<span class="sig-name descname"><span class="pre">set_J2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.Body.html#grss.prop_simulation.Body" title="grss.prop_simulation.Body"><span class="pre">grss.prop_simulation.Body</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">J2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obliquityToEcliptic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.set_J2" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">set_J2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.Body.html#grss.prop_simulation.Body" title="grss.prop_simulation.Body"><span class="pre">grss.prop_simulation.Body</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">J2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poleRA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poleDec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.set_J2" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the J2 parameter of the body.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>J2</strong> (<em>real</em>) – J2 parameter of the body.</p></li>
-<li><p><strong>obliquityToEcliptic</strong> (<em>real</em>) – Obliquity of the body’s orbit to the ecliptic.</p></li>
+<li><p><strong>poleRA</strong> (<em>real</em>) – Right ascension of the pole of the body.</p></li>
+<li><p><strong>poleDec</strong> (<em>real</em>) – Declination of the pole of the body.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -759,7 +770,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.mass"><code class="docutils literal notranslate"><span class="pre">IntegBody.mass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.name"><code class="docutils literal notranslate"><span class="pre">IntegBody.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.ngParams"><code class="docutils literal notranslate"><span class="pre">IntegBody.ngParams</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.obliquityToEcliptic"><code class="docutils literal notranslate"><span class="pre">IntegBody.obliquityToEcliptic</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleDec"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleDec</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleRA"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleRA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.pos"><code class="docutils literal notranslate"><span class="pre">IntegBody.pos</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
@@ -795,7 +807,7 @@ document.write(`
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jul 20, 2023.
+  Last updated on Jul 21, 2023.
   <br/>
 </p>
   </div>

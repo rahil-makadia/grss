@@ -35,7 +35,8 @@ grss.prop\_simulation.SpiceBody
         ~SpiceBody.isSpice
         ~SpiceBody.mass
         ~SpiceBody.name
-        ~SpiceBody.obliquityToEcliptic
+        ~SpiceBody.poleDec
+        ~SpiceBody.poleRA
         ~SpiceBody.pos
         ~SpiceBody.radius
         ~SpiceBody.spiceId

@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop_simulation.ForceParameters &#8212; GRSS 0.7.1 documentation</title>
+    <title>grss.prop_simulation.ForceParameters &#8212; GRSS 0.8.0 documentation</title>
   
   
   
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.7.1 documentation</p>
+    <p class="title logo__title">GRSS v0.8.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -427,7 +427,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.isThrustingList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.isThrustingList</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.masses"><code class="docutils literal notranslate"><span class="pre">ForceParameters.masses</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.ngParamsList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.ngParamsList</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.obliquityList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.obliquityList</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.poleDecList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.poleDecList</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.poleRAList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.poleRAList</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.radii"><code class="docutils literal notranslate"><span class="pre">ForceParameters.radii</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.spiceIdList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.spiceIdList</span></code></a></li>
 </ul>
@@ -491,13 +492,16 @@ forces on integrated bodies.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.ngParamsList" title="grss.prop_simulation.ForceParameters.ngParamsList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParamsList</span></code></a></p></td>
 <td><p>Non-gravitational parameters of the bodies.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.obliquityList" title="grss.prop_simulation.ForceParameters.obliquityList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obliquityList</span></code></a></p></td>
-<td><p>Obliquity of the bodies' orbit to the ecliptic.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.poleDecList" title="grss.prop_simulation.ForceParameters.poleDecList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDecList</span></code></a></p></td>
+<td><p>Declination of the poles of the bodies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.radii" title="grss.prop_simulation.ForceParameters.radii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radii</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.poleRAList" title="grss.prop_simulation.ForceParameters.poleRAList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRAList</span></code></a></p></td>
+<td><p>Right ascension of the poles of the bodies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.radii" title="grss.prop_simulation.ForceParameters.radii"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radii</span></code></a></p></td>
 <td><p>Radii of the bodies.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.spiceIdList" title="grss.prop_simulation.ForceParameters.spiceIdList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceIdList</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.ForceParameters.spiceIdList" title="grss.prop_simulation.ForceParameters.spiceIdList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceIdList</span></code></a></p></td>
 <td><p>SPICE IDs of the bodies.</p></td>
 </tr>
 </tbody>
@@ -551,9 +555,15 @@ forces on integrated bodies.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.ForceParameters.obliquityList">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">obliquityList</span></span><a class="headerlink" href="#grss.prop_simulation.ForceParameters.obliquityList" title="Permalink to this definition">#</a></dt>
-<dd><p>Obliquity of the bodies’ orbit to the ecliptic.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.ForceParameters.poleDecList">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poleDecList</span></span><a class="headerlink" href="#grss.prop_simulation.ForceParameters.poleDecList" title="Permalink to this definition">#</a></dt>
+<dd><p>Declination of the poles of the bodies.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.ForceParameters.poleRAList">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poleRAList</span></span><a class="headerlink" href="#grss.prop_simulation.ForceParameters.poleRAList" title="Permalink to this definition">#</a></dt>
+<dd><p>Right ascension of the poles of the bodies.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -630,7 +640,8 @@ forces on integrated bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.isThrustingList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.isThrustingList</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.masses"><code class="docutils literal notranslate"><span class="pre">ForceParameters.masses</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.ngParamsList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.ngParamsList</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.obliquityList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.obliquityList</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.poleDecList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.poleDecList</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.poleRAList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.poleRAList</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.radii"><code class="docutils literal notranslate"><span class="pre">ForceParameters.radii</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.ForceParameters.spiceIdList"><code class="docutils literal notranslate"><span class="pre">ForceParameters.spiceIdList</span></code></a></li>
 </ul>
@@ -663,7 +674,7 @@ forces on integrated bodies.</p>
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jul 20, 2023.
+  Last updated on Jul 21, 2023.
   <br/>
 </p>
   </div>

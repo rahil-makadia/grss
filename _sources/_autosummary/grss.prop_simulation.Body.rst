@@ -34,7 +34,8 @@ grss.prop\_simulation.Body
         ~Body.isPPN
         ~Body.mass
         ~Body.name
-        ~Body.obliquityToEcliptic
+        ~Body.poleDec
+        ~Body.poleRA
         ~Body.pos
         ~Body.radius
         ~Body.t0

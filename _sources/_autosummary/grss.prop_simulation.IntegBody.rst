@@ -38,7 +38,8 @@ grss.prop\_simulation.IntegBody
         ~IntegBody.mass
         ~IntegBody.name
         ~IntegBody.ngParams
-        ~IntegBody.obliquityToEcliptic
+        ~IntegBody.poleDec
+        ~IntegBody.poleRA
         ~IntegBody.pos
         ~IntegBody.radius
         ~IntegBody.t0

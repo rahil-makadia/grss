@@ -34,7 +34,8 @@ grss.prop\_simulation.ForceParameters
         ~ForceParameters.isThrustingList
         ~ForceParameters.masses
         ~ForceParameters.ngParamsList
-        ~ForceParameters.obliquityList
+        ~ForceParameters.poleDecList
+        ~ForceParameters.poleRAList
         ~ForceParameters.radii
         ~ForceParameters.spiceIdList
     
