@@ -32,7 +32,10 @@ def get_ra_from_hms(ra_hms):
     """
     # convert right ascension from HH:MM:SS.SSS to arcseconds
     ra_split = ra_hms.split(' ')
-    r_asc = 15*(float(ra_split[0])+float(ra_split[1])/60+float(ra_split[2])/3600)
+    hour = float(ra_split[0])
+    mins = 0.0 if ra_split[1] == '' else float(ra_split[1])
+    secs = 0.0 if ra_split[2] == '' else float(ra_split[2])
+    r_asc = 15*(hour+mins/60+secs/3600)
     return r_asc*3600
 
 def get_dec_from_dms(dec_dms):
@@ -51,7 +54,10 @@ def get_dec_from_dms(dec_dms):
     """
     # convert declination from deg MM:SS.SSS to arcseconds
     dec_split = dec_dms.replace('+','').replace('-','').split(' ')
-    dec = float(dec_split[0])+float(dec_split[1])/60+float(dec_split[2])/3600
+    deg = float(dec_split[0])
+    mins = 0.0 if dec_split[1] == '' else float(dec_split[1])
+    secs = 0.0 if dec_split[2] == '' else float(dec_split[2])
+    dec = deg+mins/60+secs/3600
     if dec_dms[0] == '-':
         dec *= -1
     return dec*3600
@@ -320,7 +326,7 @@ def get_observer_info(observer_codes):
                 freq = code[2]
                 info_list.append(freq)
         # for geocentric occultations code is a tuple but needs to be decomposed
-        elif isinstance(code, tuple) and code[0] == '275':
+        elif isinstance(code, tuple) and code[0] in {'275', 'S/C'}:
             info_list.extend((body_id, code[1], code[2], code[3]))
             # info_list.extend((500, code[1], code[2], code[3], code[4], code[5], code[6]))
         else:

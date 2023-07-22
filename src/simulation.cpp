@@ -1,13 +1,14 @@
 #include "simulation.h"
 
-void Body::set_J2(real J2, real obliquityToEcliptic) {
+void Body::set_J2(real J2, real poleRA, real poleDec) {
     this->J2 = J2;
     if (this->J2 != 0.0L) {
         this->isJ2 = true;
     } else {
         this->isJ2 = false;
     }
-    this->obliquityToEcliptic = obliquityToEcliptic;
+    this->poleRA = poleRA*DEG2RAD;
+    this->poleDec = poleDec*DEG2RAD;
 }
 
 SpiceBody::SpiceBody(std::string DEkernelPath, std::string name, int spiceId,
@@ -201,29 +202,10 @@ propSimulation::propSimulation(std::string name, real t0,
             PlutoBarycenter.isMajor = true;
             Sun.set_J2(
                 2.1106088532726840e-7L,
-                7.25L *
-                    DEG2RAD);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
-            // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
-            // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
+                286.13L, 63.87L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             Earth.set_J2(
                 0.00108262545L,
-                EARTH_OBLIQUITY);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
-            // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
-            // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
-            // JupiterBarycenter.set_J2(14736.0e-6L, 3.13L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
-            // SaturnBarycenter.set_J2(16298.0e-6L, 26.73L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/saturnfact.html
-            // UranusBarycenter.set_J2(3343.43e-6L, 97.77L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/uranusfact.html
-            // NeptuneBarycenter.set_J2(3411.0e-6L, 28.32L*DEG2RAD); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html
-            // PlutoBarycenter.set_J2(0.0L, 122.53L); //
-            // https://nssdc.gsfc.nasa.gov/planetary/factsheet/plutofact.html
+                0.0L, 90.0L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             add_spice_body(Sun);
             add_spice_body(MercuryBarycenter);
             add_spice_body(VenusBarycenter);
@@ -311,7 +293,7 @@ propSimulation::propSimulation(std::string name, real t0,
             // add planets and planetary bodies from DE441 header
             // (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de441_tech-comments.txt)
             SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0,
-                          2.9591220828411956e-04L / G, 6.957e8L, this->consts);
+                          2.9591220828411956e-04L / G, 6.96e8L, this->consts);
             SpiceBody MercuryBarycenter(
                 DEkernelPath, "Mercury Barycenter", 1, this->integParams.t0,
                 4.9125001948893182e-11L / G, 0.0L, this->consts);
@@ -319,7 +301,7 @@ propSimulation::propSimulation(std::string name, real t0,
                 DEkernelPath, "Venus Barycenter", 2, this->integParams.t0,
                 7.2434523326441187e-10L / G, 0.0L, this->consts);
             SpiceBody Earth(DEkernelPath, "Earth", 399, this->integParams.t0,
-                            8.8876924467071033e-10L / G, 6378136.3L,
+                            8.8876924467071033e-10L / G, 6378136.6L,
                             this->consts);
             SpiceBody Moon(DEkernelPath, "Moon", 301, this->integParams.t0,
                            1.0931894624024351e-11L / G, 0.0L, this->consts);
@@ -365,15 +347,14 @@ propSimulation::propSimulation(std::string name, real t0,
             PlutoBarycenter.isMajor = true;
             Sun.set_J2(
                 2.1961391516529825e-07L,
-                7.25L *
-                    DEG2RAD);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+                286.13L, 63.87L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); //
             // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
             // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); //
             // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
             Earth.set_J2(
                 1.0826253900000000e-03L,
-                EARTH_OBLIQUITY);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+                0.0L, 90.0L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); //
             // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
             // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); //
@@ -863,8 +844,8 @@ void propSimulation::preprocess() {
         this->forceParams.isPPNList.push_back(integBodies[i].isPPN);
         this->forceParams.isJ2List.push_back(integBodies[i].isJ2);
         this->forceParams.J2List.push_back(integBodies[i].J2);
-        this->forceParams.obliquityList.push_back(
-            integBodies[i].obliquityToEcliptic);
+        this->forceParams.poleRAList.push_back(integBodies[i].poleRA);
+        this->forceParams.poleDecList.push_back(integBodies[i].poleDec);
         this->forceParams.isNongravList.push_back(integBodies[i].isNongrav);
         this->forceParams.ngParamsList.push_back(integBodies[i].ngParams);
         this->forceParams.isMajorList.push_back(integBodies[i].isMajor);
@@ -877,8 +858,8 @@ void propSimulation::preprocess() {
         this->forceParams.isPPNList.push_back(spiceBodies[i].isPPN);
         this->forceParams.isJ2List.push_back(spiceBodies[i].isJ2);
         this->forceParams.J2List.push_back(spiceBodies[i].J2);
-        this->forceParams.obliquityList.push_back(
-            spiceBodies[i].obliquityToEcliptic);
+        this->forceParams.poleRAList.push_back(spiceBodies[i].poleRA);
+        this->forceParams.poleDecList.push_back(spiceBodies[i].poleDec);
         this->forceParams.isMajorList.push_back(spiceBodies[i].isMajor);
     }
     this->tStep.push_back(t);

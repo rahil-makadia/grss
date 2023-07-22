@@ -10,7 +10,8 @@ struct Body {
     real mass;
     real radius;
     real J2 = 0.0L;
-    real obliquityToEcliptic = 0.0L;
+    real poleRA = 0.0L;
+    real poleDec = 90.0L;
     std::string name;
     std::vector<real> pos;
     std::vector<real> vel;
@@ -18,7 +19,7 @@ struct Body {
     bool isJ2 = false;
     bool isNongrav = false;
     bool isMajor = false;
-    void set_J2(real J2, real obliquityToEcliptic);
+    void set_J2(real J2, real poleRA, real poleDec);
 };
 
 class SpiceBody : public Body {

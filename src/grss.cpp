@@ -197,9 +197,13 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("J2List", &ForceParameters::J2List, R"mydelimiter(
             J2 parameters of the bodies.
             )mydelimiter")
-        .def_readwrite("obliquityList", &ForceParameters::obliquityList,
+        .def_readwrite("poleRAList", &ForceParameters::poleRAList,
                        R"mydelimiter(
-            Obliquity of the bodies' orbit to the ecliptic.
+            Right ascension of the poles of the bodies.
+            )mydelimiter")
+        .def_readwrite("poleDecList", &ForceParameters::poleDecList,
+                       R"mydelimiter(
+            Declination of the poles of the bodies.
             )mydelimiter")
         .def_readwrite("isNongravList", &ForceParameters::isNongravList,
                        R"mydelimiter(
@@ -231,9 +235,11 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("J2", &Body::J2, R"mydelimiter(
             J2 parameter of the body.
             )mydelimiter")
-        .def_readwrite("obliquityToEcliptic", &Body::obliquityToEcliptic,
-                       R"mydelimiter(
-            Obliquity of the body's orbit to the ecliptic.
+        .def_readwrite("poleRA", &Body::poleRA, R"mydelimiter(
+            Right ascension of the pole of the body.
+            )mydelimiter")
+        .def_readwrite("poleDec", &Body::poleDec, R"mydelimiter(
+            Declination of the pole of the body.
             )mydelimiter")
         .def_readwrite("name", &Body::name, R"mydelimiter(
             Name of the body.
@@ -257,15 +263,17 @@ PYBIND11_MODULE(prop_simulation, m) {
             Whether the body has non-gravitational accelerations.
             )mydelimiter")
         .def("set_J2", &Body::set_J2, py::arg("J2"),
-             py::arg("obliquityToEcliptic"), R"mydelimiter(
+             py::arg("poleRA"), py::arg("poleDec"), R"mydelimiter(
             Set the J2 parameter of the body.
 
             Parameters
             ----------
             J2 : real
                 J2 parameter of the body.
-            obliquityToEcliptic : real
-                Obliquity of the body's orbit to the ecliptic.
+            poleRA : real
+                Right ascension of the pole of the body.
+            poleDec : real
+                Declination of the pole of the body.
 
             Returns
             -------
