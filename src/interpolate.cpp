@@ -106,7 +106,11 @@ void one_timestep_interpolation(
 
     get_coeffs(tVecForInterp, xIntegForInterp, coeffs);
     // get_coeffs(tVecForInterpPrev, xIntegForInterpPrev, coeffsPrev);
-    static size_t interpIdx = 0;
+    size_t &interpIdx = propSim->interpIdx;
+    if (interpIdx == 0) {
+        coeffsPrev = coeffs;
+        tVecForInterpPrev = tVecForInterp;
+    }
     bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[tLen - 1];
     bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[tLen - 1];
     while (interpIdx < propSim->tEval.size() &&

@@ -99,6 +99,7 @@ class propSimulation {
     ForceParameters forceParams;
 
     // interpolator variables
+    size_t interpIdx = 0;
     bool tEvalUTC = false;
     bool evalApparentState = false;
     bool convergedLightTime = false;

@@ -494,13 +494,13 @@ void propSimulation::prepare_for_evaluation(
             // remove any tEval values that are before the integration start
             // time
             tEval.erase(tEval.begin());
-            observerInfo.erase(observerInfo.begin());
+            if (observerInfo.size() != 0) observerInfo.erase(observerInfo.begin());
             removeCounter++;
         }
         while (tEval.back() > this->integParams.tf + this->tEvalMargin) {
             // remove any tEval values that are after the integration end time
             tEval.pop_back();
-            observerInfo.pop_back();
+            if (observerInfo.size() != 0) observerInfo.pop_back();
             removeCounter++;
         }
         if (removeCounter > 0) {
@@ -515,13 +515,13 @@ void propSimulation::prepare_for_evaluation(
         while (tEval[0] > this->integParams.t0 + this->tEvalMargin) {
             // remove any tEval values that are after the integration start time
             tEval.erase(tEval.begin());
-            observerInfo.erase(observerInfo.begin());
+            if (observerInfo.size() != 0) observerInfo.erase(observerInfo.begin());
             removeCounter++;
         }
         while (tEval.back() < this->integParams.tf - this->tEvalMargin) {
             // remove any tEval values that are before the integration end time
             tEval.pop_back();
-            observerInfo.pop_back();
+            if (observerInfo.size() != 0) observerInfo.pop_back();
             removeCounter++;
         }
         if (removeCounter > 0) {
@@ -550,7 +550,6 @@ void propSimulation::prepare_for_evaluation(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
     furnsh_c(this->DEkernelPath.c_str());
-    std::cout.precision(22);
     if (tEval.size() != 0) {
         for (size_t i = 0; i < tEval.size(); i++) {
             if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
