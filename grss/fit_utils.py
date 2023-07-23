@@ -14,6 +14,7 @@ __all__ = [ 'get_ra_from_hms',
             'get_codes_dict',
             'get_observer_info',
             'get_sbdb_info',
+            'get_similarity_stats',
 ]
 
 def get_ra_from_hms(ra_hms):
@@ -515,3 +516,43 @@ def radec2icrf(r_asc, dec, deg=False):
     pos_y = cosd*np.sin(alpha)
     pos_z = np.sin(delta)
     return np.array([pos_x, pos_y, pos_z])
+
+def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
+    """
+    Get similarity statistics between two solutions. This includes the
+    Mahalanobis distance of both solutions from the other, Bhattacharyya
+    distance, and Bhattacharyya coefficient.
+
+    Parameters
+    ----------
+    sol_1 : vector
+        Mean solution 1
+    cov_1 : array
+        Covariance matrix 1
+    sol_2 : vector
+        Mean solution 2
+    cov_2 : _type_
+        Covariance matrix 2
+
+    Returns
+    -------
+    maha_dist_1 : float
+        Mahalanobis distance of solution 2 from solution 1
+    maha_dist_2 : float
+        Mahalanobis distance of solution 1 from solution 2
+    bhattacharya : float
+        Bhattacharyya distance between solutions
+    bhatt_coeff : float
+        Bhattacharyya coefficient of solutions
+    """
+    maha_dist_1 = np.sqrt((sol_1-sol_2) @ np.linalg.inv(cov_1) @ (sol_1-sol_2).T)
+    maha_dist_2 = np.sqrt((sol_1-sol_2) @ np.linalg.inv(cov_2) @ (sol_1-sol_2).T)
+    big_cov = (cov_1+cov_2)/2
+    det_1 = np.linalg.det(cov_1)
+    det_2 = np.linalg.det(cov_2)
+    det_big = np.linalg.det(big_cov)
+    term_1 = 1/8 * (sol_1-sol_2) @ big_cov @ (sol_1-sol_2).T
+    term_2 = 1/2 * np.log(det_big/np.sqrt(det_1*det_2))
+    bhattacharya = term_1 + term_2
+    bhatt_coeff = np.exp(-bhattacharya)
+    return maha_dist_1, maha_dist_2, bhattacharya, bhatt_coeff
