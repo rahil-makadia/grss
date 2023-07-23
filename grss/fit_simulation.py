@@ -881,8 +881,9 @@ class FitSimulation:
             propSim object for the past observations.
         """
         t_eval_past = self.obs_array[self.past_obs_idx, 0]
-        tf_past = np.min(t_eval_past) - 1
+        tf_past = np.min(t_eval_past)
         prop_sim_past = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_past.tEvalMargin = 1.0
         prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info)
@@ -912,8 +913,9 @@ class FitSimulation:
             propSim object for the future observations.
         """
         t_eval_future = self.obs_array[self.future_obs_idx, 0]
-        tf_future = np.max(t_eval_future) + 1
+        tf_future = np.max(t_eval_future)
         prop_sim_future = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_future.tEvalMargin = 1.0
         prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info)
