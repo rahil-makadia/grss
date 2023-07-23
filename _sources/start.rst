@@ -14,6 +14,8 @@ The GRSS library is available on PyPI and can be installed using the following c
 
    pip install grss
 
+NOTE: The GRSS library is currently not pip-installable on Intel-based Macs. To use the library on an Intel-based Mac, please install the library using the source code from the GitHub repository (see below for instructions).
+
 -----------------------
 Install via source code
 -----------------------

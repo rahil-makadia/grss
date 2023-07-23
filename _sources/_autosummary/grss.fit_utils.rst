@@ -25,6 +25,7 @@
         get_sbdb_elems
         get_sbdb_info
         get_sbdb_raw_data
+        get_similarity_stats
         icrf2radec
         mjd2et
         parallax_constants_to_lat_lon_alt

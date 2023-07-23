@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 0.8.1 documentation</title>
+    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 0.8.2 documentation</title>
   
   
   
@@ -139,7 +139,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.8.1 documentation</p>
+    <p class="title logo__title">GRSS v0.8.2 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -194,6 +194,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.get_sbdb_elems.html">grss.fit_utils.get_sbdb_elems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.get_sbdb_info.html">grss.fit_utils.get_sbdb_info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.get_sbdb_raw_data.html">grss.fit_utils.get_sbdb_raw_data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.get_similarity_stats.html">grss.fit_utils.get_similarity_stats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.icrf2radec.html">grss.fit_utils.icrf2radec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.mjd2et.html">grss.fit_utils.mjd2et</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_utils.parallax_constants_to_lat_lon_alt.html">grss.fit_utils.parallax_constants_to_lat_lon_alt</a></li>
@@ -511,11 +512,11 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.462                   0.516                   859.138                         0.267
-2                        0.462                   0.516                   859.099                         0.267
+1                        0.462                   0.516                   859.200                         0.267
+2                        0.462                   0.516                   859.161                         0.267
 Converged without rejecting outliers. Starting outlier rejection now.
-3                        0.417                   0.483                   750.148                         0.234
-4                        0.417                   0.483                   750.112                         0.234
+3                        0.417                   0.483                   750.222                         0.234
+4                        0.417                   0.483                   750.186                         0.234
 Converged after rejecting outliers.
 </pre></div></div>
 </div>
@@ -534,20 +535,20 @@ Converged after rejecting outliers.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 4 (of 4):
 =======================================================
-RMS unweighted: 0.4172053458759002
-RMS weighted: 0.483253815623662
-chi-squared: 750.1120120112287
-reduced chi-squared: 0.23397130755184925
-square root of reduced chi-squared: 0.48370580682047765
+RMS unweighted: 0.4171997162122567
+RMS weighted: 0.4832775053125003
+chi-squared: 750.1855566171289
+reduced chi-squared: 0.23399424722929785
+square root of reduced chi-squared: 0.4837295186664732
 =======================================================
 t: MJD 57508.0 TDB
-Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                             Change                          Change (sigma)
-e                       1.66697367962e-01               3.14439449407e-08               1.66697372667e-01               2.98836792040e-08               +4.70469840863e-09              +0.150
-q                       2.56503058699e+00               9.88646932361e-08               2.56503057190e+00               9.41000525368e-08               -1.50845282931e-08              -0.153
-tp                      5.75113606064e+04               4.97012942237e-05               5.75113606032e+04               4.94022157550e-05               -3.13671625918e-06              -0.063
-om                      2.06375835706e+02               2.22354436006e-04               2.06375804820e+02               2.25686976249e-04               -3.08861797578e-05              -0.139
-w                       1.54025434236e+02               2.22569713937e-04               1.54025464626e+02               2.25867438289e-04               +3.03900571907e-05              +0.137
-i                       7.88804543607e-01               3.53397440345e-06               7.88804504179e-01               3.56431667918e-06               -3.94287055228e-08              -0.011
+Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
+e                       1.66697367962e-01               3.14439449407e-08               1.66697372286e-01               2.98836556854e-08               +4.32384775206e-09              +0.138
+q                       2.56503058699e+00               9.88646932361e-08               2.56503057311e+00               9.41000219303e-08               -1.38760949397e-08              -0.140
+tp                      5.75113606064e+04               4.97012942237e-05               5.75113606030e+04               4.94022103515e-05               -3.40395490639e-06              -0.068
+om                      2.06375835706e+02               2.22354436006e-04               2.06375804825e+02               2.25687036770e-04               -3.08806890530e-05              -0.139
+w                       1.54025434236e+02               2.22569713937e-04               1.54025464572e+02               2.25867341481e-04               +3.03365949321e-05              +0.136
+i                       7.88804543607e-01               3.53397440345e-06               7.88804501957e-01               3.56432188653e-06               -4.16509122747e-08              -0.012
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -585,6 +586,53 @@ i                       7.88804543607e-01               3.53397440345e-06       
 </div>
 <div class="output_area docutils container">
 <img alt="../../../_images/tests_python_fit_shantanunaidu_9_1.png" src="../../../_images/tests_python_fit_shantanunaidu_9_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>mean_0 = np.array(list(init_sol.values())[1:])
+cov_0 = init_cov
+mean_f = np.array(list(fit_sim.x_nom.values()))
+cov_f = fit_sim.covariance
+
+maha_dist_f, maha_dist_0, bhattacharya, bhatt_coeff = fit.get_similarity_stats(mean_0, cov_0, mean_f, cov_f)
+print(f&#39;Mahalonobis distance between JPL and GRSS solution: {maha_dist_f:0.2f}&#39;)
+print(f&#39;Mahalonobis distance between GRSS and JPL solution: {maha_dist_0:0.2f}&#39;)
+print(f&#39;Bhattacharya distance between JPL and GRSS solution: {bhattacharya:0.4f}&#39;)
+print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff:0.4f}&#39;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mahalonobis distance between JPL and GRSS solution: 0.23
+Mahalonobis distance between GRSS and JPL solution: 0.23
+Bhattacharya distance between JPL and GRSS solution: 0.0014
+Bhattacharya coefficient between JPL and GRSS solution: 0.9986
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>assert maha_dist_f &lt; 3.0
+assert maha_dist_0 &lt; 3.0
+assert bhattacharya &lt; 0.10
+assert bhatt_coeff &gt; 0.90
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
 </div>
 </div>
 </section>
