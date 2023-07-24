@@ -8,7 +8,7 @@
 
 project = "GRSS"
 project_copyright = "2023, Rahil Makadia"
-# author = "Rahil Makadia"
+author = "Rahil Makadia"
 # get release and version from version.txt
 with open("../../grss/version.txt", "r", encoding="utf-8") as f:
     release = version = f.read().strip()
