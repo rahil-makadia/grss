@@ -1717,10 +1717,10 @@ class FitSimulation:
             plt.close()
         return None
 
-def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times,
-                            optical_obs_types, radar_times, radar_obs_types, de_kernel,
-                            de_kernel_path, noise, bias,
-                            doppler_freq=8560e6, observatory_code='500'):
+def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_arrays,
+                            simulated_optical_obs_idx, optical_obs_types,
+                            simulated_radar_obs_idx, radar_obs_types, de_kernel,
+                            de_kernel_path, noise):
     """
     Generates simulated observations for a given reference solution.
 
@@ -1734,12 +1734,14 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
         Dictionary containing the reference non-gravitational acceleration information.
     events : list
         List of lists containing the event information.
-    optical_times : vector
-        Vector of optical observation times.
+    modified_obs_arrays : tuple
+        Tuple containing the modified optical and radar observation arrays and observer codes.
+    simulated_optical_obs_idx : vector
+        Vector containing the indices of the simulated optical observations.
     optical_obs_types : list
         List of optical observation types.
-    radar_times : vector
-        Vector of radar observation times.
+    simulated_radar_obs_idx : vector
+        Vector containing the indices of the simulated radar observations.
     radar_obs_types : list
         List of radar observation types.
     de_kernel : int
@@ -1748,20 +1750,14 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
         Path to SPICE kernel.
     noise : bool
         Flag to add noise to the simulated observations.
-    bias : bool
-        Flag to add bias to the simulated observations.
-    doppler_freq : float, optional
-        Doppler frequency, by default 8560e6
-    observatory_code : str, optional
-        MPC observatory code, by default '500'
 
     Returns
     -------
-    sim_obs_array_optical : array
+    obs_array_optical : array
         Simulated optical observation data for the given reference solution.
     observer_codes_optical : tuple
         Observer locations for each observation in sim_obs_array_optical
-    sim_obs_array_radar : array
+    obs_array_radar : array
         Simulated radar observation data for the given reference solution.
     observer_codes_radar : tuple
         Observer locations for each observation in sim_obs_array_radar
@@ -1791,7 +1787,11 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
                         # 'doppler_hera': 0.1 mm/s to Hz
     }
     # check length of times is not zero
-    if len(optical_times) == 0 and len(radar_times) == 0:
+    (obs_array_optical, observer_codes_optical,
+                    obs_array_radar, observer_codes_radar) = modified_obs_arrays
+    optical_times = tuple(obs_array_optical[:, 0])
+    radar_times = tuple(obs_array_radar[:, 0])
+    if len(simulated_optical_obs_idx) == 0 and len(simulated_radar_obs_idx) == 0:
         raise ValueError("Must provide at least one observation time.")
     # check length of times and obs_types are the same
     if len(optical_times) != len(optical_obs_types):
@@ -1835,16 +1835,8 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
         raise ValueError("Must provide either a full cartesian or cometary",
                                 "state for the initial solution.")
     # initialize past and future times and observer codes
-    optical_observer_codes = tuple([observatory_code]*len(optical_times))
-    radar_observer_codes = []
-    for i in range(len(radar_times)):
-        codes = [(observatory_code, observatory_code), 0]
-        if radar_obs_types[i].lower() == 'doppler':
-            codes.append(doppler_freq)
-        radar_observer_codes.append(tuple(codes))
-    radar_observer_codes = tuple(radar_observer_codes)
     obs_times = np.array(optical_times + radar_times)
-    observer_codes = optical_observer_codes + radar_observer_codes
+    observer_codes = observer_codes_optical + observer_codes_radar
     obs_types = tuple(optical_obs_types + radar_obs_types)
     sort_idx = np.argsort(obs_times)
     obs_times = obs_times[sort_idx]
@@ -1857,11 +1849,11 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
     observer_info = get_observer_info(observer_codes)
     if past_obs_exist:
         t_eval_past = obs_times[past_obs_idx]
-        tf_past = np.min(t_eval_past) - 1.0
+        tf_past = np.min(t_eval_past)
         observer_info_past = tuple(np.array(observer_info, dtype=tuple)[past_obs_idx])
     if future_obs_exist:
         t_eval_future = obs_times[future_obs_idx]
-        tf_future = np.max(t_eval_future) + 1.0
+        tf_future = np.max(t_eval_future)
         observer_info_future = tuple(np.array(observer_info, dtype=tuple)[future_obs_idx])
     # initialize the propagator
     t_eval_utc = True
@@ -1869,8 +1861,10 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
     converged_light_time = True
     prop_sim_past = prop.propSimulation("simulated_obs_past", ref_sol['t'],
                                         de_kernel, de_kernel_path)
+    prop_sim_past.tEvalMargin = 1.0
     prop_sim_future = prop.propSimulation("simulated_obs_future", ref_sol['t'],
                                         de_kernel, de_kernel_path)
+    prop_sim_future.tEvalMargin = 1.0
     if past_obs_exist:
         prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
                                                 eval_apparent_state, converged_light_time,
@@ -1918,74 +1912,58 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, optical_times
         apparent_states = apparent_states_future
         radar_observations_future = np.array(prop_sim_future.radarObsEval)
         radar_observations = radar_observations_future
-    sim_obs_array = np.nan*np.ones((len(obs_times), 6))
-    for i, obs_time in enumerate(obs_times):
-        sim_obs_array[i, 0] = obs_time
-        obs_info_len = len(observer_info[i])
-        if obs_info_len in {4, 7}:
-            r_asc, dec = get_radec(apparent_states[i])
-            sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
-            sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
-            sim_obs_array[i, 1] = r_asc
-            if noise:
-                ra_noise = np.random.normal(0, sim_obs_array[i, 3])
-                sim_obs_array[i, 1] += ra_noise
-            if bias:
-                ra_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
-                sim_obs_array[i, 1] += ra_bias
-            sim_obs_array[i, 2] = dec
-            if noise:
-                dec_noise = np.random.normal(0, sim_obs_array[i, 4])
-                sim_obs_array[i, 2] += dec_noise
-            if bias:
-                dec_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
-                sim_obs_array[i, 2] += dec_bias
-            sim_obs_array[i, 5] = 0.0
-        elif obs_info_len == 9: # delay measurement
-            sim_obs_array[i, 3] = obs_sigma_dict[obs_types[i]]
-            sim_obs_array[i, 1] = radar_observations[i]
-            if noise:
-                delay_noise = np.random.normal(0, sim_obs_array[i, 3])
-                sim_obs_array[i, 1] += delay_noise
-            if bias:
-                delay_bias = np.random.uniform(-sim_obs_array[i, 3]/2, sim_obs_array[i, 3]/2)
-                sim_obs_array[i, 1] += delay_bias
-            sim_obs_array[i, 5] = np.nan
-        elif obs_info_len == 10: # doppler measurement
-            sim_obs_array[i, 4] = obs_sigma_dict[obs_types[i]]
-            sim_obs_array[i, 2] = radar_observations[i]
-            if noise:
-                doppler_noise = np.random.normal(0, sim_obs_array[i, 4])
-                sim_obs_array[i, 2] += doppler_noise
-            if bias:
-                doppler_bias = np.random.uniform(-sim_obs_array[i, 4]/2, sim_obs_array[i, 4]/2)
-                sim_obs_array[i, 2] += doppler_bias
-            sim_obs_array[i, 5] = np.nan
-    # split sim_obs_array and observer_codes into optical and radar
-    optical_astrometry_obs_idx = np.where(np.array(obs_types) == 'astrometry')[0]
-    optical_occultation_obs_idx = np.where(np.array(obs_types) == 'occultation')[0]
-    optical_obs_idx = np.hstack((optical_astrometry_obs_idx, optical_occultation_obs_idx))
-    radar_delay_obs_idx = np.where(np.array(obs_types) == 'delay')[0]
-    radar_delay_hera_obs_idx = np.where(np.array(obs_types) == 'delay_hera')[0]
-    radar_doppler_obs_idx = np.where(np.array(obs_types) == 'doppler')[0]
-    radar_obs_idx = np.hstack((radar_delay_obs_idx, radar_delay_hera_obs_idx,
-                                radar_doppler_obs_idx))
-    if len(optical_obs_idx) == 0:
-        sim_obs_array_optical = None
-        observer_codes_optical = None
-    else:
-        sim_obs_array_optical = sim_obs_array[optical_obs_idx]
-        observer_codes_optical = tuple(np.array(observer_codes, dtype=tuple)[optical_obs_idx])
-    if len(radar_obs_idx) == 0:
-        sim_obs_array_radar = None
-        observer_codes_radar = None
-    else:
-        sim_obs_array_radar = sim_obs_array[radar_obs_idx]
-        observer_codes_radar = tuple(np.array(observer_codes, dtype=tuple)[radar_obs_idx])
-    return sim_obs_array_optical, observer_codes_optical, sim_obs_array_radar, observer_codes_radar
+    optical_idx = 0
+    radar_idx = 0
+    for idx in range(len(obs_times)):
+        typ = obs_types[idx]
+        info_len = len(observer_info[idx])
+        if info_len in {4, 7}:
+            if typ != 'actual_obs_optical':
+                if typ == 'actual_obs_to_sim_optical':
+                    r_asc, dec = get_radec(apparent_states[idx])
+                    obs_array_optical[optical_idx, 1] = r_asc
+                    obs_array_optical[optical_idx, 2] = dec
+                else:
+                    r_asc, dec = get_radec(apparent_states[idx])
+                    obs_array_optical[optical_idx, 1] = r_asc
+                    obs_array_optical[optical_idx, 2] = dec
+                    obs_array_optical[optical_idx, 3] = obs_sigma_dict[typ]
+                    obs_array_optical[optical_idx, 4] = obs_sigma_dict[typ]
+                    obs_array_optical[optical_idx, 5] = 0.0
+                if noise:
+                    ra_noise = np.random.normal(0, obs_array_optical[optical_idx, 3])
+                    obs_array_optical[optical_idx, 1] += ra_noise
+                    dec_noise = np.random.normal(0, obs_array_optical[optical_idx, 4])
+                    obs_array_optical[optical_idx, 2] += dec_noise
+            optical_idx += 1
+        elif info_len in {9, 10}:
+            if typ != 'actual_obs_radar':
+                if typ == 'actual_obs_to_sim_radar':
+                    if info_len == 9:
+                        obs_array_radar[radar_idx, 1] = radar_observations[idx]
+                    elif info_len == 10:
+                        obs_array_radar[radar_idx, 2] = radar_observations[idx]
+                else:
+                    if info_len == 9:
+                        obs_array_radar[radar_idx, 1] = radar_observations[idx]
+                        obs_array_radar[radar_idx, 3] = obs_sigma_dict[typ]
+                        obs_array_radar[radar_idx, 5] = np.nan
+                    elif info_len == 10:
+                        obs_array_radar[radar_idx, 2] = radar_observations[idx]
+                        obs_array_radar[radar_idx, 4] = obs_sigma_dict[typ]
+                        obs_array_radar[radar_idx, 5] = np.nan
+                if noise:
+                    if info_len == 9:
+                        delay_noise = np.random.normal(0, obs_array_radar[radar_idx, 3])
+                        obs_array_radar[radar_idx, 1] += delay_noise
+                    elif info_len == 10:
+                        doppler_noise = np.random.normal(0, obs_array_radar[radar_idx, 4])
+                        obs_array_radar[radar_idx, 2] += doppler_noise
+            radar_idx += 1
+    return obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar
 
 def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_obs_start_time,
-                                add_extra_simulated_obs, extra_simulated_obs_info, noise, bias):
+                                add_extra_simulated_obs, extra_simulated_obs_info, noise):
     """
     Creates observation arrays with simulated observations added to the real observations.
 
@@ -2004,8 +1982,6 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
         Tuple containing the extra simulated optical and radar observation times and types.
     noise : bool
         Flag to add noise to the simulated observations.
-    bias : bool
-        Flag to add bias to the simulated observations.
 
     Returns
     -------
@@ -2022,6 +1998,14 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
         de_kernel, de_kernel_path) = simulated_traj_info
     (obs_array_optical, observer_codes_optical,
         obs_array_radar, observer_codes_radar) = real_obs_arrays
+    # sort optical observations by time
+    sort_idx = np.argsort(obs_array_optical[:,0])
+    obs_array_optical = obs_array_optical[sort_idx]
+    observer_codes_optical = tuple(observer_codes_optical[i] for i in sort_idx)
+    # sort radar observations by time
+    sort_idx = np.argsort(obs_array_radar[:,0])
+    obs_array_radar = obs_array_radar[sort_idx]
+    observer_codes_radar = tuple(observer_codes_radar[i] for i in sort_idx)
     if add_extra_simulated_obs:
         (extra_simulated_optical_obs_times, extra_simulated_optical_obs_types,
             extra_simulated_radar_obs_times,
@@ -2030,16 +2014,19 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     radar_obs_times = obs_array_radar[:,0]
     simulated_optical_obs_idx = np.where(optical_obs_times >= simulated_obs_start_time)[0]
     simulated_optical_obs_times = tuple(optical_obs_times[simulated_optical_obs_idx])
-    simulated_optical_obs_types = ['astrometry']*len(simulated_optical_obs_times)
+    optical_obs_types = ['actual_obs_optical']*(len(optical_obs_times)-
+                                                len(simulated_optical_obs_times))
+    optical_obs_types += ['actual_obs_to_sim_optical']*len(simulated_optical_obs_times)
     if (add_extra_simulated_obs and extra_simulated_optical_obs_times is not None
             and extra_simulated_optical_obs_types is not None
             and len(extra_simulated_optical_obs_times) == len(extra_simulated_optical_obs_types)):
         num_extra_optical_obs = len(extra_simulated_optical_obs_times)
         # add extra simulated optical obs times and types
         simulated_optical_obs_times = simulated_optical_obs_times+extra_simulated_optical_obs_times
-        simulated_optical_obs_types = simulated_optical_obs_types+extra_simulated_optical_obs_types
+        optical_obs_types += extra_simulated_optical_obs_types
         # add extra rows to obs_array_optical
         extra_simulated_optical_obs_array = np.nan*np.ones((num_extra_optical_obs, 6))
+        extra_simulated_optical_obs_array[:,0] = extra_simulated_optical_obs_times
         obs_array_optical = np.vstack((obs_array_optical, extra_simulated_optical_obs_array))
         # add indices to simulated_optical_obs_idx
         simulated_optical_obs_idx = np.hstack((simulated_optical_obs_idx,
@@ -2047,20 +2034,22 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
                                                 len(optical_obs_times)+
                                                 num_extra_optical_obs)))
         # add extra rows to observer_codes_optical
-        extra_simulated_optical_observer_codes = tuple(['']*num_extra_optical_obs)
+        extra_simulated_optical_observer_codes = tuple(['500']*num_extra_optical_obs)
         observer_codes_optical = observer_codes_optical + extra_simulated_optical_observer_codes
     simulated_radar_obs_idx = np.where(radar_obs_times >= simulated_obs_start_time)[0]
     simulated_radar_obs_times = tuple(radar_obs_times[simulated_radar_obs_idx])
-    simulated_radar_obs_types = ['delay']*len(simulated_radar_obs_times)
+    radar_obs_types = ['actual_obs_radar']*(len(radar_obs_times)-len(simulated_radar_obs_times))
+    radar_obs_types += ['actual_obs_to_sim_radar']*len(simulated_radar_obs_times)
     if (add_extra_simulated_obs and extra_simulated_radar_obs_times is not None
             and extra_simulated_radar_obs_types is not None
             and len(extra_simulated_radar_obs_times) == len(extra_simulated_radar_obs_types)):
         num_extra_radar_obs = len(extra_simulated_radar_obs_times)
         # add extra simulated radar obs times and types
         simulated_radar_obs_times = simulated_radar_obs_times + extra_simulated_radar_obs_times
-        simulated_radar_obs_types = simulated_radar_obs_types + extra_simulated_radar_obs_types
+        radar_obs_types += extra_simulated_radar_obs_types
         # add extra rows to obs_array_radar
         extra_simulated_radar_obs_array = np.nan*np.ones((num_extra_radar_obs, 6))
+        extra_simulated_radar_obs_array[:,0] = extra_simulated_radar_obs_times
         obs_array_radar = np.vstack((obs_array_radar, extra_simulated_radar_obs_array))
         # add indices to simulated_radar_obs_idx
         simulated_radar_obs_idx = np.hstack((simulated_radar_obs_idx,
@@ -2068,32 +2057,25 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
                                                 len(radar_obs_times)+
                                                 num_extra_radar_obs)))
         # add extra rows to observer_codes_radar
-        extra_simulated_radar_observer_codes = tuple(['']*num_extra_radar_obs)
+        extra_simulated_radar_observer_codes = []
+        for i, typ in enumerate(extra_simulated_radar_obs_types):
+            if typ == 'doppler':
+                extra_simulated_radar_observer_codes.append((('-14','-14'),0,8560e6))
+            else:
+                extra_simulated_radar_observer_codes.append((('-14','-14'),0))
+        extra_simulated_radar_observer_codes = tuple(extra_simulated_radar_observer_codes)
         observer_codes_radar = observer_codes_radar + extra_simulated_radar_observer_codes
     simulated_obs_ref_sol = x_nom.copy()
     simulated_obs_ref_sol['mass'] = 0.0
     simulated_obs_ref_sol['radius'] = target_radius
     simulated_obs_ref_cov = covariance.copy()
     simulated_obs_event = events if events is not None else None
+    modified_obs_arrays = (obs_array_optical, observer_codes_optical,
+                            obs_array_radar, observer_codes_radar)
     simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov,
                                                     nongrav_info, simulated_obs_event,
-                                                    simulated_optical_obs_times,
-                                                    simulated_optical_obs_types,
-                                                    simulated_radar_obs_times,
-                                                    simulated_radar_obs_types, de_kernel,
-                                                    de_kernel_path, noise, bias)
-    (simulated_obs_array_optical, simulated_observer_codes_optical, simulated_obs_array_radar,
-        simulated_observer_codes_radar) = simulated_obs_info
-    if simulated_obs_array_optical is not None:
-        obs_array_optical[simulated_optical_obs_idx,:] = simulated_obs_array_optical
-        observer_codes_optical_temp = list(observer_codes_optical)
-        for idx, code in enumerate(simulated_observer_codes_optical):
-            observer_codes_optical_temp[simulated_optical_obs_idx[idx]] = code
-        observer_codes_optical = tuple(observer_codes_optical_temp)
-    if simulated_obs_array_radar is not None:
-        obs_array_radar[simulated_radar_obs_idx,:] = simulated_obs_array_radar
-        observer_codes_radar_temp = list(observer_codes_radar)
-        for idx, code in enumerate(simulated_observer_codes_radar):
-            observer_codes_radar_temp[simulated_radar_obs_idx[idx]] = code
-        observer_codes_radar = tuple(observer_codes_radar_temp)
-    return obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar
+                                                    modified_obs_arrays,
+                                                    simulated_optical_obs_idx, optical_obs_types,
+                                                    simulated_radar_obs_idx, radar_obs_types,
+                                                    de_kernel, de_kernel_path, noise)
+    return simulated_obs_info
