@@ -1782,7 +1782,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
                         'occultation': 2.5e-3, # arcsec
                         'delay': 2, # microseconds
                         # 15 meter (conservative since it is 1m random + 10m systematic)
-                        'delay_hera': 15 /299792458*1e6, # microseconds
+                        'delay_hera': 15*2 /299792458*1e6, # microseconds
                         'doppler': 0.5, # Hz
                         # 'doppler_hera': 0.1 mm/s to Hz
     }
