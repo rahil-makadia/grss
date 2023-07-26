@@ -91,6 +91,54 @@ void evaluate_one_interpolation(
     }
 }
 
+void get_interpIdxInWindow(const propSimulation *propSim,
+                           const real &tWindowStart, const real &tNext,
+                           const bool &forwardIntegrate,
+                           const bool &backwardIntegrate,
+                           bool &interpIdxInWindow) {
+    interpIdxInWindow = false;
+    const size_t interpIdx = propSim->interpIdx;
+    bool fwInWindow, fwInWindowMarginStart, fwInWindowMarginEnd;
+    bool bwInWindow, bwInWindowMarginStart, bwInWindowMarginEnd;
+    fwInWindow =
+        (forwardIntegrate && propSim->tEval[interpIdx] >= tWindowStart &&
+         propSim->tEval[interpIdx] <= tNext);
+    fwInWindowMarginStart =
+        (forwardIntegrate &&
+         propSim->tEval[interpIdx] <= propSim->integParams.t0 &&
+         propSim->tEval[interpIdx] + propSim->tEvalMargin >=
+             propSim->integParams.t0 &&
+         propSim->tEval[interpIdx] + propSim->tEvalMargin >= tWindowStart &&
+         propSim->tEval[interpIdx] + propSim->tEvalMargin <= tNext);
+    fwInWindowMarginEnd =
+        (forwardIntegrate &&
+         propSim->tEval[interpIdx] >= propSim->integParams.tf &&
+         propSim->tEval[interpIdx] - propSim->tEvalMargin <=
+             propSim->integParams.tf &&
+         propSim->tEval[interpIdx] - propSim->tEvalMargin >= tWindowStart &&
+         propSim->tEval[interpIdx] - propSim->tEvalMargin <= tNext);
+    bwInWindow =
+        (backwardIntegrate && propSim->tEval[interpIdx] <= tWindowStart &&
+         propSim->tEval[interpIdx] >= tNext);
+    bwInWindowMarginStart =
+        (backwardIntegrate &&
+         propSim->tEval[interpIdx] >= propSim->integParams.t0 &&
+         propSim->tEval[interpIdx] - propSim->tEvalMargin <=
+             propSim->integParams.t0 &&
+         propSim->tEval[interpIdx] - propSim->tEvalMargin <= tWindowStart &&
+         propSim->tEval[interpIdx] - propSim->tEvalMargin >= tNext);
+    bwInWindowMarginEnd =
+        (backwardIntegrate &&
+         propSim->tEval[interpIdx] <= propSim->integParams.tf &&
+         propSim->tEval[interpIdx] + propSim->tEvalMargin >=
+             propSim->integParams.tf &&
+         propSim->tEval[interpIdx] + propSim->tEvalMargin <= tWindowStart &&
+         propSim->tEval[interpIdx] + propSim->tEvalMargin >= tNext);
+    interpIdxInWindow = fwInWindow || fwInWindowMarginStart ||
+        fwInWindowMarginEnd || bwInWindow || bwInWindowMarginStart ||
+        bwInWindowMarginEnd;
+}
+
 void one_timestep_interpolation(
     const real &tNext, const std::vector<real> &tVecForInterp,
     const std::vector<std::vector<real>> &xIntegForInterp,
@@ -111,33 +159,12 @@ void one_timestep_interpolation(
         coeffsPrev = coeffs;
         tVecForInterpPrev = tVecForInterp;
     }
-    bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[tLen - 1];
-    bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[tLen - 1];
-    while (interpIdx < propSim->tEval.size() &&
-           ((forwardIntegrate &&
-             (propSim->tEval[interpIdx] == tVecForInterp[0] ||
-              (propSim->tEval[interpIdx] > tVecForInterp[0] &&
-               propSim->tEval[interpIdx] <= tNext))) ||
-            (forwardIntegrate &&
-             propSim->tEval[interpIdx] <= propSim->integParams.t0 &&
-             propSim->tEval[interpIdx] + propSim->tEvalMargin >=
-                 propSim->integParams.t0) ||
-            (forwardIntegrate &&
-             propSim->tEval[interpIdx] >= propSim->integParams.tf &&
-             propSim->tEval[interpIdx] - propSim->tEvalMargin <=
-                 propSim->integParams.tf) ||
-            (backwardIntegrate &&
-             (propSim->tEval[interpIdx] == tVecForInterp[0] ||
-              (propSim->tEval[interpIdx] < tVecForInterp[0] &&
-               propSim->tEval[interpIdx] >= tNext))) ||
-            (backwardIntegrate &&
-             propSim->tEval[interpIdx] >= propSim->integParams.t0 &&
-             propSim->tEval[interpIdx] - propSim->tEvalMargin <=
-                 propSim->integParams.t0) ||
-            (backwardIntegrate &&
-             propSim->tEval[interpIdx] <= propSim->integParams.tf &&
-             propSim->tEval[interpIdx] + propSim->tEvalMargin >=
-                 propSim->integParams.tf))) {
+    const bool forwardIntegrate = tVecForInterp[0] < tVecForInterp[tLen - 1];
+    const bool backwardIntegrate = tVecForInterp[0] > tVecForInterp[tLen - 1];
+    bool interpIdxInWindow;
+    get_interpIdxInWindow(propSim, tVecForInterp[0], tNext, forwardIntegrate,
+                          backwardIntegrate, interpIdxInWindow);
+    while (interpIdx < propSim->tEval.size() && interpIdxInWindow) {
         real tInterpGeom;
         if (!propSim->evalApparentState) {
             for (size_t i = 0; i < tLen; i++) {
@@ -186,6 +213,9 @@ void one_timestep_interpolation(
             propSim->xIntegEval.push_back(xInterpGeom);
         }
         interpIdx++;
+        get_interpIdxInWindow(propSim, tVecForInterp[0], tNext,
+                              forwardIntegrate, backwardIntegrate,
+                              interpIdxInWindow);
     }
     coeffsPrev = coeffs;
     if (interpIdx == propSim->tEval.size()) {

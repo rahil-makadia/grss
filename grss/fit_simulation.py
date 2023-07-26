@@ -1998,14 +1998,6 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
         de_kernel, de_kernel_path) = simulated_traj_info
     (obs_array_optical, observer_codes_optical,
         obs_array_radar, observer_codes_radar) = real_obs_arrays
-    # sort optical observations by time
-    sort_idx = np.argsort(obs_array_optical[:,0])
-    obs_array_optical = obs_array_optical[sort_idx]
-    observer_codes_optical = tuple(observer_codes_optical[i] for i in sort_idx)
-    # sort radar observations by time
-    sort_idx = np.argsort(obs_array_radar[:,0])
-    obs_array_radar = obs_array_radar[sort_idx]
-    observer_codes_radar = tuple(observer_codes_radar[i] for i in sort_idx)
     if add_extra_simulated_obs:
         (extra_simulated_optical_obs_times, extra_simulated_optical_obs_types,
             extra_simulated_radar_obs_times,
@@ -2036,6 +2028,15 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
         # add extra rows to observer_codes_optical
         extra_simulated_optical_observer_codes = tuple(['500']*num_extra_optical_obs)
         observer_codes_optical = observer_codes_optical + extra_simulated_optical_observer_codes
+    # sort optical observations by time
+    sort_idx = np.argsort(obs_array_optical[:,0])
+    obs_array_optical = obs_array_optical[sort_idx]
+    observer_codes_optical = tuple(observer_codes_optical[i] for i in sort_idx)
+    optical_obs_types = tuple(optical_obs_types[i] for i in sort_idx)
+    simulated_optical_obs_idx = []
+    for i, typ in enumerate(optical_obs_types):
+        if typ != 'actual_obs_optical':
+            simulated_optical_obs_idx.append(i)
     simulated_radar_obs_idx = np.where(radar_obs_times >= simulated_obs_start_time)[0]
     simulated_radar_obs_times = tuple(radar_obs_times[simulated_radar_obs_idx])
     radar_obs_types = ['actual_obs_radar']*(len(radar_obs_times)-len(simulated_radar_obs_times))
@@ -2065,6 +2066,15 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
                 extra_simulated_radar_observer_codes.append((('-14','-14'),0))
         extra_simulated_radar_observer_codes = tuple(extra_simulated_radar_observer_codes)
         observer_codes_radar = observer_codes_radar + extra_simulated_radar_observer_codes
+    # sort radar observations by time
+    sort_idx = np.argsort(obs_array_radar[:,0])
+    obs_array_radar = obs_array_radar[sort_idx]
+    observer_codes_radar = tuple(observer_codes_radar[i] for i in sort_idx)
+    radar_obs_types = tuple(radar_obs_types[i] for i in sort_idx)
+    simulated_radar_obs_idx = []
+    for i, typ in enumerate(radar_obs_types):
+        if typ != 'actual_obs_radar':
+            simulated_radar_obs_idx.append(i)
     simulated_obs_ref_sol = x_nom.copy()
     simulated_obs_ref_sol['mass'] = 0.0
     simulated_obs_ref_sol['radius'] = target_radius
