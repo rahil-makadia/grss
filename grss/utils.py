@@ -43,9 +43,9 @@ def default_kernel_path(kernel_version=0):
 
 def _download_obs_codes_file():
     """
-    Download a text file of the observatory code info from the Minor Planet
-    Center.
+    Download a text file of the observatory code info from the Minor Planet Center.
     """
+    print("Downloading observatory codes file from the MPC...")
     url = "https://www.minorplanetcenter.net/iau/lists/ObsCodes.html"
     req = request("GET", url, timeout=30)
     text = req.content.replace(b'<pre>',b'').replace(b'</pre>',b'')
@@ -71,8 +71,8 @@ def get_obs_codes_file():
             data = file.read()
             last_updated = data.split('\n')[0]
             last_updated = datetime.datetime(*[int(i) for i in last_updated.split(',')])
-            diff_weeks = (now - last_updated).seconds / (60 * 60 * 24 * 7)
-            if diff_weeks >= 1.0:
+            diff_days = (now - last_updated).seconds / (60 * 60 * 24)
+            if diff_days >= 1.0:
                 _download_obs_codes_file()
     else:
         _download_obs_codes_file()

@@ -19,6 +19,11 @@ void evaluate_one_interpolation(
     const std::vector<real> &tVecForInterpPrev,
     const std::vector<std::vector<real>> &coeffsPrev,
     std::vector<real> &xInterp);
+void get_interpIdxInWindow(const propSimulation *propSim,
+                           const real &tWindowStart, const real &tNext,
+                           const bool &forwardIntegrate,
+                           const bool &backwardIntegrate,
+                           bool &interpIdxInWindow);
 void one_timestep_interpolation(
     const real &tNext, const std::vector<real> &tVecForInterp,
     const std::vector<std::vector<real>> &xIntegForInterp,
