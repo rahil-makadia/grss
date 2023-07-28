@@ -1779,7 +1779,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         or cometary state.
     """
     obs_sigma_dict = {  'astrometry': 1, # arcsec
-                        'occultation': 2.5e-3, # arcsec
+                        'occultation': 2.2e-3, # arcsec
                         'delay': 2, # microseconds
                         # 15 meter (conservative since it is 1m random + 10m systematic)
                         'delay_hera': 15*2 /299792458*1e6, # microseconds
