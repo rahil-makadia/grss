@@ -1312,6 +1312,13 @@ class FitSimulation:
             obs_info_len = len(observer_info[i])
             if obs_info_len in {4, 7}:
                 computed_obs[i, :] = get_radec(apparent_states[i])
+                # if self.obs_array[i, 3] < 10e-3 or self.obs_array[i, 4] < 10e-3:
+                #     dist = np.linalg.norm(apparent_states[i, :3])*1.495978707e11
+                #     ang_diam = 2*np.arctan(self.fixed_propsim_params['radius']/dist)
+                #     ang_diam *= 180/np.pi*3600
+                #     print(f'Angular diameter at {self.obs_array[i, 0]} is {ang_diam} arcsec. ',
+                #             f'RA uncertainty fraction is {self.obs_array[i, 3]/ang_diam}. ',
+                #             f'Dec uncertainty fraction is {self.obs_array[i, 4]/ang_diam}.')
             elif obs_info_len == 9: # delay measurement
                 computed_obs[i, 0] = radar_observations[i]
             elif obs_info_len == 10: # dopper measurement
@@ -1779,7 +1786,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         or cometary state.
     """
     obs_sigma_dict = {  'astrometry': 1, # arcsec
-                        'occultation': 2.2e-3, # arcsec
+                        'occultation': 0.25, # fraction of body angular diameter
                         'delay': 2, # microseconds
                         # 15 meter (conservative since it is 1m random + 10m systematic)
                         'delay_hera': 15*2 /299792458*1e6, # microseconds
@@ -1929,6 +1936,12 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
                     obs_array_optical[optical_idx, 2] = dec
                     obs_array_optical[optical_idx, 3] = obs_sigma_dict[typ]
                     obs_array_optical[optical_idx, 4] = obs_sigma_dict[typ]
+                    if typ == 'occultation':
+                        dist = np.linalg.norm(apparent_states[idx, :3])*1.495978707e11
+                        ang_diam = 2*np.arctan(ref_sol['radius'] / dist)
+                        ang_diam *= 180/np.pi*3600
+                        obs_array_optical[optical_idx, 3] *= ang_diam
+                        obs_array_optical[optical_idx, 4] *= ang_diam
                     obs_array_optical[optical_idx, 5] = 0.0
                 if noise:
                     ra_noise = np.random.normal(0, obs_array_optical[optical_idx, 3])
@@ -2033,10 +2046,8 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     obs_array_optical = obs_array_optical[sort_idx]
     observer_codes_optical = tuple(observer_codes_optical[i] for i in sort_idx)
     optical_obs_types = tuple(optical_obs_types[i] for i in sort_idx)
-    simulated_optical_obs_idx = []
-    for i, typ in enumerate(optical_obs_types):
-        if typ != 'actual_obs_optical':
-            simulated_optical_obs_idx.append(i)
+    simulated_optical_obs_idx = [i for i, typ in enumerate(optical_obs_types)
+                                    if typ != 'actual_obs_optical']
     simulated_radar_obs_idx = np.where(radar_obs_times >= simulated_obs_start_time)[0]
     simulated_radar_obs_times = tuple(radar_obs_times[simulated_radar_obs_idx])
     radar_obs_types = ['actual_obs_radar']*(len(radar_obs_times)-len(simulated_radar_obs_times))
@@ -2071,10 +2082,8 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     obs_array_radar = obs_array_radar[sort_idx]
     observer_codes_radar = tuple(observer_codes_radar[i] for i in sort_idx)
     radar_obs_types = tuple(radar_obs_types[i] for i in sort_idx)
-    simulated_radar_obs_idx = []
-    for i, typ in enumerate(radar_obs_types):
-        if typ != 'actual_obs_radar':
-            simulated_radar_obs_idx.append(i)
+    simulated_radar_obs_idx = [i for i, typ in enumerate(radar_obs_types)
+                                    if typ != 'actual_obs_radar']
     simulated_obs_ref_sol = x_nom.copy()
     simulated_obs_ref_sol['mass'] = 0.0
     simulated_obs_ref_sol['radius'] = target_radius
