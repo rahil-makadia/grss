@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import spiceypy as spice
 
-from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec, mjd2et
+from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec, rec2lat
 
 __all__ = [ 'get_ades_optical_obs_array',
             'get_optical_obs_array',
@@ -177,12 +177,7 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
             pos_x = float(obs['pos1'])
             pos_y = float(obs['pos2'])
             pos_z = float(obs['pos3'])
-            rot_mat = spice.pxform('J2000', 'ITRF93', mjd2et(obs_times[i].tdb.mjd))
-            observer_pos_j2000 = np.array([pos_x, pos_y, pos_z])
-            rho = np.linalg.norm(observer_pos_j2000)
-            observer_pos_itrf93 = np.dot(rot_mat, observer_pos_j2000)
-            lon = np.arctan2(observer_pos_itrf93[1], observer_pos_itrf93[0])
-            lat = np.arcsin(observer_pos_itrf93[2]/np.linalg.norm(observer_pos_itrf93))
+            lon, lat, rho = rec2lat(obs_times[i].tdb.mjd, pos_x, pos_y, pos_z)
             observer_codes_optical.append((str(obs['stn']), lon, lat, 1e3*rho))
             # pos_itrf_x = rho*np.cos(lat)*np.cos(lon)
             # pos_itrf_y = rho*np.cos(lat)*np.sin(lon)
