@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop_simulation.SpiceBody &#8212; GRSS 0.9.0 documentation</title>
+    <title>grss.prop_simulation.SpiceBody &#8212; GRSS 0.9.1 documentation</title>
   
   
   
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.0 documentation</p>
+    <p class="title logo__title">GRSS v0.9.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -459,11 +459,9 @@ document.write(`
 <p>The SpiceBody class contains the properties of a SPICE body.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop_simulation.SpiceBody.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.SpiceBody" title="grss.prop_simulation.SpiceBody"><span class="pre">grss.prop_simulation.SpiceBody</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">DEkernelPath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiceId</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.Constants.html#grss.prop_simulation.Constants" title="grss.prop_simulation.Constants"><span class="pre">grss.prop_simulation.Constants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.SpiceBody.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.SpiceBody" title="grss.prop_simulation.SpiceBody"><span class="pre">grss.prop_simulation.SpiceBody</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiceId</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.Constants.html#grss.prop_simulation.Constants" title="grss.prop_simulation.Constants"><span class="pre">grss.prop_simulation.Constants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.SpiceBody.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor for the SpiceBody class.</p>
 <dl class="simple">
-<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
-</dd>
 <dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
 </dd>
 <dt>spiceId<span class="classifier">int</span></dt><dd><p>SPICE ID of the body.</p>
@@ -482,7 +480,7 @@ document.write(`
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.__init__" title="grss.prop_simulation.SpiceBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, DEkernelPath, name, spiceId, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.__init__" title="grss.prop_simulation.SpiceBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, name, spiceId, t0, mass, ...)</p></td>
 <td><p>Constructor for the SpiceBody class.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.set_J2" title="grss.prop_simulation.SpiceBody.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, poleRA, poleDec)</p></td>

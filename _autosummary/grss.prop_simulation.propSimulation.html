@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop_simulation.propSimulation &#8212; GRSS 0.9.0 documentation</title>
+    <title>grss.prop_simulation.propSimulation &#8212; GRSS 0.9.1 documentation</title>
   
   
   
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.0 documentation</p>
+    <p class="title logo__title">GRSS v0.9.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -722,12 +722,10 @@ document.write(`
 <span class="sig-name descname"><span class="pre">add_spice_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_spice_body" title="Permalink to this definition">#</a></dt>
 <dd><p>Overloaded function.</p>
 <ol class="arabic">
-<li><p>add_spice_body(self: grss.prop_simulation.propSimulation, DEkernelPath: str, name: str, spiceId: int, t0: float, mass: float, radius: float, constants: grss.prop_simulation.Constants) -&gt; None</p>
+<li><p>add_spice_body(self: grss.prop_simulation.propSimulation, name: str, spiceId: int, t0: float, mass: float, radius: float, constants: grss.prop_simulation.Constants) -&gt; None</p>
 <blockquote>
 <div><p>Adds a SPICE body to the simulation.</p>
 <dl class="simple">
-<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
-</dd>
 <dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
 </dd>
 <dt>spiceId<span class="classifier">int</span></dt><dd><p>SPICE ID of the body.</p>
