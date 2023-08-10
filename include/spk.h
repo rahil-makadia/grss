@@ -10,7 +10,7 @@
 #include "utilities.h"
 
 struct CacheItem {
-    int spiceID;
+    int spiceID = -99999;
     double t;
     double x;
     double y;

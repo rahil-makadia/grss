@@ -4,7 +4,14 @@
 #include <assert.h>
 
 int main(){
-    std::cout.precision(20);
+    timeval t1, t2;
+    gettimeofday(&t1, NULL);
+    real tDiff;
+    std::cout
+        << "/////////////////////// SPK map accuracy test ///////////////////////"
+        << std::endl
+        << std::endl;
+    std::cout.precision(5);
     SpiceDouble mjd = 51544.5+1000;
     std::vector<int> kernels = {431, 441};
     for (size_t i = 0; i < kernels.size(); i++){    
@@ -64,7 +71,7 @@ int main(){
             }
         }
         std::cout << "DE" << kernel << " errors: " << std::endl;
-        printf("pos_error: %0.20e\nvel_error: %0.20e\n", pos_error, vel_error);
+        printf("pos_error: %0.5e\nvel_error: %0.5e\n", pos_error, vel_error);
         assert(pos_error < 0.1/1.495978707e11);
         assert(vel_error < 1e-9/1.495978707e11*86400.0);
 
@@ -72,5 +79,12 @@ int main(){
         spk_free(sbInfo);
         kclear_c();
     }
+    std::cout
+        << std::endl
+        << "/////////////////////// SPK map accuracy test ///////////////////////"
+        << std::endl;
+    gettimeofday(&t2, NULL);
+    tDiff = (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) / 1000000.0L;
+    std::cout << "elapsed time: " << tDiff << " sec" << std::endl;
     return 0;
 }
