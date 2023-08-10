@@ -283,15 +283,12 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<SpiceBody, Body>(m, "SpiceBody", R"mydelimiter(
         The SpiceBody class contains the properties of a SPICE body.
         )mydelimiter")
-        .def(py::init<std::string, std::string, int, real, real, real,
-                      Constants>(),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"),
-             py::arg("t0"), py::arg("mass"), py::arg("radius"),
-             py::arg("constants"), R"mydelimiter(
+        .def(py::init<std::string, int, real, real, real, Constants>(),
+             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
+             py::arg("mass"), py::arg("radius"), py::arg("constants"),
+             R"mydelimiter(
             Constructor for the SpiceBody class.
 
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
             name : str
                 Name of the body.
             spiceId : int
@@ -522,16 +519,14 @@ PYBIND11_MODULE(prop_simulation, m) {
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
         .def("add_spice_body",
-             static_cast<void (propSimulation::*)(std::string, std::string, int,
-                                                  real, real, real, Constants)>(
+             static_cast<void (propSimulation::*)(std::string, int, real, real,
+                                                  real, Constants)>(
                  &propSimulation::add_spice_body),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"),
-             py::arg("t0"), py::arg("mass"), py::arg("radius"),
-             py::arg("constants"), R"mydelimiter(
+             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
+             py::arg("mass"), py::arg("radius"), py::arg("constants"),
+             R"mydelimiter(
             Adds a SPICE body to the simulation.
 
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
             name : str
                 Name of the body.
             spiceId : int

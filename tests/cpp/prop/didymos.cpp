@@ -2,10 +2,15 @@
 #include <sys/time.h>
 #include <assert.h>
 // #include <gperftools/profiler.h>
+/*
+cd tests/cpp/prop/
+g++ -std=c++11 -stdlib=libc++ -g didymos.cpp ../../../src/force.cpp ../../../src/gr15.cpp ../../../src/interpolate.cpp ../../../src/simulation.cpp ../../../src/spk.cpp ../../../src/utilities.cpp ../../../extern/cspice/lib/cspice.a -o didymos.out -I ../../../include/ -I ../../../extern/cspice/include/ -lprofiler
+pprof --web ./didymos.out ./didymos.prof
+*/
 
 int main() {
     std::cout.precision(5);
-    // ProfilerStart("test.prof");
+    // ProfilerStart("didymos.prof");
     timeval t1, t2;
     real tDiff;
 

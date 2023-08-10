@@ -7,12 +7,12 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
     } else {
         this->isJ2 = false;
     }
-    this->poleRA = poleRA*DEG2RAD;
-    this->poleDec = poleDec*DEG2RAD;
+    this->poleRA = poleRA * DEG2RAD;
+    this->poleDec = poleDec * DEG2RAD;
 }
 
-SpiceBody::SpiceBody(std::string DEkernelPath, std::string name, int spiceId,
-                     real t0, real mass, real radius, Constants consts) {
+SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
+                     real radius, Constants consts) {
     this->name = std::to_string(spiceId) + " " + name;
     this->spiceId = spiceId;
     this->t0 = t0;
@@ -21,14 +21,8 @@ SpiceBody::SpiceBody(std::string DEkernelPath, std::string name, int spiceId,
     this->isNongrav = false;
     this->isPPN = false;
     this->isMajor = false;
-    if (this->isSpice) {
-        double state[6];
-        furnsh_c(DEkernelPath.c_str());
-        get_spice_state(this->spiceId, this->t0, consts, state);
-        unload_c(DEkernelPath.c_str());
-        this->pos = {state[0], state[1], state[2]};
-        this->vel = {state[3], state[4], state[5]};
-    }
+    this->pos = {0.0L, 0.0L, 0.0L};
+    this->vel = {0.0L, 0.0L, 0.0L};
 }
 
 IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
@@ -110,8 +104,8 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->isMajor = false;
 }
 
-void ImpulseEvent::apply(const real &t, std::vector<real> &xInteg,
-                         const real &propDir) {
+void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,
+                         const real& propDir) {
     if (t != this->t) {
         throw std::runtime_error(
             "ImpulseEvent::apply: Integration time does "
@@ -160,36 +154,36 @@ propSimulation::propSimulation(std::string name, real t0,
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
             // add planets and planetary bodies from DE431 header
             // (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de431_tech-comments.txt)
-            SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0,
+            SpiceBody Sun("Sun", 10, this->integParams.t0,
                           2.959122082855911e-4L / G, 6.96e8L, this->consts);
             SpiceBody MercuryBarycenter(
-                DEkernelPath, "Mercury Barycenter", 1, this->integParams.t0,
+                "Mercury Barycenter", 1, this->integParams.t0,
                 4.91248045036476e-11L / G, 0.0L, this->consts);
             SpiceBody VenusBarycenter(
-                DEkernelPath, "Venus Barycenter", 2, this->integParams.t0,
+                "Venus Barycenter", 2, this->integParams.t0,
                 7.24345233264412e-10L / G, 0.0L, this->consts);
-            SpiceBody Earth(DEkernelPath, "Earth", 399, this->integParams.t0,
+            SpiceBody Earth("Earth", 399, this->integParams.t0,
                             8.887692445125634e-10L / G, 6378136.3L,
                             this->consts);
-            SpiceBody Moon(DEkernelPath, "Moon", 301, this->integParams.t0,
+            SpiceBody Moon("Moon", 301, this->integParams.t0,
                            1.093189450742374e-11L / G, 0.0L, this->consts);
-            SpiceBody MarsBarycenter(
-                DEkernelPath, "Mars Barycenter", 4, this->integParams.t0,
-                9.54954869555077e-11L / G, 0.0L, this->consts);
+            SpiceBody MarsBarycenter("Mars Barycenter", 4, this->integParams.t0,
+                                     9.54954869555077e-11L / G, 0.0L,
+                                     this->consts);
             SpiceBody JupiterBarycenter(
-                DEkernelPath, "Jupiter Barycenter", 5, this->integParams.t0,
+                "Jupiter Barycenter", 5, this->integParams.t0,
                 2.82534584083387e-07L / G, 0.0L, this->consts);
             SpiceBody SaturnBarycenter(
-                DEkernelPath, "Saturn Barycenter", 6, this->integParams.t0,
+                "Saturn Barycenter", 6, this->integParams.t0,
                 8.45970607324503e-08L / G, 0.0L, this->consts);
             SpiceBody UranusBarycenter(
-                DEkernelPath, "Uranus Barycenter", 7, this->integParams.t0,
+                "Uranus Barycenter", 7, this->integParams.t0,
                 1.29202482578296e-08L / G, 0.0L, this->consts);
             SpiceBody NeptuneBarycenter(
-                DEkernelPath, "Neptune Barycenter", 8, this->integParams.t0,
+                "Neptune Barycenter", 8, this->integParams.t0,
                 1.52435734788511e-08L / G, 0.0L, this->consts);
             SpiceBody PlutoBarycenter(
-                DEkernelPath, "Pluto Barycenter", 9, this->integParams.t0,
+                "Pluto Barycenter", 9, this->integParams.t0,
                 2.17844105197418e-12L / G, 0.0L, this->consts);
             Sun.isPPN = true;
             Sun.isMajor = true;
@@ -214,11 +208,11 @@ propSimulation::propSimulation(std::string name, real t0,
             PlutoBarycenter.isPPN = true;
             PlutoBarycenter.isMajor = true;
             Sun.set_J2(
-                2.1106088532726840e-7L,
-                286.13L, 63.87L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+                2.1106088532726840e-7L, 286.13L,
+                63.87L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             Earth.set_J2(
-                0.00108262545L,
-                0.0L, 90.0L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+                0.00108262545L, 0.0L,
+                90.0L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             add_spice_body(Sun);
             add_spice_body(MercuryBarycenter);
             add_spice_body(VenusBarycenter);
@@ -234,53 +228,40 @@ propSimulation::propSimulation(std::string name, real t0,
             // add DE431 big16 asteroids from JPL sb431-big16s.bsp, mass
             // parameters from DE431 header
             // (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de431_tech-comments.txt)
-            SpiceBody Ceres(DEkernelPath, "Ceres", 2000001,
-                            this->integParams.t0, 1.400476556172344e-13L / G,
-                            0.0L, this->consts);
-            SpiceBody Vesta(DEkernelPath, "Vesta", 2000004,
-                            this->integParams.t0, 3.85475018780881e-14L / G,
-                            0.0L, this->consts);
-            SpiceBody Pallas(DEkernelPath, "Pallas", 2000002,
-                             this->integParams.t0, 3.104448198938713e-14L / G,
-                             0.0L, this->consts);
-            SpiceBody Hygiea(DEkernelPath, "Hygiea", 2000010,
-                             this->integParams.t0, 1.235800787294125e-14L / G,
-                             0.0L, this->consts);
-            SpiceBody Euphrosyne(
-                DEkernelPath, "Euphrosyne", 2000031, this->integParams.t0,
-                6.343280473648602e-15L / G, 0.0L, this->consts);
-            SpiceBody Interamnia(
-                DEkernelPath, "Interamnia", 2000704, this->integParams.t0,
-                5.256168678493662e-15L / G, 0.0L, this->consts);
-            SpiceBody Davida(DEkernelPath, "Davida", 2000511,
-                             this->integParams.t0, 5.198126979457498e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Eunomia(DEkernelPath, "Eunomia", 2000015,
-                              this->integParams.t0, 4.678307418350905e-15L / G,
-                              0.0L, this->consts);
-            SpiceBody Juno(DEkernelPath, "Juno", 2000003, this->integParams.t0,
+            SpiceBody Ceres("Ceres", 2000001, this->integParams.t0,
+                            1.400476556172344e-13L / G, 0.0L, this->consts);
+            SpiceBody Vesta("Vesta", 2000004, this->integParams.t0,
+                            3.85475018780881e-14L / G, 0.0L, this->consts);
+            SpiceBody Pallas("Pallas", 2000002, this->integParams.t0,
+                             3.104448198938713e-14L / G, 0.0L, this->consts);
+            SpiceBody Hygiea("Hygiea", 2000010, this->integParams.t0,
+                             1.235800787294125e-14L / G, 0.0L, this->consts);
+            SpiceBody Euphrosyne("Euphrosyne", 2000031, this->integParams.t0,
+                                 6.343280473648602e-15L / G, 0.0L,
+                                 this->consts);
+            SpiceBody Interamnia("Interamnia", 2000704, this->integParams.t0,
+                                 5.256168678493662e-15L / G, 0.0L,
+                                 this->consts);
+            SpiceBody Davida("Davida", 2000511, this->integParams.t0,
+                             5.198126979457498e-15L / G, 0.0L, this->consts);
+            SpiceBody Eunomia("Eunomia", 2000015, this->integParams.t0,
+                              4.678307418350905e-15L / G, 0.0L, this->consts);
+            SpiceBody Juno("Juno", 2000003, this->integParams.t0,
                            3.617538317147937e-15L / G, 0.0L, this->consts);
-            SpiceBody Psyche(DEkernelPath, "Psyche", 2000016,
-                             this->integParams.t0, 3.411586826193812e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Cybele(DEkernelPath, "Cybele", 2000065,
-                             this->integParams.t0, 3.180659282652541e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Thisbe(DEkernelPath, "Thisbe", 2000088,
-                             this->integParams.t0, 2.577114127311047e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Doris(DEkernelPath, "Doris", 2000048,
-                            this->integParams.t0, 2.531091726015068e-15L / G,
-                            0.0L, this->consts);
-            SpiceBody Europa(DEkernelPath, "Europa", 2000052,
-                             this->integParams.t0, 2.476788101255867e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Patientia(DEkernelPath, "Patientia", 2000451,
-                                this->integParams.t0,
+            SpiceBody Psyche("Psyche", 2000016, this->integParams.t0,
+                             3.411586826193812e-15L / G, 0.0L, this->consts);
+            SpiceBody Cybele("Cybele", 2000065, this->integParams.t0,
+                             3.180659282652541e-15L / G, 0.0L, this->consts);
+            SpiceBody Thisbe("Thisbe", 2000088, this->integParams.t0,
+                             2.577114127311047e-15L / G, 0.0L, this->consts);
+            SpiceBody Doris("Doris", 2000048, this->integParams.t0,
+                            2.531091726015068e-15L / G, 0.0L, this->consts);
+            SpiceBody Europa("Europa", 2000052, this->integParams.t0,
+                             2.476788101255867e-15L / G, 0.0L, this->consts);
+            SpiceBody Patientia("Patientia", 2000451, this->integParams.t0,
                                 2.295559390637462e-15L / G, 0.0L, this->consts);
-            SpiceBody Sylvia(DEkernelPath, "Sylvia", 2000087,
-                             this->integParams.t0, 2.199295173574073e-15L / G,
-                             0.0L, this->consts);
+            SpiceBody Sylvia("Sylvia", 2000087, this->integParams.t0,
+                             2.199295173574073e-15L / G, 0.0L, this->consts);
             add_spice_body(Ceres);
             add_spice_body(Vesta);
             add_spice_body(Pallas);
@@ -311,36 +292,36 @@ propSimulation::propSimulation(std::string name, real t0,
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
             // add planets and planetary bodies from DE441 header
             // (https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de441_tech-comments.txt)
-            SpiceBody Sun(DEkernelPath, "Sun", 10, this->integParams.t0,
+            SpiceBody Sun("Sun", 10, this->integParams.t0,
                           2.9591220828411956e-04L / G, 6.96e8L, this->consts);
             SpiceBody MercuryBarycenter(
-                DEkernelPath, "Mercury Barycenter", 1, this->integParams.t0,
+                "Mercury Barycenter", 1, this->integParams.t0,
                 4.9125001948893182e-11L / G, 0.0L, this->consts);
             SpiceBody VenusBarycenter(
-                DEkernelPath, "Venus Barycenter", 2, this->integParams.t0,
+                "Venus Barycenter", 2, this->integParams.t0,
                 7.2434523326441187e-10L / G, 0.0L, this->consts);
-            SpiceBody Earth(DEkernelPath, "Earth", 399, this->integParams.t0,
+            SpiceBody Earth("Earth", 399, this->integParams.t0,
                             8.8876924467071033e-10L / G, 6378136.6L,
                             this->consts);
-            SpiceBody Moon(DEkernelPath, "Moon", 301, this->integParams.t0,
+            SpiceBody Moon("Moon", 301, this->integParams.t0,
                            1.0931894624024351e-11L / G, 0.0L, this->consts);
-            SpiceBody MarsBarycenter(
-                DEkernelPath, "Mars Barycenter", 4, this->integParams.t0,
-                9.5495488297258119e-11L / G, 0.0L, this->consts);
+            SpiceBody MarsBarycenter("Mars Barycenter", 4, this->integParams.t0,
+                                     9.5495488297258119e-11L / G, 0.0L,
+                                     this->consts);
             SpiceBody JupiterBarycenter(
-                DEkernelPath, "Jupiter Barycenter", 5, this->integParams.t0,
+                "Jupiter Barycenter", 5, this->integParams.t0,
                 2.8253458252257917e-07L / G, 0.0L, this->consts);
             SpiceBody SaturnBarycenter(
-                DEkernelPath, "Saturn Barycenter", 6, this->integParams.t0,
+                "Saturn Barycenter", 6, this->integParams.t0,
                 8.4597059933762903e-08L / G, 0.0L, this->consts);
             SpiceBody UranusBarycenter(
-                DEkernelPath, "Uranus Barycenter", 7, this->integParams.t0,
+                "Uranus Barycenter", 7, this->integParams.t0,
                 1.2920265649682399e-08L / G, 0.0L, this->consts);
             SpiceBody NeptuneBarycenter(
-                DEkernelPath, "Neptune Barycenter", 8, this->integParams.t0,
+                "Neptune Barycenter", 8, this->integParams.t0,
                 1.5243573478851939e-08L / G, 0.0L, this->consts);
             SpiceBody PlutoBarycenter(
-                DEkernelPath, "Pluto Barycenter", 9, this->integParams.t0,
+                "Pluto Barycenter", 9, this->integParams.t0,
                 2.1750964648933581e-12L / G, 0.0L, this->consts);
             Sun.isPPN = true;
             Sun.isMajor = true;
@@ -365,15 +346,15 @@ propSimulation::propSimulation(std::string name, real t0,
             PlutoBarycenter.isPPN = true;
             PlutoBarycenter.isMajor = true;
             Sun.set_J2(
-                2.1961391516529825e-07L,
-                286.13L, 63.87L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+                2.1961391516529825e-07L, 286.13L,
+                63.87L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             // MercuryBarycenter.set_J2(50.3e-6L, 0.034L*DEG2RAD); //
             // https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
             // VenusBarycenter.set_J2(4.458e-6L, 177.36L*DEG2RAD); //
             // https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
             Earth.set_J2(
-                1.0826253900000000e-03L,
-                0.0L, 90.0L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
+                1.0826253900000000e-03L, 0.0L,
+                90.0L);  // https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf
             // Moon.set_J2(2.0321568464952570e-4L, 5.145L*DEG2RAD); //
             // https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
             // MarsBarycenter.set_J2(1960.45e-6L, 25.19L*DEG2RAD); //
@@ -402,52 +383,40 @@ propSimulation::propSimulation(std::string name, real t0,
 
             // add DE441 big16 asteroids from JPL SSD IOM 392R-21-005
             // (ftp://ssd.jpl.nasa.gov/pub/eph/small_bodies/asteroids_de441/SB441_IOM392R-21-005_perturbers.pdf)
-            SpiceBody Ceres(DEkernelPath, "Ceres", 2000001,
-                            this->integParams.t0, 1.3964518123081070e-13L / G,
-                            0.0L, this->consts);
-            SpiceBody Vesta(DEkernelPath, "Vesta", 2000004,
-                            this->integParams.t0, 3.8548000225257904e-14L / G,
-                            0.0L, this->consts);
-            SpiceBody Pallas(DEkernelPath, "Pallas", 2000002,
-                             this->integParams.t0, 3.0471146330043200e-14L / G,
-                             0.0L, this->consts);
-            SpiceBody Hygiea(DEkernelPath, "Hygiea", 2000010,
-                             this->integParams.t0, 1.2542530761640810e-14L / G,
-                             0.0L, this->consts);
-            SpiceBody Davida(DEkernelPath, "Davida", 2000511,
-                             this->integParams.t0, 8.6836253492286545e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Interamnia(
-                DEkernelPath, "Interamnia", 2000704, this->integParams.t0,
-                6.3110343420878887e-15L / G, 0.0L, this->consts);
-            SpiceBody Europa(DEkernelPath, "Europa", 2000052,
-                             this->integParams.t0, 5.9824315264869841e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Sylvia(DEkernelPath, "Sylvia", 2000087,
-                             this->integParams.t0, 4.8345606546105521e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Eunomia(DEkernelPath, "Eunomia", 2000015,
-                              this->integParams.t0, 4.5107799051436795e-15L / G,
-                              0.0L, this->consts);
-            SpiceBody Juno(DEkernelPath, "Juno", 2000003, this->integParams.t0,
+            SpiceBody Ceres("Ceres", 2000001, this->integParams.t0,
+                            1.3964518123081070e-13L / G, 0.0L, this->consts);
+            SpiceBody Vesta("Vesta", 2000004, this->integParams.t0,
+                            3.8548000225257904e-14L / G, 0.0L, this->consts);
+            SpiceBody Pallas("Pallas", 2000002, this->integParams.t0,
+                             3.0471146330043200e-14L / G, 0.0L, this->consts);
+            SpiceBody Hygiea("Hygiea", 2000010, this->integParams.t0,
+                             1.2542530761640810e-14L / G, 0.0L, this->consts);
+            SpiceBody Davida("Davida", 2000511, this->integParams.t0,
+                             8.6836253492286545e-15L / G, 0.0L, this->consts);
+            SpiceBody Interamnia("Interamnia", 2000704, this->integParams.t0,
+                                 6.3110343420878887e-15L / G, 0.0L,
+                                 this->consts);
+            SpiceBody Europa("Europa", 2000052, this->integParams.t0,
+                             5.9824315264869841e-15L / G, 0.0L, this->consts);
+            SpiceBody Sylvia("Sylvia", 2000087, this->integParams.t0,
+                             4.8345606546105521e-15L / G, 0.0L, this->consts);
+            SpiceBody Eunomia("Eunomia", 2000015, this->integParams.t0,
+                              4.5107799051436795e-15L / G, 0.0L, this->consts);
+            SpiceBody Juno("Juno", 2000003, this->integParams.t0,
                            4.2823439677995011e-15L / G, 0.0L, this->consts);
-            SpiceBody Psyche(DEkernelPath, "Psyche", 2000016,
-                             this->integParams.t0, 3.5445002842488978e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Camilla(DEkernelPath, "Camilla", 2000107,
-                              this->integParams.t0, 3.2191392075878588e-15L / G,
-                              0.0L, this->consts);
-            SpiceBody Thisbe(DEkernelPath, "Thisbe", 2000088,
-                             this->integParams.t0, 2.6529436610356353e-15L / G,
-                             0.0L, this->consts);
-            SpiceBody Iris(DEkernelPath, "Iris", 2000007, this->integParams.t0,
+            SpiceBody Psyche("Psyche", 2000016, this->integParams.t0,
+                             3.5445002842488978e-15L / G, 0.0L, this->consts);
+            SpiceBody Camilla("Camilla", 2000107, this->integParams.t0,
+                              3.2191392075878588e-15L / G, 0.0L, this->consts);
+            SpiceBody Thisbe("Thisbe", 2000088, this->integParams.t0,
+                             2.6529436610356353e-15L / G, 0.0L, this->consts);
+            SpiceBody Iris("Iris", 2000007, this->integParams.t0,
                            2.5416014973471498e-15L / G, 0.0L, this->consts);
-            SpiceBody Euphrosyne(
-                DEkernelPath, "Euphrosyne", 2000031, this->integParams.t0,
-                2.4067012218937576e-15L / G, 0.0L, this->consts);
-            SpiceBody Cybele(DEkernelPath, "Cybele", 2000065,
-                             this->integParams.t0, 2.0917175955133682e-15L / G,
-                             0.0L, this->consts);
+            SpiceBody Euphrosyne("Euphrosyne", 2000031, this->integParams.t0,
+                                 2.4067012218937576e-15L / G, 0.0L,
+                                 this->consts);
+            SpiceBody Cybele("Cybele", 2000065, this->integParams.t0,
+                             2.0917175955133682e-15L / G, 0.0L, this->consts);
             add_spice_body(Ceres);
             add_spice_body(Vesta);
             add_spice_body(Pallas);
@@ -476,7 +445,7 @@ propSimulation::propSimulation(std::string name, real t0,
     }
 }
 
-propSimulation::propSimulation(std::string name, const propSimulation &simRef) {
+propSimulation::propSimulation(std::string name, const propSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
     this->integParams = simRef.integParams;
@@ -486,7 +455,7 @@ propSimulation::propSimulation(std::string name, const propSimulation &simRef) {
 }
 
 void propSimulation::prepare_for_evaluation(
-    std::vector<real> &tEval, std::vector<std::vector<real>> &observerInfo) {
+    std::vector<real>& tEval, std::vector<std::vector<real>>& observerInfo) {
     bool forwardProp = this->integParams.t0 <= this->integParams.tf;
     bool backwardProp = this->integParams.t0 >= this->integParams.tf;
     if (forwardProp && backwardProp) {
@@ -513,7 +482,8 @@ void propSimulation::prepare_for_evaluation(
             // remove any tEval values that are before the integration start
             // time
             tEval.erase(tEval.begin());
-            if (observerInfo.size() != 0) observerInfo.erase(observerInfo.begin());
+            if (observerInfo.size() != 0)
+                observerInfo.erase(observerInfo.begin());
             removeCounter++;
         }
         while (tEval.back() > this->integParams.tf + this->tEvalMargin) {
@@ -534,7 +504,8 @@ void propSimulation::prepare_for_evaluation(
         while (tEval[0] > this->integParams.t0 + this->tEvalMargin) {
             // remove any tEval values that are after the integration start time
             tEval.erase(tEval.begin());
-            if (observerInfo.size() != 0) observerInfo.erase(observerInfo.begin());
+            if (observerInfo.size() != 0)
+                observerInfo.erase(observerInfo.begin());
             removeCounter++;
         }
         while (tEval.back() < this->integParams.tf - this->tEvalMargin) {
@@ -604,9 +575,8 @@ void propSimulation::prepare_for_evaluation(
     }
 }
 
-void propSimulation::add_spice_body(std::string DEkernelPath, std::string name,
-                                    int spiceId, real t0, real mass,
-                                    real radius, Constants consts) {
+void propSimulation::add_spice_body(std::string name, int spiceId, real t0,
+                                    real mass, real radius, Constants consts) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->spiceBodies.size(); i++) {
         if (this->spiceBodies[i].name == name) {
@@ -615,7 +585,7 @@ void propSimulation::add_spice_body(std::string DEkernelPath, std::string name,
                                         this->name);
         }
     }
-    SpiceBody body(DEkernelPath, name, spiceId, t0, mass, radius, consts);
+    SpiceBody body(name, spiceId, t0, mass, radius, consts);
     this->spiceBodies.push_back(body);
     this->integParams.nSpice++;
     this->integParams.nTotal++;
