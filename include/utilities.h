@@ -6,7 +6,7 @@
 #include <iostream>
 #include <limits>
 #include <numeric>
-#include <string>
+#include <cstring>
 #include <vector>
 using std::acos;
 using std::asin;
