@@ -232,9 +232,8 @@ void get_lightTime_and_xRelative(
     const std::vector<real> &tVecForInterp,
     const std::vector<std::vector<real>> &coeffs,
     const std::vector<real> &tVecForInterpPrev,
-    const std::vector<std::vector<real>> &coeffsPrev,
-    const propSimulation *propSim, std::vector<real> &lightTime,
-    std::vector<real> &xInterpApparent) {
+    const std::vector<std::vector<real>> &coeffsPrev, propSimulation *propSim,
+    std::vector<real> &lightTime, std::vector<real> &xInterpApparent) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
     bool bouncePointAtLeadingEdge = false;
@@ -272,8 +271,7 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
                           const std::vector<std::vector<real>> &coeffs,
                           const std::vector<real> &tVecForInterpPrev,
                           const std::vector<std::vector<real>> &coeffsPrev,
-                          const propSimulation *propSim,
-                          real &lightTimeOneBody) {
+                          propSimulation *propSim, real &lightTimeOneBody) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xInterpApparentFull(numStates, 0.0);
     std::vector<real> xInterpApparent(6, 0.0);
@@ -330,7 +328,7 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
     }
 }
 
-void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
+void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     Constants consts = propSim->consts;
     double sunState[6];
@@ -417,7 +415,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
                            const std::vector<std::vector<real>> &coeffs,
                            const std::vector<real> &tVecForInterpPrev,
                            const std::vector<std::vector<real>> &coeffsPrev,
-                           const propSimulation *propSim,
+                           propSimulation *propSim,
                            std::vector<real> &radarMeasurement) {
     if (propSim->observerInfo[interpIdx].size() != 9 &&
         propSim->observerInfo[interpIdx].size() != 10) {
@@ -536,7 +534,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
     }
 }
 
-void get_delta_delay_relativistic(const propSimulation *propSim,
+void get_delta_delay_relativistic(propSimulation *propSim,
                                   const real &tForSpice,
                                   const std::vector<real> &targetState,
                                   const Constants &consts,
@@ -586,11 +584,13 @@ void get_delta_delay_relativistic(const propSimulation *propSim,
             (sunEarthDist + sunTargetDist - earthTargetDist));
 }
 
-void get_doppler_measurement(
-    const propSimulation *propSim, const real receiveTimeTDB,
-    const real transmitTimeTDB, const std::vector<real> xObsBaryRcv,
-    const std::vector<real> xTrgtBaryBounce, const std::vector<real> xObsBaryTx,
-    const real transmitFreq, real &dopplerMeasurement) {
+void get_doppler_measurement(propSimulation *propSim, const real receiveTimeTDB,
+                             const real transmitTimeTDB,
+                             const std::vector<real> xObsBaryRcv,
+                             const std::vector<real> xTrgtBaryBounce,
+                             const std::vector<real> xObsBaryTx,
+                             const real transmitFreq,
+                             real &dopplerMeasurement) {
     // based on "Mathematical Formulation of the Double-Precision Orbit
     // Determination Program (DPODP)" by T.D.Moyer (1971),
     // https://ntrs.nasa.gov/citations/19710017134

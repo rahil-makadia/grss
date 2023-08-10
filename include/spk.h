@@ -9,12 +9,9 @@
 #include <unistd.h>
 #include "utilities.h"
 
-struct Ephemeris {
-    struct spkInfo *mb;
-    struct spkInfo *sb;
-};
-
-struct cacheItem {
+struct CacheItem {
+    int spiceID;
+    double t;
     double x;
     double y;
     double z;
@@ -23,10 +20,19 @@ struct cacheItem {
     double vz;
 };
 
-struct ephemerisCache {
-    double *t;
-    double dtSign;
-    struct cacheItem *items;
+#define SPK_CACHE_ITEM_SIZE 40
+struct EphemerisCache {
+    double t;
+    struct CacheItem items[SPK_CACHE_ITEM_SIZE];
+};
+
+#define SPK_CACHE_SIZE 10
+struct Ephemeris {
+    struct spkInfo *mb;
+    struct spkInfo *sb;
+    size_t cacheSize = SPK_CACHE_SIZE;
+    size_t nextIdxToWrite = -1;
+    EphemerisCache cache[SPK_CACHE_SIZE];
 };
 
 struct spkTarget {
@@ -52,6 +58,6 @@ spkInfo *spk_init(const std::string &path);
 int spk_free(struct spkInfo *pl);
 int spk_calc(struct spkInfo *pl, double epoch, int m, double *x, double *y,
              double *z, double *out_vx, double *out_vy, double *out_vz);
-void get_spk_state(const int &spiceID, const double &t0_mjd,
-                   const Ephemeris &ephem, double state[6]);
+void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
+                   double state[6]);
 #endif

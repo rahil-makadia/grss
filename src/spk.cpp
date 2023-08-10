@@ -38,9 +38,9 @@ spkInfo *spk_init(const std::string &path) {
             double
                 prev;  // The record number of the previous summary record in
                        // the file. Zero if this is the initial summary record.
-            double nsum;  // Number of summaries in this record
+            double nsum;    // Number of summaries in this record
             summary s[25];  // Summaries (25 is the maximum)
-        } summary;        // Summary record
+        } summary;          // Summary record
         struct {
             char locidw[8];  // An identification word
             int nd;  // The number of double precision components in each array
@@ -59,7 +59,9 @@ spkInfo *spk_init(const std::string &path) {
     read(fd, &record, RECORD_LEN);
     // Check if the file is a valid double Precision Array File
     if (strncmp(record.file.locidw, "DAF/SPK", 7) != 0) {
-        fprintf(stderr, "Error parsing DAF/SPK file. Incorrect header.\n");
+        throw std::runtime_error(
+            "Error parsing DAF/SPK file. Incorrect "
+            "header.");
         close(fd);
         return NULL;
     }
@@ -68,8 +70,9 @@ spkInfo *spk_init(const std::string &path) {
     // struct.
     int nc = 8 * (record.file.nd + (record.file.ni + 1) / 2);
     if (nc != sizeof(summary)) {
-        fprintf(stderr,
-                "Error parsing DAF/SPK file. Wrong size of summary record.\n");
+        throw std::runtime_error(
+            "Error parsing DAF/SPK file. Wrong size of "
+            "summary record.");
         close(fd);
         return NULL;
     }
@@ -81,8 +84,9 @@ spkInfo *spk_init(const std::string &path) {
 
     // We are at the first summary block, validate
     if ((int64_t)record.buf[8] != 0) {
-        fprintf(stderr,
-                "Error parsing DAF/SPL file. Cannot find summary block.\n");
+        throw std::runtime_error(
+            "Error parsing DAF/SPL file. Cannot find "
+            "summary block.");
         close(fd);
         return NULL;
     }
@@ -94,7 +98,7 @@ spkInfo *spk_init(const std::string &path) {
     spkInfo *pl = (spkInfo *)calloc(1, sizeof(spkInfo));
     while (1) {  // Loop over records
         for (int b = 0; b < (int)record.summary.nsum;
-             b++) {                             // Loop over summaries
+             b++) {                               // Loop over summaries
             summary *sum = &record.summary.s[b];  // get current summary
             // Index in our arrays for current target
             int m = pl->num - 1;
@@ -308,23 +312,62 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
     return 0;
 }
 
-void get_spk_state(const int &spiceID, const double &t0_mjd,
-                   const Ephemeris &ephem, double state[6]) {
-    spkInfo *spkInfo;
-    if (spiceID > 1000000) {
-        spkInfo = ephem.sb;
+void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
+                   double state[6]) {
+    bool smallBody = spiceID > 1000000;
+    spkInfo *infoToUse;
+    if (smallBody) {
+        infoToUse = ephem.sb;
     } else {
-        spkInfo = ephem.mb;
+        infoToUse = ephem.mb;
     }
+    // find what cache index corresponds to the requested SPICE ID
+    int m;
+    m = spiceID;
+    for (m = 0; m < infoToUse->num; m++) {
+        if (infoToUse->targets[m].code == spiceID) {
+            break;
+        }
+        if (m == infoToUse->num - 1) {
+            throw std::invalid_argument(
+                "ERROR: Requested SPICE ID not found in SPK file");
+        }
+    }
+    int cacheIdx = m;
+    if (smallBody) {
+        cacheIdx += ephem.mb->num;
+    }
+    // std::cout.precision(15);
+    // std::cout << "cacheIdx = " << cacheIdx << ". ";
+    // check if t0_mjd is in the ephem cache
+    bool t0SomewhereInCache = false;
+    for (size_t i = 0; i < ephem.cacheSize; i++) {
+        if (ephem.cache[i].t == t0_mjd) {
+            t0SomewhereInCache = true;
+            if (ephem.cache[i].items[cacheIdx].t == t0_mjd &&
+                ephem.cache[i].items[cacheIdx].spiceID == spiceID) {
+                // std::cout << "Using cached state for " << spiceID << " at "
+                // << t0_mjd << " from slot" << i << std::endl;
+                state[0] = ephem.cache[i].items[cacheIdx].x;
+                state[1] = ephem.cache[i].items[cacheIdx].y;
+                state[2] = ephem.cache[i].items[cacheIdx].z;
+                state[3] = ephem.cache[i].items[cacheIdx].vx;
+                state[4] = ephem.cache[i].items[cacheIdx].vy;
+                state[5] = ephem.cache[i].items[cacheIdx].vz;
+                return;
+            }
+        }
+    }
+    // if not, calculate it from the SPK memory map,
     double x, y, z, vx, vy, vz;
-    spk_calc(spkInfo, t0_mjd, spiceID, &x, &y, &z, &vx, &vy, &vz);
+    spk_calc(infoToUse, t0_mjd, spiceID, &x, &y, &z, &vx, &vy, &vz);
     state[0] = x;
     state[1] = y;
     state[2] = z;
     state[3] = vx;
     state[4] = vy;
     state[5] = vz;
-    if (spiceID > 1000000) {
+    if (smallBody) {
         double xSun, ySun, zSun, vxSun, vySun, vzSun;
         spk_calc(ephem.mb, t0_mjd, 10, &xSun, &ySun, &zSun, &vxSun, &vySun,
                  &vzSun);
@@ -335,4 +378,22 @@ void get_spk_state(const int &spiceID, const double &t0_mjd,
         state[4] += vySun;
         state[5] += vzSun;
     }
+    // and add it to the cache
+    if (!t0SomewhereInCache) {
+        ephem.nextIdxToWrite++;
+        if (ephem.nextIdxToWrite == ephem.cacheSize) {
+            ephem.nextIdxToWrite = 0;
+        }
+    }
+    // std::cout << "Adding state for " << spiceID << " at " << t0_mjd << " to
+    // cache at slot" << ephem.nextIdxToWrite << std::endl;
+    ephem.cache[ephem.nextIdxToWrite].t = t0_mjd;
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].t = t0_mjd;
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].spiceID = spiceID;
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].x = state[0];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].y = state[1];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].z = state[2];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vx = state[3];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vy = state[4];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vz = state[5];
 }

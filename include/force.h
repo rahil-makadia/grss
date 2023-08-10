@@ -3,7 +3,7 @@
 #include "simulation.h"
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
-                                const propSimulation *propSim);
+                                propSimulation *propSim);
 void force_newton(const std::vector<real> &posAll, std::vector<real> &xDotInteg,
                   const ForceParameters &forceParams,
                   const IntegrationParameters &integParams,
