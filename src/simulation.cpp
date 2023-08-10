@@ -23,9 +23,8 @@ SpiceBody::SpiceBody(std::string DEkernelPath, std::string name, int spiceId,
     this->isMajor = false;
     if (this->isSpice) {
         double state[6];
-        double lt;
         furnsh_c(DEkernelPath.c_str());
-        get_spice_state_lt(this->spiceId, this->t0, consts, state, lt);
+        get_spice_state(this->spiceId, this->t0, consts, state);
         unload_c(DEkernelPath.c_str());
         this->pos = {state[0], state[1], state[2]};
         this->vel = {state[3], state[4], state[5]};
@@ -58,9 +57,8 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
                 cartesianVel);
     // shift heliocentric to barycentric
     double sunState[6];
-    double lt;
     furnsh_c(DEkernelPath.c_str());
-    get_spice_state_lt(10, t0, consts, sunState, lt);
+    get_spice_state(10, t0, consts, sunState);
     unload_c(DEkernelPath.c_str());
     for (size_t i = 0; i < 3; i++) {
         cartesianPos[i] += sunState[i];
@@ -137,11 +135,26 @@ propSimulation::propSimulation(std::string name, real t0,
     this->integParams.nTotal = 0;
     this->integParams.timestepCounter = 0;
 
+    std::string selfPath = __FILE__;
+    selfPath = selfPath.substr(0, selfPath.find_last_of("/\\"));
+    std::string mapKernelPath = selfPath + "/../grss/kernels/";
     switch (defaultSpiceBodies) {
         case 0: {
+            std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
+            std::string kernel_mb = mapKernelPath + "de440.bsp";
+            spkInfo* mbInfo = spk_init(kernel_mb);
+            spkInfo* sbInfo = spk_init(kernel_sb);
+            this->ephem.mb = mbInfo;
+            this->ephem.sb = sbInfo;
             break;
         }
         case 431: {
+            std::string kernel_sb = mapKernelPath + "sb431-n16s.bsp";
+            std::string kernel_mb = mapKernelPath + "de430.bsp";
+            spkInfo* mbInfo = spk_init(kernel_mb);
+            spkInfo* sbInfo = spk_init(kernel_sb);
+            this->ephem.mb = mbInfo;
+            this->ephem.sb = sbInfo;
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
@@ -287,6 +300,12 @@ propSimulation::propSimulation(std::string name, real t0,
             break;
         }
         case 441: {
+            std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
+            std::string kernel_mb = mapKernelPath + "de440.bsp";
+            spkInfo* mbInfo = spk_init(kernel_mb);
+            spkInfo* sbInfo = spk_init(kernel_sb);
+            this->ephem.mb = mbInfo;
+            this->ephem.sb = sbInfo;
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2

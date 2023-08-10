@@ -81,8 +81,23 @@ struct NongravParamaters {
     real r0_au = 2.808L;
 };
 
-void get_spice_state_lt(const int &spiceID, const real &t0_mjd,
-                        const Constants &consts, double state[6], double &lt);
+struct ForceParameters {
+    std::vector<real> masses;
+    std::vector<real> radii;
+    std::vector<int> spiceIdList;
+    std::vector<NongravParamaters> ngParamsList;
+    std::vector<bool> isPPNList;
+    std::vector<bool> isJ2List;
+    std::vector<real> J2List;
+    std::vector<real> poleRAList;
+    std::vector<real> poleDecList;
+    std::vector<bool> isNongravList;
+    std::vector<bool> isMajorList;
+    std::vector<bool> isThrustingList;
+};
+
+void get_spice_state(const int &spiceID, const real &t0_mjd,
+                        const Constants &consts, double state[6]);
 void get_observer_state(const real &t_obs_mjd,
                         const std::vector<real> &observerInfo,
                         const Constants &consts, const bool &tObsInUTC,

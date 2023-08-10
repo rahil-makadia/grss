@@ -6,13 +6,11 @@
 #endif
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
-                                const ForceParameters &forceParams,
-                                const IntegrationParameters &integParams,
-                                const Constants &consts) {
-    std::vector<real> posAll(3 * integParams.nTotal, 0.0);
-    std::vector<real> velAll(3 * integParams.nTotal, 0.0);
-    std::vector<real> accInteg(3 * integParams.nInteg, 0.0);
-    for (size_t i = 0; i < integParams.nInteg; i++) {
+                                const propSimulation *propSim) {
+    std::vector<real> posAll(3 * propSim->integParams.nTotal, 0.0);
+    std::vector<real> velAll(3 * propSim->integParams.nTotal, 0.0);
+    std::vector<real> accInteg(3 * propSim->integParams.nInteg, 0.0);
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         posAll[3 * i] = xInteg[6 * i];
         posAll[3 * i + 1] = xInteg[6 * i + 1];
         posAll[3 * i + 2] = xInteg[6 * i + 2];
@@ -20,10 +18,10 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
         velAll[3 * i + 1] = xInteg[6 * i + 4];
         velAll[3 * i + 2] = xInteg[6 * i + 5];
     }
-    for (size_t i = integParams.nInteg; i < integParams.nTotal; i++) {
+    for (size_t i = propSim->integParams.nInteg; i < propSim->integParams.nTotal; i++) {
         double xSpice_i[6];
-        double lt;
-        get_spice_state_lt(forceParams.spiceIdList[i], t, consts, xSpice_i, lt);
+        // get_spice_state(propSim->forceParams.spiceIdList[i], t, propSim->consts, xSpice_i);
+        get_spk_state(propSim->forceParams.spiceIdList[i], t, propSim->ephem, xSpice_i);
         posAll[3 * i] = xSpice_i[0];
         posAll[3 * i + 1] = xSpice_i[1];
         posAll[3 * i + 2] = xSpice_i[2];
@@ -45,13 +43,13 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     forceFile << std::endl;
     forceFile.close();
 #endif
-    force_newton(posAll, accInteg, forceParams, integParams, consts);
-    // force_ppn_simple(posAll, velAll, accInteg, forceParams, integParams,
-    // consts);
-    force_ppn_eih(posAll, velAll, accInteg, forceParams, integParams, consts);
-    force_J2(posAll, accInteg, forceParams, integParams, consts);
-    force_nongrav(posAll, velAll, accInteg, forceParams, integParams, consts);
-    force_thruster(velAll, accInteg, forceParams, integParams, consts);
+    force_newton(posAll, accInteg, propSim->forceParams, propSim->integParams, propSim->consts);
+    // force_ppn_simple(posAll, velAll, accInteg, propSim->forceParams, propSim->integParams,
+    // propSim->consts);
+    force_ppn_eih(posAll, velAll, accInteg, propSim->forceParams, propSim->integParams, propSim->consts);
+    force_J2(posAll, accInteg, propSim->forceParams, propSim->integParams, propSim->consts);
+    force_nongrav(posAll, velAll, accInteg, propSim->forceParams, propSim->integParams, propSim->consts);
+    force_thruster(velAll, accInteg, propSim->forceParams, propSim->integParams, propSim->consts);
 #ifdef PRINT_FORCES
     forceFile.open("cpp.11", std::ios::app);
     forceFile << std::setw(10) << "total acc:" << std::setw(25) << accInteg[0] << std::setw(25) << accInteg[1] << std::setw(25)

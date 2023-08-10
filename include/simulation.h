@@ -1,7 +1,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include "force.h"
+#include "utilities.h"
 
 struct Body {
    private:
@@ -79,6 +79,9 @@ class propSimulation {
     propSimulation(std::string name, real t0, const int defaultSpiceBodies,
                    std::string DEkernelPath);
     propSimulation(std::string name, const propSimulation &simRef);
+
+    // memory-mapped ephemeris
+    Ephemeris ephem;
 
     // constants
     Constants consts;

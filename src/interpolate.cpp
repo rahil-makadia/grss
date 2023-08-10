@@ -333,12 +333,12 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
 void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     Constants consts = propSim->consts;
-    SpiceDouble sunState[6];
-    SpiceDouble sunLightTime;
-    get_spice_state_lt(10, tInterpGeom, consts, sunState, sunLightTime);
-    SpiceDouble earthState[6];
-    SpiceDouble earthLightTime;
-    get_spice_state_lt(399, tInterpGeom, consts, earthState, earthLightTime);
+    double sunState[6];
+    double earthState[6];
+    // get_spice_state(10, tInterpGeom, consts, sunState);
+    // get_spice_state(399, tInterpGeom, consts, earthState);
+    get_spk_state(10, tInterpGeom, propSim->ephem, sunState);
+    get_spk_state(399, tInterpGeom, propSim->ephem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -543,12 +543,12 @@ void get_delta_delay_relativistic(const propSimulation *propSim,
                                   real &deltaDelayRelativistic) {
     // from Standish (1990),
     // https://ui.adsabs.harvard.edu/abs/1990A&A...233..252S
-    SpiceDouble sunState[6];
-    SpiceDouble sunLightTime;
-    get_spice_state_lt(10, tForSpice, consts, sunState, sunLightTime);
-    SpiceDouble earthState[6];
-    SpiceDouble earthLightTime;
-    get_spice_state_lt(399, tForSpice, consts, earthState, earthLightTime);
+    double sunState[6];
+    double earthState[6];
+    // get_spice_state(10, tForSpice, consts, sunState);
+    // get_spice_state(399, tForSpice, consts, earthState);
+    get_spk_state(10, tForSpice, propSim->ephem, sunState);
+    get_spk_state(399, tForSpice, propSim->ephem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -620,11 +620,12 @@ void get_doppler_measurement(
     vdot(pos3, vel3, rdot3);
     rdot3 /= r3;
 
-    SpiceDouble lt;
-    SpiceDouble xSun3[6];
-    get_spice_state_lt(10, receiveTimeTDB, propSim->consts, xSun3, lt);
-    SpiceDouble xSun1[6];
-    get_spice_state_lt(10, transmitTimeTDB, propSim->consts, xSun1, lt);
+    double xSun3[6];
+    double xSun1[6];
+    // get_spice_state(10, receiveTimeTDB, propSim->consts, xSun3);
+    // get_spice_state(10, transmitTimeTDB, propSim->consts, xSun1);
+    get_spk_state(10, receiveTimeTDB, propSim->ephem, xSun3);
+    get_spk_state(10, transmitTimeTDB, propSim->ephem, xSun1);
 
     std::vector<real> posHelio3(3), velHelio3(3), posHelio1(3), velHelio1(3);
     posHelio3[0] = pos3[0] - xSun3[0];

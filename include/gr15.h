@@ -33,9 +33,7 @@ const real cMat[8][8] = {
     };
 
 real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
-                          const ForceParameters &forceParams,
-                          IntegrationParameters &integParams,
-                          const Constants &consts);
+                          propSimulation *propSim);
 void compute_g_and_b(const std::vector<std::vector<real> > &AccIntegArr,
                      const size_t &hIdx, std::vector<std::vector<real> > &g,
                      std::vector<std::vector<real> > &b, const size_t &dim);

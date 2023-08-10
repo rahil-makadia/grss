@@ -1,7 +1,7 @@
 #ifndef INTERPOLATE_H
 #define INTERPOLATE_H
 
-#include "simulation.h"
+#include "force.h"
 #include "gr15.h"
 
 void interpolate(const real &t, const real &dt,

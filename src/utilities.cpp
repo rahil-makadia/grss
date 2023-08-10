@@ -1,13 +1,14 @@
 #include "utilities.h"
 
-void get_spice_state_lt(const int &spiceID, const real &t0_mjd,
-                        const Constants &consts, double state[6], double &lt) {
+void get_spice_state(const int &spiceID, const real &t0_mjd,
+                        const Constants &consts, double state[6]) {
     real t0_et;
     mjd_to_et(t0_mjd, t0_et);
     SpiceInt center = 0;  // 0 = solar system barycenter
     ConstSpiceChar *frame =
         "J2000";  // Earth mean equator and equinox of J2000,
                   // states output will be ICRF-EME2000 frame
+    SpiceDouble lt;
     spkgeo_c(spiceID, t0_et, frame, center, state, &lt);
     // std::cout << "state: " << state[0] << " " << state[1] << " " << state[2]
     // << " " << state[3] << " " << state[4] << " " << state[5] << std::endl;
@@ -52,8 +53,7 @@ void get_observer_state(const real &tObsMjd,
         tObsMjdTDB = tObsMjd;
     }
     double baseBodyState[6];
-    double lt;
-    get_spice_state_lt(baseBody, tObsMjdTDB, consts, baseBodyState, lt);
+    get_spice_state(baseBody, tObsMjdTDB, consts, baseBodyState);
 
     // real a, f;
     ConstSpiceChar *baseBodyFrame;

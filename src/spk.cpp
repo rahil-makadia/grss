@@ -137,7 +137,7 @@ spkInfo *spk_init(const std::string &path) {
     // Get file size
     struct stat sb;
     if (fstat(fd, &sb) < 0) {
-        fprintf(stderr, "Error calculating size for DAF/SPL file.\n");
+        throw std::runtime_error("Error calculating size for DAF/SPL file.");
         return NULL;
     }
     pl->len = sb.st_size;
@@ -145,12 +145,12 @@ spkInfo *spk_init(const std::string &path) {
     // Memory map
     pl->map = mmap(NULL, pl->len, PROT_READ, MAP_SHARED, fd, 0);
     if (pl->map == NULL) {
-        fprintf(stderr, "Error creating memory map.\n");
+        throw std::runtime_error("Error creating memory map.");
         return NULL;  // Will leak memory
     }
 #if defined(MADV_RANDOM)
     if (madvise(pl->map, pl->len, MADV_RANDOM) < 0) {
-        fprintf(stderr, "Error while calling madvise().\n");
+        throw std::runtime_error("Error while calling madvise().");
         return NULL;  // Will leak memory
     }
 #endif
@@ -309,7 +309,7 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
 }
 
 void get_spk_state(const int &spiceID, const double &t0_mjd,
-                   const ephemeris &ephem, double state[6]) {
+                   const Ephemeris &ephem, double state[6]) {
     spkInfo *spkInfo;
     if (spiceID > 1000000) {
         spkInfo = ephem.sb;
