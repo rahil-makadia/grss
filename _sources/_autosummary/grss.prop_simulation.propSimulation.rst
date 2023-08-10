@@ -40,6 +40,7 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.DEkernelPath
         ~propSimulation.consts
         ~propSimulation.convergedLightTime
+        ~propSimulation.ephem
         ~propSimulation.evalApparentState
         ~propSimulation.events
         ~propSimulation.forceParams
