@@ -20,8 +20,9 @@
         deweight_obs
         eliminate_obs
         get_ades_optical_obs_array
+        get_gaia_optical_obs_array
+        get_mpc_optical_obs_array
         get_optical_data
-        get_optical_obs_array
     
     
 

@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 0.9.2 documentation</title>
+    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 0.9.3 documentation</title>
   
   
   
@@ -139,7 +139,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.2 documentation</p>
+    <p class="title logo__title">GRSS v0.9.3 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -167,8 +167,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.deweight_obs.html">grss.fit_optical.deweight_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.get_ades_optical_obs_array.html">grss.fit_optical.get_ades_optical_obs_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.get_gaia_optical_obs_array.html">grss.fit_optical.get_gaia_optical_obs_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.get_mpc_optical_obs_array.html">grss.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.get_optical_data.html">grss.fit_optical.get_optical_data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.fit_optical.get_optical_obs_array.html">grss.fit_optical.get_optical_obs_array</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/grss.fit_radar.html">grss.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -453,6 +454,8 @@ import matplotlib.pyplot as plt
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>body_id = &#39;84100&#39;
 init_sol, init_cov, nongrav_info = fit.get_sbdb_info(body_id)
 body_radius = 0.0
+de_kernel = 441
+de_kernel_path = grss.utils.default_kernel_path(de_kernel)
 </pre></div>
 </div>
 </div>
@@ -460,7 +463,8 @@ body_radius = 0.0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>optical_obs_file = None
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>add_gaia_obs = True
+optical_obs_file = None
 t_min_tdb = None
 t_max_tdb = None
 debias = False
@@ -469,8 +473,12 @@ deweight = True
 eliminate = False
 max_obs_per_night = 4
 verbose = True
-obs_array_optical, observer_codes_optical = fit.get_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
+obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
 obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
+if add_gaia_obs:
+    obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=True)
+    obs_array_optical = np.vstack((obs_array_optical, obs_array_gaia))
+    observer_codes_optical = observer_codes_optical + observer_codes_gaia
 </pre></div>
 </div>
 </div>
@@ -486,6 +494,8 @@ Skipped 21 observations
 No debiasing needed for 505 observations. Debiased 417 observations. No biasing information for 0 observations.
 Applied default weight of 1 arcsec to 38 CCD observations
 Deweighted 208 observations as part of deweighting scheme.
+Found 111 observations from Gaia DR3.
+         Added 17 of those observations.
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -493,8 +503,6 @@ Deweighted 208 observations as part of deweighting scheme.
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>n_iter_max = 10
-de_kernel = 441
-de_kernel_path = grss.utils.default_kernel_path(de_kernel)
 fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar, n_iter_max=n_iter_max, de_kernel=de_kernel, de_kernel_path=de_kernel_path, radius=body_radius, nongrav_info=nongrav_info)
 </pre></div>
 </div>
@@ -513,11 +521,12 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.428                   0.530                   518.657                         0.282
-2                        0.428                   0.530                   518.235                         0.282
+1                        0.425                   0.537                   521.972                         0.279
+2                        0.425                   0.536                   522.034                         0.279
+3                        0.425                   0.536                   522.034                         0.279
 Converged without rejecting outliers. Starting outlier rejection now.
-3                        0.393                   0.490                   439.901                         0.241
-4                        0.393                   0.490                   439.764                         0.241
+4                        0.398                   0.502                   452.977                         0.243
+5                        0.398                   0.502                   452.985                         0.243
 Converged after rejecting outliers.
 </pre></div></div>
 </div>
@@ -534,22 +543,22 @@ Converged after rejecting outliers.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Summary of the orbit fit calculations at iteration 4 (of 4):
+Summary of the orbit fit calculations at iteration 5 (of 5):
 =======================================================
-RMS unweighted: 0.39314188132605554
-RMS weighted: 0.4896774755007317
-chi-squared: 439.7639110434197
-reduced chi-squared: 0.24057106731040465
-square root of reduced chi-squared: 0.4904804453904403
+RMS unweighted: 0.39771774632707624
+RMS weighted: 0.5015272846243118
+chi-squared: 452.9847135036531
+reduced chi-squared: 0.24301755016290402
+square root of reduced chi-squared: 0.4929681025816011
 =======================================================
-t: MJD 57900.0 TDB
+t: MJD 58005.0 TDB
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02922458015e-01               3.51842031434e-08               2.02922457346e-01               3.44829807669e-08               -6.69466537762e-10              -0.019
-q                       2.17573385967e+00               9.43400203799e-08               2.17573386152e+00               9.26483150001e-08               +1.85316251233e-09              +0.020
-tp                      5.74183571490e+04               3.77402663480e-05               5.74183571444e+04               3.55718892995e-05               -4.56755515188e-06              -0.121
-om                      1.52357330368e+02               3.65881788601e-05               1.52357322980e+02               3.61051560456e-05               -7.38838815550e-06              -0.202
-w                       2.08343130337e+02               3.75791928400e-05               2.08343136301e+02               3.69436401424e-05               +5.96428114363e-06              +0.159
-i                       5.81863574787e+00               3.66657233129e-06               5.81863701450e+00               3.52859223080e-06               +1.26663171329e-06              +0.345
+e                       2.02873972467e-01               8.68484665189e-09               2.02873968805e-01               8.62076386034e-09               -3.66183117162e-09              -0.422
+q                       2.17589058084e+00               2.17665563753e-08               2.17589058977e+00               2.17522118695e-08               +8.92721585544e-09              +0.410
+tp                      5.74183073230e+04               2.22081224579e-05               5.74183073049e+04               2.19858448936e-05               -1.80273491424e-05              -0.812
+om                      1.52357220933e+02               5.23893835974e-06               1.52357219631e+02               5.23708215658e-06               -1.30247926222e-06              -0.249
+w                       2.08340003612e+02               8.22208064955e-06               2.08339999754e+02               8.17538593915e-06               -3.85778426448e-06              -0.469
+i                       5.81863313358e+00               9.87518684851e-07               5.81863359230e+00               9.83936811131e-07               +4.58719797258e-07              +0.465
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -611,18 +620,18 @@ print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 0.45
-Mahalonobis distance between GRSS and JPL solution: 0.48
-Bhattacharya distance between JPL and GRSS solution: 0.0065
-Bhattacharya coefficient between JPL and GRSS solution: 0.9935
+Mahalonobis distance between JPL and GRSS solution: 1.66
+Mahalonobis distance between GRSS and JPL solution: 1.66
+Bhattacharya distance between JPL and GRSS solution: 0.0002
+Bhattacharya coefficient between JPL and GRSS solution: 0.9998
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>assert maha_dist_f &lt; 3.0
-assert maha_dist_0 &lt; 3.0
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>assert maha_dist_f &lt; 5.0
+assert maha_dist_0 &lt; 5.0
 assert bhattacharya &lt; 0.10
 assert bhatt_coeff &gt; 0.90
 </pre></div>

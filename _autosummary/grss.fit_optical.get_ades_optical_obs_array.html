@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit_optical.get_ades_optical_obs_array &#8212; GRSS 0.9.2 documentation</title>
+    <title>grss.fit_optical.get_ades_optical_obs_array &#8212; GRSS 0.9.3 documentation</title>
   
   
   
@@ -57,7 +57,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit_optical.get_ades_optical_obs_array';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit_optical.get_optical_data" href="grss.fit_optical.get_optical_data.html" />
+    <link rel="next" title="grss.fit_optical.get_gaia_optical_obs_array" href="grss.fit_optical.get_gaia_optical_obs_array.html" />
     <link rel="prev" title="grss.fit_optical.eliminate_obs" href="grss.fit_optical.eliminate_obs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.2 documentation</p>
+    <p class="title logo__title">GRSS v0.9.3 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -164,8 +164,9 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.deweight_obs.html">grss.fit_optical.deweight_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.fit_optical.get_ades_optical_obs_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_gaia_optical_obs_array.html">grss.fit_optical.get_gaia_optical_obs_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_mpc_optical_obs_array.html">grss.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_data.html">grss.fit_optical.get_optical_data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_obs_array.html">grss.fit_optical.get_optical_obs_array</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit_radar.html">grss.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -435,15 +436,15 @@ document.write(`
 <h1>grss.fit_optical.get_ades_optical_obs_array<a class="headerlink" href="#grss-fit-optical-get-ades-optical-obs-array" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.fit_optical.get_ades_optical_obs_array">
-<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_ades_optical_obs_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psv_obs_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occultation_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.get_ades_optical_obs_array" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_ades_optical_obs_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psv_obs_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">occultation_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.get_ades_optical_obs_array" title="Permalink to this definition">#</a></dt>
 <dd><p>Assemble the optical observations for a given body into an array for an orbit fit,
 from the ADES PSV observation file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>psv_obs_file</strong> (<em>str</em>) – Path to the ADES PSV observation file</p></li>
+<li><p><strong>de_kernel_path</strong> (<em>str</em>) – Path to the DE kernel file</p></li>
 <li><p><strong>occultation_obs</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag for whether file is made of occultation measurement data, by default False</p></li>
-<li><p><strong>de_kernel_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the DE kernel file, by default None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -480,11 +481,11 @@ from the ADES PSV observation file.</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit_optical.get_optical_data.html"
+       href="grss.fit_optical.get_gaia_optical_obs_array.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit_optical.get_optical_data</p>
+        <p class="prev-next-title">grss.fit_optical.get_gaia_optical_obs_array</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

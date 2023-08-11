@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit_optical.get_optical_obs_array &#8212; GRSS 0.9.2 documentation</title>
+    <title>grss.fit_optical.get_gaia_optical_obs_array &#8212; GRSS 0.9.3 documentation</title>
   
   
   
@@ -54,11 +54,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit_optical.get_optical_obs_array';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit_optical.get_gaia_optical_obs_array';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit_radar" href="grss.fit_radar.html" />
-    <link rel="prev" title="grss.fit_optical.get_optical_data" href="grss.fit_optical.get_optical_data.html" />
+    <link rel="next" title="grss.fit_optical.get_mpc_optical_obs_array" href="grss.fit_optical.get_mpc_optical_obs_array.html" />
+    <link rel="prev" title="grss.fit_optical.get_ades_optical_obs_array" href="grss.fit_optical.get_ades_optical_obs_array.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.2 documentation</p>
+    <p class="title logo__title">GRSS v0.9.3 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -164,8 +164,9 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.deweight_obs.html">grss.fit_optical.deweight_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.eliminate_obs.html">grss.fit_optical.eliminate_obs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_ades_optical_obs_array.html">grss.fit_optical.get_ades_optical_obs_array</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.fit_optical.get_gaia_optical_obs_array</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_mpc_optical_obs_array.html">grss.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.fit_optical.get_optical_data.html">grss.fit_optical.get_optical_data</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.fit_optical.get_optical_obs_array</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit_radar.html">grss.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -297,7 +298,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit_optical.get_optical_obs_array.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit_optical.get_gaia_optical_obs_array.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -327,7 +328,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.fit_optical.get_optical_obs_array.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.fit_optical.get_gaia_optical_obs_array.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -409,7 +410,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.fit_optical.get_optical_obs_array</h1>
+    <h1>grss.fit_optical.get_gaia_optical_obs_array</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -419,7 +420,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_optical.get_optical_obs_array"><code class="docutils literal notranslate"><span class="pre">get_optical_obs_array()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_optical.get_gaia_optical_obs_array"><code class="docutils literal notranslate"><span class="pre">get_gaia_optical_obs_array()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -431,25 +432,20 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="grss-fit-optical-get-optical-obs-array">
-<h1>grss.fit_optical.get_optical_obs_array<a class="headerlink" href="#grss-fit-optical-get-optical-obs-array" title="Permalink to this heading">#</a></h1>
+  <section id="grss-fit-optical-get-gaia-optical-obs-array">
+<h1>grss.fit_optical.get_gaia_optical_obs_array<a class="headerlink" href="#grss-fit-optical-get-gaia-optical-obs-array" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="grss.fit_optical.get_optical_obs_array">
-<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_optical_obs_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optical_obs_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debias_lowres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deweight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eliminate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_obs_per_night</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.get_optical_obs_array" title="Permalink to this definition">#</a></dt>
-<dd><p>Assemble the optical observations for a given body into an array for an orbit fit.</p>
+<dt class="sig sig-object py" id="grss.fit_optical.get_gaia_optical_obs_array">
+<span class="sig-prename descclassname"><span class="pre">grss.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_gaia_optical_obs_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit_optical.get_gaia_optical_obs_array" title="Permalink to this definition">#</a></dt>
+<dd><p>Assemble the optical observations for a given body from Gaia DR3.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>body_id</strong> (<em>str/int</em>) – Target id, numbers are interpreted as asteroids,
 append ‘P’ for comets, start with comet type and a ‘/’ for comet designations</p></li>
-<li><p><strong>optical_obs_file</strong> (<em>str</em><em>, </em><em>optional</em>) – Filepath to the optical observations file, by default None</p></li>
+<li><p><strong>de_kernel_path</strong> (<em>str</em>) – Path to the DE kernel file</p></li>
 <li><p><strong>t_min_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum time (MJD TDB) for observations to be included, by default None</p></li>
 <li><p><strong>t_max_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum time (MJD TDB) for observations to be included, by default None</p></li>
-<li><p><strong>debias</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to debias the observations, by default True</p></li>
-<li><p><strong>debias_lowres</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to debias the observations using the low resolution scheme, by default False</p></li>
-<li><p><strong>deweight</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to deweight the observations, by default True</p></li>
-<li><p><strong>eliminate</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to eliminate too many observations from the same night, by default False</p></li>
-<li><p><strong>num_obs_per_night</strong> (<em>int</em><em>, </em><em>optional</em>) – Effective/Maximum number of effective observations per night, by default 5</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to print out information about the observations, by default False</p></li>
 </ul>
 </dd>
@@ -459,14 +455,6 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
 <li><p><strong>observer_codes_optical</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array_optical</p></li>
 </ul>
 </p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ValueError</strong> – If deweight and eliminate are both True.</p></li>
-<li><p><strong>ValueError</strong> – If deweight and eliminate are both False.</p></li>
-<li><p><strong>ValueError</strong> – If debias and debias_lowres are both True.</p></li>
-<li><p><strong>ValueError</strong> – If debias and debias_lowres are both False.</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -486,20 +474,20 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit_optical.get_optical_data.html"
+       href="grss.fit_optical.get_ades_optical_obs_array.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit_optical.get_optical_data</p>
+        <p class="prev-next-title">grss.fit_optical.get_ades_optical_obs_array</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit_radar.html"
+       href="grss.fit_optical.get_mpc_optical_obs_array.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit_radar</p>
+        <p class="prev-next-title">grss.fit_optical.get_mpc_optical_obs_array</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -521,7 +509,7 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_optical.get_optical_obs_array"><code class="docutils literal notranslate"><span class="pre">get_optical_obs_array()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit_optical.get_gaia_optical_obs_array"><code class="docutils literal notranslate"><span class="pre">get_gaia_optical_obs_array()</span></code></a></li>
 </ul>
   </nav></div>
 
