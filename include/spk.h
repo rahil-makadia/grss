@@ -20,13 +20,13 @@ struct CacheItem {
     double vz;
 };
 
-#define SPK_CACHE_ITEM_SIZE 40
+#define SPK_CACHE_ITEM_SIZE 32
 struct EphemerisCache {
     double t;
     struct CacheItem items[SPK_CACHE_ITEM_SIZE];
 };
 
-#define SPK_CACHE_SIZE 10
+#define SPK_CACHE_SIZE 16
 struct Ephemeris {
     struct spkInfo *mb;
     struct spkInfo *sb;

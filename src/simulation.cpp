@@ -142,6 +142,8 @@ propSimulation::propSimulation(std::string name, real t0,
             this->ephem.sb = sbInfo;
             break;
         }
+        // DE430 or DE431
+        case 430:
         case 431: {
             std::string kernel_sb = mapKernelPath + "sb431-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de430.bsp";
@@ -280,6 +282,8 @@ propSimulation::propSimulation(std::string name, real t0,
             add_spice_body(Sylvia);
             break;
         }
+        // DE440 or DE441
+        case 440:
         case 441: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de440.bsp";
