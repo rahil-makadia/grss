@@ -117,6 +117,55 @@ PYBIND11_MODULE(prop_simulation, m) {
             Non-gravitational parameter r0 in AU from Marsden et al. (1973).
             )mydelimiter");
 
+    py::class_<ForceParameters>(m, "ForceParameters", R"mydelimiter(
+        The ForceParameters class contains constants used for calculating the
+        forces on integrated bodies.
+        )mydelimiter")
+        .def(py::init<>())
+        .def_readwrite("masses", &ForceParameters::masses, R"mydelimiter(
+            Masses of the bodies.
+            )mydelimiter")
+        .def_readwrite("radii", &ForceParameters::radii, R"mydelimiter(
+            Radii of the bodies.
+            )mydelimiter")
+        .def_readwrite("spiceIdList", &ForceParameters::spiceIdList,
+                       R"mydelimiter(
+            SPICE IDs of the bodies.
+            )mydelimiter")
+        .def_readwrite("ngParamsList", &ForceParameters::ngParamsList,
+                       R"mydelimiter(
+            Non-gravitational parameters of the bodies.
+            )mydelimiter")
+        .def_readwrite("isPPNList", &ForceParameters::isPPNList, R"mydelimiter(
+            Whether the bodies are PPN bodies.
+            )mydelimiter")
+        .def_readwrite("isJ2List", &ForceParameters::isJ2List, R"mydelimiter(
+            Whether the bodies are J2 bodies.
+            )mydelimiter")
+        .def_readwrite("J2List", &ForceParameters::J2List, R"mydelimiter(
+            J2 parameters of the bodies.
+            )mydelimiter")
+        .def_readwrite("poleRAList", &ForceParameters::poleRAList,
+                       R"mydelimiter(
+            Right ascension of the poles of the bodies.
+            )mydelimiter")
+        .def_readwrite("poleDecList", &ForceParameters::poleDecList,
+                       R"mydelimiter(
+            Declination of the poles of the bodies.
+            )mydelimiter")
+        .def_readwrite("isNongravList", &ForceParameters::isNongravList,
+                       R"mydelimiter(
+            Whether the bodies have non-gravitational accelerations.
+            )mydelimiter")
+        .def_readwrite("isMajorList", &ForceParameters::isMajorList,
+                       R"mydelimiter(
+            Whether the bodies are major bodies (used for EIH PPN).
+            )mydelimiter")
+        .def_readwrite("isThrustingList", &ForceParameters::isThrustingList,
+                       R"mydelimiter(
+            Whether the bodies are thrusting.
+            )mydelimiter");
+
     m.def(
         "cometary_to_cartesian",
         [](real epochMjd, std::vector<real> cometaryState, real GM) {
@@ -168,56 +217,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             Cometary state vector.
         )mydelimiter");
 
-    // // from force.h
-    py::class_<ForceParameters>(m, "ForceParameters", R"mydelimiter(
-        The ForceParameters class contains constants used for calculating the
-        forces on integrated bodies.
-        )mydelimiter")
-        .def(py::init<>())
-        .def_readwrite("masses", &ForceParameters::masses, R"mydelimiter(
-            Masses of the bodies.
-            )mydelimiter")
-        .def_readwrite("radii", &ForceParameters::radii, R"mydelimiter(
-            Radii of the bodies.
-            )mydelimiter")
-        .def_readwrite("spiceIdList", &ForceParameters::spiceIdList,
-                       R"mydelimiter(
-            SPICE IDs of the bodies.
-            )mydelimiter")
-        .def_readwrite("ngParamsList", &ForceParameters::ngParamsList,
-                       R"mydelimiter(
-            Non-gravitational parameters of the bodies.
-            )mydelimiter")
-        .def_readwrite("isPPNList", &ForceParameters::isPPNList, R"mydelimiter(
-            Whether the bodies are PPN bodies.
-            )mydelimiter")
-        .def_readwrite("isJ2List", &ForceParameters::isJ2List, R"mydelimiter(
-            Whether the bodies are J2 bodies.
-            )mydelimiter")
-        .def_readwrite("J2List", &ForceParameters::J2List, R"mydelimiter(
-            J2 parameters of the bodies.
-            )mydelimiter")
-        .def_readwrite("poleRAList", &ForceParameters::poleRAList,
-                       R"mydelimiter(
-            Right ascension of the poles of the bodies.
-            )mydelimiter")
-        .def_readwrite("poleDecList", &ForceParameters::poleDecList,
-                       R"mydelimiter(
-            Declination of the poles of the bodies.
-            )mydelimiter")
-        .def_readwrite("isNongravList", &ForceParameters::isNongravList,
-                       R"mydelimiter(
-            Whether the bodies have non-gravitational accelerations.
-            )mydelimiter")
-        .def_readwrite("isMajorList", &ForceParameters::isMajorList,
-                       R"mydelimiter(
-            Whether the bodies are major bodies (used for EIH PPN).
-            )mydelimiter")
-        .def_readwrite("isThrustingList", &ForceParameters::isThrustingList,
-                       R"mydelimiter(
-            Whether the bodies are thrusting.
-            )mydelimiter");
-
     // from simulation.h
     py::class_<Body>(m, "Body", R"mydelimiter(
         The Body class contains the properties of an integrated or SPICE body.
@@ -262,8 +261,8 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("isNongrav", &Body::isNongrav, R"mydelimiter(
             Whether the body has non-gravitational accelerations.
             )mydelimiter")
-        .def("set_J2", &Body::set_J2, py::arg("J2"),
-             py::arg("poleRA"), py::arg("poleDec"), R"mydelimiter(
+        .def("set_J2", &Body::set_J2, py::arg("J2"), py::arg("poleRA"),
+             py::arg("poleDec"), R"mydelimiter(
             Set the J2 parameter of the body.
 
             Parameters
@@ -284,15 +283,12 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<SpiceBody, Body>(m, "SpiceBody", R"mydelimiter(
         The SpiceBody class contains the properties of a SPICE body.
         )mydelimiter")
-        .def(py::init<std::string, std::string, int, real, real, real,
-                      Constants>(),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"),
-             py::arg("t0"), py::arg("mass"), py::arg("radius"),
-             py::arg("constants"), R"mydelimiter(
+        .def(py::init<std::string, int, real, real, real, Constants>(),
+             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
+             py::arg("mass"), py::arg("radius"), py::arg("constants"),
+             R"mydelimiter(
             Constructor for the SpiceBody class.
 
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
             name : str
                 Name of the body.
             spiceId : int
@@ -443,6 +439,9 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Path to the SPICE DE kernel.
             )mydelimiter")
+        .def_readwrite("ephem", &propSimulation::ephem, R"mydelimiter(
+            Memory mapped SPK ephemeris of the simulation. propSimulation.Ephemeris object.
+            )mydelimiter")
         .def_readwrite("consts", &propSimulation::consts, R"mydelimiter(
             Constants of the simulation. propSimulation.Constants object.
             )mydelimiter")
@@ -520,16 +519,14 @@ PYBIND11_MODULE(prop_simulation, m) {
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
         .def("add_spice_body",
-             static_cast<void (propSimulation::*)(std::string, std::string, int,
-                                                  real, real, real, Constants)>(
+             static_cast<void (propSimulation::*)(std::string, int, real, real,
+                                                  real, Constants)>(
                  &propSimulation::add_spice_body),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("spiceId"),
-             py::arg("t0"), py::arg("mass"), py::arg("radius"),
-             py::arg("constants"), R"mydelimiter(
+             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
+             py::arg("mass"), py::arg("radius"), py::arg("constants"),
+             R"mydelimiter(
             Adds a SPICE body to the simulation.
 
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
             name : str
                 Name of the body.
             spiceId : int
@@ -560,7 +557,7 @@ PYBIND11_MODULE(prop_simulation, m) {
              py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"),
              py::arg("mass"), py::arg("radius"), py::arg("cometaryState"),
              py::arg("covariance"), py::arg("ngParams"), py::arg("constants"),
-                R"mydelimiter(
+             R"mydelimiter(
             Adds an integration body to the simulation.
 
             DEkernelPath : str
@@ -712,7 +709,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Tolerance for predictor-corrector within IAS15.
             )mydelimiter")
         .def("get_sim_constants", &propSimulation::get_sim_constants,
-                R"mydelimiter(
+             R"mydelimiter(
                 Gets the constants of the simulation.
 
                 Returns
@@ -769,7 +766,8 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def("extend", &propSimulation::extend, py::arg("tf"),
              py::arg("tEvalNew") = std::vector<real>(),
-             py::arg("xObserverNew") = std::vector<std::vector<real>>(), R"mydelimiter(
+             py::arg("xObserverNew") = std::vector<std::vector<real>>(),
+             R"mydelimiter(
             Extends the simulation to a new final time.
 
             Parameters

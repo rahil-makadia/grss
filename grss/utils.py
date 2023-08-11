@@ -36,6 +36,8 @@ def default_kernel_path(kernel_version=0):
     """
     if kernel_version == 0:
         return f'{grss_kernel_path}/planets_big16_de441_1950_2350.tm'
+    if kernel_version in {430, 440}:
+        kernel_version += 1
     file = f'{grss_kernel_path}/planets_big16_de{kernel_version}_1950_2350.tm'
     if os.path.isfile(file):
         return file

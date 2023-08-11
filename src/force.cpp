@@ -6,13 +6,11 @@
 #endif
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
-                                const ForceParameters &forceParams,
-                                const IntegrationParameters &integParams,
-                                const Constants &consts) {
-    std::vector<real> posAll(3 * integParams.nTotal, 0.0);
-    std::vector<real> velAll(3 * integParams.nTotal, 0.0);
-    std::vector<real> accInteg(3 * integParams.nInteg, 0.0);
-    for (size_t i = 0; i < integParams.nInteg; i++) {
+                                propSimulation *propSim) {
+    std::vector<real> posAll(3 * propSim->integParams.nTotal, 0.0);
+    std::vector<real> velAll(3 * propSim->integParams.nTotal, 0.0);
+    std::vector<real> accInteg(3 * propSim->integParams.nInteg, 0.0);
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         posAll[3 * i] = xInteg[6 * i];
         posAll[3 * i + 1] = xInteg[6 * i + 1];
         posAll[3 * i + 2] = xInteg[6 * i + 2];
@@ -20,10 +18,13 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
         velAll[3 * i + 1] = xInteg[6 * i + 4];
         velAll[3 * i + 2] = xInteg[6 * i + 5];
     }
-    for (size_t i = integParams.nInteg; i < integParams.nTotal; i++) {
+    for (size_t i = propSim->integParams.nInteg;
+         i < propSim->integParams.nTotal; i++) {
         double xSpice_i[6];
-        double lt;
-        get_spice_state_lt(forceParams.spiceIdList[i], t, consts, xSpice_i, lt);
+        // get_spice_state(propSim->forceParams.spiceIdList[i], t,
+        // propSim->consts, xSpice_i);
+        get_spk_state(propSim->forceParams.spiceIdList[i], t, propSim->ephem,
+                      xSpice_i);
         posAll[3 * i] = xSpice_i[0];
         posAll[3 * i + 1] = xSpice_i[1];
         posAll[3 * i + 2] = xSpice_i[2];
@@ -39,23 +40,29 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     forceFile.open("cpp.11", std::ios::app);
     forceFile << "time (MJD): " << std::setw(16) << t << " state:";
     forceFile.precision(16);
-    for (size_t i = 0; i<6; i++){
+    for (size_t i = 0; i < 6; i++) {
         forceFile << std::setw(25) << xInteg[i];
     }
     forceFile << std::endl;
     forceFile.close();
 #endif
-    force_newton(posAll, accInteg, forceParams, integParams, consts);
-    // force_ppn_simple(posAll, velAll, accInteg, forceParams, integParams,
-    // consts);
-    force_ppn_eih(posAll, velAll, accInteg, forceParams, integParams, consts);
-    force_J2(posAll, accInteg, forceParams, integParams, consts);
-    force_nongrav(posAll, velAll, accInteg, forceParams, integParams, consts);
-    force_thruster(velAll, accInteg, forceParams, integParams, consts);
+    force_newton(posAll, accInteg, propSim->forceParams, propSim->integParams,
+                 propSim->consts);
+    // force_ppn_simple(posAll, velAll, accInteg, propSim->forceParams,
+    // propSim->integParams, propSim->consts);
+    force_ppn_eih(posAll, velAll, accInteg, propSim->forceParams,
+                  propSim->integParams, propSim->consts);
+    force_J2(posAll, accInteg, propSim->forceParams, propSim->integParams,
+             propSim->consts);
+    force_nongrav(posAll, velAll, accInteg, propSim->forceParams,
+                  propSim->integParams, propSim->consts);
+    force_thruster(velAll, accInteg, propSim->forceParams, propSim->integParams,
+                   propSim->consts);
 #ifdef PRINT_FORCES
     forceFile.open("cpp.11", std::ios::app);
-    forceFile << std::setw(10) << "total acc:" << std::setw(25) << accInteg[0] << std::setw(25) << accInteg[1] << std::setw(25)
-              << accInteg[2] << std::endl;
+    forceFile << std::setw(10) << "total acc:" << std::setw(25) << accInteg[0]
+              << std::setw(25) << accInteg[1] << std::setw(25) << accInteg[2]
+              << std::endl;
     forceFile.close();
 #endif
     return accInteg;
@@ -97,11 +104,13 @@ void force_newton(const std::vector<real> &posAll, std::vector<real> &accInteg,
                 ay -= G * massj * dy / rRel3;
                 az -= G * massj * dz / rRel3;
 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25) << G * massj
-                          << std::setw(25) << dx << std::setw(25) << dy << std::setw(25) << dz << std::setw(25)
-                          << -G * massj * dx / rRel3 << std::setw(25)
-                          << -G * massj * dy / rRel3 << std::setw(25)
-                          << -G * massj * dz / rRel3 << std::endl;
+                forceFile << std::setw(10) << forceParams.spiceIdList[j]
+                          << std::setw(25) << G * massj << std::setw(25) << dx
+                          << std::setw(25) << dy << std::setw(25) << dz
+                          << std::setw(25) << -G * massj * dx / rRel3
+                          << std::setw(25) << -G * massj * dy / rRel3
+                          << std::setw(25) << -G * massj * dz / rRel3
+                          << std::endl;
 #endif
             }
         }
@@ -176,7 +185,8 @@ void force_ppn_simple(const std::vector<real> &posAll,
                 ay += fac1 * (fac2 * dy + fac3 * dvy);
                 az += fac1 * (fac2 * dz + fac3 * dvz);
 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25) << G * massj << std::setw(25)
+                forceFile << std::setw(10) << forceParams.spiceIdList[j]
+                          << std::setw(25) << G * massj << std::setw(25)
                           << fac1 * (fac2 * dx + fac3 * dvx) << std::setw(25)
                           << fac1 * (fac2 * dy + fac3 * dvy) << std::setw(25)
                           << fac1 * (fac2 * dz + fac3 * dvz) << std::endl;
@@ -323,16 +333,17 @@ void force_ppn_eih(const std::vector<real> &posAll,
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25)
-                          << term1X + term2X + term3X << std::setw(25)
-                          << term1Y + term2Y + term3Y << std::setw(25)
-                          << term1Z + term2Z + term3Z << std::endl;
+                forceFile << std::setw(10) << forceParams.spiceIdList[j]
+                          << std::setw(25) << term1X + term2X + term3X
+                          << std::setw(25) << term1Y + term2Y + term3Y
+                          << std::setw(25) << term1Z + term2Z + term3Z
+                          << std::endl;
 #endif
             }
         }
 #ifdef PRINT_FORCES
-        forceFile << std::setw(10) << "EIH" << std::setw(25) << axi << std::setw(25)
-        << ayi << std::setw(25) << azi << std::endl;
+        forceFile << std::setw(10) << "EIH" << std::setw(25) << axi
+                  << std::setw(25) << ayi << std::setw(25) << azi << std::endl;
 #endif
         accInteg[3 * i + 0] += axi;
         accInteg[3 * i + 1] += ayi;
@@ -390,24 +401,29 @@ void force_J2(const std::vector<real> &posAll, std::vector<real> &accInteg,
                 poleDec = forceParams.poleDecList[j];
                 sinDec = sin(poleDec);
                 cosDec = cos(poleDec);
-                dxBody = -dx*sinRA + dy*cosRA;
-                dyBody = -dx*cosRA*sinDec - dy*sinRA*sinDec + dz*cosDec;
-                dzBody =  dx*cosRA*cosDec + dy*sinRA*cosDec + dz*sinDec;
+                dxBody = -dx * sinRA + dy * cosRA;
+                dyBody =
+                    -dx * cosRA * sinDec - dy * sinRA * sinDec + dz * cosDec;
+                dzBody =
+                    dx * cosRA * cosDec + dy * sinRA * cosDec + dz * sinDec;
                 real fac1 = 3 * G * massj * forceParams.J2List[j] * radius *
                     radius / (2 * rRel5);
                 real fac2 = 5 * dzBody * dzBody / rRel2 - 1;
                 real axBody = fac1 * fac2 * dxBody;
                 real ayBody = fac1 * fac2 * dyBody;
                 real azBody = fac1 * (fac2 - 2) * dzBody;
-                real axEquat = -axBody*sinRA - ayBody*cosRA*sinDec + azBody*cosRA*cosDec;
-                real ayEquat =  axBody*cosRA - ayBody*sinRA*sinDec + azBody*sinRA*cosDec;
-                real azEquat =  ayBody*cosDec + azBody*sinDec;
+                real axEquat = -axBody * sinRA - ayBody * cosRA * sinDec +
+                    azBody * cosRA * cosDec;
+                real ayEquat = axBody * cosRA - ayBody * sinRA * sinDec +
+                    azBody * sinRA * cosDec;
+                real azEquat = ayBody * cosDec + azBody * sinDec;
                 ax += axEquat;
                 ay += ayEquat;
                 az += azEquat;
 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25) << axEquat
-                          << std::setw(25) << ayEquat << std::setw(25) << azEquat << std::endl;
+                forceFile << std::setw(10) << forceParams.spiceIdList[j]
+                          << std::setw(25) << axEquat << std::setw(25)
+                          << ayEquat << std::setw(25) << azEquat << std::endl;
 #endif
             }
         }
@@ -482,7 +498,8 @@ void force_nongrav(const std::vector<real> &posAll,
                 ay += g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
                 az += g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << forceParams.spiceIdList[j] << std::setw(25)
+                forceFile << std::setw(10) << forceParams.spiceIdList[j]
+                          << std::setw(25)
                           << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])
                           << std::setw(25)
                           << g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1])
@@ -531,8 +548,8 @@ void force_thruster(const std::vector<real> &velAll,
             az += acc_thruster * vHat[2];
 #ifdef PRINT_FORCES
             forceFile << "THRUSTER " << acc_thruster * vHat[0] << std::setw(25)
-                      << acc_thruster * vHat[1] << std::setw(25) << acc_thruster * vHat[2]
-                      << std::endl;
+                      << acc_thruster * vHat[1] << std::setw(25)
+                      << acc_thruster * vHat[2] << std::endl;
 #endif
         }
         accInteg[3 * i + 0] += ax;

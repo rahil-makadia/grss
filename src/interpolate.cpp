@@ -232,9 +232,8 @@ void get_lightTime_and_xRelative(
     const std::vector<real> &tVecForInterp,
     const std::vector<std::vector<real>> &coeffs,
     const std::vector<real> &tVecForInterpPrev,
-    const std::vector<std::vector<real>> &coeffsPrev,
-    const propSimulation *propSim, std::vector<real> &lightTime,
-    std::vector<real> &xInterpApparent) {
+    const std::vector<std::vector<real>> &coeffsPrev, propSimulation *propSim,
+    std::vector<real> &lightTime, std::vector<real> &xInterpApparent) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
     bool bouncePointAtLeadingEdge = false;
@@ -272,8 +271,7 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
                           const std::vector<std::vector<real>> &coeffs,
                           const std::vector<real> &tVecForInterpPrev,
                           const std::vector<std::vector<real>> &coeffsPrev,
-                          const propSimulation *propSim,
-                          real &lightTimeOneBody) {
+                          propSimulation *propSim, real &lightTimeOneBody) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xInterpApparentFull(numStates, 0.0);
     std::vector<real> xInterpApparent(6, 0.0);
@@ -330,15 +328,15 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
     }
 }
 
-void get_glb_correction(const propSimulation *propSim, const real &tInterpGeom,
+void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     Constants consts = propSim->consts;
-    SpiceDouble sunState[6];
-    SpiceDouble sunLightTime;
-    get_spice_state_lt(10, tInterpGeom, consts, sunState, sunLightTime);
-    SpiceDouble earthState[6];
-    SpiceDouble earthLightTime;
-    get_spice_state_lt(399, tInterpGeom, consts, earthState, earthLightTime);
+    double sunState[6];
+    double earthState[6];
+    // get_spice_state(10, tInterpGeom, consts, sunState);
+    // get_spice_state(399, tInterpGeom, consts, earthState);
+    get_spk_state(10, tInterpGeom, propSim->ephem, sunState);
+    get_spk_state(399, tInterpGeom, propSim->ephem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -417,7 +415,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
                            const std::vector<std::vector<real>> &coeffs,
                            const std::vector<real> &tVecForInterpPrev,
                            const std::vector<std::vector<real>> &coeffsPrev,
-                           const propSimulation *propSim,
+                           propSimulation *propSim,
                            std::vector<real> &radarMeasurement) {
     if (propSim->observerInfo[interpIdx].size() != 9 &&
         propSim->observerInfo[interpIdx].size() != 10) {
@@ -536,19 +534,19 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
     }
 }
 
-void get_delta_delay_relativistic(const propSimulation *propSim,
+void get_delta_delay_relativistic(propSimulation *propSim,
                                   const real &tForSpice,
                                   const std::vector<real> &targetState,
                                   const Constants &consts,
                                   real &deltaDelayRelativistic) {
     // from Standish (1990),
     // https://ui.adsabs.harvard.edu/abs/1990A&A...233..252S
-    SpiceDouble sunState[6];
-    SpiceDouble sunLightTime;
-    get_spice_state_lt(10, tForSpice, consts, sunState, sunLightTime);
-    SpiceDouble earthState[6];
-    SpiceDouble earthLightTime;
-    get_spice_state_lt(399, tForSpice, consts, earthState, earthLightTime);
+    double sunState[6];
+    double earthState[6];
+    // get_spice_state(10, tForSpice, consts, sunState);
+    // get_spice_state(399, tForSpice, consts, earthState);
+    get_spk_state(10, tForSpice, propSim->ephem, sunState);
+    get_spk_state(399, tForSpice, propSim->ephem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -586,11 +584,13 @@ void get_delta_delay_relativistic(const propSimulation *propSim,
             (sunEarthDist + sunTargetDist - earthTargetDist));
 }
 
-void get_doppler_measurement(
-    const propSimulation *propSim, const real receiveTimeTDB,
-    const real transmitTimeTDB, const std::vector<real> xObsBaryRcv,
-    const std::vector<real> xTrgtBaryBounce, const std::vector<real> xObsBaryTx,
-    const real transmitFreq, real &dopplerMeasurement) {
+void get_doppler_measurement(propSimulation *propSim, const real receiveTimeTDB,
+                             const real transmitTimeTDB,
+                             const std::vector<real> xObsBaryRcv,
+                             const std::vector<real> xTrgtBaryBounce,
+                             const std::vector<real> xObsBaryTx,
+                             const real transmitFreq,
+                             real &dopplerMeasurement) {
     // based on "Mathematical Formulation of the Double-Precision Orbit
     // Determination Program (DPODP)" by T.D.Moyer (1971),
     // https://ntrs.nasa.gov/citations/19710017134
@@ -620,11 +620,12 @@ void get_doppler_measurement(
     vdot(pos3, vel3, rdot3);
     rdot3 /= r3;
 
-    SpiceDouble lt;
-    SpiceDouble xSun3[6];
-    get_spice_state_lt(10, receiveTimeTDB, propSim->consts, xSun3, lt);
-    SpiceDouble xSun1[6];
-    get_spice_state_lt(10, transmitTimeTDB, propSim->consts, xSun1, lt);
+    double xSun3[6];
+    double xSun1[6];
+    // get_spice_state(10, receiveTimeTDB, propSim->consts, xSun3);
+    // get_spice_state(10, transmitTimeTDB, propSim->consts, xSun1);
+    get_spk_state(10, receiveTimeTDB, propSim->ephem, xSun3);
+    get_spk_state(10, transmitTimeTDB, propSim->ephem, xSun1);
 
     std::vector<real> posHelio3(3), velHelio3(3), posHelio1(3), velHelio1(3);
     posHelio3[0] = pos3[0] - xSun3[0];

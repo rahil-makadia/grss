@@ -1,29 +1,27 @@
 #include "gr15.h"
 
 real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
-                          const ForceParameters &forceParams,
-                          IntegrationParameters &integParams,
-                          const Constants &consts) {
+                          propSimulation *propSim) {
     real dt;
-    if (integParams.dt0 != 0.0) {
-        dt = fabs(integParams.dt0);
-        if (integParams.tf < integParams.t0) {
+    if (propSim->integParams.dt0 != 0.0) {
+        dt = fabs(propSim->integParams.dt0);
+        if (propSim->integParams.tf < propSim->integParams.t0) {
             dt *= -1.0;
-            integParams.dtMax = -fabs(integParams.dtMax);
-            integParams.dtMin = -fabs(integParams.dtMin);
+            propSim->integParams.dtMax = -fabs(propSim->integParams.dtMax);
+            propSim->integParams.dtMin = -fabs(propSim->integParams.dtMin);
         }
         return dt;
     }
     int order = 15;
     real absMaxPos0, absMaxAcc0, absMaxAcc1Minus0;
     real dtTemp0, dtTemp1;
-    std::vector<real> posInteg0(3 * integParams.nInteg, 0.0);
-    std::vector<real> accInteg1Minus0(3 * integParams.nInteg, 0.0);
-    std::vector<real> xIntegNext(6 * integParams.nInteg, 0.0);
+    std::vector<real> posInteg0(3 * propSim->integParams.nInteg, 0.0);
+    std::vector<real> accInteg1Minus0(3 * propSim->integParams.nInteg, 0.0);
+    std::vector<real> xIntegNext(6 * propSim->integParams.nInteg, 0.0);
 
     std::vector<real> accInteg0 =
-        get_state_der(t, xInteg0, forceParams, integParams, consts);
-    for (size_t i = 0; i < integParams.nInteg; i++) {
+        get_state_der(t, xInteg0, propSim);
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         for (size_t j = 0; j < 3; j++) {
             posInteg0[3 * i + j] = xInteg0[6 * i + j];
         }
@@ -37,7 +35,7 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
     }
     // propagate xInteg0 to xIntegNext using an Euler step and a timestep of
     // dtTemp0
-    for (size_t i = 0; i < integParams.nInteg; i++) {
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         for (size_t j = 0; j < 3; j++) {
             xIntegNext[6 * i + j] =
                 xInteg0[6 * i + j] + dtTemp0 * xInteg0[6 * i + j + 3];
@@ -46,7 +44,7 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
         }
     }
     std::vector<real> accInteg1 = get_state_der(
-        t + dtTemp0, xIntegNext, forceParams, integParams, consts);
+        t + dtTemp0, xIntegNext, propSim);
     vsub(accInteg1, accInteg0, accInteg1Minus0);
     vabs_max(accInteg1Minus0, absMaxAcc1Minus0);
     if (fmax(absMaxAcc0, absMaxAcc1Minus0) <= 1e-15) {
@@ -56,13 +54,13 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
             pow(0.01 / fmax(absMaxAcc0, absMaxAcc1Minus0), 1.0 / (order + 1));
     }
     dt = fmin(100 * dtTemp0, dtTemp1);
-    if (fabs(integParams.tf - integParams.t0) < dt) {
-        dt = fabs(integParams.tf - integParams.t0);
+    if (fabs(propSim->integParams.tf - propSim->integParams.t0) < dt) {
+        dt = fabs(propSim->integParams.tf - propSim->integParams.t0);
     }
-    if (integParams.tf < integParams.t0) {
+    if (propSim->integParams.tf < propSim->integParams.t0) {
         dt *= -1.0;
-        integParams.dtMax = -fabs(integParams.dtMax);
-        integParams.dtMin = -fabs(integParams.dtMin);
+        propSim->integParams.dtMax = -fabs(propSim->integParams.dtMax);
+        propSim->integParams.dtMin = -fabs(propSim->integParams.dtMin);
     }
     return dt;
 }
@@ -248,8 +246,7 @@ void gr15(propSimulation *propSim) {
     size_t nh = 8;
     size_t dim = 3 * propSim->integParams.nInteg;
     // Constants &consts = propSim->consts;
-    real dt = get_initial_timestep(t, xInteg0, propSim->forceParams,
-                                   propSim->integParams, propSim->consts);
+    real dt = get_initial_timestep(t, xInteg0, propSim);
     propSim->integParams.timestepCounter = 0;
     std::vector<real> accInteg0;
     std::vector<real> xInteg(2 * dim, 0.0);
@@ -293,15 +290,13 @@ void gr15(propSimulation *propSim) {
         xInteg0 = propSim->xInteg;
         oneStepDone = 0;
         while (!oneStepDone) {
-            accInteg0 = get_state_der(t, xInteg0, propSim->forceParams,
-                                      propSim->integParams, propSim->consts);
+            accInteg0 = get_state_der(t, xInteg0, propSim);
             for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++) {
                 for (size_t hIdx = 0; hIdx < nh; hIdx++) {
                     approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b,
                                   propSim->integParams.nInteg);
                     accIntegArr[hIdx] = get_state_der(
-                        t + hVec[hIdx] * dt, xInteg, propSim->forceParams,
-                        propSim->integParams, propSim->consts);
+                        t + hVec[hIdx] * dt, xInteg, propSim);
                     compute_g_and_b(accIntegArr, hIdx, g, b, dim);
                 }
                 for (size_t i = 0; i < dim; i++) {
@@ -317,8 +312,7 @@ void gr15(propSimulation *propSim) {
             approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b,
                           propSim->integParams.nInteg);
             std::vector<real> accIntegNext =
-                get_state_der(t + dt, xInteg, propSim->forceParams,
-                              propSim->integParams, propSim->consts);
+                get_state_der(t + dt, xInteg, propSim);
 
             vabs_max(b[6], b6Max);
             vabs_max(accIntegNext, accIntegNextMax);

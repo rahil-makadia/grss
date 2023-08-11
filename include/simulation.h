@@ -1,7 +1,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include "force.h"
+#include "utilities.h"
 
 struct Body {
    private:
@@ -28,8 +28,8 @@ class SpiceBody : public Body {
     int spiceId;
     bool isSpice = true;
     // constructor
-    SpiceBody(std::string DEkernelPath, std::string name, int spiceID, real t0,
-              real mass, real radius, Constants consts);
+    SpiceBody(std::string name, int spiceID, real t0, real mass, real radius,
+              Constants consts);
 };
 
 class IntegBody : public Body {
@@ -80,6 +80,9 @@ class propSimulation {
                    std::string DEkernelPath);
     propSimulation(std::string name, const propSimulation &simRef);
 
+    // memory-mapped ephemeris
+    Ephemeris ephem;
+
     // constants
     Constants consts;
 
@@ -113,8 +116,8 @@ class propSimulation {
     std::vector<std::vector<real>> radarObsEval;
 
     // add/remove bodies and add events
-    void add_spice_body(std::string DEkernelPath, std::string name, int spiceID,
-                        real t0, real mass, real radius, Constants consts);
+    void add_spice_body(std::string name, int spiceID, real t0, real mass,
+                        real radius, Constants consts);
     void add_spice_body(SpiceBody body);
     void add_integ_body(std::string DEkernelPath, std::string name, real t0,
                         real mass, real radius, std::vector<real> cometaryState,

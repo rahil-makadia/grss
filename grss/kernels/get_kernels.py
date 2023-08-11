@@ -8,6 +8,7 @@ script_dir = os.path.dirname(os.path.realpath(__file__))
 
 GRSS_SITE = 'https://github.com/rahil-makadia/grss/raw/dev/grss/kernels'
 NAIF_SITE = 'https://naif.jpl.nasa.gov/pub/naif/generic_kernels'
+SSD_SITE = 'https://ssd.jpl.nasa.gov/ftp'
 # get the custom spice kernels if they are not already present
 # de431 planets + big16 1950-2350
 os.system((f'wget --no-verbose --no-clobber {GRSS_SITE}/planets_big16_de431_1950_2350.bsp '
@@ -19,6 +20,18 @@ os.system((f'wget --no-verbose --no-clobber {GRSS_SITE}/planets_big16_de441_1950
             f'-O {script_dir}/planets_big16_de441_1950_2350.bsp'))
 os.system((f'wget --no-verbose --no-clobber {GRSS_SITE}/planets_big16_de441_1950_2350.tm '
             f'-O {script_dir}/planets_big16_de441_1950_2350.tm'))
+
+# get the generic spice kernels if they are not already present
+# de430 planets + de431 big16
+os.system((f'wget --no-verbose --no-clobber {NAIF_SITE}/spk/planets/de430.bsp '
+            f'-O {script_dir}/de430.bsp'))
+os.system((f'wget --no-verbose --no-clobber {SSD_SITE}/xfr/sb431-n16s.bsp '
+            f'-O {script_dir}/sb431-n16s.bsp'))
+# de440 planets + de441 big16
+os.system((f'wget --no-verbose --no-clobber {NAIF_SITE}/spk/planets/de440.bsp '
+            f'-O {script_dir}/de440.bsp'))
+os.system((f'wget --no-verbose --no-clobber {SSD_SITE}/xfr/sb441-n16s.bsp '
+            f'-O {script_dir}/sb441-n16s.bsp'))
 
 # get the latest spice leap second kernel
 os.system((f'wget --no-verbose --no-clobber {NAIF_SITE}/lsk/latest_leapseconds.tls '
@@ -77,7 +90,7 @@ if tm_overwrite:
                         num_chunks = 1
                         lines[i] = f"    PATH_VALUES  = ( '{script_dir}" + "' )\n"
                 if 'PATH_SYMBOLS' in line and "'GRSS'" in line and num_chunks > 1:
-                    # replace PATH_SYMBOLS = ( 'GRSS' ) with PATH_SYMBOLS = ( 'GRSS_1', 'GRSS_2', ... )
+                    # replace PATH_SYMBOLS = ( 'GRSS' ) with PATH_SYMBOLS = ( 'GRSS_1', ... )
                     lines[i] = "    PATH_SYMBOLS = ( 'GRSS1',\n"
                     for j in range(2, num_chunks+1):
                         end_char = " )" if j == num_chunks else ","
