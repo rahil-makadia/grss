@@ -278,7 +278,7 @@ void gr15(propSimulation *propSim) {
     }
 
     size_t PCmaxIter = 12;
-    int maxLoops = 25;
+    int maxLoops = 100;
     int loopCounter = 0;
     int keepStepping = 1;
     int oneStepDone = 0;
@@ -327,11 +327,6 @@ void gr15(propSimulation *propSim) {
             dtReq = dt / relError;
 
             if (relError <= 1 || loopCounter > maxLoops) {
-                if (loopCounter > maxLoops) {
-                    std::cout << "Warning: maxLoops ("<< maxLoops <<") reached without meeting "
-                                 "integrator tolerance at time "
-                              << t << ". Timestep: " << dt << std::endl;
-                }
                 oneStepDone = 1;
                 propSim->integParams.timestepCounter += 1;
                 loopCounter = 0;
