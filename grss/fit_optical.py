@@ -2,6 +2,7 @@
 import os
 from astropy.time import Time
 from astroquery.mpc import MPC
+from astroquery.gaia import Gaia
 import healpy as hp
 import numpy as np
 import pandas as pd
@@ -10,7 +11,8 @@ import spiceypy as spice
 from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec, rec2lat
 
 __all__ = [ 'get_ades_optical_obs_array',
-            'get_optical_obs_array',
+            'get_gaia_optical_obs_array',
+            'get_mpc_optical_obs_array',
 ]
 
 def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None, verbose=False):
@@ -126,7 +128,7 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
     return (obs_array_optical, star_catalog_codes,
             observer_codes_optical, observation_type_codes, observer_program_codes)
 
-def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_path=None):
+def get_ades_optical_obs_array(psv_obs_file, de_kernel_path, occultation_obs=False):
     """
     Assemble the optical observations for a given body into an array for an orbit fit,
     from the ADES PSV observation file.
@@ -135,10 +137,10 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
     ----------
     psv_obs_file : str
         Path to the ADES PSV observation file
+    de_kernel_path : str
+        Path to the DE kernel file
     occultation_obs : bool, optional
         Flag for whether file is made of occultation measurement data, by default False
-    de_kernel_path : str, optional
-        Path to the DE kernel file, by default None
 
     Returns
     -------
@@ -194,6 +196,109 @@ def get_ades_optical_obs_array(psv_obs_file, occultation_obs=False, de_kernel_pa
             observer_codes_optical.append(obs['stn'])
     spice.kclear()
     return obs_array_optical, tuple(observer_codes_optical)
+
+def _get_gaia_query_results(body_id, release='gaiadr3', verbose=False):
+    """
+    Submit a Gaia archive query for a given body ID from a specific
+    Gaia data release.
+
+    Parameters
+    ----------
+    body_id : str/int
+        Target id, numbers are interpreted as asteroids,
+        append 'P' for comets, start with comet type and a '/' for comet designations
+    release : str, optional
+        Gaia data release version database name, by default 'gaiadr3'
+    verbose : bool, optional
+        Flag to print out information about the observations, by default False
+
+    Returns
+    -------
+    res : astropy.table.Table
+        Query results
+    """
+    table = 'sso_observation'
+    if body_id.isdigit():
+        match_str = f"WHERE ({release}.{table}.number_mp={body_id})"
+    else:
+        match_str = f"WHERE ({release}.{table}.denomination='{body_id.lower()}')"
+    query = (
+        "SELECT transit_id,denomination,number_mp,epoch_utc,epoch_err,"
+        + "ra,dec,"
+        + "ra_error_systematic,dec_error_systematic,ra_dec_correlation_systematic,"
+        + "ra_error_random,dec_error_random,ra_dec_correlation_random,"
+        + "x_gaia_geocentric,y_gaia_geocentric,z_gaia_geocentric,"
+        + "vx_gaia_geocentric,vy_gaia_geocentric,vz_gaia_geocentric"
+        + f" FROM {release}.{table} {match_str} ORDER BY epoch_utc ASC"
+    )
+    job = Gaia.launch_job_async(query, dump_to_file=False,background=True)
+    res = job.get_results()
+    res.sort('epoch_utc')
+    if verbose:
+        print(f"Found {len(res)} observations from Gaia DR3.")
+    return res
+
+def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=False):
+    """
+    Assemble the optical observations for a given body from Gaia DR3.
+
+    Parameters
+    ----------
+    body_id : str/int
+        Target id, numbers are interpreted as asteroids,
+        append 'P' for comets, start with comet type and a '/' for comet designations
+    de_kernel_path : str
+        Path to the DE kernel file
+    t_min_tdb : float, optional
+        Minimum time (MJD TDB) for observations to be included, by default None
+    t_max_tdb : float, optional
+        Maximum time (MJD TDB) for observations to be included, by default None
+    verbose : bool, optional
+        Flag to print out information about the observations, by default False
+
+    Returns
+    -------
+    obs_array_optical : array
+        Optical observation data for the given body
+    observer_codes_optical : tuple
+        Observer locations for each observation in obs_array_optical
+    """
+    if t_min_tdb is None:
+        t_min_tdb = -np.inf
+    if t_max_tdb is None:
+        t_max_tdb = np.inf
+    # get gaia query results
+    res = _get_gaia_query_results(body_id, verbose=verbose)
+    spice.furnsh(de_kernel_path)
+    au2km = 149597870.7
+    obs_array = np.nan*np.ones((len(res), 6))
+    observer_codes = []
+    for i, data in enumerate(res):
+        if i > 0 and res[i]['transit_id'] == res[i-1]['transit_id']:
+            continue
+        obs_time = Time(data['epoch_utc'] + 55197.0, format='mjd', scale='utc')
+        if obs_time.tdb.mjd < t_min_tdb or obs_time.tdb.mjd > t_max_tdb:
+            continue
+        cosdec = np.cos(data['dec']*np.pi/180)
+        obs_array[i, 0] = obs_time.utc.mjd
+        obs_array[i, 1] = data['ra']*3600
+        obs_array[i, 1]-= data['ra_error_systematic']/cosdec/1000
+        obs_array[i, 2] = data['dec']*3600
+        obs_array[i, 2]-= data['dec_error_systematic']/1000
+        obs_array[i, 3] = data['ra_error_random']/cosdec/1000
+        obs_array[i, 4] = data['dec_error_random']/1000
+        obs_array[i, 5] = data['ra_dec_correlation_random']
+        pos_x = data['x_gaia_geocentric']*au2km
+        pos_y = data['y_gaia_geocentric']*au2km
+        pos_z = data['z_gaia_geocentric']*au2km
+        lon, lat, rho = rec2lat(obs_time.tdb.mjd, pos_x, pos_y, pos_z)
+        observer_codes.append(('258', lon, lat, rho*1e3))
+    spice.kclear()
+    non_nan_idx = ~np.isnan(obs_array[:, 0])
+    obs_array = obs_array[non_nan_idx, :]
+    if verbose:
+        print(f"\t Added {len(obs_array)} of those observations.")
+    return obs_array, tuple(observer_codes)
 
 def debias_obs(r_asc, dec, epoch, catalog, biasdf, nside=256):
     """
@@ -745,7 +850,7 @@ def eliminate_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     "as part of elimination scheme.")
     return obs_array_eliminated, tuple(catalog_eliminated), tuple(observer_loc_eliminated)
 
-def get_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None,
+def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None,
                             debias=True, debias_lowres=False, deweight=True, eliminate=False,
                             num_obs_per_night=5, verbose=False):
     """
