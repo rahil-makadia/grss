@@ -27,16 +27,10 @@ using std::tanh;
 #include "SpiceUsr.h"
 #include "spk.h"
 
-#ifndef LONGDOUBLE
-#define LONGDOUBLE  // use long double instead of double
-#endif
-
-#ifndef real
 #ifdef LONGDOUBLE
 #define real long double
 #else
 #define real double
-#endif
 #endif
 #define PI 3.141592653589793238462643383279502884197169399375105820974944
 #define RAD2DEG 180.0 / PI
@@ -57,6 +51,7 @@ struct IntegrationParameters {
     size_t nInteg;
     size_t nSpice;
     size_t nTotal;
+    size_t n2Derivs;
     real t0;
     real tf;
     real dt0;

@@ -331,10 +331,8 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
 void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     Constants consts = propSim->consts;
-    double sunState[6];
-    double earthState[6];
-    // get_spice_state(10, tInterpGeom, consts, sunState);
-    // get_spice_state(399, tInterpGeom, consts, earthState);
+    double sunState[9];
+    double earthState[9];
     get_spk_state(10, tInterpGeom, propSim->ephem, sunState);
     get_spk_state(399, tInterpGeom, propSim->ephem, earthState);
 
@@ -541,10 +539,8 @@ void get_delta_delay_relativistic(propSimulation *propSim,
                                   real &deltaDelayRelativistic) {
     // from Standish (1990),
     // https://ui.adsabs.harvard.edu/abs/1990A&A...233..252S
-    double sunState[6];
-    double earthState[6];
-    // get_spice_state(10, tForSpice, consts, sunState);
-    // get_spice_state(399, tForSpice, consts, earthState);
+    double sunState[9];
+    double earthState[9];
     get_spk_state(10, tForSpice, propSim->ephem, sunState);
     get_spk_state(399, tForSpice, propSim->ephem, earthState);
 
@@ -620,10 +616,8 @@ void get_doppler_measurement(propSimulation *propSim, const real receiveTimeTDB,
     vdot(pos3, vel3, rdot3);
     rdot3 /= r3;
 
-    double xSun3[6];
-    double xSun1[6];
-    // get_spice_state(10, receiveTimeTDB, propSim->consts, xSun3);
-    // get_spice_state(10, transmitTimeTDB, propSim->consts, xSun1);
+    double xSun3[9];
+    double xSun1[9];
     get_spk_state(10, receiveTimeTDB, propSim->ephem, xSun3);
     get_spk_state(10, transmitTimeTDB, propSim->ephem, xSun1);
 

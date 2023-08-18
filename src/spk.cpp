@@ -181,7 +181,7 @@ int spk_free(spkInfo *pl) {
 
 int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
-             double *out_vz) {
+             double *out_vz, double *out_ax, double *out_ay, double *out_az) {
     if (pl == NULL) {
         throw std::runtime_error("The JPL ephemeris file has not been found.");
     }
@@ -209,6 +209,7 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
     }
     double T[32];
     double S[32];
+    double U[32];
     double *val, z;
     *out_x = 0.0;
     *out_y = 0.0;
@@ -216,15 +217,22 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
     *out_vx = 0.0;
     *out_vy = 0.0;
     *out_vz = 0.0;
+    *out_ax = 0.0;
+    *out_ay = 0.0;
+    *out_az = 0.0;
     if (target->cen == 3) {
-        double xc, yc, zc, vxc, vyc, vzc;
-        spk_calc(pl, epoch, target->cen, &xc, &yc, &zc, &vxc, &vyc, &vzc);
+        double xc, yc, zc, vxc, vyc, vzc, axc, ayc, azc;
+        spk_calc(pl, epoch, target->cen, &xc, &yc, &zc, &vxc, &vyc, &vzc, &axc,
+                 &ayc, &azc);
         *out_x = xc;
         *out_y = yc;
         *out_z = zc;
         *out_vx = vxc;
         *out_vy = vyc;
         *out_vz = vzc;
+        *out_ax = axc;
+        *out_ay = ayc;
+        *out_az = azc;
     }
     int n, b, p, P, R;
     // find location of 'directory' describing the data records
@@ -243,10 +251,16 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
     T[1] = z;
     S[0] = 0.0;
     S[1] = 1.0;
+    U[0] = 0.0;
+    U[1] = 0.0;
+    U[2] = 4.0;
     for (p = 2; p < P; p++) {
         T[p] = 2.0 * z * T[p - 1] - T[p - 2];
         // Not used at the moment:
         S[p] = 2.0 * z * S[p - 1] + 2.0 * T[p - 1] - S[p - 2];
+    }
+    for (p = 3; p < P; p++) {
+        U[p] = 2.0 * z * U[p - 1] + 4.0 * S[p - 1] - U[p - 2];
     }
     // double c = (0.125 / 2 / 86400.0);
     double t1 = 32.0;
@@ -295,12 +309,15 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
     double c = (double)(niv * 2) / t1 / 86400.0;
     double pos[3] = {0.0, 0.0, 0.0};
     double vel[3] = {0.0, 0.0, 0.0};
+    double acc[3] = {0.0, 0.0, 0.0};
     for (n = 0; n < 3; n++) {
         b = 2 + n * P;
         // sum interpolation stuff
         for (p = 0; p < P; p++) {
             pos[n] += val[b + p] * T[p] / 149597870.7;
             vel[n] += val[b + p] * S[p] * c / 149597870.7 * 86400.0;
+            acc[n] += val[b + p] * U[p] * c * c / 149597870.7 * 86400.0 *
+                      86400.0;
         }
     }
     *out_x += pos[0];
@@ -309,11 +326,14 @@ int spk_calc(spkInfo *pl, double epoch, int spiceId, double *out_x,
     *out_vx += vel[0];
     *out_vy += vel[1];
     *out_vz += vel[2];
+    *out_ax += acc[0];
+    *out_ay += acc[1];
+    *out_az += acc[2];
     return 0;
 }
 
 void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
-                   double state[6]) {
+                   double state[9]) {
     bool smallBody = spiceID > 1000000;
     spkInfo *infoToUse;
     if (smallBody) {
@@ -354,29 +374,39 @@ void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
                 state[3] = ephem.cache[i].items[cacheIdx].vx;
                 state[4] = ephem.cache[i].items[cacheIdx].vy;
                 state[5] = ephem.cache[i].items[cacheIdx].vz;
+                state[6] = ephem.cache[i].items[cacheIdx].ax;
+                state[7] = ephem.cache[i].items[cacheIdx].ay;
+                state[8] = ephem.cache[i].items[cacheIdx].az;
                 return;
             }
         }
     }
     // if not, calculate it from the SPK memory map,
-    double x, y, z, vx, vy, vz;
-    spk_calc(infoToUse, t0_mjd, spiceID, &x, &y, &z, &vx, &vy, &vz);
+    double x, y, z, vx, vy, vz, ax, ay, az;
+    spk_calc(infoToUse, t0_mjd, spiceID, &x, &y, &z, &vx, &vy, &vz, &ax, &ay,
+             &az);
     state[0] = x;
     state[1] = y;
     state[2] = z;
     state[3] = vx;
     state[4] = vy;
     state[5] = vz;
+    state[6] = ax;
+    state[7] = ay;
+    state[8] = az;
     if (smallBody) {
-        double xSun, ySun, zSun, vxSun, vySun, vzSun;
+        double xSun, ySun, zSun, vxSun, vySun, vzSun, axSun, aySun, azSun;
         spk_calc(ephem.mb, t0_mjd, 10, &xSun, &ySun, &zSun, &vxSun, &vySun,
-                 &vzSun);
+                 &vzSun, &axSun, &aySun, &azSun);
         state[0] += xSun;
         state[1] += ySun;
         state[2] += zSun;
         state[3] += vxSun;
         state[4] += vySun;
         state[5] += vzSun;
+        state[6] += axSun;
+        state[7] += aySun;
+        state[8] += azSun;
     }
     // and add it to the cache
     if (!t0SomewhereInCache) {
@@ -396,4 +426,7 @@ void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vx = state[3];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vy = state[4];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vz = state[5];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ax = state[6];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ay = state[7];
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].az = state[8];
 }

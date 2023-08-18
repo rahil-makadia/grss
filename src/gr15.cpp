@@ -244,11 +244,12 @@ void gr15(propSimulation *propSim) {
     // ForceParameters &forceParams = propSim->forceParams;
     // IntegrationParameters &integParams = propSim->integParams;
     size_t nh = 8;
-    size_t dim = 3 * propSim->integParams.nInteg;
+    size_t dim = propSim->integParams.n2Derivs;
     // Constants &consts = propSim->consts;
     real dt = get_initial_timestep(t, xInteg0, propSim);
     propSim->integParams.timestepCounter = 0;
-    std::vector<real> accInteg0;
+    std::vector<real> accInteg = get_state_der(t, xInteg0, propSim);
+    std::vector<real> accInteg0 = accInteg;
     std::vector<real> xInteg(2 * dim, 0.0);
     std::vector<std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
     std::vector<std::vector<real> > b(7, std::vector<real>(dim, 0.0));
@@ -290,7 +291,6 @@ void gr15(propSimulation *propSim) {
         xInteg0 = propSim->xInteg;
         oneStepDone = 0;
         while (!oneStepDone) {
-            accInteg0 = get_state_der(t, xInteg0, propSim);
             for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++) {
                 for (size_t hIdx = 0; hIdx < nh; hIdx++) {
                     approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b,
@@ -311,11 +311,10 @@ void gr15(propSimulation *propSim) {
             }
             approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b,
                           propSim->integParams.nInteg);
-            std::vector<real> accIntegNext =
-                get_state_der(t + dt, xInteg, propSim);
+            accInteg = get_state_der(t + dt, xInteg, propSim);
 
             vabs_max(b[6], b6Max);
-            vabs_max(accIntegNext, accIntegNextMax);
+            vabs_max(accInteg, accIntegNextMax);
             b6TildeEstim = b6Max / accIntegNextMax;
             if (propSim->integParams.adaptiveTimestep) {
                 relError = pow(b6TildeEstim / propSim->integParams.tolInteg,
@@ -347,6 +346,7 @@ void gr15(propSimulation *propSim) {
                                        xInteg);
                 // add close approaach/impact handling here
                 // xInteg0 = xInteg;
+                accInteg0 = accInteg;
                 propSim->t = t;
                 propSim->xInteg = xInteg;
                 propSim->tStep.push_back(t);

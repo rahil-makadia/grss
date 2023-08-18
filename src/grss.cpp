@@ -52,6 +52,9 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("nTotal", &IntegrationParameters::nTotal, R"mydelimiter(
             Total number of bodies. nTotal = nInteg + nSpice.
             )mydelimiter")
+        .def_readwrite("n2Derivs", &IntegrationParameters::n2Derivs, R"mydelimiter(
+            Number of second derivatives.
+            )mydelimiter")
         .def_readwrite("t0", &IntegrationParameters::t0, R"mydelimiter(
             Initial time of integration (MJD TDB).
             )mydelimiter")
@@ -243,12 +246,15 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("name", &Body::name, R"mydelimiter(
             Name of the body.
             )mydelimiter")
-        .def_readwrite("pos", &Body::pos, R"mydelimiter(
-            Position of the body at the initial time.
-            )mydelimiter")
-        .def_readwrite("vel", &Body::vel, R"mydelimiter(
-            Velocity of the body at the initial time.
-            )mydelimiter")
+        // .def_readwrite("pos", &Body::pos, R"mydelimiter(
+        //     Position of the body.
+        //     )mydelimiter")
+        // .def_readwrite("vel", &Body::vel, R"mydelimiter(
+        //     Velocity of the body.
+        //     )mydelimiter")
+        // .def_readwrite("acc", &Body::acc, R"mydelimiter(
+        //     Acceleration of the body.
+        //     )mydelimiter")
         .def_readwrite("isPPN", &Body::isPPN, R"mydelimiter(
             Whether the body is a PPN body.
             )mydelimiter")
@@ -379,6 +385,15 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("ngParams", &IntegBody::ngParams, R"mydelimiter(
             Non-gravitational parameters of the body.
+            )mydelimiter")
+        .def_readwrite("propStm", &IntegBody::propStm, R"mydelimiter(
+            Boolean for whether to propagate the state transition matrix of the body.
+            )mydelimiter")
+        .def_readwrite("stm", &IntegBody::stm, R"mydelimiter(
+            State transition matrix of the body.
+            )mydelimiter")
+        .def_readwrite("n2Derivs", &IntegBody::n2Derivs, R"mydelimiter(
+            Number of second derivatives of the body.
             )mydelimiter");
 
     py::class_<Event>(m, "Event", R"mydelimiter(
