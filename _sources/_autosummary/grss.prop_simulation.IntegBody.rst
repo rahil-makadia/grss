@@ -36,13 +36,14 @@ grss.prop\_simulation.IntegBody
         ~IntegBody.isPPN
         ~IntegBody.isThrusting
         ~IntegBody.mass
+        ~IntegBody.n2Derivs
         ~IntegBody.name
         ~IntegBody.ngParams
         ~IntegBody.poleDec
         ~IntegBody.poleRA
-        ~IntegBody.pos
+        ~IntegBody.propStm
         ~IntegBody.radius
+        ~IntegBody.stm
         ~IntegBody.t0
-        ~IntegBody.vel
     
     

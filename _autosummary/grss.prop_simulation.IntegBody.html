@@ -431,15 +431,16 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.isPPN"><code class="docutils literal notranslate"><span class="pre">IntegBody.isPPN</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.isThrusting"><code class="docutils literal notranslate"><span class="pre">IntegBody.isThrusting</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.mass"><code class="docutils literal notranslate"><span class="pre">IntegBody.mass</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegBody.n2Derivs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.name"><code class="docutils literal notranslate"><span class="pre">IntegBody.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.ngParams"><code class="docutils literal notranslate"><span class="pre">IntegBody.ngParams</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleDec"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleDec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleRA"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleRA</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.pos"><code class="docutils literal notranslate"><span class="pre">IntegBody.pos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.propStm"><code class="docutils literal notranslate"><span class="pre">IntegBody.propStm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.stm"><code class="docutils literal notranslate"><span class="pre">IntegBody.stm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.t0"><code class="docutils literal notranslate"><span class="pre">IntegBody.t0</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.vel"><code class="docutils literal notranslate"><span class="pre">IntegBody.vel</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -559,29 +560,32 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.mass" title="grss.prop_simulation.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
 <td><p>Mass of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.name" title="grss.prop_simulation.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.n2Derivs" title="grss.prop_simulation.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
+<td><p>Number of second derivatives of the body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.name" title="grss.prop_simulation.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.ngParams" title="grss.prop_simulation.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.ngParams" title="grss.prop_simulation.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
 <td><p>Non-gravitational parameters of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.poleDec" title="grss.prop_simulation.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.poleDec" title="grss.prop_simulation.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
 <td><p>Declination of the pole of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.poleRA" title="grss.prop_simulation.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.poleRA" title="grss.prop_simulation.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
 <td><p>Right ascension of the pole of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.pos" title="grss.prop_simulation.IntegBody.pos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></a></p></td>
-<td><p>Position of the body at the initial time.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.propStm" title="grss.prop_simulation.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
+<td><p>Boolean for whether to propagate the state transition matrix of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.radius" title="grss.prop_simulation.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.radius" title="grss.prop_simulation.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
 <td><p>Radius of the body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.stm" title="grss.prop_simulation.IntegBody.stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stm</span></code></a></p></td>
+<td><p>State transition matrix of the body.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.t0" title="grss.prop_simulation.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
 <td><p>Initial MJD TDB time of the body.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegBody.vel" title="grss.prop_simulation.IntegBody.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
-<td><p>Velocity of the body at the initial time.</p></td>
 </tr>
 </tbody>
 </table>
@@ -640,6 +644,12 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.n2Derivs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n2Derivs</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.n2Derivs" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of second derivatives of the body.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.name">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.name" title="Permalink to this definition">#</a></dt>
 <dd><p>Name of the body.</p>
@@ -664,9 +674,9 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.pos">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pos</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.pos" title="Permalink to this definition">#</a></dt>
-<dd><p>Position of the body at the initial time.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.propStm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propStm</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.propStm" title="Permalink to this definition">#</a></dt>
+<dd><p>Boolean for whether to propagate the state transition matrix of the body.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -697,15 +707,15 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.t0">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t0</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.t0" title="Permalink to this definition">#</a></dt>
-<dd><p>Initial MJD TDB time of the body. Same as the initial time of the propagator.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.stm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stm</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.stm" title="Permalink to this definition">#</a></dt>
+<dd><p>State transition matrix of the body.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.vel">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vel</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.vel" title="Permalink to this definition">#</a></dt>
-<dd><p>Velocity of the body at the initial time.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.IntegBody.t0">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t0</span></span><a class="headerlink" href="#grss.prop_simulation.IntegBody.t0" title="Permalink to this definition">#</a></dt>
+<dd><p>Initial MJD TDB time of the body. Same as the initial time of the propagator.</p>
 </dd></dl>
 
 </dd></dl>
@@ -771,15 +781,16 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.isPPN"><code class="docutils literal notranslate"><span class="pre">IntegBody.isPPN</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.isThrusting"><code class="docutils literal notranslate"><span class="pre">IntegBody.isThrusting</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.mass"><code class="docutils literal notranslate"><span class="pre">IntegBody.mass</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegBody.n2Derivs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.name"><code class="docutils literal notranslate"><span class="pre">IntegBody.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.ngParams"><code class="docutils literal notranslate"><span class="pre">IntegBody.ngParams</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleDec"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleDec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.poleRA"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleRA</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.pos"><code class="docutils literal notranslate"><span class="pre">IntegBody.pos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.propStm"><code class="docutils literal notranslate"><span class="pre">IntegBody.propStm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.stm"><code class="docutils literal notranslate"><span class="pre">IntegBody.stm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.t0"><code class="docutils literal notranslate"><span class="pre">IntegBody.t0</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegBody.vel"><code class="docutils literal notranslate"><span class="pre">IntegBody.vel</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -814,7 +825,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Aug 11, 2023.
+  Last updated on Aug 18, 2023.
   <br/>
 </p>
   </div>

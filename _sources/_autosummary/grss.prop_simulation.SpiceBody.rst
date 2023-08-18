@@ -37,10 +37,8 @@ grss.prop\_simulation.SpiceBody
         ~SpiceBody.name
         ~SpiceBody.poleDec
         ~SpiceBody.poleRA
-        ~SpiceBody.pos
         ~SpiceBody.radius
         ~SpiceBody.spiceId
         ~SpiceBody.t0
-        ~SpiceBody.vel
     
     

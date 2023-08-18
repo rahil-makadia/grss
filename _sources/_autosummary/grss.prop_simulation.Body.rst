@@ -36,9 +36,7 @@ grss.prop\_simulation.Body
         ~Body.name
         ~Body.poleDec
         ~Body.poleRA
-        ~Body.pos
         ~Body.radius
         ~Body.t0
-        ~Body.vel
     
     

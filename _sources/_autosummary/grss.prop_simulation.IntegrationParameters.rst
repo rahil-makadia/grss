@@ -31,6 +31,7 @@ grss.prop\_simulation.IntegrationParameters
         ~IntegrationParameters.dtChangeFactor
         ~IntegrationParameters.dtMax
         ~IntegrationParameters.dtMin
+        ~IntegrationParameters.n2Derivs
         ~IntegrationParameters.nInteg
         ~IntegrationParameters.nSpice
         ~IntegrationParameters.nTotal
