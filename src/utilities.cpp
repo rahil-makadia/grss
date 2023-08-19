@@ -310,6 +310,15 @@ void vabs_max(const std::vector<real> &v, real &max) {
     }
 }
 
+void vabs_max(const real *v, const size_t &dim, real &max) {
+    max = -1.0e300L;
+    for (size_t i = 0; i < dim; i++) {
+        if (fabs(v[i]) > max) {
+            max = fabs(v[i]);
+        }
+    }
+}
+
 void mat_vec_mul(const std::vector<std::vector<real>> &A,
                  const std::vector<real> &v, std::vector<real> &Av) {
     for (size_t i = 0; i < A.size(); i++) {

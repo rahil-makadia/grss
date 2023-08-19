@@ -8,6 +8,7 @@
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
                                 propSimulation *propSim) {
     real *accInteg = new real[3 * propSim->integParams.nInteg];
+    memset(accInteg, 0.0, 3 * propSim->integParams.nInteg * sizeof(real));
     for (size_t i = 0; i < propSim->integParams.nInteg; i++){
         propSim->integBodies[i].pos[0] = xInteg[6*i];
         propSim->integBodies[i].pos[1] = xInteg[6*i+1];
@@ -69,6 +70,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
         accIntegVec[3*i+1] = accInteg[3*i+1];
         accIntegVec[3*i+2] = accInteg[3*i+2];
     }
+    delete[] accInteg;
     return accIntegVec;
 }
 

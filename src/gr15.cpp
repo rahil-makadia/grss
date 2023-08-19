@@ -82,7 +82,7 @@ void approx_xInteg(const std::vector<real> &xInteg0,
 }
 
 void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
-                     const size_t &hIdx, std::vector<std::vector<real>> &g,
+                     const size_t &hIdx, real *g,
                      std::vector<std::vector<real>> &b, const size_t &dim) {
     const std::vector<real> Acc1 = AccIntegArr[0];
     const std::vector<real> Acc2 = AccIntegArr[1];
@@ -95,95 +95,95 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
 
     for (size_t i=0; i<dim; i++){
         if (hIdx == 1) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
         } else if (hIdx == 2) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1][i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0][i]) * rMat[2][1];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
         } else if (hIdx == 3) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1][i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0][i]) * rMat[2][1];
-            g[2][i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0][i]) * rMat[3][1] - g[1][i]) * rMat[3][2];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
+            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
         } else if (hIdx == 4) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1][i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0][i]) * rMat[2][1];
-            g[2][i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0][i]) * rMat[3][1] - g[1][i]) * rMat[3][2];
-            g[3][i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0][i]) * rMat[4][1] - g[1][i]) * rMat[4][2] - g[2][i]) * rMat[4][3];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
+            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
+            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
         } else if (hIdx == 5) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1][i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0][i]) * rMat[2][1];
-            g[2][i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0][i]) * rMat[3][1] - g[1][i]) * rMat[3][2];
-            g[3][i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0][i]) * rMat[4][1] - g[1][i]) * rMat[4][2] - g[2][i]) * rMat[4][3];
-            g[4][i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0][i]) * rMat[5][1] - g[1][i]) * rMat[5][2] - g[2][i]) * rMat[5][3] - g[3][i]) * rMat[5][4];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
+            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
+            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
+            g[4*dim+i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
         } else if (hIdx == 6) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1][i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0][i]) * rMat[2][1];
-            g[2][i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0][i]) * rMat[3][1] - g[1][i]) * rMat[3][2];
-            g[3][i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0][i]) * rMat[4][1] - g[1][i]) * rMat[4][2] - g[2][i]) * rMat[4][3];
-            g[4][i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0][i]) * rMat[5][1] - g[1][i]) * rMat[5][2] - g[2][i]) * rMat[5][3] - g[3][i]) * rMat[5][4];
-            g[5][i] = ((((((Acc7[i] - Acc1[i]) * rMat[6][0] - g[0][i]) * rMat[6][1] - g[1][i]) * rMat[6][2] - g[2][i]) * rMat[6][3] - g[3][i]) * rMat[6][4] - g[4][i]) * rMat[6][5];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
+            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
+            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
+            g[4*dim+i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
+            g[5*dim+i] = ((((((Acc7[i] - Acc1[i]) * rMat[6][0] - g[0*dim+i]) * rMat[6][1] - g[1*dim+i]) * rMat[6][2] - g[2*dim+i]) * rMat[6][3] - g[3*dim+i]) * rMat[6][4] - g[4*dim+i]) * rMat[6][5];
         } else if (hIdx == 7) {
-            g[0][i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1][i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0][i]) * rMat[2][1];
-            g[2][i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0][i]) * rMat[3][1] - g[1][i]) * rMat[3][2];
-            g[3][i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0][i]) * rMat[4][1] - g[1][i]) * rMat[4][2] - g[2][i]) * rMat[4][3];
-            g[4][i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0][i]) * rMat[5][1] - g[1][i]) * rMat[5][2] - g[2][i]) * rMat[5][3] - g[3][i]) * rMat[5][4];
-            g[5][i] = ((((((Acc7[i] - Acc1[i]) * rMat[6][0] - g[0][i]) * rMat[6][1] - g[1][i]) * rMat[6][2] - g[2][i]) * rMat[6][3] - g[3][i]) * rMat[6][4] - g[4][i]) * rMat[6][5];
-            g[6][i] = (((((((Acc8[i] - Acc1[i]) * rMat[7][0] - g[0][i]) * rMat[7][1] - g[1][i]) * rMat[7][2] - g[2][i]) * rMat[7][3] - g[3][i]) * rMat[7][4] - g[4][i]) * rMat[7][5] - g[5][i]) * rMat[7][6];
+            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
+            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
+            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
+            g[4*dim+i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
+            g[5*dim+i] = ((((((Acc7[i] - Acc1[i]) * rMat[6][0] - g[0*dim+i]) * rMat[6][1] - g[1*dim+i]) * rMat[6][2] - g[2*dim+i]) * rMat[6][3] - g[3*dim+i]) * rMat[6][4] - g[4*dim+i]) * rMat[6][5];
+            g[6*dim+i] = (((((((Acc8[i] - Acc1[i]) * rMat[7][0] - g[0*dim+i]) * rMat[7][1] - g[1*dim+i]) * rMat[7][2] - g[2*dim+i]) * rMat[7][3] - g[3*dim+i]) * rMat[7][4] - g[4*dim+i]) * rMat[7][5] - g[5*dim+i]) * rMat[7][6];
         }
     }
     for (size_t i=0; i<dim; i++){
         if (hIdx == 1) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
         } else if (hIdx == 2) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
-            b[1][i] =                    + cMat[1][1]*g[1][i] + cMat[2][1]*g[2][i] + cMat[3][1]*g[3][i] + cMat[4][1]*g[4][i] + cMat[5][1]*g[5][i] + cMat[6][1]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
+            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
         } else if (hIdx == 3) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
-            b[1][i] =                    + cMat[1][1]*g[1][i] + cMat[2][1]*g[2][i] + cMat[3][1]*g[3][i] + cMat[4][1]*g[4][i] + cMat[5][1]*g[5][i] + cMat[6][1]*g[6][i];
-            b[2][i] =                                         + cMat[2][2]*g[2][i] + cMat[3][2]*g[3][i] + cMat[4][2]*g[4][i] + cMat[5][2]*g[5][i] + cMat[6][2]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
+            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
         } else if (hIdx == 4) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
-            b[1][i] =                    + cMat[1][1]*g[1][i] + cMat[2][1]*g[2][i] + cMat[3][1]*g[3][i] + cMat[4][1]*g[4][i] + cMat[5][1]*g[5][i] + cMat[6][1]*g[6][i];
-            b[2][i] =                                         + cMat[2][2]*g[2][i] + cMat[3][2]*g[3][i] + cMat[4][2]*g[4][i] + cMat[5][2]*g[5][i] + cMat[6][2]*g[6][i];
-            b[3][i] =                                                              + cMat[3][3]*g[3][i] + cMat[4][3]*g[4][i] + cMat[5][3]*g[5][i] + cMat[6][3]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
+            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
         } else if (hIdx == 5) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
-            b[1][i] =                    + cMat[1][1]*g[1][i] + cMat[2][1]*g[2][i] + cMat[3][1]*g[3][i] + cMat[4][1]*g[4][i] + cMat[5][1]*g[5][i] + cMat[6][1]*g[6][i];
-            b[2][i] =                                         + cMat[2][2]*g[2][i] + cMat[3][2]*g[3][i] + cMat[4][2]*g[4][i] + cMat[5][2]*g[5][i] + cMat[6][2]*g[6][i];
-            b[3][i] =                                                              + cMat[3][3]*g[3][i] + cMat[4][3]*g[4][i] + cMat[5][3]*g[5][i] + cMat[6][3]*g[6][i];
-            b[4][i] =                                                                                   + cMat[4][4]*g[4][i] + cMat[5][4]*g[5][i] + cMat[6][4]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
+            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[4][i] =                                                                                   + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
         } else if (hIdx == 6) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
-            b[1][i] =                    + cMat[1][1]*g[1][i] + cMat[2][1]*g[2][i] + cMat[3][1]*g[3][i] + cMat[4][1]*g[4][i] + cMat[5][1]*g[5][i] + cMat[6][1]*g[6][i];
-            b[2][i] =                                         + cMat[2][2]*g[2][i] + cMat[3][2]*g[3][i] + cMat[4][2]*g[4][i] + cMat[5][2]*g[5][i] + cMat[6][2]*g[6][i];
-            b[3][i] =                                                              + cMat[3][3]*g[3][i] + cMat[4][3]*g[4][i] + cMat[5][3]*g[5][i] + cMat[6][3]*g[6][i];
-            b[4][i] =                                                                                   + cMat[4][4]*g[4][i] + cMat[5][4]*g[5][i] + cMat[6][4]*g[6][i];
-            b[5][i] =                                                                                                        + cMat[5][5]*g[5][i] + cMat[6][5]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
+            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[4][i] =                                                                                   + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
+            b[5][i] =                                                                                                        + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
         } else if (hIdx == 7) {
-            b[0][i] = cMat[0][0]*g[0][i] + cMat[1][0]*g[1][i] + cMat[2][0]*g[2][i] + cMat[3][0]*g[3][i] + cMat[4][0]*g[4][i] + cMat[5][0]*g[5][i] + cMat[6][0]*g[6][i];
-            b[1][i] =                    + cMat[1][1]*g[1][i] + cMat[2][1]*g[2][i] + cMat[3][1]*g[3][i] + cMat[4][1]*g[4][i] + cMat[5][1]*g[5][i] + cMat[6][1]*g[6][i];
-            b[2][i] =                                         + cMat[2][2]*g[2][i] + cMat[3][2]*g[3][i] + cMat[4][2]*g[4][i] + cMat[5][2]*g[5][i] + cMat[6][2]*g[6][i];
-            b[3][i] =                                                              + cMat[3][3]*g[3][i] + cMat[4][3]*g[4][i] + cMat[5][3]*g[5][i] + cMat[6][3]*g[6][i];
-            b[4][i] =                                                                                   + cMat[4][4]*g[4][i] + cMat[5][4]*g[5][i] + cMat[6][4]*g[6][i];
-            b[5][i] =                                                                                                        + cMat[5][5]*g[5][i] + cMat[6][5]*g[6][i];
-            b[6][i] =                                                                                                                             + cMat[6][6]*g[6][i];
+            b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
+            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[4][i] =                                                                                   + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
+            b[5][i] =                                                                                                        + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
+            b[6][i] =                                                                                                                             + cMat[6][6]*g[6*dim+i];
         }
     }
 }
 
 void refine_b(std::vector<std::vector<real>> &b,
-              std::vector<std::vector<real>> &e, const real &dtRatio,
+              real *e, const real &dtRatio,
               const size_t &dim, const size_t &timestepCounter) {
     std::vector<std::vector<real>> bDiff(7, std::vector<real>(dim, 0.0L));
     if (timestepCounter > 1){
         for (size_t i = 0; i < dim; i++){
-            bDiff[0][i] = b[0][i] - e[0][i];
-            bDiff[1][i] = b[1][i] - e[1][i];
-            bDiff[2][i] = b[2][i] - e[2][i];
-            bDiff[3][i] = b[3][i] - e[3][i];
-            bDiff[4][i] = b[4][i] - e[4][i];
-            bDiff[5][i] = b[5][i] - e[5][i];
-            bDiff[6][i] = b[6][i] - e[6][i];
+            bDiff[0][i] = b[0][i] - e[0*dim+i];
+            bDiff[1][i] = b[1][i] - e[1*dim+i];
+            bDiff[2][i] = b[2][i] - e[2*dim+i];
+            bDiff[3][i] = b[3][i] - e[3*dim+i];
+            bDiff[4][i] = b[4][i] - e[4*dim+i];
+            bDiff[5][i] = b[5][i] - e[5*dim+i];
+            bDiff[6][i] = b[6][i] - e[6*dim+i];
         }
     }
 
@@ -196,23 +196,23 @@ void refine_b(std::vector<std::vector<real>> &b,
     real q7 = q2 * q5;
 
     for (size_t i = 0; i < dim; i++) {
-        e[0][i] = q  * (b[6][i] * 7.0  + b[5][i] * 6.0  + b[4][i] * 5.0  + b[3][i] * 4.0 + b[2][i] * 3.0 + b[1][i] * 2.0 + b[0][i]);
-        e[1][i] = q2 * (b[6][i] * 21.0 + b[5][i] * 15.0 + b[4][i] * 10.0 + b[3][i] * 6.0 + b[2][i] * 3.0 + b[1][i]);
-        e[2][i] = q3 * (b[6][i] * 35.0 + b[5][i] * 20.0 + b[4][i] * 10.0 + b[3][i] * 4.0 + b[2][i]);
-        e[3][i] = q4 * (b[6][i] * 35.0 + b[5][i] * 15.0 + b[4][i] * 5.0  + b[3][i]);
-        e[4][i] = q5 * (b[6][i] * 21.0 + b[5][i] * 6.0  + b[4][i]);
-        e[5][i] = q6 * (b[6][i] * 7.0  + b[5][i]);
-        e[6][i] = q7 * (b[6][i]);
+        e[0*dim+i] = q  * (b[6][i] * 7.0  + b[5][i] * 6.0  + b[4][i] * 5.0  + b[3][i] * 4.0 + b[2][i] * 3.0 + b[1][i] * 2.0 + b[0][i]);
+        e[1*dim+i] = q2 * (b[6][i] * 21.0 + b[5][i] * 15.0 + b[4][i] * 10.0 + b[3][i] * 6.0 + b[2][i] * 3.0 + b[1][i]);
+        e[2*dim+i] = q3 * (b[6][i] * 35.0 + b[5][i] * 20.0 + b[4][i] * 10.0 + b[3][i] * 4.0 + b[2][i]);
+        e[3*dim+i] = q4 * (b[6][i] * 35.0 + b[5][i] * 15.0 + b[4][i] * 5.0  + b[3][i]);
+        e[4*dim+i] = q5 * (b[6][i] * 21.0 + b[5][i] * 6.0  + b[4][i]);
+        e[5*dim+i] = q6 * (b[6][i] * 7.0  + b[5][i]);
+        e[6*dim+i] = q7 * (b[6][i]);
     }
 
     for (size_t i = 0; i < dim; i++) {
-        b[0][i] = e[0][i] + bDiff[0][i];
-        b[1][i] = e[1][i] + bDiff[1][i];
-        b[2][i] = e[2][i] + bDiff[2][i];
-        b[3][i] = e[3][i] + bDiff[3][i];
-        b[4][i] = e[4][i] + bDiff[4][i];
-        b[5][i] = e[5][i] + bDiff[5][i];
-        b[6][i] = e[6][i] + bDiff[6][i];
+        b[0][i] = e[0*dim+i] + bDiff[0][i];
+        b[1][i] = e[1*dim+i] + bDiff[1][i];
+        b[2][i] = e[2*dim+i] + bDiff[2][i];
+        b[3][i] = e[3*dim+i] + bDiff[3][i];
+        b[4][i] = e[4*dim+i] + bDiff[4][i];
+        b[5][i] = e[5*dim+i] + bDiff[5][i];
+        b[6][i] = e[6*dim+i] + bDiff[6][i];
     }
 }
 
@@ -253,11 +253,14 @@ void gr15(propSimulation *propSim) {
     std::vector<real> xInteg(2 * dim, 0.0);
     std::vector<std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
     std::vector<std::vector<real> > b(7, std::vector<real>(dim, 0.0));
-    std::vector<std::vector<real> > g(7, std::vector<real>(dim, 0.0));
-    std::vector<std::vector<real> > e(7, std::vector<real>(dim, 0.0));
+    real *g = new real[7 * dim];
+    memset(g, 0.0, 7 * dim * sizeof(real));
+    real *e = new real[7 * dim];
+    memset(e, 0.0, 7 * dim * sizeof(real));
     std::vector<std::vector<real> > accIntegArr(nh,
                                                 std::vector<real>(dim, 0.0));
-    std::vector<real> b6Tilde(dim, 0.0);
+    real *b6Tilde = new real[dim];
+    memset(b6Tilde, 0.0, dim * sizeof(real));
     real b6TildeMax, accIntegArr7Max;
     real b6TildeEstim, b6Max, accIntegNextMax;
     real relError, dtReq;
@@ -302,7 +305,7 @@ void gr15(propSimulation *propSim) {
                 for (size_t i = 0; i < dim; i++) {
                     b6Tilde[i] = b[6][i] - b_old[6][i];
                 }
-                vabs_max(b6Tilde, b6TildeMax);
+                vabs_max(b6Tilde, dim, b6TildeMax);
                 vabs_max(accIntegArr[7], accIntegArr7Max);
                 if (b6TildeMax / accIntegArr7Max < propSim->integParams.tolPC) {
                     break;
@@ -381,4 +384,6 @@ void gr15(propSimulation *propSim) {
             }
         }
     }
+    delete[] g;
+    delete[] e;
 }

@@ -136,6 +136,7 @@ void vcmul(const std::vector<real> &v, const real &c, std::vector<real> &vc);
 void vvmul(const std::vector<real> &v1, const std::vector<real> &v2,
            std::vector<real> &v3);
 void vabs_max(const std::vector<real> &v, real &max);
+void vabs_max(const real *v, const size_t &dim, real &max);
 
 void mat_vec_mul(const std::vector<std::vector<real>> &A,
                  const std::vector<real> &v, std::vector<real> &Av);

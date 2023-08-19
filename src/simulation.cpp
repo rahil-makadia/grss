@@ -29,6 +29,10 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
     this->vel[0] = 0.0L;
     this->vel[1] = 0.0L;
     this->vel[2] = 0.0L;
+    // this->acc = {0.0L, 0.0L, 0.0L};
+    this->acc[0] = 0.0L;
+    this->acc[1] = 0.0L;
+    this->acc[2] = 0.0L;
 }
 
 IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
@@ -72,6 +76,10 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
     this->vel[0] = cartesianVel[0];
     this->vel[1] = cartesianVel[1];
     this->vel[2] = cartesianVel[2];
+    // this->acc = {0.0L, 0.0L, 0.0L};
+    this->acc[0] = 0.0L;
+    this->acc[1] = 0.0L;
+    this->acc[2] = 0.0L;
     this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
@@ -105,6 +113,10 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->vel[0] = vel[0];
     this->vel[1] = vel[1];
     this->vel[2] = vel[2];
+    // this->acc = {0.0L, 0.0L, 0.0L};
+    this->acc[0] = 0.0L;
+    this->acc[1] = 0.0L;
+    this->acc[2] = 0.0L;
     this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
