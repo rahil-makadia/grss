@@ -259,6 +259,14 @@ void vnorm(const std::vector<real> &v, real &norm) {
     norm = sqrt(norm);
 }
 
+void vnorm(const real *v, const size_t &dim, real &norm) {
+    norm = 0;
+    for (size_t i = 0; i < dim; i++) {
+        norm += v[i] * v[i];
+    }
+    norm = sqrt(norm);
+}
+
 void vunit(const std::vector<real> &v, std::vector<real> &vunit) {
     real norm;
     vnorm(v, norm);
@@ -267,8 +275,22 @@ void vunit(const std::vector<real> &v, std::vector<real> &vunit) {
     }
 }
 
+void vunit(const real *v, const size_t &dim, real *unit) {
+    real norm;
+    vnorm(v, dim, norm);
+    for (size_t i = 0; i < dim; i++) {
+        unit[i] = v[i] / norm;
+    }
+}
+
 void vcross(const std::vector<real> &v1, const std::vector<real> &v2,
             std::vector<real> &v3) {
+    v3[0] = v1[1] * v2[2] - v1[2] * v2[1];
+    v3[1] = v1[2] * v2[0] - v1[0] * v2[2];
+    v3[2] = v1[0] * v2[1] - v1[1] * v2[0];
+}
+
+void vcross(const real *v1, const real *v2, real *v3) {
     v3[0] = v1[1] * v2[2] - v1[2] * v2[1];
     v3[1] = v1[2] * v2[0] - v1[0] * v2[2];
     v3[2] = v1[0] * v2[1] - v1[1] * v2[0];

@@ -125,9 +125,12 @@ void sort_vector_by_another(std::vector<std::vector<real>> &v,
                             const bool &ascending);
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
 void vnorm(const std::vector<real> &v, real &norm);
+void vnorm(const real *v, const size_t &dim, real &norm);
 void vunit(const std::vector<real> &v, std::vector<real> &unit);
+void vunit(const real *v, const size_t &dim, real *unit);
 void vcross(const std::vector<real> &v1, const std::vector<real> &v2,
             std::vector<real> &cross);
+void vcross(const real *v1, const real *v2, real *cross);
 void vadd(const std::vector<real> &v1, const std::vector<real> &v2,
           std::vector<real> &sum);
 void vsub(const std::vector<real> &v1, const std::vector<real> &v2,

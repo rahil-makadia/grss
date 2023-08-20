@@ -82,21 +82,13 @@ void force_newton(const propSimulation *propSim, real *accInteg) {
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
     #endif
-    real G = propSim->consts.G;
-    real x, y, z;
-    real dx, dy, dz;
-    real rRel, rRel3;
-    real ax, ay, az;
-    real massj;
+    const real G = propSim->consts.G;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        x = propSim->integBodies[i].pos[0];
-        y = propSim->integBodies[i].pos[1];
-        z = propSim->integBodies[i].pos[2];
-        ax = 0.0;
-        ay = 0.0;
-        az = 0.0;
+        const real x = propSim->integBodies[i].pos[0];
+        const real y = propSim->integBodies[i].pos[1];
+        const real z = propSim->integBodies[i].pos[2];
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
-            massj = propSim->forceParams.masses[j];
+            const real massj = propSim->forceParams.masses[j];
             if (i != j && massj != 0.0) {
                 const Body *bodyj;
                 if (j < propSim->integParams.nInteg) {
@@ -104,14 +96,14 @@ void force_newton(const propSimulation *propSim, real *accInteg) {
                 } else {
                     bodyj = &propSim->spiceBodies[j-propSim->integParams.nInteg];
                 }
-                dx = x - bodyj->pos[0];
-                dy = y - bodyj->pos[1];
-                dz = z - bodyj->pos[2];
-                rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                rRel3 = rRel * rRel * rRel;
-                ax -= G * massj * dx / rRel3;
-                ay -= G * massj * dy / rRel3;
-                az -= G * massj * dz / rRel3;
+                const real dx = x - bodyj->pos[0];
+                const real dy = y - bodyj->pos[1];
+                const real dz = z - bodyj->pos[2];
+                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+                const real rRel3 = rRel * rRel * rRel;
+                accInteg[3 * i + 0] -= G * massj * dx / rRel3;
+                accInteg[3 * i + 1] -= G * massj * dy / rRel3;
+                accInteg[3 * i + 2] -= G * massj * dz / rRel3;
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << propSim->forceParams.spiceIdList[j]
                           << std::setw(25) << G * massj << std::setw(25) << dx
@@ -123,9 +115,6 @@ void force_newton(const propSimulation *propSim, real *accInteg) {
                 #endif
             }
         }
-        accInteg[3 * i + 0] += ax;
-        accInteg[3 * i + 1] += ay;
-        accInteg[3 * i + 2] += az;
     }
     #ifdef PRINT_FORCES
     forceFile.close();
@@ -140,60 +129,47 @@ void force_ppn_simple(const propSimulation *propSim, real *accInteg) {
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
     #endif
-    real G = propSim->consts.G;
-    real c = propSim->consts.clight;
-    real c2 = c * c;
-    real x, y, z;
-    real dx, dy, dz;
-    real rRel, rRel3;
-    real vx, vy, vz;
-    real dvx, dvy, dvz;
-    real ax, ay, az;
-    real massj;
-    real dPosDotVel, dVelDotVel;
-    real gm, gmOverC2;
-    real fac1, fac2, fac3;
-    real beta = 1.0L;
-    real gamma = 1.0L;
+    const real G = propSim->consts.G;
+    const real c = propSim->consts.clight;
+    const real c2 = c * c;
+    const real beta = 1.0L;
+    const real gamma = 1.0L;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        x = propSim->integBodies[i].pos[0];
-        y = propSim->integBodies[i].pos[1];
-        z = propSim->integBodies[i].pos[2];
-        vx = propSim->integBodies[i].vel[0];
-        vy = propSim->integBodies[i].vel[1];
-        vz = propSim->integBodies[i].vel[2];
-        ax = 0.0;
-        ay = 0.0;
-        az = 0.0;
+        const real x = propSim->integBodies[i].pos[0];
+        const real y = propSim->integBodies[i].pos[1];
+        const real z = propSim->integBodies[i].pos[2];
+        const real vx = propSim->integBodies[i].vel[0];
+        const real vy = propSim->integBodies[i].vel[1];
+        const real vz = propSim->integBodies[i].vel[2];
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
-            massj = propSim->forceParams.masses[j];
+            const real massj = propSim->forceParams.masses[j];
             if (i != j && massj != 0.0 && propSim->forceParams.spiceIdList[j] == 10) {
-                gm = G * massj;
-                gmOverC2 = gm / c2;
+                const real gm = G * massj;
+                const real gmOverC2 = gm / c2;
                 const Body *bodyj;
                 if (j < propSim->integParams.nInteg) {
                     bodyj = &propSim->integBodies[j];
                 } else {
                     bodyj = &propSim->spiceBodies[j-propSim->integParams.nInteg];
                 }
-                dx = x - bodyj->pos[0];
-                dy = y - bodyj->pos[1];
-                dz = z - bodyj->pos[2];
-                dvx = vx - bodyj->vel[0];
-                dvy = vy - bodyj->vel[1];
-                dvz = vz - bodyj->vel[2];
-                rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                rRel3 = rRel * rRel * rRel;
-                dPosDotVel = dx * dvx + dy * dvy + dz * dvz;
-                dVelDotVel = dvx * dvx + dvy * dvy + dvz * dvz;
+                const real dx = x - bodyj->pos[0];
+                const real dy = y - bodyj->pos[1];
+                const real dz = z - bodyj->pos[2];
+                const real dvx = vx - bodyj->vel[0];
+                const real dvy = vy - bodyj->vel[1];
+                const real dvz = vz - bodyj->vel[2];
+                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+                const real rRel3 = rRel * rRel * rRel;
+                const real dPosDotVel = dx * dvx + dy * dvy + dz * dvz;
+                const real dVelDotVel = dvx * dvx + dvy * dvy + dvz * dvz;
                 // 1st order PPN approximation, equation 4-61 from Moyer (2003),
                 // https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                fac1 = gmOverC2 / rRel3;
-                fac2 = (2 * (beta + gamma) * gm / rRel - gamma * dVelDotVel);
-                fac3 = 2 * (1 + gamma) * dPosDotVel;
-                ax += fac1 * (fac2 * dx + fac3 * dvx);
-                ay += fac1 * (fac2 * dy + fac3 * dvy);
-                az += fac1 * (fac2 * dz + fac3 * dvz);
+                const real fac1 = gmOverC2 / rRel3;
+                const real fac2 = (2 * (beta + gamma) * gm / rRel - gamma * dVelDotVel);
+                const real fac3 = 2 * (1 + gamma) * dPosDotVel;
+                accInteg[3 * i + 0] += fac1 * (fac2 * dx + fac3 * dvx);
+                accInteg[3 * i + 1] += fac1 * (fac2 * dy + fac3 * dvy);
+                accInteg[3 * i + 2] += fac1 * (fac2 * dz + fac3 * dvz);
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << propSim->forceParams.spiceIdList[j]
                           << std::setw(25) << G * massj << std::setw(25)
@@ -203,9 +179,6 @@ void force_ppn_simple(const propSimulation *propSim, real *accInteg) {
                 #endif
             }
         }
-        accInteg[3 * i + 0] += ax;
-        accInteg[3 * i + 1] += ay;
-        accInteg[3 * i + 2] += az;
     }
     #ifdef PRINT_FORCES
     forceFile.close();
@@ -224,11 +197,11 @@ void force_ppn_eih(const propSimulation *propSim, real *accInteg) {
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
     #endif
-    real G = propSim->consts.G;
-    real c2 = propSim->consts.clight * propSim->consts.clight;
-    real oneOverC2 = 1.0 / c2;
-    real beta = 1.0;
-    real gamma = 1.0;
+    const real G = propSim->consts.G;
+    const real c2 = propSim->consts.clight * propSim->consts.clight;
+    const real oneOverC2 = 1.0 / c2;
+    const real beta = 1.0;
+    const real gamma = 1.0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         const real xi = propSim->integBodies[i].pos[0];
         const real yi = propSim->integBodies[i].pos[1];
@@ -239,7 +212,6 @@ void force_ppn_eih(const propSimulation *propSim, real *accInteg) {
         real axi = 0.0;
         real ayi = 0.0;
         real azi = 0.0;
-        real axj, ayj, azj;
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
             const real massj = propSim->forceParams.masses[j];
             if (i != j && massj != 0.0 && propSim->forceParams.isPPNList[j]) {
@@ -275,9 +247,9 @@ void force_ppn_eih(const propSimulation *propSim, real *accInteg) {
                 const real term1f = rijDotVj * rijDotVj / (rRelij * rRelij);
                 real term1a = 0.0;
                 real term1b = 0.0;
-                axj = 0.0;
-                ayj = 0.0;
-                azj = 0.0;
+                real axj = 0.0;
+                real ayj = 0.0;
+                real azj = 0.0;
                 for (size_t k = 0; k < propSim->integParams.nTotal; k++) {
                     const real massk = propSim->forceParams.masses[k];
                     if (massk != 0.0 && propSim->forceParams.isMajorList[k]) {
@@ -380,28 +352,13 @@ void force_J2(const propSimulation *propSim, real *accInteg) {
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
     #endif
-    real G = propSim->consts.G;
-    real x, y, z;
-    real dx, dy, dz;
-    real dxBody, dyBody, dzBody;
-    real rRel, rRel2, rRel5;
-    real radius;
-    real ax, ay, az;
-    real massj, poleRA, poleDec;
-    real sinRA, cosRA, sinDec, cosDec;
-    std::vector<std::vector<real>> R1(3, std::vector<real>(3));
-    std::vector<std::vector<real>> R2(3, std::vector<real>(3));
-    std::vector<std::vector<real>> R(3, std::vector<real>(3));
-    std::vector<std::vector<real>> Rinv(3, std::vector<real>(3));
+    const real G = propSim->consts.G;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        x = propSim->integBodies[i].pos[0];
-        y = propSim->integBodies[i].pos[1];
-        z = propSim->integBodies[i].pos[2];
-        ax = 0.0;
-        ay = 0.0;
-        az = 0.0;
+        const real x = propSim->integBodies[i].pos[0];
+        const real y = propSim->integBodies[i].pos[1];
+        const real z = propSim->integBodies[i].pos[2];
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
-            massj = propSim->forceParams.masses[j];
+            const real massj = propSim->forceParams.masses[j];
             if (i != j && massj != 0.0 && propSim->forceParams.isJ2List[j]) {
                 const Body *bodyj;
                 if (j < propSim->integParams.nInteg) {
@@ -409,23 +366,23 @@ void force_J2(const propSimulation *propSim, real *accInteg) {
                 } else {
                     bodyj = &propSim->spiceBodies[j-propSim->integParams.nInteg];
                 }
-                dx = x - bodyj->pos[0];
-                dy = y - bodyj->pos[1];
-                dz = z - bodyj->pos[2];
-                rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                rRel2 = rRel * rRel;
-                rRel5 = rRel2 * rRel2 * rRel;
-                radius = propSim->forceParams.radii[j];
-                poleRA = propSim->forceParams.poleRAList[j];
-                sinRA = sin(poleRA);
-                cosRA = cos(poleRA);
-                poleDec = propSim->forceParams.poleDecList[j];
-                sinDec = sin(poleDec);
-                cosDec = cos(poleDec);
-                dxBody = -dx * sinRA + dy * cosRA;
-                dyBody =
+                const real dx = x - bodyj->pos[0];
+                const real dy = y - bodyj->pos[1];
+                const real dz = z - bodyj->pos[2];
+                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+                const real rRel2 = rRel * rRel;
+                const real rRel5 = rRel2 * rRel2 * rRel;
+                const real radius = propSim->forceParams.radii[j];
+                const real poleRA = propSim->forceParams.poleRAList[j];
+                const real sinRA = sin(poleRA);
+                const real cosRA = cos(poleRA);
+                const real poleDec = propSim->forceParams.poleDecList[j];
+                const real sinDec = sin(poleDec);
+                const real cosDec = cos(poleDec);
+                const real dxBody = -dx * sinRA + dy * cosRA;
+                const real dyBody =
                     -dx * cosRA * sinDec - dy * sinRA * sinDec + dz * cosDec;
-                dzBody =
+                const real dzBody =
                     dx * cosRA * cosDec + dy * sinRA * cosDec + dz * sinDec;
                 real fac1 = 3 * G * massj * propSim->forceParams.J2List[j] * radius *
                     radius / (2 * rRel5);
@@ -433,24 +390,20 @@ void force_J2(const propSimulation *propSim, real *accInteg) {
                 real axBody = fac1 * fac2 * dxBody;
                 real ayBody = fac1 * fac2 * dyBody;
                 real azBody = fac1 * (fac2 - 2) * dzBody;
-                real axEquat = -axBody * sinRA - ayBody * cosRA * sinDec +
+                accInteg[3 * i + 0] += -axBody * sinRA - ayBody * cosRA * sinDec +
                     azBody * cosRA * cosDec;
-                real ayEquat = axBody * cosRA - ayBody * sinRA * sinDec +
+                accInteg[3 * i + 1] += axBody * cosRA - ayBody * sinRA * sinDec +
                     azBody * sinRA * cosDec;
-                real azEquat = ayBody * cosDec + azBody * sinDec;
-                ax += axEquat;
-                ay += ayEquat;
-                az += azEquat;
+                accInteg[3 * i + 2] += ayBody * cosDec + azBody * sinDec;
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << propSim->forceParams.spiceIdList[j]
-                          << std::setw(25) << axEquat << std::setw(25)
-                          << ayEquat << std::setw(25) << azEquat << std::endl;
+                          << std::setw(25) << -axBody * sinRA - ayBody * cosRA * sinDec +
+                    azBody * cosRA * cosDec << std::setw(25)
+                          << axBody * cosRA - ayBody * sinRA * sinDec +
+                    azBody * sinRA * cosDec << std::setw(25) << ayBody * cosDec + azBody * sinDec << std::endl;
                 #endif
             }
         }
-        accInteg[3 * i + 0] += ax;
-        accInteg[3 * i + 1] += ay;
-        accInteg[3 * i + 2] += az;
     }
     #ifdef PRINT_FORCES
     forceFile.close();
@@ -465,39 +418,24 @@ void force_nongrav(const propSimulation *propSim, real *accInteg) {
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
     #endif
-    real a1, a2, a3;
-    real alpha, k, m, n;
-    real r0;
-    real g;
-    real x, y, z;
-    real vx, vy, vz;
-    real dx, dy, dz;
-    real dvx, dvy, dvz;
-    real rRel;
-    std::vector<real> hRelVec(3), hRelHatVec(3);
-    std::vector<real> eRHat(3), eTHat(3), eNHat(3);
-    real ax, ay, az;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        x = propSim->integBodies[i].pos[0];
-        y = propSim->integBodies[i].pos[1];
-        z = propSim->integBodies[i].pos[2];
-        vx = propSim->integBodies[i].vel[0];
-        vy = propSim->integBodies[i].vel[1];
-        vz = propSim->integBodies[i].vel[2];
-        ax = 0.0;
-        ay = 0.0;
-        az = 0.0;
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
             if (propSim->forceParams.spiceIdList[j] == 10 &&
                 propSim->forceParams.isNongravList[i]) {  // j is Sun idx in spiceIdList
-                a1 = propSim->forceParams.ngParamsList[i].a1;
-                a2 = propSim->forceParams.ngParamsList[i].a2;
-                a3 = propSim->forceParams.ngParamsList[i].a3;
-                alpha = propSim->forceParams.ngParamsList[i].alpha;
-                k = propSim->forceParams.ngParamsList[i].k;
-                m = propSim->forceParams.ngParamsList[i].m;
-                n = propSim->forceParams.ngParamsList[i].n;
-                r0 = propSim->forceParams.ngParamsList[i].r0_au * 1.495978707e11 /
+                const real x = propSim->integBodies[i].pos[0];
+                const real y = propSim->integBodies[i].pos[1];
+                const real z = propSim->integBodies[i].pos[2];
+                const real vx = propSim->integBodies[i].vel[0];
+                const real vy = propSim->integBodies[i].vel[1];
+                const real vz = propSim->integBodies[i].vel[2];
+                const real a1 = propSim->forceParams.ngParamsList[i].a1;
+                const real a2 = propSim->forceParams.ngParamsList[i].a2;
+                const real a3 = propSim->forceParams.ngParamsList[i].a3;
+                const real alpha = propSim->forceParams.ngParamsList[i].alpha;
+                const real k = propSim->forceParams.ngParamsList[i].k;
+                const real m = propSim->forceParams.ngParamsList[i].m;
+                const real n = propSim->forceParams.ngParamsList[i].n;
+                const real r0 = propSim->forceParams.ngParamsList[i].r0_au * 1.495978707e11 /
                     propSim->consts.du2m;
                 const Body *bodyj;
                 if (j < propSim->integParams.nInteg) {
@@ -505,21 +443,37 @@ void force_nongrav(const propSimulation *propSim, real *accInteg) {
                 } else {
                     bodyj = &propSim->spiceBodies[j-propSim->integParams.nInteg];
                 }
-                dx = x - bodyj->pos[0];
-                dy = y - bodyj->pos[1];
-                dz = z - bodyj->pos[2];
-                dvx = vx - bodyj->vel[0];
-                dvy = vy - bodyj->vel[1];
-                dvz = vz - bodyj->vel[2];
-                rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                g = alpha * pow(rRel / r0, -m) * pow(1 + pow(rRel / r0, n), -k);
-                vunit({dx, dy, dz}, eRHat);
-                vcross({dx, dy, dz}, {dvx, dvy, dvz}, hRelVec);
-                vunit(hRelVec, eNHat);
+                const real dx = x - bodyj->pos[0];
+                const real dy = y - bodyj->pos[1];
+                const real dz = z - bodyj->pos[2];
+                const real dvx = vx - bodyj->vel[0];
+                const real dvy = vy - bodyj->vel[1];
+                const real dvz = vz - bodyj->vel[2];
+                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+                const real g = alpha * pow(rRel / r0, -m) * pow(1 + pow(rRel / r0, n), -k);
+                real *dpos = new real[3];
+                dpos[0] = dx;
+                dpos[1] = dy;
+                dpos[2] = dz;
+                real *dvel = new real[3];
+                dvel[0] = dvx;
+                dvel[1] = dvy;
+                dvel[2] = dvz;
+                real *hRelVec = new real[3];
+                memset(hRelVec, 0.0, 3 * sizeof(real));
+                real *eRHat = new real[3];
+                memset(eRHat, 0.0, 3 * sizeof(real));
+                real *eTHat = new real[3];
+                memset(eTHat, 0.0, 3 * sizeof(real));
+                real *eNHat = new real[3];
+                memset(eNHat, 0.0, 3 * sizeof(real));
+                vunit(dpos, (size_t)3, eRHat);
+                vcross(dpos, dvel, hRelVec);
+                vunit(hRelVec, (size_t)3, eNHat);
                 vcross(eNHat, eRHat, eTHat);
-                ax += g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0]);
-                ay += g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
-                az += g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
+                accInteg[3 * i + 0] += g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0]);
+                accInteg[3 * i + 1] += g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
+                accInteg[3 * i + 2] += g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << propSim->forceParams.spiceIdList[j]
                           << std::setw(25)
@@ -530,11 +484,14 @@ void force_nongrav(const propSimulation *propSim, real *accInteg) {
                           << g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2])
                           << std::endl;
                 #endif
+                delete[] dpos;
+                delete[] dvel;
+                delete[] hRelVec;
+                delete[] eRHat;
+                delete[] eTHat;
+                delete[] eNHat;
             }
         }
-        accInteg[3 * i + 0] += ax;
-        accInteg[3 * i + 1] += ay;
-        accInteg[3 * i + 2] += az;
     }
     #ifdef PRINT_FORCES
     forceFile.close();
@@ -549,31 +506,27 @@ void force_thruster(const propSimulation *propSim, real *accInteg) {
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
 #endif
-    real vx, vy, vz;
-    real ax, ay, az;
-    std::vector<real> vHat(3);
-    real acc_thruster = 1.0e7L /propSim->consts.du2m;  // m/day^2 -> au/day^2
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        vx = propSim->integBodies[i].vel[0];
-        vy = propSim->integBodies[i].vel[1];
-        vz = propSim->integBodies[i].vel[2];
-        ax = 0.0;
-        ay = 0.0;
-        az = 0.0;
         if (propSim->forceParams.isThrustingList[i]) {
-            vunit({vx, vy, vz}, vHat);
-            ax += acc_thruster * vHat[0];
-            ay += acc_thruster * vHat[1];
-            az += acc_thruster * vHat[2];
+            real *vel = new real[3];
+            vel[0] = propSim->integBodies[i].vel[0];
+            vel[1] = propSim->integBodies[i].vel[1];
+            vel[2] = propSim->integBodies[i].vel[2];
+            real *vHat = new real[3];
+            memset(vHat, 0, 3 * sizeof(real));
+            const real acc_thruster = 1.0e7L /propSim->consts.du2m;  // m/day^2 -> au/day^2
+            vunit(vel, (size_t) 3, vHat);
+            accInteg[3 * i + 0] += acc_thruster * vHat[0];
+            accInteg[3 * i + 1] += acc_thruster * vHat[1];
+            accInteg[3 * i + 2] += acc_thruster * vHat[2];
             #ifdef PRINT_FORCES
             forceFile << "THRUSTER " << acc_thruster * vHat[0] << std::setw(25)
                       << acc_thruster * vHat[1] << std::setw(25)
                       << acc_thruster * vHat[2] << std::endl;
             #endif
+            delete[] vel;
+            delete[] vHat;
         }
-        accInteg[3 * i + 0] += ax;
-        accInteg[3 * i + 1] += ay;
-        accInteg[3 * i + 2] += az;
     }
     #ifdef PRINT_FORCES
     forceFile.close();
