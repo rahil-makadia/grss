@@ -13,8 +13,10 @@ struct Body {
     real poleRA = 0.0L;
     real poleDec = 90.0L;
     std::string name;
-    std::vector<real> pos;
-    std::vector<real> vel;
+    // std::vector<real> pos = {0.0L, 0.0L, 0.0L};
+    // std::vector<real> vel = {0.0L, 0.0L, 0.0L};
+    // std::vector<real> acc = {0.0L, 0.0L, 0.0L};
+    real pos[3], vel[3], acc[3];
     bool isPPN = false;
     bool isJ2 = false;
     bool isNongrav = false;
@@ -39,6 +41,9 @@ class IntegBody : public Body {
     bool isThrusting = false;
     std::vector<std::vector<real>> covariance;
     NongravParamaters ngParams;
+    bool propStm = false;
+    std::vector<real> stm;
+    size_t n2Derivs = 3;
     // constructors
     IntegBody(std::string DEkernelPath, std::string name, real t0, real mass,
               real radius, std::vector<real> cometaryState,
@@ -147,7 +152,7 @@ class propSimulation {
             std::vector<std::vector<real>>(),
         bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 6.0L,
         real dtMin = 5.0e-3L, real dtChangeFactor = 0.25L,
-        real tolInteg = 1.0e-6L, real tolPC = 1.0e-16L);
+        real tolInteg = 1.0e-9L, real tolPC = 1.0e-16L);
 
     // getters
     std::vector<real> get_sim_constants();

@@ -59,7 +59,7 @@ int main(){
             state[3] /= 149597870.7/86400;
             state[4] /= 149597870.7/86400;
             state[5] /= 149597870.7/86400;
-            double mapState[6];
+            double mapState[9];
             get_spk_state(spiceId, mjd, eph, mapState);
             // std::cout << "id: " << spiceId << ", ";
             // printf("spkstate: %0.20f %0.20f %0.20f %0.20f %0.20f %0.20f\n", state[0], state[1], state[2], state[3], state[4], state[5]);

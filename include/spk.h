@@ -18,6 +18,9 @@ struct CacheItem {
     double vx;
     double vy;
     double vz;
+    double ax;
+    double ay;
+    double az;
 };
 
 #define SPK_CACHE_ITEM_SIZE 32
@@ -59,5 +62,5 @@ int spk_free(struct spkInfo *pl);
 int spk_calc(struct spkInfo *pl, double epoch, int m, double *x, double *y,
              double *z, double *out_vx, double *out_vy, double *out_vz);
 void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
-                   double state[6]);
+                   double state[9]);
 #endif

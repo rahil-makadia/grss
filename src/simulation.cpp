@@ -21,8 +21,18 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
     this->isNongrav = false;
     this->isPPN = false;
     this->isMajor = false;
-    this->pos = {0.0L, 0.0L, 0.0L};
-    this->vel = {0.0L, 0.0L, 0.0L};
+    // this->pos = {0.0L, 0.0L, 0.0L};
+    this->pos[0] = 0.0L;
+    this->pos[1] = 0.0L;
+    this->pos[2] = 0.0L;
+    // this->vel = {0.0L, 0.0L, 0.0L};
+    this->vel[0] = 0.0L;
+    this->vel[1] = 0.0L;
+    this->vel[2] = 0.0L;
+    // this->acc = {0.0L, 0.0L, 0.0L};
+    this->acc[0] = 0.0L;
+    this->acc[1] = 0.0L;
+    this->acc[2] = 0.0L;
 }
 
 IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
@@ -58,8 +68,18 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
         cartesianPos[i] += sunState[i];
         cartesianVel[i] += sunState[i + 3];
     }
-    this->pos = cartesianPos;
-    this->vel = cartesianVel;
+    // this->pos = cartesianPos;
+    this->pos[0] = cartesianPos[0];
+    this->pos[1] = cartesianPos[1];
+    this->pos[2] = cartesianPos[2];
+    // this->vel = cartesianVel;
+    this->vel[0] = cartesianVel[0];
+    this->vel[1] = cartesianVel[1];
+    this->vel[2] = cartesianVel[2];
+    // this->acc = {0.0L, 0.0L, 0.0L};
+    this->acc[0] = 0.0L;
+    this->acc[1] = 0.0L;
+    this->acc[2] = 0.0L;
     this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
@@ -85,8 +105,18 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->t0 = t0;
     this->mass = mass;
     this->radius = radius / consts.du2m;
-    this->pos = pos;
-    this->vel = vel;
+    // this->pos = pos;
+    this->pos[0] = pos[0];
+    this->pos[1] = pos[1];
+    this->pos[2] = pos[2];
+    // this->vel = vel;
+    this->vel[0] = vel[0];
+    this->vel[1] = vel[1];
+    this->vel[2] = vel[2];
+    // this->acc = {0.0L, 0.0L, 0.0L};
+    this->acc[0] = 0.0L;
+    this->acc[1] = 0.0L;
+    this->acc[2] = 0.0L;
     this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
@@ -100,6 +130,24 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
         this->ngParams.r0_au = ngParams.r0_au;
         this->isNongrav = true;
     }
+    int stmSize = 36;
+    if (this->isNongrav) {
+        if (ngParams.a1 != 0.0L) {
+            stmSize += 6;
+        }
+        if (ngParams.a2 != 0.0L) {
+            stmSize += 6;
+        }
+        if (ngParams.a3 != 0.0L) {
+            stmSize += 6;
+        }
+    }
+    this->stm = std::vector<real>(stmSize, 0.0L);
+    for (size_t i = 0; i < 6; i++) {
+        this->stm[6*i+i] = 1.0L;
+    }
+    // this->n2Derivs += (size_t) stmSize/2;
+    this->propStm = false;
     this->isPPN = false;
     this->isMajor = false;
 }
@@ -127,6 +175,7 @@ propSimulation::propSimulation(std::string name, real t0,
     this->integParams.nInteg = 0;
     this->integParams.nSpice = 0;
     this->integParams.nTotal = 0;
+    this->integParams.n2Derivs = 0;
     this->integParams.timestepCounter = 0;
 
     std::string selfPath = __FILE__;
@@ -628,6 +677,7 @@ void propSimulation::add_integ_body(std::string DEkernelPath, std::string name,
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
+    this->integParams.n2Derivs += body.n2Derivs;
 }
 
 void propSimulation::add_integ_body(std::string name, real t0, real mass,
@@ -649,6 +699,7 @@ void propSimulation::add_integ_body(std::string name, real t0, real mass,
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
+    this->integParams.n2Derivs += body.n2Derivs;
 }
 
 void propSimulation::add_integ_body(IntegBody body) {
@@ -663,6 +714,7 @@ void propSimulation::add_integ_body(IntegBody body) {
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
+    this->integParams.n2Derivs += body.n2Derivs;
 }
 
 void propSimulation::remove_body(std::string name) {
@@ -829,6 +881,11 @@ void propSimulation::preprocess() {
         }
         for (size_t j = 0; j < 3; j++) {
             this->xInteg.push_back(integBodies[i].vel[j]);
+        }
+        if (integBodies[i].propStm) {
+            for (size_t j = 0; j < integBodies[i].stm.size(); j++) {
+                this->xInteg.push_back(integBodies[i].stm[j]);
+            }
         }
         this->forceParams.masses.push_back(integBodies[i].mass);
         this->forceParams.radii.push_back(integBodies[i].radius);

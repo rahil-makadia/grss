@@ -27,16 +27,10 @@ using std::tanh;
 #include "SpiceUsr.h"
 #include "spk.h"
 
-#ifndef LONGDOUBLE
-#define LONGDOUBLE  // use long double instead of double
-#endif
-
-#ifndef real
 #ifdef LONGDOUBLE
 #define real long double
 #else
 #define real double
-#endif
 #endif
 #define PI 3.141592653589793238462643383279502884197169399375105820974944
 #define RAD2DEG 180.0 / PI
@@ -57,6 +51,7 @@ struct IntegrationParameters {
     size_t nInteg;
     size_t nSpice;
     size_t nTotal;
+    size_t n2Derivs;
     real t0;
     real tf;
     real dt0;
@@ -130,9 +125,12 @@ void sort_vector_by_another(std::vector<std::vector<real>> &v,
                             const bool &ascending);
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
 void vnorm(const std::vector<real> &v, real &norm);
+void vnorm(const real *v, const size_t &dim, real &norm);
 void vunit(const std::vector<real> &v, std::vector<real> &unit);
+void vunit(const real *v, const size_t &dim, real *unit);
 void vcross(const std::vector<real> &v1, const std::vector<real> &v2,
             std::vector<real> &cross);
+void vcross(const real *v1, const real *v2, real *cross);
 void vadd(const std::vector<real> &v1, const std::vector<real> &v2,
           std::vector<real> &sum);
 void vsub(const std::vector<real> &v1, const std::vector<real> &v2,
@@ -141,6 +139,7 @@ void vcmul(const std::vector<real> &v, const real &c, std::vector<real> &vc);
 void vvmul(const std::vector<real> &v1, const std::vector<real> &v2,
            std::vector<real> &v3);
 void vabs_max(const std::vector<real> &v, real &max);
+void vabs_max(const real *v, const size_t &dim, real &max);
 
 void mat_vec_mul(const std::vector<std::vector<real>> &A,
                  const std::vector<real> &v, std::vector<real> &Av);
