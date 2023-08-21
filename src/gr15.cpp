@@ -241,11 +241,8 @@ void check_and_apply_events(propSimulation *propSim, const real &t,
 void gr15(propSimulation *propSim) {
     real t = propSim->t;
     std::vector<real> xInteg0 = propSim->xInteg;
-    // ForceParameters &forceParams = propSim->forceParams;
-    // IntegrationParameters &integParams = propSim->integParams;
     size_t nh = 8;
     size_t dim = propSim->integParams.n2Derivs;
-    // Constants &consts = propSim->consts;
     real dt = get_initial_timestep(t, xInteg0, propSim);
     propSim->integParams.timestepCounter = 0;
     std::vector<real> accInteg = get_state_der(t, xInteg0, propSim);
@@ -347,8 +344,7 @@ void gr15(propSimulation *propSim) {
                          propSim->integParams.timestepCounter);
                 check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
                                        xInteg);
-                // add close approaach/impact handling here
-                // xInteg0 = xInteg;
+                // TODO: add close approaach/impact handling here
                 accInteg0 = accInteg;
                 propSim->t = t;
                 propSim->xInteg = xInteg;
@@ -386,4 +382,5 @@ void gr15(propSimulation *propSim) {
     }
     delete[] g;
     delete[] e;
+    delete[] b6Tilde;
 }

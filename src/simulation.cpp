@@ -887,29 +887,6 @@ void propSimulation::preprocess() {
                 this->xInteg.push_back(integBodies[i].stm[j]);
             }
         }
-        this->forceParams.masses.push_back(integBodies[i].mass);
-        this->forceParams.radii.push_back(integBodies[i].radius);
-        this->forceParams.spiceIdList.push_back(-99999);
-        this->forceParams.isPPNList.push_back(integBodies[i].isPPN);
-        this->forceParams.isJ2List.push_back(integBodies[i].isJ2);
-        this->forceParams.J2List.push_back(integBodies[i].J2);
-        this->forceParams.poleRAList.push_back(integBodies[i].poleRA);
-        this->forceParams.poleDecList.push_back(integBodies[i].poleDec);
-        this->forceParams.isNongravList.push_back(integBodies[i].isNongrav);
-        this->forceParams.ngParamsList.push_back(integBodies[i].ngParams);
-        this->forceParams.isMajorList.push_back(integBodies[i].isMajor);
-        this->forceParams.isThrustingList.push_back(integBodies[i].isThrusting);
-    }
-    for (size_t i = 0; i < this->integParams.nSpice; i++) {
-        this->forceParams.masses.push_back(spiceBodies[i].mass);
-        this->forceParams.radii.push_back(spiceBodies[i].radius);
-        this->forceParams.spiceIdList.push_back(spiceBodies[i].spiceId);
-        this->forceParams.isPPNList.push_back(spiceBodies[i].isPPN);
-        this->forceParams.isJ2List.push_back(spiceBodies[i].isJ2);
-        this->forceParams.J2List.push_back(spiceBodies[i].J2);
-        this->forceParams.poleRAList.push_back(spiceBodies[i].poleRA);
-        this->forceParams.poleDecList.push_back(spiceBodies[i].poleDec);
-        this->forceParams.isMajorList.push_back(spiceBodies[i].isMajor);
     }
     this->tStep.push_back(t);
     this->xIntegStep.push_back(xInteg);

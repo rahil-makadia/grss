@@ -13,9 +13,7 @@ struct Body {
     real poleRA = 0.0L;
     real poleDec = 90.0L;
     std::string name;
-    // std::vector<real> pos = {0.0L, 0.0L, 0.0L};
-    // std::vector<real> vel = {0.0L, 0.0L, 0.0L};
-    // std::vector<real> acc = {0.0L, 0.0L, 0.0L};
+    int spiceId;
     real pos[3], vel[3], acc[3];
     bool isPPN = false;
     bool isJ2 = false;
@@ -27,7 +25,6 @@ struct Body {
 class SpiceBody : public Body {
    private:
    public:
-    int spiceId;
     bool isSpice = true;
     // constructor
     SpiceBody(std::string name, int spiceID, real t0, real mass, real radius,
@@ -37,6 +34,7 @@ class SpiceBody : public Body {
 class IntegBody : public Body {
    private:
    public:
+    int spiceId = -99999;
     bool isInteg = true;
     bool isThrusting = false;
     std::vector<std::vector<real>> covariance;
@@ -104,7 +102,6 @@ class propSimulation {
     // preprocessor variables
     real t;
     std::vector<real> xInteg;
-    ForceParameters forceParams;
 
     // interpolator variables
     size_t interpIdx = 0;

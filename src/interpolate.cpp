@@ -284,7 +284,7 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
     vnorm({xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]},
           distRelativeOneBody);
     if (bouncePointAtLeadingEdge) {
-        distRelativeOneBody -= propSim->forceParams.radii[i];
+        distRelativeOneBody -= propSim->integBodies[i].radius;
     }
     lightTimeOneBody = distRelativeOneBody / propSim->consts.clight;
     if (propSim->convergedLightTime) {
@@ -308,7 +308,7 @@ void get_lightTimeOneBody(const size_t &i, const real tInterpGeom,
                 {xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]},
                 distRelativeOneBody);
             if (bouncePointAtLeadingEdge) {
-                distRelativeOneBody -= propSim->forceParams.radii[i];
+                distRelativeOneBody -= propSim->integBodies[i].radius;
             }
             lightTimeOneBodyPrev = lightTimeOneBody;
             get_delta_delay_relativistic(
@@ -354,10 +354,9 @@ void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
 
     real G = consts.G;
     real sunGM = 0;
-    for (size_t i = propSim->integParams.nInteg;
-         i < propSim->integParams.nTotal; i++) {
-        if (propSim->forceParams.spiceIdList[i] == 10) {
-            sunGM = G * propSim->forceParams.masses[i];
+    for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
+        if (propSim->spiceBodies[i].spiceId == 10) {
+            sunGM = G * propSim->spiceBodies[i].mass;
         }
     }
     if (sunGM == 0) {
@@ -484,7 +483,7 @@ void get_radar_measurement(const size_t interpIdx, const real tInterpGeom,
                        xRelativeOneBody[2]},
                       distRelativeUpleg);
                 if (bouncePointAtLeadingEdge) {
-                    distRelativeUpleg -= propSim->forceParams.radii[i];
+                    distRelativeUpleg -= propSim->integBodies[i].radius;
                 }
                 delayUplegPrev = delayUpleg;
                 get_delta_delay_relativistic(
@@ -562,10 +561,9 @@ void get_delta_delay_relativistic(propSimulation *propSim,
 
     real G = consts.G;
     real sunGM = 0;
-    for (size_t i = propSim->integParams.nInteg;
-         i < propSim->integParams.nTotal; i++) {
-        if (propSim->forceParams.spiceIdList[i] == 10) {
-            sunGM = G * propSim->forceParams.masses[i];
+    for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
+        if (propSim->spiceBodies[i].spiceId == 10) {
+            sunGM = G * propSim->spiceBodies[i].mass;
         }
     }
     if (sunGM == 0) {
@@ -665,10 +663,9 @@ void get_doppler_measurement(propSimulation *propSim, const real receiveTimeTDB,
 
     real G = propSim->consts.G;
     real sunGM = 0;
-    for (size_t i = propSim->integParams.nInteg;
-         i < propSim->integParams.nTotal; i++) {
-        if (propSim->forceParams.spiceIdList[i] == 10) {
-            sunGM = G * propSim->forceParams.masses[i];
+    for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
+        if (propSim->spiceBodies[i].spiceId == 10) {
+            sunGM = G * propSim->spiceBodies[i].mass;
         }
     }
     if (sunGM == 0) {

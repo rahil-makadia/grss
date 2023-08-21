@@ -120,55 +120,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             Non-gravitational parameter r0 in AU from Marsden et al. (1973).
             )mydelimiter");
 
-    py::class_<ForceParameters>(m, "ForceParameters", R"mydelimiter(
-        The ForceParameters class contains constants used for calculating the
-        forces on integrated bodies.
-        )mydelimiter")
-        .def(py::init<>())
-        .def_readwrite("masses", &ForceParameters::masses, R"mydelimiter(
-            Masses of the bodies.
-            )mydelimiter")
-        .def_readwrite("radii", &ForceParameters::radii, R"mydelimiter(
-            Radii of the bodies.
-            )mydelimiter")
-        .def_readwrite("spiceIdList", &ForceParameters::spiceIdList,
-                       R"mydelimiter(
-            SPICE IDs of the bodies.
-            )mydelimiter")
-        .def_readwrite("ngParamsList", &ForceParameters::ngParamsList,
-                       R"mydelimiter(
-            Non-gravitational parameters of the bodies.
-            )mydelimiter")
-        .def_readwrite("isPPNList", &ForceParameters::isPPNList, R"mydelimiter(
-            Whether the bodies are PPN bodies.
-            )mydelimiter")
-        .def_readwrite("isJ2List", &ForceParameters::isJ2List, R"mydelimiter(
-            Whether the bodies are J2 bodies.
-            )mydelimiter")
-        .def_readwrite("J2List", &ForceParameters::J2List, R"mydelimiter(
-            J2 parameters of the bodies.
-            )mydelimiter")
-        .def_readwrite("poleRAList", &ForceParameters::poleRAList,
-                       R"mydelimiter(
-            Right ascension of the poles of the bodies.
-            )mydelimiter")
-        .def_readwrite("poleDecList", &ForceParameters::poleDecList,
-                       R"mydelimiter(
-            Declination of the poles of the bodies.
-            )mydelimiter")
-        .def_readwrite("isNongravList", &ForceParameters::isNongravList,
-                       R"mydelimiter(
-            Whether the bodies have non-gravitational accelerations.
-            )mydelimiter")
-        .def_readwrite("isMajorList", &ForceParameters::isMajorList,
-                       R"mydelimiter(
-            Whether the bodies are major bodies (used for EIH PPN).
-            )mydelimiter")
-        .def_readwrite("isThrustingList", &ForceParameters::isThrustingList,
-                       R"mydelimiter(
-            Whether the bodies are thrusting.
-            )mydelimiter");
-
     m.def(
         "cometary_to_cartesian",
         [](real epochMjd, std::vector<real> cometaryState, real GM) {
@@ -486,10 +437,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("xInteg", &propSimulation::xInteg, R"mydelimiter(
             Current states of each integration body in the simulation.
-            )mydelimiter")
-        .def_readwrite("forceParams", &propSimulation::forceParams,
-                       R"mydelimiter(
-            Force parameters of the simulation. propSimulation.ForceParams object.
             )mydelimiter")
         .def_readwrite("evalApparentState", &propSimulation::evalApparentState,
                        R"mydelimiter(
