@@ -73,7 +73,7 @@ def get_obs_codes_file():
             data = file.read()
             last_updated = data.split('\n')[0]
             last_updated = datetime.datetime(*[int(i) for i in last_updated.split(',')])
-            diff_days = (now - last_updated).seconds / (60 * 60 * 24)
+            diff_days = (now - last_updated).days
             if diff_days >= 1.0:
                 _download_obs_codes_file()
     else:
