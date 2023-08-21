@@ -30,7 +30,6 @@
         Body
         Constants
         Event
-        ForceParameters
         ImpulseEvent
         IntegBody
         IntegrationParameters

@@ -43,7 +43,6 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.ephem
         ~propSimulation.evalApparentState
         ~propSimulation.events
-        ~propSimulation.forceParams
         ~propSimulation.integBodies
         ~propSimulation.integParams
         ~propSimulation.lightTimeEval
