@@ -36,7 +36,9 @@ The source code for the GRSS library is available on GitHub and can be downloade
 Once the source code has been downloaded, the library can be installed using the following command:
 
 ```console
-    python setup.py install
+    cd grss
+    source initialize.sh
+    python3 -m pip install .
 ```
 
 ## Usage
