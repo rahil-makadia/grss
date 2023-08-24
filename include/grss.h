@@ -12,6 +12,7 @@ void propSimulation::integrate() {
             "integrate.\n");
     }
 
+    this->preprocess();
     furnsh_c(this->DEkernelPath.c_str());
     gr15(this);
     unload_c(this->DEkernelPath.c_str());

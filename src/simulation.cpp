@@ -874,22 +874,24 @@ std::vector<real> propSimulation::get_integration_parameters() {
 }
 
 void propSimulation::preprocess() {
-    this->t = this->integParams.t0;
-    for (size_t i = 0; i < this->integParams.nInteg; i++) {
-        for (size_t j = 0; j < 3; j++) {
-            this->xInteg.push_back(integBodies[i].pos[j]);
-        }
-        for (size_t j = 0; j < 3; j++) {
-            this->xInteg.push_back(integBodies[i].vel[j]);
-        }
-        if (integBodies[i].propStm) {
-            for (size_t j = 0; j < integBodies[i].stm.size(); j++) {
-                this->xInteg.push_back(integBodies[i].stm[j]);
+    if (!this->isPreprocessed){
+        this->t = this->integParams.t0;
+        for (size_t i = 0; i < this->integParams.nInteg; i++) {
+            for (size_t j = 0; j < 3; j++) {
+                this->xInteg.push_back(integBodies[i].pos[j]);
+            }
+            for (size_t j = 0; j < 3; j++) {
+                this->xInteg.push_back(integBodies[i].vel[j]);
+            }
+            if (integBodies[i].propStm) {
+                for (size_t j = 0; j < integBodies[i].stm.size(); j++) {
+                    this->xInteg.push_back(integBodies[i].stm[j]);
+                }
             }
         }
+        this->tStep.push_back(t);
+        this->xIntegStep.push_back(xInteg);
     }
-    this->tStep.push_back(t);
-    this->xIntegStep.push_back(xInteg);
 }
 
 void propSimulation::extend(real tf, std::vector<real> tEvalNew,

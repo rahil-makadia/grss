@@ -57,7 +57,6 @@ int main() {
     IntegBody Didymos204f("(65803) Didymos204", simTestForward.integParams.t0, 0.0L,
                          0.0L, posf, velf, cov, ngPrms, simTestForward.consts);
     simTestForward.add_integ_body(Didymos204f);
-    simTestForward.preprocess();
     simTestForward.integrate();
 
     // handle backward sim
@@ -69,7 +68,6 @@ int main() {
     IntegBody Didymos204b("(65803) Didymos204", simTestBackward.integParams.t0, 0.0L,
                          0.0L, posb, velb, cov, ngPrms, simTestBackward.consts);
     simTestBackward.add_integ_body(Didymos204b);
-    simTestBackward.preprocess();
     simTestBackward.integrate();
 
     std::cout

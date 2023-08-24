@@ -73,6 +73,9 @@ class propSimulation {
    private:
     void prepare_for_evaluation(std::vector<real> &tEval,
                                 std::vector<std::vector<real>> &observerInfo);
+    // preprocessor
+    bool isPreprocessed = false;
+    void preprocess();
 
    public:
     // name and path to DE kernels
@@ -154,9 +157,6 @@ class propSimulation {
     // getters
     std::vector<real> get_sim_constants();
     std::vector<real> get_integration_parameters();
-
-    // preprocessor
-    void preprocess();
 
     // integrator
     void integrate();

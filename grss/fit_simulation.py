@@ -1254,10 +1254,8 @@ class FitSimulation:
                                                                             integ_body_minus,
                                                                             events_minus)
         if self.past_obs_exist:
-            prop_sim_past.preprocess()
             prop_sim_past.integrate()
         if self.future_obs_exist:
-            prop_sim_future.preprocess()
             prop_sim_future.integrate()
         return prop_sim_past, prop_sim_future
 
@@ -1896,10 +1894,8 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
                 prop_sim_future.add_event(target_body, t_event, [dvx, dvy, dvz], multiplier)
     # propagate
     if past_obs_exist:
-        prop_sim_past.preprocess()
         prop_sim_past.integrate()
     if future_obs_exist:
-        prop_sim_future.preprocess()
         prop_sim_future.integrate()
     # get the propagated solution
     if past_obs_exist and future_obs_exist:

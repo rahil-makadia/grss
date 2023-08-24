@@ -720,9 +720,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             tolPC : real
                 Tolerance for predictor-corrector within IAS15.
             )mydelimiter")
-        .def("preprocess", &propSimulation::preprocess, R"mydelimiter(
-            Preprocesses the simulation and assembles the forceParams attribute.
-            )mydelimiter")
         .def("integrate", &propSimulation::integrate, R"mydelimiter(
             Propagates the simulation using the Gauss-Radau integrator.
             )mydelimiter")
