@@ -632,7 +632,7 @@ PYBIND11_MODULE(prop_simulation, m) {
              py::arg("convergedLightTims") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
              py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
-             py::arg("dtMax") = 6.0L, py::arg("dtMin") = 5.0e-3L,
+             py::arg("dtMax") = 21.0L, py::arg("dtMin") = 5.0e-3L,
              py::arg("dtChangeFactor") = 0.25L, py::arg("tolInteg") = 1.0e-9L,
              py::arg("tolPC") = 1.0e-16L, R"mydelimiter(
             Sets the integration parameters.
