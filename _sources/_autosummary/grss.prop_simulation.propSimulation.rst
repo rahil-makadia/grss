@@ -24,7 +24,6 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.get_integration_parameters
         ~propSimulation.get_sim_constants
         ~propSimulation.integrate
-        ~propSimulation.preprocess
         ~propSimulation.remove_body
         ~propSimulation.set_integration_parameters
         ~propSimulation.set_sim_constants
