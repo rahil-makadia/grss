@@ -153,7 +153,7 @@ void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
 
 void kepler_solve(const real &M, const real &e, real &E,
-                  const real &tol = 1.0e-14L, const int &max_iter = 100);
+                  const real &tol = 1.0e-12L, const int &max_iter = 100);
 void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
                              const real &tol = 1.0e-12L,
                              const int &max_iter = 100);
