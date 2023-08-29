@@ -15,7 +15,7 @@ jobs:
           submodules: true
       - name: Build GRSS library
         run: |
-          source initialize.sh
+          source initialize.sh --tm-overwrite
           source build_cpp.sh -clean
       - name: Run tests
         run: |

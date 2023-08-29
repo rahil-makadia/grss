@@ -13,7 +13,7 @@ git submodule update
 cd ./grss/debias/
 python3 get_debiasing_data.py
 cd ../kernels/
-if [ "$1" = "tm-overwrite" ]; then
+if [ "$1" = "--tm-overwrite" ]; then
     python3 get_kernels.py
 else
     python3 get_kernels.py --no-tm-overwrite
