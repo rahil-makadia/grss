@@ -87,6 +87,8 @@ class CMakeBuild(build_ext):
 # get version from version.txt
 with open("grss/version.txt", "r", encoding="utf-8") as f:
     ver = f.read().strip()
+# run get_cspice in the extern folder
+subprocess.run(["python", "get_cspice.py"], cwd="extern", check=True)
 setup(
     version=ver,
     packages=["grss", "grss.debias", "grss.kernels"],

@@ -2,7 +2,8 @@ include include/*.h
 include src/*.cpp
 include src/CMakeLists.txt
 
-recursive-include extern *
+include extern/get_cspice.py
+recursive-include extern/pybind11 *
 recursive-include tests *
 
 include CMakeLists.txt
