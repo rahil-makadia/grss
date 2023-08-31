@@ -269,17 +269,15 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<IntegBody, Body>(m, "IntegBody", R"mydelimiter(
         The IntegBody class contains the properties of an integrated body.
         )mydelimiter")
-        .def(py::init<std::string, std::string, real, real, real,
+        .def(py::init<std::string, real, real, real,
                       std::vector<real>, std::vector<std::vector<real>>,
-                      NongravParamaters, Constants>(),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"),
+                      NongravParamaters>(),
+             py::arg("name"), py::arg("t0"),
              py::arg("mass"), py::arg("radius"), py::arg("cometaryState"),
-             py::arg("covariance"), py::arg("ngParams"), py::arg("constants"),
+             py::arg("covariance"), py::arg("ngParams"),
              R"mydelimiter(
             Constructor for the IntegBody class.
 
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
             name : str
                 Name of the body.
             t0 : real
@@ -294,16 +292,14 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Covariance of the body's initial state.
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
 
         .def(py::init<std::string, real, real, real, std::vector<real>,
                       std::vector<real>, std::vector<std::vector<real>>,
-                      NongravParamaters, Constants>(),
+                      NongravParamaters>(),
              py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
              py::arg("pos"), py::arg("vel"), py::arg("covariance"),
-             py::arg("ngParams"), py::arg("constants"), R"mydelimiter(
+             py::arg("ngParams"), R"mydelimiter(
             Constructor for the IntegBody class.
 
             name : str
@@ -322,8 +318,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Covariance of the body's initial state.
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
         .def_readwrite("isInteg", &IntegBody::isInteg, R"mydelimiter(
             Whether the body is an integrated body. Always True.
@@ -481,28 +475,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
         .def("add_spice_body",
-             static_cast<void (propSimulation::*)(std::string, int, real, real,
-                                                  real, Constants)>(
-                 &propSimulation::add_spice_body),
-             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("constants"),
-             R"mydelimiter(
-            Adds a SPICE body to the simulation.
-
-            name : str
-                Name of the body.
-            spiceId : int
-                SPICE ID of the body.
-            t0 : real
-                Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.
-            mass : real
-                Mass of the body.
-            radius : real
-                Radius of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
-            )mydelimiter")
-        .def("add_spice_body",
              static_cast<void (propSimulation::*)(SpiceBody)>(
                  &propSimulation::add_spice_body),
              py::arg("body"), R"mydelimiter(
@@ -510,66 +482,6 @@ PYBIND11_MODULE(prop_simulation, m) {
 
             body : propSimulation.SpiceBody
                 SPICE body to add to the simulation.
-            )mydelimiter")
-        .def("add_integ_body",
-             static_cast<void (propSimulation::*)(
-                 std::string, std::string, real, real, real, std::vector<real>,
-                 std::vector<std::vector<real>>, NongravParamaters, Constants)>(
-                 &propSimulation::add_integ_body),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("cometaryState"),
-             py::arg("covariance"), py::arg("ngParams"), py::arg("constants"),
-             R"mydelimiter(
-            Adds an integration body to the simulation.
-
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
-            name : str
-                Name of the body.
-            t0 : real
-                Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.
-            mass : real
-                Mass of the body.
-            radius : real
-                Radius of the body.
-            cometaryState : list of real
-                Initial Heliocentric Ecliptic Cometary state of the body.
-            covariance : list of list of real
-                Covariance of the initial state.
-            ngParams : propSimulation.NongravParamaters
-                Nongravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
-            )mydelimiter")
-        .def(
-            "add_integ_body",
-            static_cast<void (propSimulation::*)(
-                std::string, real, real, real, std::vector<real>,
-                std::vector<real>, std::vector<std::vector<real>>,
-                NongravParamaters, Constants)>(&propSimulation::add_integ_body),
-            py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
-            py::arg("pos"), py::arg("vel"), py::arg("covariance"),
-            py::arg("ngParams"), py::arg("constants"), R"mydelimiter(
-            Adds an integration body to the simulation.
-
-            name : str
-                Name of the body.
-            t0 : real
-                Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.
-            mass : real
-                Mass of the body.
-            radius : real
-                Radius of the body.
-            pos : list of real
-                Initial barycentric Cartesian position of the body.
-            vel : list of real
-                Initial barycentric Cartesian velocity of the body.
-            covariance : list of list of real
-                Covariance of the initial state.
-            ngParams : propSimulation.NongravParamaters
-                Nongravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
         .def("add_integ_body",
              static_cast<void (propSimulation::*)(IntegBody)>(

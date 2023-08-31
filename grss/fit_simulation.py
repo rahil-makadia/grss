@@ -1186,7 +1186,6 @@ class FitSimulation:
         # get propagated states
         prop_sim_past, prop_sim_future = self.get_prop_sims("orbit_fit_sim")
         # create nominal integ_body object
-        consts = prop.Constants()
         state_nom = self.x_dict_to_state(self.x_nom)
         ng_params_nom = self.x_dict_to_nongrav_params(self.x_nom)
         events_nom = self.x_dict_to_events(self.x_nom)
@@ -1196,12 +1195,12 @@ class FitSimulation:
                                             self.fixed_propsim_params['mass'],
                                             self.fixed_propsim_params['radius'],
                                             state_nom[:3], state_nom[3:6],
-                                            cov_nom, ng_params_nom, consts)
+                                            cov_nom, ng_params_nom)
         elif self.fit_cometary:
-            integ_body_nom = prop.IntegBody(self.de_kernel_path, "integ_body_nom",
+            integ_body_nom = prop.IntegBody("integ_body_nom",
                                             self.t_sol, self.fixed_propsim_params['mass'],
                                             self.fixed_propsim_params['radius'],
-                                            state_nom, cov_nom, ng_params_nom, consts)
+                                            state_nom, cov_nom, ng_params_nom)
         # add the nominal integ_body for the residuals
         if self.past_obs_exist:
             prop_sim_past.add_integ_body(integ_body_nom)
@@ -1220,25 +1219,21 @@ class FitSimulation:
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_plus[:3], state_plus[3:6],
-                                                        cov_nom, ng_params_plus, consts)
+                                                        cov_nom, ng_params_plus)
                     integ_body_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_minus[:3], state_minus[3:6],
-                                                        cov_nom, ng_params_minus, consts)
+                                                        cov_nom, ng_params_minus)
                 elif self.fit_cometary:
-                    integ_body_plus = prop.IntegBody(self.de_kernel_path,
-                                                        f"integBody_pert_{key}_plus", self.t_sol,
+                    integ_body_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
-                                                        state_plus, cov_nom,
-                                                        ng_params_plus, consts)
-                    integ_body_minus = prop.IntegBody(self.de_kernel_path,
-                                                        f"integBody_pert_{key}_minus", self.t_sol,
+                                                        state_plus, cov_nom, ng_params_plus)
+                    integ_body_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
-                                                        state_minus, cov_nom,
-                                                        ng_params_minus, consts)
+                                                        state_minus, cov_nom, ng_params_minus)
                 if self.past_obs_exist:
                     prop_sim_past.add_integ_body(integ_body_plus)
                     prop_sim_past.add_integ_body(integ_body_minus)
@@ -1808,7 +1803,6 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     # check that the reference solution has the requisite information and create integration body
     if 't' not in ref_sol:
         raise ValueError("Must provide a time for the initial solution.")
-    consts = prop.Constants()
     nongrav_params = prop.NongravParamaters()
     nongrav_params.a1 = ref_ng_info['a1']
     nongrav_params.a2 = ref_ng_info['a2']
@@ -1823,7 +1817,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         vel = [ref_sol['vx'], ref_sol['vy'], ref_sol['vz']]
         target_body = prop.IntegBody("body_simulated_obs", ref_sol['t'], ref_sol['mass'],
                                         ref_sol['radius'], pos, vel,
-                                        ref_cov, nongrav_params, consts)
+                                        ref_cov, nongrav_params)
     elif all(key in ref_sol for key in ("e", "q", "tp", "om", "w", "i")):
         ecc = ref_sol['e']
         peri_dist = ref_sol['q']
@@ -1833,9 +1827,9 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         inc = ref_sol['i']
         cometary_elements = [ecc, peri_dist, time_peri,
                                 omega*np.pi/180.0, arg_peri*np.pi/180.0, inc*np.pi/180.0]
-        target_body = prop.IntegBody(de_kernel_path, "body_simulated_obs", ref_sol['t'],
+        target_body = prop.IntegBody("body_simulated_obs", ref_sol['t'],
                                         ref_sol['mass'], ref_sol['radius'], cometary_elements,
-                                        ref_cov, nongrav_params, consts)
+                                        ref_cov, nongrav_params)
     else:
         raise ValueError("Must provide either a full cartesian or cometary",
                                 "state for the initial solution.")

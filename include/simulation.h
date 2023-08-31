@@ -35,6 +35,7 @@ class IntegBody : public Body {
    private:
    public:
     int spiceId = -99999;
+    bool isCometary = false;
     bool isInteg = true;
     bool isThrusting = false;
     std::vector<std::vector<real>> covariance;
@@ -43,14 +44,14 @@ class IntegBody : public Body {
     std::vector<real> stm;
     size_t n2Derivs = 3;
     // constructors
-    IntegBody(std::string DEkernelPath, std::string name, real t0, real mass,
-              real radius, std::vector<real> cometaryState,
+    IntegBody(std::string name, real t0, real mass, real radius,
+              std::vector<real> cometaryState,
               std::vector<std::vector<real>> covariance,
-              NongravParamaters ngParams, Constants consts);
+              NongravParamaters ngParams);
     IntegBody(std::string name, real t0, real mass, real radius,
               std::vector<real> pos, std::vector<real> vel,
               std::vector<std::vector<real>> covariance,
-              NongravParamaters ngParams, Constants consts);
+              NongravParamaters ngParams);
 };
 
 class Event {
@@ -121,17 +122,7 @@ class propSimulation {
     std::vector<std::vector<real>> radarObsEval;
 
     // add/remove bodies and add events
-    void add_spice_body(std::string name, int spiceID, real t0, real mass,
-                        real radius, Constants consts);
     void add_spice_body(SpiceBody body);
-    void add_integ_body(std::string DEkernelPath, std::string name, real t0,
-                        real mass, real radius, std::vector<real> cometaryState,
-                        std::vector<std::vector<real>> covariance,
-                        NongravParamaters ngParams, Constants consts);
-    void add_integ_body(std::string name, real t0, real mass, real radius,
-                        std::vector<real> pos, std::vector<real> vel,
-                        std::vector<std::vector<real>> covariance,
-                        NongravParamaters ngParams, Constants consts);
     void add_integ_body(IntegBody body);
     void remove_body(std::string name);
     void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
