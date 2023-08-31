@@ -510,7 +510,7 @@ prop_sim.set_integration_parameters(tf, t_eval, t_eval_utc, eval_apparent_state,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>icarus = prop.IntegBody(de_kernel_path, &quot;(1566) Icarus&quot;, t0, 0.0, 0.0, cometary_elements, init_cov, ng_params, prop_sim.consts)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>icarus = prop.IntegBody(&quot;(1566) Icarus&quot;, t0, 0.0, 0.0, cometary_elements, init_cov, ng_params)
 prop_sim.add_integ_body(icarus)
 </pre></div>
 </div>

@@ -517,11 +517,11 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_event" title="grss.prop_simulation.propSimulation.add_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_event</span></code></a>(self, body, tEvent, deltaV[, ...])</p></td>
 <td><p>Adds an impulsive delta-V event to the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_integ_body" title="grss.prop_simulation.propSimulation.add_integ_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_integ_body</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Overloaded function.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_integ_body" title="grss.prop_simulation.propSimulation.add_integ_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_integ_body</span></code></a>(self, body)</p></td>
+<td><p>Adds an integration body to the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_spice_body" title="grss.prop_simulation.propSimulation.add_spice_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_spice_body</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Overloaded function.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.add_spice_body" title="grss.prop_simulation.propSimulation.add_spice_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_spice_body</span></code></a>(self, body)</p></td>
+<td><p>Adds a SPICE body to the simulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.extend" title="grss.prop_simulation.propSimulation.extend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code></a>(self, tf[, tEvalNew, xObserverNew])</p></td>
 <td><p>Extends the simulation to a new final time.</p></td>
@@ -644,105 +644,22 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_integ_body">
-<span class="sig-name descname"><span class="pre">add_integ_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_integ_body" title="Permalink to this definition">#</a></dt>
-<dd><p>Overloaded function.</p>
-<ol class="arabic">
-<li><p>add_integ_body(self: grss.prop_simulation.propSimulation, DEkernelPath: str, name: str, t0: float, mass: float, radius: float, cometaryState: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters, constants: grss.prop_simulation.Constants) -&gt; None</p>
-<blockquote>
-<div><p>Adds an integration body to the simulation.</p>
-<dl class="simple">
-<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
-</dd>
-<dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
-</dd>
-<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.</p>
-</dd>
-<dt>mass<span class="classifier">real</span></dt><dd><p>Mass of the body.</p>
-</dd>
-<dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
-</dd>
-<dt>cometaryState<span class="classifier">list of real</span></dt><dd><p>Initial Heliocentric Ecliptic Cometary state of the body.</p>
-</dd>
-<dt>covariance<span class="classifier">list of list of real</span></dt><dd><p>Covariance of the initial state.</p>
-</dd>
-<dt>ngParams<span class="classifier">propSimulation.NongravParamaters</span></dt><dd><p>Nongravitational parameters of the body.</p>
-</dd>
-<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>add_integ_body(self: grss.prop_simulation.propSimulation, name: str, t0: float, mass: float, radius: float, pos: List[float], vel: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters, constants: grss.prop_simulation.Constants) -&gt; None</p>
-<blockquote>
-<div><p>Adds an integration body to the simulation.</p>
-<dl class="simple">
-<dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
-</dd>
-<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.</p>
-</dd>
-<dt>mass<span class="classifier">real</span></dt><dd><p>Mass of the body.</p>
-</dd>
-<dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
-</dd>
-<dt>pos<span class="classifier">list of real</span></dt><dd><p>Initial barycentric Cartesian position of the body.</p>
-</dd>
-<dt>vel<span class="classifier">list of real</span></dt><dd><p>Initial barycentric Cartesian velocity of the body.</p>
-</dd>
-<dt>covariance<span class="classifier">list of list of real</span></dt><dd><p>Covariance of the initial state.</p>
-</dd>
-<dt>ngParams<span class="classifier">propSimulation.NongravParamaters</span></dt><dd><p>Nongravitational parameters of the body.</p>
-</dd>
-<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>add_integ_body(self: grss.prop_simulation.propSimulation, body: grss.prop_simulation.IntegBody) -&gt; None</p>
-<blockquote>
-<div><p>Adds an integration body to the simulation.</p>
+<span class="sig-name descname"><span class="pre">add_integ_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.IntegBody.html#grss.prop_simulation.IntegBody" title="grss.prop_simulation.IntegBody"><span class="pre">grss.prop_simulation.IntegBody</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_integ_body" title="Permalink to this definition">#</a></dt>
+<dd><p>Adds an integration body to the simulation.</p>
 <dl class="simple">
 <dt>body<span class="classifier">propSimulation.IntegBody</span></dt><dd><p>Integration body to add to the simulation.</p>
 </dd>
 </dl>
-</div></blockquote>
-</li>
-</ol>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_spice_body">
-<span class="sig-name descname"><span class="pre">add_spice_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_spice_body" title="Permalink to this definition">#</a></dt>
-<dd><p>Overloaded function.</p>
-<ol class="arabic">
-<li><p>add_spice_body(self: grss.prop_simulation.propSimulation, name: str, spiceId: int, t0: float, mass: float, radius: float, constants: grss.prop_simulation.Constants) -&gt; None</p>
-<blockquote>
-<div><p>Adds a SPICE body to the simulation.</p>
-<dl class="simple">
-<dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
-</dd>
-<dt>spiceId<span class="classifier">int</span></dt><dd><p>SPICE ID of the body.</p>
-</dd>
-<dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.</p>
-</dd>
-<dt>mass<span class="classifier">real</span></dt><dd><p>Mass of the body.</p>
-</dd>
-<dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
-</dd>
-<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>add_spice_body(self: grss.prop_simulation.propSimulation, body: grss.prop_simulation.SpiceBody) -&gt; None</p>
-<blockquote>
-<div><p>Adds a SPICE body to the simulation.</p>
+<span class="sig-name descname"><span class="pre">add_spice_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.SpiceBody.html#grss.prop_simulation.SpiceBody" title="grss.prop_simulation.SpiceBody"><span class="pre">grss.prop_simulation.SpiceBody</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_spice_body" title="Permalink to this definition">#</a></dt>
+<dd><p>Adds a SPICE body to the simulation.</p>
 <dl class="simple">
 <dt>body<span class="classifier">propSimulation.SpiceBody</span></dt><dd><p>SPICE body to add to the simulation.</p>
 </dd>
 </dl>
-</div></blockquote>
-</li>
-</ol>
 </dd></dl>
 
 <dl class="py property">

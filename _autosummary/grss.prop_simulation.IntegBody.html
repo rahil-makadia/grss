@@ -465,12 +465,10 @@ document.write(`
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop_simulation.IntegBody.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Overloaded function.</p>
 <ol class="arabic">
-<li><p>__init__(self: grss.prop_simulation.IntegBody, DEkernelPath: str, name: str, t0: float, mass: float, radius: float, cometaryState: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters, constants: grss.prop_simulation.Constants) -&gt; None</p>
+<li><p>__init__(self: grss.prop_simulation.IntegBody, name: str, t0: float, mass: float, radius: float, cometaryState: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters) -&gt; None</p>
 <blockquote>
 <div><p>Constructor for the IntegBody class.</p>
 <dl class="simple">
-<dt>DEkernelPath<span class="classifier">str</span></dt><dd><p>Path to the SPICE DE kernel.</p>
-</dd>
 <dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
 </dd>
 <dt>t0<span class="classifier">real</span></dt><dd><p>Initial MJD TDB time of the body. Same as the initial time of the propagator.</p>
@@ -485,12 +483,10 @@ document.write(`
 </dd>
 <dt>ngParams<span class="classifier">propSimulation.NongravParamaters</span></dt><dd><p>Non-gravitational parameters of the body.</p>
 </dd>
-<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
-</dd>
 </dl>
 </div></blockquote>
 </li>
-<li><p>__init__(self: grss.prop_simulation.IntegBody, name: str, t0: float, mass: float, radius: float, pos: List[float], vel: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters, constants: grss.prop_simulation.Constants) -&gt; None</p>
+<li><p>__init__(self: grss.prop_simulation.IntegBody, name: str, t0: float, mass: float, radius: float, pos: List[float], vel: List[float], covariance: List[List[float]], ngParams: grss.prop_simulation.NongravParamaters) -&gt; None</p>
 <blockquote>
 <div><p>Constructor for the IntegBody class.</p>
 <dl class="simple">
@@ -509,8 +505,6 @@ document.write(`
 <dt>covariance<span class="classifier">list of list of real</span></dt><dd><p>Covariance of the body’s initial state.</p>
 </dd>
 <dt>ngParams<span class="classifier">propSimulation.NongravParamaters</span></dt><dd><p>Non-gravitational parameters of the body.</p>
-</dd>
-<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
 </dd>
 </dl>
 </div></blockquote>
