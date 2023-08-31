@@ -178,9 +178,7 @@ propSimulation::propSimulation(std::string name, real t0,
     this->integParams.n2Derivs = 0;
     this->integParams.timestepCounter = 0;
 
-    std::string selfPath = __FILE__;
-    selfPath = selfPath.substr(0, selfPath.find_last_of("/\\"));
-    std::string mapKernelPath = selfPath + "/../grss/kernels/";
+    std::string mapKernelPath = DEkernelPath.substr(0, DEkernelPath.find_last_of("/\\"))+"/";
     switch (defaultSpiceBodies) {
         case 0: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
