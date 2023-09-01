@@ -326,11 +326,12 @@ void gr15(propSimulation *propSim) {
             dtReq = dt / relError;
 
             if (relError <= 1 || loopCounter > maxLoops) {
-                if (propSim->tEval.size() != propSim->xIntegEval.size()) {
-                    interpolate(t, dt, xInteg0, accInteg0, b, propSim);
-                }
-                propSim->interpParams.accIntegStack.push_back(accInteg0);
                 propSim->interpParams.bStack.push_back(bOld);
+                propSim->interpParams.accIntegStack.push_back(accInteg0);
+                if (propSim->tEval.size() != propSim->xIntegEval.size()) {
+                    // interpolate(t, dt, xInteg0, accInteg0, b, propSim);
+                    interpolate_on_the_fly(propSim, t, dt);
+                }
                 accInteg0 = accIntegNext;
                 t += dt;
                 propSim->t = t;
