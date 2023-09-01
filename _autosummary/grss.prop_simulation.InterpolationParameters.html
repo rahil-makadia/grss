@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop_simulation.IntegrationParameters &#8212; GRSS 0.9.7 documentation</title>
+    <title>grss.prop_simulation.InterpolationParameters &#8212; GRSS 0.9.7 documentation</title>
   
   
   
@@ -54,11 +54,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop_simulation.IntegrationParameters';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop_simulation.InterpolationParameters';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.prop_simulation.InterpolationParameters" href="grss.prop_simulation.InterpolationParameters.html" />
-    <link rel="prev" title="grss.prop_simulation.IntegBody" href="grss.prop_simulation.IntegBody.html" />
+    <link rel="next" title="grss.prop_simulation.NongravParamaters" href="grss.prop_simulation.NongravParamaters.html" />
+    <link rel="prev" title="grss.prop_simulation.IntegrationParameters" href="grss.prop_simulation.IntegrationParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -208,8 +208,8 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Event.html">grss.prop_simulation.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.ImpulseEvent.html">grss.prop_simulation.ImpulseEvent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.IntegBody.html">grss.prop_simulation.IntegBody</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.prop_simulation.IntegrationParameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.InterpolationParameters.html">grss.prop_simulation.InterpolationParameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.IntegrationParameters.html">grss.prop_simulation.IntegrationParameters</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.prop_simulation.InterpolationParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.NongravParamaters.html">grss.prop_simulation.NongravParamaters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.SpiceBody.html">grss.prop_simulation.SpiceBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.propSimulation.html">grss.prop_simulation.propSimulation</a></li>
@@ -298,7 +298,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop_simulation.IntegrationParameters.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop_simulation.InterpolationParameters.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -328,7 +328,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.prop_simulation.IntegrationParameters.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.prop_simulation.InterpolationParameters.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -410,7 +410,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.prop_simulation.IntegrationParameters</h1>
+    <h1>grss.prop_simulation.InterpolationParameters</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -420,22 +420,12 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.__init__"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.adaptiveTimestep"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.adaptiveTimestep</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dt0"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dt0</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dtChangeFactor"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtChangeFactor</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dtMax"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMax</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dtMin"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMin</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.n2Derivs</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.nInteg"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nInteg</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.nSpice"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nSpice</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.nTotal"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nTotal</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.t0"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.t0</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.tf"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.tf</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.timestepCounter"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.timestepCounter</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.tolInteg"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.tolInteg</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.tolPC"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.tolPC</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.__init__"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.accIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.accIntegStack</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.bStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.bStack</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.tStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.tStack</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.xIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.xIntegStack</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -449,23 +439,23 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="grss-prop-simulation-integrationparameters">
-<h1>grss.prop_simulation.IntegrationParameters<a class="headerlink" href="#grss-prop-simulation-integrationparameters" title="Permalink to this heading">#</a></h1>
+  <section id="grss-prop-simulation-interpolationparameters">
+<h1>grss.prop_simulation.InterpolationParameters<a class="headerlink" href="#grss-prop-simulation-interpolationparameters" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">IntegrationParameters</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="grss.prop_simulation.InterpolationParameters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">InterpolationParameters</span></span><a class="headerlink" href="#grss.prop_simulation.InterpolationParameters" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>The IntegrationParameters class contains parameters used in the numerical
-integration of the equations of motion.</p>
+<p>The InterpolationParameters class contains parameters used for
+interpolation of the states of the integrated bodies.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters" title="grss.prop_simulation.IntegrationParameters"><span class="pre">grss.prop_simulation.IntegrationParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.__init__" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="grss.prop_simulation.InterpolationParameters.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.InterpolationParameters" title="grss.prop_simulation.InterpolationParameters"><span class="pre">grss.prop_simulation.InterpolationParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.InterpolationParameters.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.__init__" title="grss.prop_simulation.IntegrationParameters.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.InterpolationParameters.__init__" title="grss.prop_simulation.InterpolationParameters.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -473,132 +463,42 @@ integration of the equations of motion.</p>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.adaptiveTimestep" title="grss.prop_simulation.IntegrationParameters.adaptiveTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adaptiveTimestep</span></code></a></p></td>
-<td><p>Flag to use adaptive time step.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.InterpolationParameters.accIntegStack" title="grss.prop_simulation.InterpolationParameters.accIntegStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accIntegStack</span></code></a></p></td>
+<td><p>Stack of accelerations of the integrated bodies at steps taken by the integrator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dt0" title="grss.prop_simulation.IntegrationParameters.dt0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt0</span></code></a></p></td>
-<td><p>Initial time step.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.InterpolationParameters.bStack" title="grss.prop_simulation.InterpolationParameters.bStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bStack</span></code></a></p></td>
+<td><p>Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dtChangeFactor" title="grss.prop_simulation.IntegrationParameters.dtChangeFactor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtChangeFactor</span></code></a></p></td>
-<td><p>Factor by which to limit the change in time step.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.InterpolationParameters.tStack" title="grss.prop_simulation.InterpolationParameters.tStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tStack</span></code></a></p></td>
+<td><p>Stack of times used for interpolation at steps taken by the integrator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dtMax" title="grss.prop_simulation.IntegrationParameters.dtMax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMax</span></code></a></p></td>
-<td><p>Maximum time step.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.dtMin" title="grss.prop_simulation.IntegrationParameters.dtMin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMin</span></code></a></p></td>
-<td><p>Minimum time step.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.n2Derivs" title="grss.prop_simulation.IntegrationParameters.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
-<td><p>Number of second derivatives.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.nInteg" title="grss.prop_simulation.IntegrationParameters.nInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nInteg</span></code></a></p></td>
-<td><p>Number of integrated bodies.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.nSpice" title="grss.prop_simulation.IntegrationParameters.nSpice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nSpice</span></code></a></p></td>
-<td><p>Number of bodies with SPICE ephemerides.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.nTotal" title="grss.prop_simulation.IntegrationParameters.nTotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTotal</span></code></a></p></td>
-<td><p>Total number of bodies.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.t0" title="grss.prop_simulation.IntegrationParameters.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
-<td><p>Initial time of integration (MJD TDB).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.tf" title="grss.prop_simulation.IntegrationParameters.tf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tf</span></code></a></p></td>
-<td><p>Final time of integration (MJD TDB).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.timestepCounter" title="grss.prop_simulation.IntegrationParameters.timestepCounter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestepCounter</span></code></a></p></td>
-<td><p>Counter for number of time steps.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.tolInteg" title="grss.prop_simulation.IntegrationParameters.tolInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolInteg</span></code></a></p></td>
-<td><p>Tolerance for integration.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.IntegrationParameters.tolPC" title="grss.prop_simulation.IntegrationParameters.tolPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolPC</span></code></a></p></td>
-<td><p>Tolerance for predictor-corrector within IAS15.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.InterpolationParameters.xIntegStack" title="grss.prop_simulation.InterpolationParameters.xIntegStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegStack</span></code></a></p></td>
+<td><p>Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.adaptiveTimestep">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">adaptiveTimestep</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.adaptiveTimestep" title="Permalink to this definition">#</a></dt>
-<dd><p>Flag to use adaptive time step.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.InterpolationParameters.accIntegStack">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">accIntegStack</span></span><a class="headerlink" href="#grss.prop_simulation.InterpolationParameters.accIntegStack" title="Permalink to this definition">#</a></dt>
+<dd><p>Stack of accelerations of the integrated bodies at steps taken by the integrator.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dt0">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt0</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dt0" title="Permalink to this definition">#</a></dt>
-<dd><p>Initial time step.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.InterpolationParameters.bStack">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bStack</span></span><a class="headerlink" href="#grss.prop_simulation.InterpolationParameters.bStack" title="Permalink to this definition">#</a></dt>
+<dd><p>Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dtChangeFactor">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtChangeFactor</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dtChangeFactor" title="Permalink to this definition">#</a></dt>
-<dd><p>Factor by which to limit the change in time step.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.InterpolationParameters.tStack">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tStack</span></span><a class="headerlink" href="#grss.prop_simulation.InterpolationParameters.tStack" title="Permalink to this definition">#</a></dt>
+<dd><p>Stack of times used for interpolation at steps taken by the integrator.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dtMax">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtMax</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dtMax" title="Permalink to this definition">#</a></dt>
-<dd><p>Maximum time step.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.dtMin">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtMin</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.dtMin" title="Permalink to this definition">#</a></dt>
-<dd><p>Minimum time step.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.n2Derivs">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n2Derivs</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.n2Derivs" title="Permalink to this definition">#</a></dt>
-<dd><p>Number of second derivatives.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.nInteg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nInteg</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.nInteg" title="Permalink to this definition">#</a></dt>
-<dd><p>Number of integrated bodies.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.nSpice">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nSpice</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.nSpice" title="Permalink to this definition">#</a></dt>
-<dd><p>Number of bodies with SPICE ephemerides.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.nTotal">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nTotal</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.nTotal" title="Permalink to this definition">#</a></dt>
-<dd><p>Total number of bodies. nTotal = nInteg + nSpice.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.t0">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t0</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.t0" title="Permalink to this definition">#</a></dt>
-<dd><p>Initial time of integration (MJD TDB).</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.tf">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tf</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.tf" title="Permalink to this definition">#</a></dt>
-<dd><p>Final time of integration (MJD TDB).</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.timestepCounter">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timestepCounter</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.timestepCounter" title="Permalink to this definition">#</a></dt>
-<dd><p>Counter for number of time steps.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.tolInteg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tolInteg</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.tolInteg" title="Permalink to this definition">#</a></dt>
-<dd><p>Tolerance for integration.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.prop_simulation.IntegrationParameters.tolPC">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tolPC</span></span><a class="headerlink" href="#grss.prop_simulation.IntegrationParameters.tolPC" title="Permalink to this definition">#</a></dt>
-<dd><p>Tolerance for predictor-corrector within IAS15.</p>
+<dt class="sig sig-object py" id="grss.prop_simulation.InterpolationParameters.xIntegStack">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xIntegStack</span></span><a class="headerlink" href="#grss.prop_simulation.InterpolationParameters.xIntegStack" title="Permalink to this definition">#</a></dt>
+<dd><p>Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.</p>
 </dd></dl>
 
 </dd></dl>
@@ -618,20 +518,20 @@ integration of the equations of motion.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.prop_simulation.IntegBody.html"
+       href="grss.prop_simulation.IntegrationParameters.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.prop_simulation.IntegBody</p>
+        <p class="prev-next-title">grss.prop_simulation.IntegrationParameters</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.prop_simulation.InterpolationParameters.html"
+       href="grss.prop_simulation.NongravParamaters.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.prop_simulation.InterpolationParameters</p>
+        <p class="prev-next-title">grss.prop_simulation.NongravParamaters</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -653,22 +553,12 @@ integration of the equations of motion.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.__init__"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.adaptiveTimestep"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.adaptiveTimestep</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dt0"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dt0</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dtChangeFactor"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtChangeFactor</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dtMax"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMax</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.dtMin"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMin</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.n2Derivs</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.nInteg"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nInteg</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.nSpice"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nSpice</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.nTotal"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nTotal</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.t0"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.t0</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.tf"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.tf</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.timestepCounter"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.timestepCounter</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.tolInteg"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.tolInteg</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.IntegrationParameters.tolPC"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.tolPC</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.__init__"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.accIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.accIntegStack</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.bStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.bStack</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.tStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.tStack</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.InterpolationParameters.xIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.xIntegStack</span></code></a></li>
 </ul>
 </li>
 </ul>

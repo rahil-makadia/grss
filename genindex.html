@@ -197,6 +197,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.ImpulseEvent.html">grss.prop_simulation.ImpulseEvent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.IntegBody.html">grss.prop_simulation.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.IntegrationParameters.html">grss.prop_simulation.IntegrationParameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.InterpolationParameters.html">grss.prop_simulation.InterpolationParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.NongravParamaters.html">grss.prop_simulation.NongravParamaters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.SpiceBody.html">grss.prop_simulation.SpiceBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.propSimulation.html">grss.prop_simulation.propSimulation</a></li>
@@ -407,6 +408,8 @@ document.write(`
 </li>
         <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.__init__">(grss.prop_simulation.IntegrationParameters method)</a>
 </li>
+        <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.__init__">(grss.prop_simulation.InterpolationParameters method)</a>
+</li>
         <li><a href="_autosummary/grss.prop_simulation.NongravParamaters.html#grss.prop_simulation.NongravParamaters.__init__">(grss.prop_simulation.NongravParamaters method)</a>
 </li>
         <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.__init__">(grss.prop_simulation.propSimulation method)</a>
@@ -426,16 +429,18 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.prop_simulation.NongravParamaters.html#grss.prop_simulation.NongravParamaters.a3">a3 (grss.prop_simulation.NongravParamaters property)</a>
 </li>
+      <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.accIntegStack">accIntegStack (grss.prop_simulation.InterpolationParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.adaptiveTimestep">adaptiveTimestep (grss.prop_simulation.IntegrationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.add_event">add_event() (grss.prop_simulation.propSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.add_integ_body">add_integ_body() (grss.prop_simulation.propSimulation method)</a>
 </li>
-      <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.add_iteration">add_iteration() (grss.fit_simulation.FitSimulation method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.add_iteration">add_iteration() (grss.fit_simulation.FitSimulation method)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.add_spice_body">add_spice_body() (grss.prop_simulation.propSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.NongravParamaters.html#grss.prop_simulation.NongravParamaters.alpha">alpha (grss.prop_simulation.NongravParamaters property)</a>
@@ -472,6 +477,8 @@ document.write(`
         <li><a href="_autosummary/grss.prop_simulation.ImpulseEvent.html#grss.prop_simulation.ImpulseEvent.bodyName">(grss.prop_simulation.ImpulseEvent property)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.bStack">bStack (grss.prop_simulation.InterpolationParameters property)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -718,6 +725,12 @@ document.write(`
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.integrate">integrate() (grss.prop_simulation.propSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters">IntegrationParameters (class in grss.prop_simulation)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.interpolate">interpolate() (grss.prop_simulation.propSimulation method)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters">InterpolationParameters (class in grss.prop_simulation)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.interpParams">interpParams (grss.prop_simulation.propSimulation property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.IntegBody.html#grss.prop_simulation.IntegBody.isInteg">isInteg (grss.prop_simulation.IntegBody property)</a>
 </li>
@@ -1028,7 +1041,7 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.tolPC">tolPC (grss.prop_simulation.IntegrationParameters property)</a>
 </li>
-      <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.tStep">tStep (grss.prop_simulation.propSimulation property)</a>
+      <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.tStack">tStack (grss.prop_simulation.InterpolationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.tu2sec">tu2sec (grss.prop_simulation.Constants property)</a>
 </li>
@@ -1050,7 +1063,7 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.xIntegEval">xIntegEval (grss.prop_simulation.propSimulation property)</a>
 </li>
-      <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.xIntegStep">xIntegStep (grss.prop_simulation.propSimulation property)</a>
+      <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.xIntegStack">xIntegStack (grss.prop_simulation.InterpolationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.xObserver">xObserver (grss.prop_simulation.propSimulation property)</a>
 </li>
@@ -1107,7 +1120,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Aug 31, 2023.
+  Last updated on Sep 01, 2023.
   <br/>
 </p>
   </div>

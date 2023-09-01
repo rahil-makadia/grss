@@ -24,6 +24,7 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.get_integration_parameters
         ~propSimulation.get_sim_constants
         ~propSimulation.integrate
+        ~propSimulation.interpolate
         ~propSimulation.remove_body
         ~propSimulation.set_integration_parameters
         ~propSimulation.set_sim_constants
@@ -44,6 +45,7 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.events
         ~propSimulation.integBodies
         ~propSimulation.integParams
+        ~propSimulation.interpParams
         ~propSimulation.lightTimeEval
         ~propSimulation.name
         ~propSimulation.observerInfo
@@ -54,10 +56,8 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.tEval
         ~propSimulation.tEvalMargin
         ~propSimulation.tEvalUTC
-        ~propSimulation.tStep
         ~propSimulation.xInteg
         ~propSimulation.xIntegEval
-        ~propSimulation.xIntegStep
         ~propSimulation.xObserver
     
     

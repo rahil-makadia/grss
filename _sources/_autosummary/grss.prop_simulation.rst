@@ -33,6 +33,7 @@
         ImpulseEvent
         IntegBody
         IntegrationParameters
+        InterpolationParameters
         NongravParamaters
         SpiceBody
         propSimulation
