@@ -76,6 +76,13 @@ struct NongravParamaters {
     real r0_au = 2.808L;
 };
 
+struct InterpolationParameters {
+    std::vector<real> tStack;
+    std::vector<std::vector<real>> xIntegStack;
+    std::vector<std::vector<std::vector<real>>> bStack;
+    std::vector<std::vector<real>> accIntegStack;
+};
+
 struct ForceParameters {
     std::vector<real> masses;
     std::vector<real> radii;
@@ -92,7 +99,7 @@ struct ForceParameters {
 };
 
 void get_spice_state(const int &spiceID, const real &t0_mjd,
-                        const Constants &consts, double state[6]);
+                     const Constants &consts, double state[6]);
 void get_observer_state(const real &t_obs_mjd,
                         const std::vector<real> &observerInfo,
                         const Constants &consts, const bool &tObsInUTC,

@@ -825,8 +825,9 @@ void propSimulation::preprocess() {
                 }
             }
         }
-        this->tStep.push_back(t);
-        this->xIntegStep.push_back(xInteg);
+        this->interpParams.tStack.push_back(t);
+        this->interpParams.xIntegStack.push_back(xInteg);
+        this->isPreprocessed = true;
     }
 }
 

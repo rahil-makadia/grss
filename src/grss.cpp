@@ -52,7 +52,8 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("nTotal", &IntegrationParameters::nTotal, R"mydelimiter(
             Total number of bodies. nTotal = nInteg + nSpice.
             )mydelimiter")
-        .def_readwrite("n2Derivs", &IntegrationParameters::n2Derivs, R"mydelimiter(
+        .def_readwrite("n2Derivs", &IntegrationParameters::n2Derivs,
+                       R"mydelimiter(
             Number of second derivatives.
             )mydelimiter")
         .def_readwrite("t0", &IntegrationParameters::t0, R"mydelimiter(
@@ -118,6 +119,29 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("r0_au", &NongravParamaters::r0_au, R"mydelimiter(
             Non-gravitational parameter r0 in AU from Marsden et al. (1973).
+            )mydelimiter");
+
+    py::class_<InterpolationParameters>(m, "InterpolationParameters",
+                                        R"mydelimiter(
+        The InterpolationParameters class contains parameters used for
+        interpolation of the states of the integrated bodies.
+        )mydelimiter")
+        .def(py::init<>())
+        .def_readwrite("tStack", &InterpolationParameters::tStack,
+                       R"mydelimiter(
+            Stack of times used for interpolation at steps taken by the integrator.
+            )mydelimiter")
+        .def_readwrite("xIntegStack", &InterpolationParameters::xIntegStack,
+                       R"mydelimiter(
+            Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.
+            )mydelimiter")
+        .def_readwrite("bStack", &InterpolationParameters::bStack,
+                       R"mydelimiter(
+            Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.
+            )mydelimiter")
+        .def_readwrite("accIntegStack", &InterpolationParameters::accIntegStack,
+                       R"mydelimiter(
+            Stack of accelerations of the integrated bodies at steps taken by the integrator.
             )mydelimiter");
 
     m.def(
@@ -269,12 +293,11 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<IntegBody, Body>(m, "IntegBody", R"mydelimiter(
         The IntegBody class contains the properties of an integrated body.
         )mydelimiter")
-        .def(py::init<std::string, real, real, real,
-                      std::vector<real>, std::vector<std::vector<real>>,
-                      NongravParamaters>(),
-             py::arg("name"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("cometaryState"),
-             py::arg("covariance"), py::arg("ngParams"),
+        .def(py::init<std::string, real, real, real, std::vector<real>,
+                      std::vector<std::vector<real>>, NongravParamaters>(),
+             py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
+             py::arg("cometaryState"), py::arg("covariance"),
+             py::arg("ngParams"),
              R"mydelimiter(
             Constructor for the IntegBody class.
 
@@ -409,12 +432,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Integration parameters of the simulation. propSimulation.IntegParams object.
             )mydelimiter")
-        .def_readwrite("tStep", &propSimulation::tStep, R"mydelimiter(
-            Epochs of each step taken by the propagator.
-            )mydelimiter")
-        .def_readwrite("xIntegStep", &propSimulation::xIntegStep, R"mydelimiter(
-            States of each step taken by the propagator.
-            )mydelimiter")
         .def_readwrite("spiceBodies", &propSimulation::spiceBodies,
                        R"mydelimiter(
             SPICE bodies of the simulation. List of propSimulation.SpiceBodies objects.
@@ -431,6 +448,10 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("xInteg", &propSimulation::xInteg, R"mydelimiter(
             Current states of each integration body in the simulation.
+            )mydelimiter")
+        .def_readwrite("interpParams", &propSimulation::interpParams,
+                       R"mydelimiter(
+            Interpolation parameters of the simulation. propSimulation.InterpolationParameters object.
             )mydelimiter")
         .def_readwrite("evalApparentState", &propSimulation::evalApparentState,
                        R"mydelimiter(
@@ -473,6 +494,20 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("radarObsEval", &propSimulation::radarObsEval,
                        R"mydelimiter(
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
+            )mydelimiter")
+        .def("interpolate", &propSimulation::interpolate, py::arg("t"),
+             R"mydelimiter(
+            Interpolates the states of the integrated bodies to a given time.
+
+            Parameters
+            ----------
+            t : real
+                Time to interpolate to.
+
+            Returns
+            -------
+            xIntegInterp : list of real
+                Interpolated states of the integration bodies.
             )mydelimiter")
         .def("add_spice_body",
              static_cast<void (propSimulation::*)(SpiceBody)>(

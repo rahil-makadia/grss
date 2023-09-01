@@ -245,10 +245,10 @@ void gr15(propSimulation *propSim) {
     size_t dim = propSim->integParams.n2Derivs;
     real dt = get_initial_timestep(t, xInteg0, propSim);
     propSim->integParams.timestepCounter = 0;
-    std::vector<real> accInteg = get_state_der(t, xInteg0, propSim);
-    std::vector<real> accInteg0 = accInteg;
+    std::vector<real> accInteg0 = get_state_der(t, xInteg0, propSim);
+    std::vector<real> accIntegNext = std::vector<real>(accInteg0.size(), 0.0);
     std::vector<real> xInteg(2 * dim, 0.0);
-    std::vector<std::vector<real> > b_old(7, std::vector<real>(dim, 0.0));
+    std::vector<std::vector<real> > bOld(7, std::vector<real>(dim, 0.0));
     std::vector<std::vector<real> > b(7, std::vector<real>(dim, 0.0));
     real *g = new real[7 * dim];
     memset(g, 0.0, 7 * dim * sizeof(real));
@@ -300,21 +300,21 @@ void gr15(propSimulation *propSim) {
                     compute_g_and_b(accIntegArr, hIdx, g, b, dim);
                 }
                 for (size_t i = 0; i < dim; i++) {
-                    b6Tilde[i] = b[6][i] - b_old[6][i];
+                    b6Tilde[i] = b[6][i] - bOld[6][i];
                 }
                 vabs_max(b6Tilde, dim, b6TildeMax);
                 vabs_max(accIntegArr[7], accIntegArr7Max);
                 if (b6TildeMax / accIntegArr7Max < propSim->integParams.tolPC) {
                     break;
                 }
-                b_old = b;
+                bOld = b;
             }
             approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b,
                           propSim->integParams.nInteg);
-            accInteg = get_state_der(t + dt, xInteg, propSim);
+            accIntegNext = get_state_der(t + dt, xInteg, propSim);
 
             vabs_max(b[6], b6Max);
-            vabs_max(accInteg, accIntegNextMax);
+            vabs_max(accIntegNext, accIntegNextMax);
             b6TildeEstim = b6Max / accIntegNextMax;
             if (propSim->integParams.adaptiveTimestep) {
                 relError = pow(b6TildeEstim / propSim->integParams.tolInteg,
@@ -326,30 +326,31 @@ void gr15(propSimulation *propSim) {
             dtReq = dt / relError;
 
             if (relError <= 1 || loopCounter > maxLoops) {
-                oneStepDone = 1;
-                propSim->integParams.timestepCounter += 1;
-                loopCounter = 0;
                 if (propSim->tEval.size() != propSim->xIntegEval.size()) {
                     interpolate(t, dt, xInteg0, accInteg0, b, propSim);
                 }
+                propSim->interpParams.accIntegStack.push_back(accInteg0);
+                propSim->interpParams.bStack.push_back(bOld);
+                accInteg0 = accIntegNext;
                 t += dt;
+                propSim->t = t;
+                check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
+                                       xInteg);
+                propSim->xInteg = xInteg;
+                propSim->interpParams.tStack.push_back(t);
+                propSim->interpParams.xIntegStack.push_back(xInteg);
+                loopCounter = 0;
+                oneStepDone = 1;
+                propSim->integParams.timestepCounter += 1;
+                refine_b(b, e, dtReq / dt, dim,
+                         propSim->integParams.timestepCounter);
                 if ((propSim->integParams.tf > propSim->integParams.t0 &&
                      t >= propSim->integParams.tf) ||
                     (propSim->integParams.tf < propSim->integParams.t0 &&
                      t <= propSim->integParams.tf)) {
                     keepStepping = 0;
                 }
-                b_old = b;
-                refine_b(b, e, dtReq / dt, dim,
-                         propSim->integParams.timestepCounter);
-                check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
-                                       xInteg);
-                // TODO: add close approaach/impact handling here
-                accInteg0 = accInteg;
-                propSim->t = t;
-                propSim->xInteg = xInteg;
-                propSim->tStep.push_back(t);
-                propSim->xIntegStep.push_back(xInteg);
+                // TODO: add close approach/impact handling here
             } else {
                 loopCounter += 1;
             }

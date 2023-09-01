@@ -1,4 +1,58 @@
 #include "interpolate.h"
+// #include "fstream"
+
+std::vector<real> propSimulation::interpolate(const real t) {
+    // std::ofstream outfile;
+    // outfile.precision(16);
+    // outfile.open("interp.txt", std::ios_base::app);
+    // outfile << "t: " << t;
+    std::vector<real> xIntegInterp = std::vector<real>(this->xInteg.size(), 0.0);
+    // find the index of the last element in this->interpParams.tStack that is
+    // less than t if propagating forward, or the first element that is greater
+    // than t if propagating backward
+    size_t idx = 0;
+    const bool forwardIntegrate = this->integParams.t0 < this->integParams.tf;
+    const bool backwardIntegrate = this->integParams.t0 > this->integParams.tf;
+    if (forwardIntegrate) {
+        if (t+this->tEvalMargin < this->integParams.t0 || t+this->tEvalMargin > this->integParams.tf) {
+            throw std::runtime_error("The interpolation time is outside the integration time window");
+        }
+        while (idx < this->interpParams.tStack.size() &&
+               this->interpParams.tStack[idx+1] < t) {
+            idx++;
+        }
+    } else if (backwardIntegrate) {
+        if (t+this->tEvalMargin > this->integParams.t0 || t+this->tEvalMargin < this->integParams.tf) {
+            throw std::runtime_error("The interpolation time is outside the integration time window");
+        }
+        while (idx < this->interpParams.tStack.size() &&
+               this->interpParams.tStack[idx+1] > t) {
+            idx++;
+        }
+    }
+    // outfile << ". idx: " << idx;
+    const real t0 = this->interpParams.tStack[idx];
+    // outfile << ". t0: " << t0;
+    real dt;
+    if (idx == this->interpParams.tStack.size() - 1) {
+        dt = this->integParams.tf - t0;
+    } else {
+        dt = this->interpParams.tStack[idx + 1] - t0;
+    }
+    // outfile << ". dt: " << dt;
+    const real h = (t - t0) / dt;
+    // outfile << ". h: " << h;
+    approx_xInteg(this->interpParams.xIntegStack[idx],
+                  this->interpParams.accIntegStack[idx], xIntegInterp, dt, h,
+                  this->interpParams.bStack[idx], this->integParams.nInteg);
+    // outfile << ". xIntegInterp: ";
+    // for (size_t i = 0; i < xIntegInterp.size(); i++) {
+    //     outfile << xIntegInterp[i] << " ";
+    // }
+    // outfile << std::endl;
+    // outfile.close();
+    return xIntegInterp;
+}
 
 void interpolate(const real &t, const real &dt,
                  const std::vector<real> &xInteg0,

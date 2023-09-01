@@ -95,8 +95,6 @@ class propSimulation {
 
     // integration parameters
     IntegrationParameters integParams;
-    std::vector<real> tStep;
-    std::vector<std::vector<real>> xIntegStep;
 
     // bodies and events
     std::vector<SpiceBody> spiceBodies;
@@ -107,7 +105,8 @@ class propSimulation {
     real t;
     std::vector<real> xInteg;
 
-    // interpolator variables
+    // interpolation parameters
+    InterpolationParameters interpParams;
     size_t interpIdx = 0;
     bool tEvalUTC = false;
     bool evalApparentState = false;
@@ -120,6 +119,7 @@ class propSimulation {
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
     std::vector<std::vector<real>> radarObsEval;
+    std::vector<real> interpolate(const real t);
 
     // add/remove bodies and add events
     void add_spice_body(SpiceBody body);
