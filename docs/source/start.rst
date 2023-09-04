@@ -29,8 +29,9 @@ Once the source code has been downloaded, the library can be installed using the
 
 .. code-block:: console
 
+   cd grss
    source initialize.sh
-   python -m pip install .
+   python3 -m pip install .
 
 -----
 Usage

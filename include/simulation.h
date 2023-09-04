@@ -13,9 +13,7 @@ struct Body {
     real poleRA = 0.0L;
     real poleDec = 90.0L;
     std::string name;
-    // std::vector<real> pos = {0.0L, 0.0L, 0.0L};
-    // std::vector<real> vel = {0.0L, 0.0L, 0.0L};
-    // std::vector<real> acc = {0.0L, 0.0L, 0.0L};
+    int spiceId;
     real pos[3], vel[3], acc[3];
     bool isPPN = false;
     bool isJ2 = false;
@@ -27,7 +25,6 @@ struct Body {
 class SpiceBody : public Body {
    private:
    public:
-    int spiceId;
     bool isSpice = true;
     // constructor
     SpiceBody(std::string name, int spiceID, real t0, real mass, real radius,
@@ -37,6 +34,8 @@ class SpiceBody : public Body {
 class IntegBody : public Body {
    private:
    public:
+    int spiceId = -99999;
+    bool isCometary = false;
     bool isInteg = true;
     bool isThrusting = false;
     std::vector<std::vector<real>> covariance;
@@ -45,14 +44,14 @@ class IntegBody : public Body {
     std::vector<real> stm;
     size_t n2Derivs = 3;
     // constructors
-    IntegBody(std::string DEkernelPath, std::string name, real t0, real mass,
-              real radius, std::vector<real> cometaryState,
+    IntegBody(std::string name, real t0, real mass, real radius,
+              std::vector<real> cometaryState,
               std::vector<std::vector<real>> covariance,
-              NongravParamaters ngParams, Constants consts);
+              NongravParamaters ngParams);
     IntegBody(std::string name, real t0, real mass, real radius,
               std::vector<real> pos, std::vector<real> vel,
               std::vector<std::vector<real>> covariance,
-              NongravParamaters ngParams, Constants consts);
+              NongravParamaters ngParams);
 };
 
 class Event {
@@ -75,6 +74,9 @@ class propSimulation {
    private:
     void prepare_for_evaluation(std::vector<real> &tEval,
                                 std::vector<std::vector<real>> &observerInfo);
+    // preprocessor
+    bool isPreprocessed = false;
+    void preprocess();
 
    public:
     // name and path to DE kernels
@@ -93,8 +95,6 @@ class propSimulation {
 
     // integration parameters
     IntegrationParameters integParams;
-    std::vector<real> tStep;
-    std::vector<std::vector<real>> xIntegStep;
 
     // bodies and events
     std::vector<SpiceBody> spiceBodies;
@@ -104,9 +104,9 @@ class propSimulation {
     // preprocessor variables
     real t;
     std::vector<real> xInteg;
-    ForceParameters forceParams;
 
-    // interpolator variables
+    // interpolation parameters
+    InterpolationParameters interpParams;
     size_t interpIdx = 0;
     bool tEvalUTC = false;
     bool evalApparentState = false;
@@ -119,19 +119,10 @@ class propSimulation {
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
     std::vector<std::vector<real>> radarObsEval;
+    std::vector<real> interpolate(const real t);
 
     // add/remove bodies and add events
-    void add_spice_body(std::string name, int spiceID, real t0, real mass,
-                        real radius, Constants consts);
     void add_spice_body(SpiceBody body);
-    void add_integ_body(std::string DEkernelPath, std::string name, real t0,
-                        real mass, real radius, std::vector<real> cometaryState,
-                        std::vector<std::vector<real>> covariance,
-                        NongravParamaters ngParams, Constants consts);
-    void add_integ_body(std::string name, real t0, real mass, real radius,
-                        std::vector<real> pos, std::vector<real> vel,
-                        std::vector<std::vector<real>> covariance,
-                        NongravParamaters ngParams, Constants consts);
     void add_integ_body(IntegBody body);
     void remove_body(std::string name);
     void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
@@ -150,16 +141,13 @@ class propSimulation {
         bool convergedLightTime = false,
         std::vector<std::vector<real>> observerInfo =
             std::vector<std::vector<real>>(),
-        bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 6.0L,
+        bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 21.0L,
         real dtMin = 5.0e-3L, real dtChangeFactor = 0.25L,
         real tolInteg = 1.0e-9L, real tolPC = 1.0e-16L);
 
     // getters
     std::vector<real> get_sim_constants();
     std::vector<real> get_integration_parameters();
-
-    // preprocessor
-    void preprocess();
 
     // integrator
     void integrate();

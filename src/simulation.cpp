@@ -35,17 +35,18 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
     this->acc[2] = 0.0L;
 }
 
-IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
-                     real mass, real radius, std::vector<real> cometaryState,
+IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
+                     std::vector<real> cometaryState,
                      std::vector<std::vector<real>> covariance,
-                     NongravParamaters ngParams, Constants consts) {
+                     NongravParamaters ngParams) {
     this->name = name;
     this->t0 = t0;
     this->mass = mass;
-    this->radius = radius / consts.du2m;
+    this->radius = radius;
     std::vector<real> cartesianStateEclip(6);
     std::vector<real> cartesianPos(3);
     std::vector<real> cartesianVel(3);
+    this->isCometary = true;
 
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
@@ -59,24 +60,12 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
                 {cartesianStateEclip[3], cartesianStateEclip[4],
                  cartesianStateEclip[5]},
                 cartesianVel);
-    // shift heliocentric to barycentric
-    double sunState[6];
-    furnsh_c(DEkernelPath.c_str());
-    get_spice_state(10, t0, consts, sunState);
-    unload_c(DEkernelPath.c_str());
-    for (size_t i = 0; i < 3; i++) {
-        cartesianPos[i] += sunState[i];
-        cartesianVel[i] += sunState[i + 3];
-    }
-    // this->pos = cartesianPos;
     this->pos[0] = cartesianPos[0];
     this->pos[1] = cartesianPos[1];
     this->pos[2] = cartesianPos[2];
-    // this->vel = cartesianVel;
     this->vel[0] = cartesianVel[0];
     this->vel[1] = cartesianVel[1];
     this->vel[2] = cartesianVel[2];
-    // this->acc = {0.0L, 0.0L, 0.0L};
     this->acc[0] = 0.0L;
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
@@ -100,20 +89,18 @@ IntegBody::IntegBody(std::string DEkernelPath, std::string name, real t0,
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> pos, std::vector<real> vel,
                      std::vector<std::vector<real>> covariance,
-                     NongravParamaters ngParams, Constants consts) {
+                     NongravParamaters ngParams) {
     this->name = name;
     this->t0 = t0;
     this->mass = mass;
-    this->radius = radius / consts.du2m;
-    // this->pos = pos;
+    this->radius = radius;
+    this->isCometary = false;
     this->pos[0] = pos[0];
     this->pos[1] = pos[1];
     this->pos[2] = pos[2];
-    // this->vel = vel;
     this->vel[0] = vel[0];
     this->vel[1] = vel[1];
     this->vel[2] = vel[2];
-    // this->acc = {0.0L, 0.0L, 0.0L};
     this->acc[0] = 0.0L;
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
@@ -178,9 +165,7 @@ propSimulation::propSimulation(std::string name, real t0,
     this->integParams.n2Derivs = 0;
     this->integParams.timestepCounter = 0;
 
-    std::string selfPath = __FILE__;
-    selfPath = selfPath.substr(0, selfPath.find_last_of("/\\"));
-    std::string mapKernelPath = selfPath + "/../grss/kernels/";
+    std::string mapKernelPath = DEkernelPath.substr(0, DEkernelPath.find_last_of("/\\"))+"/";
     switch (defaultSpiceBodies) {
         case 0: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
@@ -628,22 +613,6 @@ void propSimulation::prepare_for_evaluation(
     }
 }
 
-void propSimulation::add_spice_body(std::string name, int spiceId, real t0,
-                                    real mass, real radius, Constants consts) {
-    // check if body already exists. if so, throw error
-    for (size_t i = 0; i < this->spiceBodies.size(); i++) {
-        if (this->spiceBodies[i].name == name) {
-            throw std::invalid_argument("SPICE Body with name " + name +
-                                        " already exists in simulation " +
-                                        this->name);
-        }
-    }
-    SpiceBody body(name, spiceId, t0, mass, radius, consts);
-    this->spiceBodies.push_back(body);
-    this->integParams.nSpice++;
-    this->integParams.nTotal++;
-}
-
 void propSimulation::add_spice_body(SpiceBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->spiceBodies.size(); i++) {
@@ -658,50 +627,6 @@ void propSimulation::add_spice_body(SpiceBody body) {
     this->integParams.nTotal++;
 }
 
-void propSimulation::add_integ_body(std::string DEkernelPath, std::string name,
-                                    real t0, real mass, real radius,
-                                    std::vector<real> cometaryState,
-                                    std::vector<std::vector<real>> covariance,
-                                    NongravParamaters ngParams,
-                                    Constants consts) {
-    // check if body already exists. if so, throw error
-    for (size_t i = 0; i < this->integBodies.size(); i++) {
-        if (this->integBodies[i].name == name) {
-            throw std::invalid_argument("Integration body with name " + name +
-                                        " already exists in simulation " +
-                                        this->name);
-        }
-    }
-    IntegBody body(DEkernelPath, name, t0, mass, radius, cometaryState,
-                   covariance, ngParams, consts);
-    this->integBodies.push_back(body);
-    this->integParams.nInteg++;
-    this->integParams.nTotal++;
-    this->integParams.n2Derivs += body.n2Derivs;
-}
-
-void propSimulation::add_integ_body(std::string name, real t0, real mass,
-                                    real radius, std::vector<real> pos,
-                                    std::vector<real> vel,
-                                    std::vector<std::vector<real>> covariance,
-                                    NongravParamaters ngParams,
-                                    Constants consts) {
-    // check if body already exists. if so, throw error
-    for (size_t i = 0; i < this->integBodies.size(); i++) {
-        if (this->integBodies[i].name == name) {
-            throw std::invalid_argument("Integration body with name " + name +
-                                        " already exists in simulation " +
-                                        this->name);
-        }
-    }
-    IntegBody body(name, t0, mass, radius, pos, vel, covariance, ngParams,
-                   consts);
-    this->integBodies.push_back(body);
-    this->integParams.nInteg++;
-    this->integParams.nTotal++;
-    this->integParams.n2Derivs += body.n2Derivs;
-}
-
 void propSimulation::add_integ_body(IntegBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->integBodies.size(); i++) {
@@ -711,6 +636,17 @@ void propSimulation::add_integ_body(IntegBody body) {
                 " already exists in simulation " + this->name);
         }
     }
+    if (body.isCometary) {
+        double sunState[9];
+        get_spk_state(10, body.t0, this->ephem, sunState);
+        body.pos[0] += sunState[0];
+        body.pos[1] += sunState[1];
+        body.pos[2] += sunState[2];
+        body.vel[0] += sunState[3];
+        body.vel[1] += sunState[4];
+        body.vel[2] += sunState[5];
+    }
+    body.radius /= this->consts.du2m;
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
     this->integParams.nTotal++;
@@ -874,45 +810,25 @@ std::vector<real> propSimulation::get_integration_parameters() {
 }
 
 void propSimulation::preprocess() {
-    this->t = this->integParams.t0;
-    for (size_t i = 0; i < this->integParams.nInteg; i++) {
-        for (size_t j = 0; j < 3; j++) {
-            this->xInteg.push_back(integBodies[i].pos[j]);
-        }
-        for (size_t j = 0; j < 3; j++) {
-            this->xInteg.push_back(integBodies[i].vel[j]);
-        }
-        if (integBodies[i].propStm) {
-            for (size_t j = 0; j < integBodies[i].stm.size(); j++) {
-                this->xInteg.push_back(integBodies[i].stm[j]);
+    if (!this->isPreprocessed){
+        this->t = this->integParams.t0;
+        for (size_t i = 0; i < this->integParams.nInteg; i++) {
+            for (size_t j = 0; j < 3; j++) {
+                this->xInteg.push_back(integBodies[i].pos[j]);
+            }
+            for (size_t j = 0; j < 3; j++) {
+                this->xInteg.push_back(integBodies[i].vel[j]);
+            }
+            if (integBodies[i].propStm) {
+                for (size_t j = 0; j < integBodies[i].stm.size(); j++) {
+                    this->xInteg.push_back(integBodies[i].stm[j]);
+                }
             }
         }
-        this->forceParams.masses.push_back(integBodies[i].mass);
-        this->forceParams.radii.push_back(integBodies[i].radius);
-        this->forceParams.spiceIdList.push_back(-99999);
-        this->forceParams.isPPNList.push_back(integBodies[i].isPPN);
-        this->forceParams.isJ2List.push_back(integBodies[i].isJ2);
-        this->forceParams.J2List.push_back(integBodies[i].J2);
-        this->forceParams.poleRAList.push_back(integBodies[i].poleRA);
-        this->forceParams.poleDecList.push_back(integBodies[i].poleDec);
-        this->forceParams.isNongravList.push_back(integBodies[i].isNongrav);
-        this->forceParams.ngParamsList.push_back(integBodies[i].ngParams);
-        this->forceParams.isMajorList.push_back(integBodies[i].isMajor);
-        this->forceParams.isThrustingList.push_back(integBodies[i].isThrusting);
+        this->interpParams.tStack.push_back(t);
+        this->interpParams.xIntegStack.push_back(xInteg);
+        this->isPreprocessed = true;
     }
-    for (size_t i = 0; i < this->integParams.nSpice; i++) {
-        this->forceParams.masses.push_back(spiceBodies[i].mass);
-        this->forceParams.radii.push_back(spiceBodies[i].radius);
-        this->forceParams.spiceIdList.push_back(spiceBodies[i].spiceId);
-        this->forceParams.isPPNList.push_back(spiceBodies[i].isPPN);
-        this->forceParams.isJ2List.push_back(spiceBodies[i].isJ2);
-        this->forceParams.J2List.push_back(spiceBodies[i].J2);
-        this->forceParams.poleRAList.push_back(spiceBodies[i].poleRA);
-        this->forceParams.poleDecList.push_back(spiceBodies[i].poleDec);
-        this->forceParams.isMajorList.push_back(spiceBodies[i].isMajor);
-    }
-    this->tStep.push_back(t);
-    this->xIntegStep.push_back(xInteg);
 }
 
 void propSimulation::extend(real tf, std::vector<real> tEvalNew,

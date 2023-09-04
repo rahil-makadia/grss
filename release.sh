@@ -1,4 +1,6 @@
+#!/bin/bash
 server=$1
+# if file run with -pypi then upload to pypi, else upload to testpypi
 if [ "$server" = "-pypi" ]; then
     python3 -m twine upload dist/*
 else

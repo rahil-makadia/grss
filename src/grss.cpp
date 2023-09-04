@@ -52,7 +52,8 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("nTotal", &IntegrationParameters::nTotal, R"mydelimiter(
             Total number of bodies. nTotal = nInteg + nSpice.
             )mydelimiter")
-        .def_readwrite("n2Derivs", &IntegrationParameters::n2Derivs, R"mydelimiter(
+        .def_readwrite("n2Derivs", &IntegrationParameters::n2Derivs,
+                       R"mydelimiter(
             Number of second derivatives.
             )mydelimiter")
         .def_readwrite("t0", &IntegrationParameters::t0, R"mydelimiter(
@@ -120,53 +121,27 @@ PYBIND11_MODULE(prop_simulation, m) {
             Non-gravitational parameter r0 in AU from Marsden et al. (1973).
             )mydelimiter");
 
-    py::class_<ForceParameters>(m, "ForceParameters", R"mydelimiter(
-        The ForceParameters class contains constants used for calculating the
-        forces on integrated bodies.
+    py::class_<InterpolationParameters>(m, "InterpolationParameters",
+                                        R"mydelimiter(
+        The InterpolationParameters class contains parameters used for
+        interpolation of the states of the integrated bodies.
         )mydelimiter")
         .def(py::init<>())
-        .def_readwrite("masses", &ForceParameters::masses, R"mydelimiter(
-            Masses of the bodies.
-            )mydelimiter")
-        .def_readwrite("radii", &ForceParameters::radii, R"mydelimiter(
-            Radii of the bodies.
-            )mydelimiter")
-        .def_readwrite("spiceIdList", &ForceParameters::spiceIdList,
+        .def_readwrite("tStack", &InterpolationParameters::tStack,
                        R"mydelimiter(
-            SPICE IDs of the bodies.
+            Stack of times used for interpolation at steps taken by the integrator.
             )mydelimiter")
-        .def_readwrite("ngParamsList", &ForceParameters::ngParamsList,
+        .def_readwrite("xIntegStack", &InterpolationParameters::xIntegStack,
                        R"mydelimiter(
-            Non-gravitational parameters of the bodies.
+            Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.
             )mydelimiter")
-        .def_readwrite("isPPNList", &ForceParameters::isPPNList, R"mydelimiter(
-            Whether the bodies are PPN bodies.
-            )mydelimiter")
-        .def_readwrite("isJ2List", &ForceParameters::isJ2List, R"mydelimiter(
-            Whether the bodies are J2 bodies.
-            )mydelimiter")
-        .def_readwrite("J2List", &ForceParameters::J2List, R"mydelimiter(
-            J2 parameters of the bodies.
-            )mydelimiter")
-        .def_readwrite("poleRAList", &ForceParameters::poleRAList,
+        .def_readwrite("bStack", &InterpolationParameters::bStack,
                        R"mydelimiter(
-            Right ascension of the poles of the bodies.
+            Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.
             )mydelimiter")
-        .def_readwrite("poleDecList", &ForceParameters::poleDecList,
+        .def_readwrite("accIntegStack", &InterpolationParameters::accIntegStack,
                        R"mydelimiter(
-            Declination of the poles of the bodies.
-            )mydelimiter")
-        .def_readwrite("isNongravList", &ForceParameters::isNongravList,
-                       R"mydelimiter(
-            Whether the bodies have non-gravitational accelerations.
-            )mydelimiter")
-        .def_readwrite("isMajorList", &ForceParameters::isMajorList,
-                       R"mydelimiter(
-            Whether the bodies are major bodies (used for EIH PPN).
-            )mydelimiter")
-        .def_readwrite("isThrustingList", &ForceParameters::isThrustingList,
-                       R"mydelimiter(
-            Whether the bodies are thrusting.
+            Stack of accelerations of the integrated bodies at steps taken by the integrator.
             )mydelimiter");
 
     m.def(
@@ -318,17 +293,14 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<IntegBody, Body>(m, "IntegBody", R"mydelimiter(
         The IntegBody class contains the properties of an integrated body.
         )mydelimiter")
-        .def(py::init<std::string, std::string, real, real, real,
-                      std::vector<real>, std::vector<std::vector<real>>,
-                      NongravParamaters, Constants>(),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("cometaryState"),
-             py::arg("covariance"), py::arg("ngParams"), py::arg("constants"),
+        .def(py::init<std::string, real, real, real, std::vector<real>,
+                      std::vector<std::vector<real>>, NongravParamaters>(),
+             py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
+             py::arg("cometaryState"), py::arg("covariance"),
+             py::arg("ngParams"),
              R"mydelimiter(
             Constructor for the IntegBody class.
 
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
             name : str
                 Name of the body.
             t0 : real
@@ -343,16 +315,14 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Covariance of the body's initial state.
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
 
         .def(py::init<std::string, real, real, real, std::vector<real>,
                       std::vector<real>, std::vector<std::vector<real>>,
-                      NongravParamaters, Constants>(),
+                      NongravParamaters>(),
              py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
              py::arg("pos"), py::arg("vel"), py::arg("covariance"),
-             py::arg("ngParams"), py::arg("constants"), R"mydelimiter(
+             py::arg("ngParams"), R"mydelimiter(
             Constructor for the IntegBody class.
 
             name : str
@@ -371,8 +341,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Covariance of the body's initial state.
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
         .def_readwrite("isInteg", &IntegBody::isInteg, R"mydelimiter(
             Whether the body is an integrated body. Always True.
@@ -464,12 +432,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Integration parameters of the simulation. propSimulation.IntegParams object.
             )mydelimiter")
-        .def_readwrite("tStep", &propSimulation::tStep, R"mydelimiter(
-            Epochs of each step taken by the propagator.
-            )mydelimiter")
-        .def_readwrite("xIntegStep", &propSimulation::xIntegStep, R"mydelimiter(
-            States of each step taken by the propagator.
-            )mydelimiter")
         .def_readwrite("spiceBodies", &propSimulation::spiceBodies,
                        R"mydelimiter(
             SPICE bodies of the simulation. List of propSimulation.SpiceBodies objects.
@@ -487,9 +449,9 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("xInteg", &propSimulation::xInteg, R"mydelimiter(
             Current states of each integration body in the simulation.
             )mydelimiter")
-        .def_readwrite("forceParams", &propSimulation::forceParams,
+        .def_readwrite("interpParams", &propSimulation::interpParams,
                        R"mydelimiter(
-            Force parameters of the simulation. propSimulation.ForceParams object.
+            Interpolation parameters of the simulation. propSimulation.InterpolationParameters object.
             )mydelimiter")
         .def_readwrite("evalApparentState", &propSimulation::evalApparentState,
                        R"mydelimiter(
@@ -533,27 +495,19 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
-        .def("add_spice_body",
-             static_cast<void (propSimulation::*)(std::string, int, real, real,
-                                                  real, Constants)>(
-                 &propSimulation::add_spice_body),
-             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("constants"),
+        .def("interpolate", &propSimulation::interpolate, py::arg("t"),
              R"mydelimiter(
-            Adds a SPICE body to the simulation.
+            Interpolates the states of the integrated bodies to a given time.
 
-            name : str
-                Name of the body.
-            spiceId : int
-                SPICE ID of the body.
-            t0 : real
-                Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.
-            mass : real
-                Mass of the body.
-            radius : real
-                Radius of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
+            Parameters
+            ----------
+            t : real
+                Time to interpolate to.
+
+            Returns
+            -------
+            xIntegInterp : list of real
+                Interpolated states of the integration bodies.
             )mydelimiter")
         .def("add_spice_body",
              static_cast<void (propSimulation::*)(SpiceBody)>(
@@ -563,66 +517,6 @@ PYBIND11_MODULE(prop_simulation, m) {
 
             body : propSimulation.SpiceBody
                 SPICE body to add to the simulation.
-            )mydelimiter")
-        .def("add_integ_body",
-             static_cast<void (propSimulation::*)(
-                 std::string, std::string, real, real, real, std::vector<real>,
-                 std::vector<std::vector<real>>, NongravParamaters, Constants)>(
-                 &propSimulation::add_integ_body),
-             py::arg("DEkernelPath"), py::arg("name"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("cometaryState"),
-             py::arg("covariance"), py::arg("ngParams"), py::arg("constants"),
-             R"mydelimiter(
-            Adds an integration body to the simulation.
-
-            DEkernelPath : str
-                Path to the SPICE DE kernel.
-            name : str
-                Name of the body.
-            t0 : real
-                Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.
-            mass : real
-                Mass of the body.
-            radius : real
-                Radius of the body.
-            cometaryState : list of real
-                Initial Heliocentric Ecliptic Cometary state of the body.
-            covariance : list of list of real
-                Covariance of the initial state.
-            ngParams : propSimulation.NongravParamaters
-                Nongravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
-            )mydelimiter")
-        .def(
-            "add_integ_body",
-            static_cast<void (propSimulation::*)(
-                std::string, real, real, real, std::vector<real>,
-                std::vector<real>, std::vector<std::vector<real>>,
-                NongravParamaters, Constants)>(&propSimulation::add_integ_body),
-            py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
-            py::arg("pos"), py::arg("vel"), py::arg("covariance"),
-            py::arg("ngParams"), py::arg("constants"), R"mydelimiter(
-            Adds an integration body to the simulation.
-
-            name : str
-                Name of the body.
-            t0 : real
-                Initial MJD epoch of the body. Must be in TDB. Same as the initial epoch of the simulation.
-            mass : real
-                Mass of the body.
-            radius : real
-                Radius of the body.
-            pos : list of real
-                Initial barycentric Cartesian position of the body.
-            vel : list of real
-                Initial barycentric Cartesian velocity of the body.
-            covariance : list of list of real
-                Covariance of the initial state.
-            ngParams : propSimulation.NongravParamaters
-                Nongravitational parameters of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
         .def("add_integ_body",
              static_cast<void (propSimulation::*)(IntegBody)>(
@@ -685,7 +579,7 @@ PYBIND11_MODULE(prop_simulation, m) {
              py::arg("convergedLightTims") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
              py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
-             py::arg("dtMax") = 6.0L, py::arg("dtMin") = 5.0e-3L,
+             py::arg("dtMax") = 21.0L, py::arg("dtMin") = 5.0e-3L,
              py::arg("dtChangeFactor") = 0.25L, py::arg("tolInteg") = 1.0e-9L,
              py::arg("tolPC") = 1.0e-16L, R"mydelimiter(
             Sets the integration parameters.
@@ -772,9 +666,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Tolerance for integration.
             tolPC : real
                 Tolerance for predictor-corrector within IAS15.
-            )mydelimiter")
-        .def("preprocess", &propSimulation::preprocess, R"mydelimiter(
-            Preprocesses the simulation and assembles the forceParams attribute.
             )mydelimiter")
         .def("integrate", &propSimulation::integrate, R"mydelimiter(
             Propagates the simulation using the Gauss-Radau integrator.

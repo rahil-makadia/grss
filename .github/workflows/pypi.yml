@@ -9,12 +9,9 @@ on:
       - "grss/version.txt"
 
 jobs:
-    build:
-      name: build ${{ matrix.os }}
-      runs-on: ${{ matrix.os }}
-      strategy:
-        matrix:
-          os: [ubuntu-latest, macos-latest]
+    build-and-publish:
+      name: Build python distribution and publish to PyPI/Test PyPI
+      runs-on: ubuntu-latest
       steps:
         - name: Checkout repo
           uses: actions/checkout@v3
@@ -27,27 +24,8 @@ jobs:
         - name: Initialize repository
           run: |
             source initialize.sh --no-tm-overwrite
-        - name: Build python distributions
+        - name: Run build script
           run: source build_python.sh
-        - name: Upload distribution for next job
-          uses: actions/upload-artifact@master
-          with:
-            name: dist-${{ matrix.os }}
-            path: dist
-    publish:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-        - name: Download Ubuntu distribution from previous job
-          uses: actions/download-artifact@master
-          with:
-            name: dist-ubuntu-latest
-            path: dist
-        - name: Download MacOS distribution from previous job
-          uses: actions/download-artifact@master
-          with:
-            name: dist-macos-latest
-            path: dist
         - name: Show files
           run: ls -l dist
         - name: Publish to Test PyPI
