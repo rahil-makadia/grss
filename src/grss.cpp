@@ -22,8 +22,11 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("du2m", &Constants::du2m, R"mydelimiter(
             Conversion factor from distance units to meters.
             )mydelimiter")
-        .def_readwrite("tu2sec", &Constants::tu2sec, R"mydelimiter(
+        .def_readwrite("tu2s", &Constants::tu2s, R"mydelimiter(
             Conversion factor from time units to seconds.
+            )mydelimiter")
+        .def_readwrite("duptu2mps", &Constants::duptu2mps, R"mydelimiter(
+            Conversion factor from distance units per time units to meters per second.
             )mydelimiter")
         .def_readwrite("G", &Constants::G, R"mydelimiter(
             Gravitational constant.
@@ -144,6 +147,87 @@ PYBIND11_MODULE(prop_simulation, m) {
             Stack of accelerations of the integrated bodies at steps taken by the integrator.
             )mydelimiter");
 
+    py::class_<BPlaneParameters>(m, "BPlaneParameters", R"mydelimiter(
+        The BPlaneParameters class contains parameters used for calculating the
+        B-plane of a close approach.
+        )mydelimiter")
+        .def(py::init<>())
+        .def_readwrite("x", &BPlaneParameters::x, R"mydelimiter(
+            X coordinate of the B-plane.
+            )mydelimiter")
+        .def_readwrite("y", &BPlaneParameters::y, R"mydelimiter(
+            Y coordinate of the B-plane.
+            )mydelimiter")
+        .def_readwrite("z", &BPlaneParameters::z, R"mydelimiter(
+            Z coordinate of the B-plane.
+            )mydelimiter");
+
+    py::class_<CloseApproachParameters>(m, "CloseApproachParameters",
+                                        R"mydelimiter(
+        The CloseApproachParameters class contains parameters used for calculating
+        the close approach between two integrated bodies.
+        )mydelimiter")
+        .def(py::init<>())
+        .def_readwrite("tCA", &CloseApproachParameters::tCA, R"mydelimiter(
+            Time of the close approach.
+            )mydelimiter")
+        .def_readwrite("xRelCA", &CloseApproachParameters::xRelCA,
+                       R"mydelimiter(
+            Relative position of the close approach.
+            )mydelimiter")
+        .def_readwrite("dist", &CloseApproachParameters::dist, R"mydelimiter(
+            Distance of the close approach.
+            )mydelimiter")
+        .def_readwrite("vel", &CloseApproachParameters::vel, R"mydelimiter(
+            Velocity of the close approach.
+            )mydelimiter")
+        .def_readwrite("vInf", &CloseApproachParameters::vInf,
+                       R"mydelimiter(
+            Hyperbolic excess velocity of the close approach.
+            )mydelimiter")
+        .def_readwrite("flybyBody", &CloseApproachParameters::flybyBody,
+                       R"mydelimiter(
+            Name of the flyby body.
+            )mydelimiter")
+        .def_readwrite("centralBody", &CloseApproachParameters::centralBody,
+                       R"mydelimiter(
+            Name of the central body.
+            )mydelimiter")
+        .def_readwrite("impact", &CloseApproachParameters::impact,
+                       R"mydelimiter(
+            Whether the close approach is an impact when accounting for gravitational focusing.
+            )mydelimiter")
+        .def_readwrite("tPeri", &CloseApproachParameters::tPeri, R"mydelimiter(
+            Time of periapsis (according to Keplerian hyperbolic motion).
+            )mydelimiter")
+        .def_readwrite("tLin", &CloseApproachParameters::tLin, R"mydelimiter(
+            Linearized time of periapsis
+            )mydelimiter")
+        .def_readwrite("bVec", &CloseApproachParameters::bVec, R"mydelimiter(
+            B-vector of the close approach.
+            )mydelimiter")
+        .def_readwrite("bMag", &CloseApproachParameters::bMag, R"mydelimiter(
+            Magnitude of the B-vector of the close approach (Impact parameter).
+            )mydelimiter")
+        .def_readwrite("gravFocusFactor",
+                       &CloseApproachParameters::gravFocusFactor, R"mydelimiter(
+            Lambda parameter of the close approach (gravitational focusing).
+            )mydelimiter")
+        .def_readwrite("kizner", &CloseApproachParameters::kizner,
+                       R"mydelimiter(
+            Kizner B-plane parameters of the close approach.
+            )mydelimiter")
+        .def_readwrite("opik", &CloseApproachParameters::opik, R"mydelimiter(
+            Öpik B-plane parameters of the close approach.
+            )mydelimiter")
+        .def_readwrite("scaled", &CloseApproachParameters::scaled,
+                       R"mydelimiter(
+            Scaled B-plane parameters of the close approach.
+            )mydelimiter")
+        .def_readwrite("mtp", &CloseApproachParameters::mtp, R"mydelimiter(
+            Modified Target Plane (MTP) B-plane parameters of the close approach.
+            )mydelimiter");
+
     m.def(
         "cometary_to_cartesian",
         [](real epochMjd, std::vector<real> cometaryState, real GM) {
@@ -221,15 +305,6 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("name", &Body::name, R"mydelimiter(
             Name of the body.
             )mydelimiter")
-        // .def_readwrite("pos", &Body::pos, R"mydelimiter(
-        //     Position of the body.
-        //     )mydelimiter")
-        // .def_readwrite("vel", &Body::vel, R"mydelimiter(
-        //     Velocity of the body.
-        //     )mydelimiter")
-        // .def_readwrite("acc", &Body::acc, R"mydelimiter(
-        //     Acceleration of the body.
-        //     )mydelimiter")
         .def_readwrite("isPPN", &Body::isPPN, R"mydelimiter(
             Whether the body is a PPN body.
             )mydelimiter")
@@ -241,6 +316,9 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("isNongrav", &Body::isNongrav, R"mydelimiter(
             Whether the body has non-gravitational accelerations.
+            )mydelimiter")
+        .def_readwrite("caTol", &Body::caTol, R"mydelimiter(
+            Distance tolerance for close approaches.
             )mydelimiter")
         .def("set_J2", &Body::set_J2, py::arg("J2"), py::arg("poleRA"),
              py::arg("poleDec"), R"mydelimiter(
@@ -264,9 +342,9 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<SpiceBody, Body>(m, "SpiceBody", R"mydelimiter(
         The SpiceBody class contains the properties of a SPICE body.
         )mydelimiter")
-        .def(py::init<std::string, int, real, real, real, Constants>(),
+        .def(py::init<std::string, int, real, real, real>(),
              py::arg("name"), py::arg("spiceId"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"), py::arg("constants"),
+             py::arg("mass"), py::arg("radius"),
              R"mydelimiter(
             Constructor for the SpiceBody class.
 
@@ -280,8 +358,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Mass of the body.
             radius : real
                 Radius of the body.
-            constants : propSimulation.Constants
-                Constants of the simulation.
             )mydelimiter")
         .def_readwrite("spiceId", &SpiceBody::spiceId, R"mydelimiter(
             SPICE ID of the body.
@@ -443,6 +519,9 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("events", &propSimulation::events, R"mydelimiter(
             Events of the simulation. List of propSimulation.Event objects.
             )mydelimiter")
+        .def_readwrite("caParams", &propSimulation::caParams, R"mydelimiter(
+            Close approach parameters of the simulation. List of propSimulation.CloseApproachParameters objects.
+            )mydelimiter")
         .def_readwrite("t", &propSimulation::t, R"mydelimiter(
             Current time of the simulation.
             )mydelimiter")
@@ -553,7 +632,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Multiplier to apply to the delta-V.
             )mydelimiter")
         .def("set_sim_constants", &propSimulation::set_sim_constants,
-             py::arg("du2m") = 149597870700.0L, py::arg("tu2sec") = 86400.0L,
+             py::arg("du2m") = 149597870700.0L, py::arg("tu2s") = 86400.0L,
              py::arg("G") = 6.6743e-11L /
                  (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                  86400.0L * 86400.0L,
@@ -565,7 +644,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             ----------
             du2m : real
                 Conversion factor from distance units to meters.
-            tu2sec : real
+            tu2s : real
                 Conversion factor from time units to seconds.
             G : real
                 Gravitational constant.
@@ -625,7 +704,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 -------
                 du2m : real
                     Conversion factor from distance units to meters.
-                tu2sec : real
+                tu2s : real
                     Conversion factor from time units to seconds.
                 G : real
                     Gravitational constant.

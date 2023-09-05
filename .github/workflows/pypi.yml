@@ -9,8 +9,7 @@ on:
       - "grss/version.txt"
 
 jobs:
-    build-and-publish:
-      name: Build python distribution and publish to PyPI/Test PyPI
+    build-and-upload:
       runs-on: ubuntu-latest
       steps:
         - name: Checkout repo

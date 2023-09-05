@@ -1,7 +1,7 @@
 #ifndef GR15_H
 #define GR15_H
 
-#include "interpolate.h"
+#include "approach.h"
 
 const real hVec[8] = {0.0,
                       0.0562625605369221464656522,

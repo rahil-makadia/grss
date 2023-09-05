@@ -345,13 +345,13 @@ void gr15(propSimulation *propSim) {
                 propSim->integParams.timestepCounter += 1;
                 refine_b(b, e, dtReq / dt, dim,
                          propSim->integParams.timestepCounter);
+                check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg, keepStepping);
                 if ((propSim->integParams.tf > propSim->integParams.t0 &&
                      t >= propSim->integParams.tf) ||
                     (propSim->integParams.tf < propSim->integParams.t0 &&
                      t <= propSim->integParams.tf)) {
                     keepStepping = 0;
                 }
-                // TODO: add close approach/impact handling here
             } else {
                 loopCounter += 1;
             }

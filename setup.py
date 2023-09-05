@@ -87,8 +87,10 @@ class CMakeBuild(build_ext):
 # get version from version.txt
 with open("grss/version.txt", "r", encoding="utf-8") as f:
     ver = f.read().strip()
-# run get_cspice in the extern folder
-subprocess.run(["python", "get_cspice.py"], cwd="extern", check=True)
+# run get_cspice in the extern folder if installing from source
+if (not os.path.exists("./extern/cspice/lib/cspice.a") or
+    not os.path.exists("./extern/cspice/include/SpiceUsr.h") ):
+    subprocess.run(["python", "get_cspice.py"], cwd="./extern", check=True)
 setup(
     version=ver,
     packages=["grss", "grss.debias", "grss.kernels"],
@@ -96,7 +98,7 @@ setup(
     package_data={"grss": [ "version.txt"
                             "debias/*.py",
                             "kernels/*.py", "kernels/*.txt", "kernels/*.tm",
-                            "kernels/*.log", ],}, # "kernels/*.bsp"
+                            "kernels/*.log", ],},
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )
