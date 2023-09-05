@@ -19,6 +19,7 @@ struct Body {
     bool isJ2 = false;
     bool isNongrav = false;
     bool isMajor = false;
+    real caTol = 0.1;
     void set_J2(real J2, real poleRA, real poleDec);
 };
 
@@ -27,8 +28,7 @@ class SpiceBody : public Body {
    public:
     bool isSpice = true;
     // constructor
-    SpiceBody(std::string name, int spiceID, real t0, real mass, real radius,
-              Constants consts);
+    SpiceBody(std::string name, int spiceID, real t0, real mass, real radius);
 };
 
 class IntegBody : public Body {
@@ -101,6 +101,9 @@ class propSimulation {
     std::vector<IntegBody> integBodies;
     std::vector<ImpulseEvent> events;
 
+    // close approach parameters
+    std::vector<CloseApproachParameters> caParams;
+
     // preprocessor variables
     real t;
     std::vector<real> xInteg;
@@ -130,7 +133,7 @@ class propSimulation {
 
     // setters
     void set_sim_constants(
-        real du2m = 149597870700.0L, real tu2sec = 86400.0L,
+        real du2m = 149597870700.0L, real tu2s = 86400.0L,
         real G = 6.6743e-11L /
             (149597870700.0L * 149597870700.0L * 149597870700.0L) * 86400.0L *
             86400.0L,

@@ -1201,6 +1201,7 @@ class FitSimulation:
                                             self.t_sol, self.fixed_propsim_params['mass'],
                                             self.fixed_propsim_params['radius'],
                                             state_nom, cov_nom, ng_params_nom)
+        integ_body_nom.caTol = 0.0 # turn off close approach detection
         # add the nominal integ_body for the residuals
         if self.past_obs_exist:
             prop_sim_past.add_integ_body(integ_body_nom)
@@ -1234,6 +1235,8 @@ class FitSimulation:
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_minus, cov_nom, ng_params_minus)
+                integ_body_plus.caTol = 0.0
+                integ_body_minus.caTol = 0.0
                 if self.past_obs_exist:
                     prop_sim_past.add_integ_body(integ_body_plus)
                     prop_sim_past.add_integ_body(integ_body_minus)

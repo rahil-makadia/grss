@@ -2,8 +2,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-__all__ = [ 'plot_solar_system'
+__all__ = [ 'plot_solar_system',
+            'equat2eclip',
+            'eclip2equat'
 ]
+
+earth_obliq = 84381.448/3600.0*np.pi/180.0
+equat2eclip = np.array([[1.0,          0.0,                 0.0        ],
+                        [0.0,  np.cos(earth_obliq), np.sin(earth_obliq)],
+                        [0.0, -np.sin(earth_obliq), np.cos(earth_obliq)]])
+eclip2equat = np.array([[1.0,          0.0,                 0.0        ],
+                        [0.0,  np.cos(earth_obliq), -np.sin(earth_obliq)],
+                        [0.0,  np.sin(earth_obliq),  np.cos(earth_obliq)]])
 
 def _add_planet_xy(axis, dist, color, alpha, lstyle):
     """
@@ -93,5 +103,5 @@ def plot_solar_system(axis, xy_plane, alpha=0.25, lstyle='--'):
     else:
         obliqs = [7.25, 3.39, 0.0, 1.85, 1.3, 2.49, 0.77, 1.77, 0.0]
         for i in range(num_planets):
-            _add_planet_xz(axis, dists[i], obliqs[i]+23.44, colors[i], alpha, lstyle)
+            _add_planet_xz(axis, dists[i], obliqs[i], colors[i], alpha, lstyle)
     return None

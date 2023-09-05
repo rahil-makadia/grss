@@ -10,15 +10,11 @@ void get_spice_state(const int &spiceID, const real &t0_mjd,
                   // states output will be ICRF-EME2000 frame
     SpiceDouble lt;
     spkgeo_c(spiceID, t0_et, frame, center, state, &lt);
-    // std::cout << "state: " << state[0] << " " << state[1] << " " << state[2]
-    // << " " << state[3] << " " << state[4] << " " << state[5] << std::endl;
-    // std::cout << "du2m: " << consts.du2m << std::endl;
-    // std::cout << "tu2sec: " << consts.tu2sec << std::endl;
     for (int i = 0; i < 6; i++) {
         state[i] *= 1000.0L / consts.du2m;
     }
     for (int i = 3; i < 6; i++) {
-        state[i] *= consts.tu2sec;
+        state[i] *= consts.tu2s;
     }
 }
 
@@ -65,9 +61,9 @@ void get_observer_state(const real &tObsMjd,
             observerState[0] = (real) baseBodyState[0] + observerInfo[1]/consts.du2m;
             observerState[1] = (real) baseBodyState[1] + observerInfo[2]/consts.du2m;
             observerState[2] = (real) baseBodyState[2] + observerInfo[3]/consts.du2m;
-            observerState[3] = (real) baseBodyState[3] + observerInfo[4]/consts.du2m*consts.tu2sec;
-            observerState[4] = (real) baseBodyState[4] + observerInfo[5]/consts.du2m*consts.tu2sec;
-            observerState[5] = (real) baseBodyState[5] + observerInfo[6]/consts.du2m*consts.tu2sec;
+            observerState[3] = (real) baseBodyState[3] + observerInfo[4]/consts.duptu2mps;
+            observerState[4] = (real) baseBodyState[4] + observerInfo[5]/consts.duptu2mps;
+            observerState[5] = (real) baseBodyState[5] + observerInfo[6]/consts.duptu2mps;
             return;
             break;
         default:
@@ -90,9 +86,9 @@ void get_observer_state(const real &tObsMjd,
     observerStateInertial[0] *= (real)1.0e3L / consts.du2m;
     observerStateInertial[1] *= (real)1.0e3L / consts.du2m;
     observerStateInertial[2] *= (real)1.0e3L / consts.du2m;
-    observerStateInertial[3] *= (real)1.0e3L / consts.du2m * consts.tu2sec;
-    observerStateInertial[4] *= (real)1.0e3L / consts.du2m * consts.tu2sec;
-    observerStateInertial[5] *= (real)1.0e3L / consts.du2m * consts.tu2sec;
+    observerStateInertial[3] *= (real)1.0e3L / consts.duptu2mps;
+    observerStateInertial[4] *= (real)1.0e3L / consts.duptu2mps;
+    observerStateInertial[5] *= (real)1.0e3L / consts.duptu2mps;
     observerState[0] = baseBodyState[0] + observerStateInertial[0];
     observerState[1] = baseBodyState[1] + observerStateInertial[1];
     observerState[2] = baseBodyState[2] + observerStateInertial[2];
@@ -247,6 +243,13 @@ void sort_vector_by_another(std::vector<std::vector<real>> &v,
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot) {
     dot = 0;
     for (size_t i = 0; i < v1.size(); i++) {
+        dot += v1[i] * v2[i];
+    }
+}
+
+void vdot(const real *v1, const real *v2, const size_t &dim, real &dot) {
+    dot = 0;
+    for (size_t i = 0; i < dim; i++) {
         dot += v1[i] * v2[i];
     }
 }

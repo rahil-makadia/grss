@@ -10,6 +10,7 @@
 #include <vector>
 using std::acos;
 using std::asin;
+using std::asinh;
 using std::atan2;
 using std::cos;
 using std::cosh;
@@ -39,10 +40,11 @@ using std::tanh;
 
 struct Constants {
     real du2m = 149597870700.0L;  // default au to m
-    real tu2sec = 86400.0;        // default day to sec
-    real G = 6.6743e-11L / (du2m * du2m * du2m) * tu2sec *
-        tu2sec;                                  // default kg au^3 / day^2
-    real clight = 299792458.0L / du2m * tu2sec;  // default au/day
+    real tu2s = 86400.0;          // default day to sec
+    real duptu2mps = du2m/tu2s;   // default au/day to m/s
+    real G = 6.6743e-11L / (du2m * du2m * du2m) * tu2s *
+        tu2s;                                  // default kg au^3 / day^2
+    real clight = 299792458.0L / du2m * tu2s;  // default au/day
     real j2000Jd = 2451545.0;
     real JdMinusMjd = 2400000.5;
 };
@@ -98,6 +100,32 @@ struct ForceParameters {
     std::vector<bool> isThrustingList;
 };
 
+struct BPlaneParameters {
+    real x;
+    real y;
+    real z;
+};
+
+struct CloseApproachParameters {
+    real tCA;
+    std::vector<real> xRelCA = std::vector<real>(6, 0.0L);
+    real dist;
+    real vel;
+    real vInf;
+    std::string flybyBody;
+    std::string centralBody;
+    bool impact;
+    real tPeri;
+    real tLin;
+    std::vector<real> bVec = std::vector<real>(3, 0.0L);
+    real bMag;
+    real gravFocusFactor;
+    BPlaneParameters kizner;
+    BPlaneParameters opik;
+    BPlaneParameters scaled;
+    BPlaneParameters mtp;
+};
+
 void get_spice_state(const int &spiceID, const real &t0_mjd,
                      const Constants &consts, double state[6]);
 void get_observer_state(const real &t_obs_mjd,
@@ -131,6 +159,7 @@ void sort_vector_by_another(std::vector<std::vector<real>> &v,
                             const std::vector<real> &vRef,
                             const bool &ascending);
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
+void vdot(const real *v1, const real *v2, const size_t &dim, real &dot);
 void vnorm(const std::vector<real> &v, real &norm);
 void vnorm(const real *v, const size_t &dim, real &norm);
 void vunit(const std::vector<real> &v, std::vector<real> &unit);
