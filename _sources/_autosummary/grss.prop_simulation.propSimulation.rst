@@ -38,6 +38,7 @@ grss.prop\_simulation.propSimulation
     .. autosummary::
     
         ~propSimulation.DEkernelPath
+        ~propSimulation.caParams
         ~propSimulation.consts
         ~propSimulation.convergedLightTime
         ~propSimulation.ephem

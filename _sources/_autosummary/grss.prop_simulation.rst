@@ -27,7 +27,9 @@
         :toctree:
         :template: custom-class.rst
     
+        BPlaneParameters
         Body
+        CloseApproachParameters
         Constants
         Event
         ImpulseEvent

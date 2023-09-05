@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; GRSS 0.9.7 documentation</title>
+    <title>Index &#8212; GRSS 0.9.8 documentation</title>
   
   
   
@@ -124,7 +124,7 @@
     <script>document.write(`<img src="_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.7 documentation</p>
+    <p class="title logo__title">GRSS v0.9.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -191,7 +191,9 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="_autosummary/grss.prop_simulation.html">grss.prop_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.cartesian_to_cometary.html">grss.prop_simulation.cartesian_to_cometary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.cometary_to_cartesian.html">grss.prop_simulation.cometary_to_cartesian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.BPlaneParameters.html">grss.prop_simulation.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.Body.html">grss.prop_simulation.Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.CloseApproachParameters.html">grss.prop_simulation.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.Constants.html">grss.prop_simulation.Constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.Event.html">grss.prop_simulation.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.prop_simulation.ImpulseEvent.html">grss.prop_simulation.ImpulseEvent</a></li>
@@ -385,7 +387,10 @@ document.write(`
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#X"><strong>X</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -397,6 +402,10 @@ document.write(`
         <li><a href="_autosummary/grss.fit_simulation.IterationParams.html#grss.fit_simulation.IterationParams.__init__">(grss.fit_simulation.IterationParams method)</a>
 </li>
         <li><a href="_autosummary/grss.prop_simulation.Body.html#grss.prop_simulation.Body.__init__">(grss.prop_simulation.Body method)</a>
+</li>
+        <li><a href="_autosummary/grss.prop_simulation.BPlaneParameters.html#grss.prop_simulation.BPlaneParameters.__init__">(grss.prop_simulation.BPlaneParameters method)</a>
+</li>
+        <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.__init__">(grss.prop_simulation.CloseApproachParameters method)</a>
 </li>
         <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.__init__">(grss.prop_simulation.Constants method)</a>
 </li>
@@ -461,6 +470,8 @@ document.write(`
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.bMag">bMag (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.Body.html#grss.prop_simulation.Body">Body (class in grss.prop_simulation)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.Event.html#grss.prop_simulation.Event.bodyIndex">bodyIndex (grss.prop_simulation.Event property)</a>
@@ -477,7 +488,11 @@ document.write(`
         <li><a href="_autosummary/grss.prop_simulation.ImpulseEvent.html#grss.prop_simulation.ImpulseEvent.bodyName">(grss.prop_simulation.ImpulseEvent property)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/grss.prop_simulation.BPlaneParameters.html#grss.prop_simulation.BPlaneParameters">BPlaneParameters (class in grss.prop_simulation)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.bStack">bStack (grss.prop_simulation.InterpolationParameters property)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.bVec">bVec (grss.prop_simulation.CloseApproachParameters property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -489,19 +504,33 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.fit_simulation.IterationParams.html#grss.fit_simulation.IterationParams.calculate_rms">calculate_rms() (grss.fit_simulation.IterationParams method)</a>
 </li>
+      <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.caParams">caParams (grss.prop_simulation.propSimulation property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.cartesian_to_cometary.html#grss.prop_simulation.cartesian_to_cometary">cartesian_to_cometary() (in module grss.prop_simulation)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.Body.html#grss.prop_simulation.Body.caTol">caTol (grss.prop_simulation.Body property)</a>
+
+      <ul>
+        <li><a href="_autosummary/grss.prop_simulation.IntegBody.html#grss.prop_simulation.IntegBody.caTol">(grss.prop_simulation.IntegBody property)</a>
+</li>
+        <li><a href="_autosummary/grss.prop_simulation.SpiceBody.html#grss.prop_simulation.SpiceBody.caTol">(grss.prop_simulation.SpiceBody property)</a>
+</li>
+      </ul></li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.centralBody">centralBody (grss.prop_simulation.CloseApproachParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.check_and_add_events">check_and_add_events() (grss.fit_simulation.FitSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.check_convergence">check_convergence() (grss.fit_simulation.FitSimulation method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.check_initial_solution">check_initial_solution() (grss.fit_simulation.FitSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.check_input_observation_arrays">check_input_observation_arrays() (grss.fit_simulation.FitSimulation method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.clight">clight (grss.prop_simulation.Constants property)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters">CloseApproachParameters (class in grss.prop_simulation)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.cometary_to_cartesian.html#grss.prop_simulation.cometary_to_cartesian">cometary_to_cartesian() (in module grss.prop_simulation)</a>
 </li>
@@ -533,6 +562,8 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.fit_optical.deweight_obs.html#grss.fit_optical.deweight_obs">deweight_obs() (in module grss.fit_optical)</a>
 </li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.dist">dist (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.dt0">dt0 (grss.prop_simulation.IntegrationParameters property)</a>
@@ -544,6 +575,8 @@ document.write(`
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.dtMin">dtMin (grss.prop_simulation.IntegrationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.du2m">du2m (grss.prop_simulation.Constants property)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.duptu2mps">duptu2mps (grss.prop_simulation.Constants property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -585,6 +618,8 @@ document.write(`
         <li><a href="_autosummary/grss.fit_simulation.IterationParams.html#grss.fit_simulation.IterationParams.flatten_and_clean">(grss.fit_simulation.IterationParams method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.flybyBody">flybyBody (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -635,10 +670,10 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.fit_utils.get_radar_codes_dict.html#grss.fit_utils.get_radar_codes_dict">get_radar_codes_dict() (in module grss.fit_utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.fit_radar.get_radar_obs_array.html#grss.fit_radar.get_radar_obs_array">get_radar_obs_array() (in module grss.fit_radar)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.fit_radar.get_radar_raw_data.html#grss.fit_radar.get_radar_raw_data">get_radar_raw_data() (in module grss.fit_radar)</a>
 </li>
       <li><a href="_autosummary/grss.fit_utils.get_radec.html#grss.fit_utils.get_radec">get_radec() (in module grss.fit_utils)</a>
@@ -654,6 +689,8 @@ document.write(`
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.get_sim_constants">get_sim_constants() (grss.prop_simulation.propSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.fit_utils.get_similarity_stats.html#grss.fit_utils.get_similarity_stats">get_similarity_stats() (in module grss.fit_utils)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.gravFocusFactor">gravFocusFactor (grss.prop_simulation.CloseApproachParameters property)</a>
 </li>
       <li>
     grss.fit_optical
@@ -711,6 +748,8 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.fit_utils.icrf2radec.html#grss.fit_utils.icrf2radec">icrf2radec() (in module grss.fit_utils)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.impact">impact (grss.prop_simulation.CloseApproachParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.ImpulseEvent.html#grss.prop_simulation.ImpulseEvent">ImpulseEvent (class in grss.prop_simulation)</a>
 </li>
@@ -803,6 +842,10 @@ document.write(`
       <li><a href="_autosummary/grss.prop_simulation.NongravParamaters.html#grss.prop_simulation.NongravParamaters.k">k (grss.prop_simulation.NongravParamaters property)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.kizner">kizner (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
@@ -851,6 +894,8 @@ document.write(`
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.mtp">mtp (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.ImpulseEvent.html#grss.prop_simulation.ImpulseEvent.multiplier">multiplier (grss.prop_simulation.ImpulseEvent property)</a>
 </li>
   </ul></td>
@@ -896,6 +941,10 @@ document.write(`
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.observerInfo">observerInfo (grss.prop_simulation.propSimulation property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.opik">opik (grss.prop_simulation.CloseApproachParameters property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -975,6 +1024,8 @@ document.write(`
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.scaled">scaled (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.fit_simulation.IterationParams.html#grss.fit_simulation.IterationParams.scatter_hist">scatter_hist() (grss.fit_simulation.IterationParams method)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.set_integration_parameters">set_integration_parameters() (grss.prop_simulation.propSimulation method)</a>
@@ -1025,6 +1076,8 @@ document.write(`
         <li><a href="_autosummary/grss.prop_simulation.SpiceBody.html#grss.prop_simulation.SpiceBody.t0">(grss.prop_simulation.SpiceBody property)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.tCA">tCA (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.tEval">tEval (grss.prop_simulation.propSimulation property)</a>
 </li>
   </ul></td>
@@ -1037,13 +1090,29 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.timestepCounter">timestepCounter (grss.prop_simulation.IntegrationParameters property)</a>
 </li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.tLin">tLin (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.tolInteg">tolInteg (grss.prop_simulation.IntegrationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.IntegrationParameters.html#grss.prop_simulation.IntegrationParameters.tolPC">tolPC (grss.prop_simulation.IntegrationParameters property)</a>
 </li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.tPeri">tPeri (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.tStack">tStack (grss.prop_simulation.InterpolationParameters property)</a>
 </li>
-      <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.tu2sec">tu2sec (grss.prop_simulation.Constants property)</a>
+      <li><a href="_autosummary/grss.prop_simulation.Constants.html#grss.prop_simulation.Constants.tu2s">tu2s (grss.prop_simulation.Constants property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.vel">vel (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.vInf">vInf (grss.prop_simulation.CloseApproachParameters property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1051,6 +1120,8 @@ document.write(`
 <h2 id="X">X</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.BPlaneParameters.html#grss.prop_simulation.BPlaneParameters.x">x (grss.prop_simulation.BPlaneParameters property)</a>
+</li>
       <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.x_dict_to_events">x_dict_to_events() (grss.fit_simulation.FitSimulation method)</a>
 </li>
       <li><a href="_autosummary/grss.fit_simulation.FitSimulation.html#grss.fit_simulation.FitSimulation.x_dict_to_nongrav_params">x_dict_to_nongrav_params() (grss.fit_simulation.FitSimulation method)</a>
@@ -1066,6 +1137,24 @@ document.write(`
       <li><a href="_autosummary/grss.prop_simulation.InterpolationParameters.html#grss.prop_simulation.InterpolationParameters.xIntegStack">xIntegStack (grss.prop_simulation.InterpolationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.prop_simulation.propSimulation.html#grss.prop_simulation.propSimulation.xObserver">xObserver (grss.prop_simulation.propSimulation property)</a>
+</li>
+      <li><a href="_autosummary/grss.prop_simulation.CloseApproachParameters.html#grss.prop_simulation.CloseApproachParameters.xRelCA">xRelCA (grss.prop_simulation.CloseApproachParameters property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.BPlaneParameters.html#grss.prop_simulation.BPlaneParameters.y">y (grss.prop_simulation.BPlaneParameters property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.prop_simulation.BPlaneParameters.html#grss.prop_simulation.BPlaneParameters.z">z (grss.prop_simulation.BPlaneParameters property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1120,7 +1209,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 04, 2023.
+  Last updated on Sep 05, 2023.
   <br/>
 </p>
   </div>

@@ -28,6 +28,7 @@ grss.prop\_simulation.SpiceBody
     .. autosummary::
     
         ~SpiceBody.J2
+        ~SpiceBody.caTol
         ~SpiceBody.isJ2
         ~SpiceBody.isMajor
         ~SpiceBody.isNongrav

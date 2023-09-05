@@ -28,6 +28,7 @@ grss.prop\_simulation.Body
     .. autosummary::
     
         ~Body.J2
+        ~Body.caTol
         ~Body.isJ2
         ~Body.isMajor
         ~Body.isNongrav

@@ -30,7 +30,8 @@ grss.prop\_simulation.Constants
         ~Constants.JdMinusMjd
         ~Constants.clight
         ~Constants.du2m
+        ~Constants.duptu2mps
         ~Constants.j2000Jd
-        ~Constants.tu2sec
+        ~Constants.tu2s
     
     

@@ -28,6 +28,7 @@ grss.prop\_simulation.IntegBody
     .. autosummary::
     
         ~IntegBody.J2
+        ~IntegBody.caTol
         ~IntegBody.covariance
         ~IntegBody.isInteg
         ~IntegBody.isJ2

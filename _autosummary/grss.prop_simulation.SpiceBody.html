@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop_simulation.SpiceBody &#8212; GRSS 0.9.7 documentation</title>
+    <title>grss.prop_simulation.SpiceBody &#8212; GRSS 0.9.8 documentation</title>
   
   
   
@@ -136,7 +136,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v0.9.7 documentation</p>
+    <p class="title logo__title">GRSS v0.9.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -203,7 +203,9 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.prop_simulation.html">grss.prop_simulation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.cartesian_to_cometary.html">grss.prop_simulation.cartesian_to_cometary</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.cometary_to_cartesian.html">grss.prop_simulation.cometary_to_cartesian</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.BPlaneParameters.html">grss.prop_simulation.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Body.html">grss.prop_simulation.Body</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.CloseApproachParameters.html">grss.prop_simulation.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Constants.html">grss.prop_simulation.Constants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.Event.html">grss.prop_simulation.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.prop_simulation.ImpulseEvent.html">grss.prop_simulation.ImpulseEvent</a></li>
@@ -423,6 +425,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody"><code class="docutils literal notranslate"><span class="pre">SpiceBody</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.__init__"><code class="docutils literal notranslate"><span class="pre">SpiceBody.__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.J2"><code class="docutils literal notranslate"><span class="pre">SpiceBody.J2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.caTol"><code class="docutils literal notranslate"><span class="pre">SpiceBody.caTol</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.isJ2"><code class="docutils literal notranslate"><span class="pre">SpiceBody.isJ2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.isMajor"><code class="docutils literal notranslate"><span class="pre">SpiceBody.isMajor</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.isNongrav"><code class="docutils literal notranslate"><span class="pre">SpiceBody.isNongrav</span></code></a></li>
@@ -458,7 +461,7 @@ document.write(`
 <p>The SpiceBody class contains the properties of a SPICE body.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop_simulation.SpiceBody.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.SpiceBody" title="grss.prop_simulation.SpiceBody"><span class="pre">grss.prop_simulation.SpiceBody</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiceId</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constants</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.Constants.html#grss.prop_simulation.Constants" title="grss.prop_simulation.Constants"><span class="pre">grss.prop_simulation.Constants</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.SpiceBody.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.SpiceBody" title="grss.prop_simulation.SpiceBody"><span class="pre">grss.prop_simulation.SpiceBody</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiceId</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.SpiceBody.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor for the SpiceBody class.</p>
 <dl class="simple">
 <dt>name<span class="classifier">str</span></dt><dd><p>Name of the body.</p>
@@ -471,15 +474,13 @@ document.write(`
 </dd>
 <dt>radius<span class="classifier">real</span></dt><dd><p>Radius of the body.</p>
 </dd>
-<dt>constants<span class="classifier">propSimulation.Constants</span></dt><dd><p>Constants of the simulation.</p>
-</dd>
 </dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.__init__" title="grss.prop_simulation.SpiceBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, name, spiceId, t0, mass, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.__init__" title="grss.prop_simulation.SpiceBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, name, spiceId, t0, mass, radius)</p></td>
 <td><p>Constructor for the SpiceBody class.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.set_J2" title="grss.prop_simulation.SpiceBody.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, poleRA, poleDec)</p></td>
@@ -493,40 +494,43 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.J2" title="grss.prop_simulation.SpiceBody.J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">J2</span></code></a></p></td>
 <td><p>J2 parameter of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isJ2" title="grss.prop_simulation.SpiceBody.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.caTol" title="grss.prop_simulation.SpiceBody.caTol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">caTol</span></code></a></p></td>
+<td><p>Distance tolerance for close approaches.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isJ2" title="grss.prop_simulation.SpiceBody.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
 <td><p>Whether the body is a J2 body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isMajor" title="grss.prop_simulation.SpiceBody.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isMajor" title="grss.prop_simulation.SpiceBody.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
 <td><p>Whether the body is a major body (used for EIH PPN).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isNongrav" title="grss.prop_simulation.SpiceBody.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isNongrav" title="grss.prop_simulation.SpiceBody.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
 <td><p>Whether the body has non-gravitational accelerations.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isPPN" title="grss.prop_simulation.SpiceBody.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isPPN" title="grss.prop_simulation.SpiceBody.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
 <td><p>Whether the body is a PPN body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isSpice" title="grss.prop_simulation.SpiceBody.isSpice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isSpice</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.isSpice" title="grss.prop_simulation.SpiceBody.isSpice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isSpice</span></code></a></p></td>
 <td><p>Whether the body is a SPICE body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.mass" title="grss.prop_simulation.SpiceBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.mass" title="grss.prop_simulation.SpiceBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
 <td><p>Mass of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.name" title="grss.prop_simulation.SpiceBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.name" title="grss.prop_simulation.SpiceBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.poleDec" title="grss.prop_simulation.SpiceBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.poleDec" title="grss.prop_simulation.SpiceBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
 <td><p>Declination of the pole of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.poleRA" title="grss.prop_simulation.SpiceBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.poleRA" title="grss.prop_simulation.SpiceBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
 <td><p>Right ascension of the pole of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.radius" title="grss.prop_simulation.SpiceBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.radius" title="grss.prop_simulation.SpiceBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
 <td><p>Radius of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.spiceId" title="grss.prop_simulation.SpiceBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.spiceId" title="grss.prop_simulation.SpiceBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
 <td><p>SPICE ID of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.t0" title="grss.prop_simulation.SpiceBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.SpiceBody.t0" title="grss.prop_simulation.SpiceBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
 <td><p>Initial MJD TDB time of the body.</p></td>
 </tr>
 </tbody>
@@ -535,6 +539,12 @@ document.write(`
 <dt class="sig sig-object py" id="grss.prop_simulation.SpiceBody.J2">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">J2</span></span><a class="headerlink" href="#grss.prop_simulation.SpiceBody.J2" title="Permalink to this definition">#</a></dt>
 <dd><p>J2 parameter of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop_simulation.SpiceBody.caTol">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">caTol</span></span><a class="headerlink" href="#grss.prop_simulation.SpiceBody.caTol" title="Permalink to this definition">#</a></dt>
+<dd><p>Distance tolerance for close approaches.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -685,6 +695,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody"><code class="docutils literal notranslate"><span class="pre">SpiceBody</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.__init__"><code class="docutils literal notranslate"><span class="pre">SpiceBody.__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.J2"><code class="docutils literal notranslate"><span class="pre">SpiceBody.J2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.caTol"><code class="docutils literal notranslate"><span class="pre">SpiceBody.caTol</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.isJ2"><code class="docutils literal notranslate"><span class="pre">SpiceBody.isJ2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.isMajor"><code class="docutils literal notranslate"><span class="pre">SpiceBody.isMajor</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.SpiceBody.isNongrav"><code class="docutils literal notranslate"><span class="pre">SpiceBody.isNongrav</span></code></a></li>
@@ -732,7 +743,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 04, 2023.
+  Last updated on Sep 05, 2023.
   <br/>
 </p>
   </div>
