@@ -632,10 +632,11 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.9998
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>assert maha_dist_f &lt; 5.0
-assert maha_dist_0 &lt; 5.0
-assert bhattacharya &lt; 0.10
-assert bhatt_coeff &gt; 0.90
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def test_farnocchia():
+    assert maha_dist_f &lt; 5.0
+    assert maha_dist_0 &lt; 5.0
+    assert bhattacharya &lt; 0.10
+    assert bhatt_coeff &gt; 0.90
 </pre></div>
 </div>
 </div>
@@ -716,7 +717,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 05, 2023.
+  Last updated on Sep 07, 2023.
   <br/>
 </p>
   </div>

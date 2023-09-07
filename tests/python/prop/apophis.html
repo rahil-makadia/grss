@@ -453,8 +453,18 @@ import matplotlib.pyplot as plt
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>body_id = &#39;99942&#39;
-init_sol, init_cov, nongrav_info = fit.get_sbdb_info(body_id)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>pos = [-0.55946538550488512+0.001232781221250307, 0.85647564757574512-0.0012750764430978325, 0.30415066217102493-0.0005187131180711941]
+vel = [-0.013818324735921638-4.1817715078240506e-07, -0.0060088275597939191+4.81738545944803e-06, -0.0025805044631309632+2.0787456036811378e-06]
+ng_params = prop.NongravParamaters()
+ng_params.a1 = 4.999999873689E-13
+ng_params.a2 = -2.901085508711E-14
+ng_params.a3 = 0.0
+ng_params.alpha = 1.0
+ng_params.k = 0.0
+ng_params.m = 2.0
+ng_params.n = 0.0
+ng_params.r0_au = 1.0
+init_cov = np.zeros((7, 7))
 </pre></div>
 </div>
 </div>
@@ -462,38 +472,16 @@ init_sol, init_cov, nongrav_info = fit.get_sbdb_info(body_id)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>e = init_sol[&#39;e&#39;]
-q = init_sol[&#39;q&#39;]
-tp = init_sol[&#39;tp&#39;]
-om = init_sol[&#39;om&#39;]*np.pi/180.0
-w = init_sol[&#39;w&#39;]*np.pi/180.0
-i = init_sol[&#39;i&#39;]*np.pi/180.0
-
-cometary_elements = [e, q, tp, om, w, i]
-ng_params = prop.NongravParamaters()
-ng_params.a1 = init_sol.get(&#39;a1&#39;, 0.0)
-ng_params.a2 = init_sol.get(&#39;a2&#39;, 0.0)
-ng_params.a3 = init_sol.get(&#39;a3&#39;, 0.0)
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>de_kernel = 441
 de_kernel_path = grss.utils.default_kernel_path(de_kernel)
-t0 = init_sol[&#39;t&#39;]
-daysInYear = 365.25
-numYears = 20
-numDays = numYears * daysInYear
-tf = t0 + numDays
+t0 = 62138.035998938605
+tf = 62502.53724260954
 prop_sim = prop.propSimulation(&quot;(99942) Apophis propagation test&quot;, t0, de_kernel, de_kernel_path)
 </pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>t_temp = t0
@@ -505,7 +493,16 @@ while t_temp &lt;= tf:
 eval_apparent_state = False
 t_eval_utc = False
 converged_light_time = False
-prop_sim.set_integration_parameters(tf, t_eval, t_eval_utc, eval_apparent_state, converged_light_time)
+prop_sim.set_integration_parameters(tf, t_eval, t_eval_utc, eval_apparent_state, converged_light_time, dtMin=4e-3)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>apophis = prop.IntegBody(&quot;(99942) Apophis&quot;, t0, 0.0, 0.0, pos, vel, init_cov, ng_params)
+prop_sim.add_integ_body(apophis)
 </pre></div>
 </div>
 </div>
@@ -513,21 +510,12 @@ prop_sim.set_integration_parameters(tf, t_eval, t_eval_utc, eval_apparent_state,
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>apophis = prop.IntegBody(&quot;(99942) Apophis&quot;, t0, 0.0, 0.0, cometary_elements, init_cov, ng_params)
-prop_sim.add_integ_body(apophis)
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
-</pre></div>
-</div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>prop_sim.integrate()
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>arr = np.array(prop_sim.xIntegEval)
@@ -548,7 +536,19 @@ plt.close()
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tests_python_prop_apophis_9_0.png" src="../../../_images/tests_python_prop_apophis_9_0.png" />
+<img alt="../../../_images/tests_python_prop_apophis_8_0.png" src="../../../_images/tests_python_prop_apophis_8_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>jpl = np.array([0.017575542120147558, 1.2196672850476662, 0.4783965165437007, -0.013539283384755667, 0.0005355366349979586, -1.5069904336052799e-05])
+grss = np.array(prop_sim.xInteg)
+pos_diff = np.linalg.norm((jpl-grss)[:3])*prop_sim.consts.du2m
+def test_apophis():
+    assert pos_diff &lt; 100.0
+</pre></div>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -628,7 +628,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 05, 2023.
+  Last updated on Sep 07, 2023.
   <br/>
 </p>
   </div>
