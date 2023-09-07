@@ -411,28 +411,31 @@ class IterationParams:
         plt.suptitle(msg, y=0.95)
         if plot_chi_squared:
             plt.subplot(1,2,1)
-        plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
-        plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
-        plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
-        plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
-        plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2',
-                    markersize=radar_scale*markersize, label='Delay')
-        plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
-                    markersize=radar_scale*markersize, label='Doppler')
-        plt.axhline(-sigma_limit, c='khaki', linestyle='--', alpha=1.0,
+        if not np.all(np.isnan(ra_chi)) and not np.all(np.isnan(dec_chi)):
+            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
+            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
+                        markersize=2*markersize, markerfacecolor='none')#, label='Rejected Obs.')
+            plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
+                        markersize=2*markersize, markerfacecolor='none')
+        if not np.all(np.isnan(delay_chi)):
+            plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2',
+                        markersize=radar_scale*markersize, label='Delay')
+        if not np.all(np.isnan(doppler_chi)):
+            plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
+                        markersize=radar_scale*markersize, label='Doppler')
+        plt.axhline(-sigma_limit, c='red', linestyle='--', alpha=0.5,
                         label=fr'$\pm{sigma_limit:.0f}\sigma$')
-        plt.axhline(sigma_limit, c='khaki', linestyle='--', alpha=1.0)
-        plt.axhline(-2*sigma_limit, c='red', linestyle='--', alpha=0.5,
-                        label=fr'$\pm{2*sigma_limit:.0f}\sigma$')
-        plt.axhline(2*sigma_limit, c='red', linestyle='--', alpha=0.5)
-        plt.legend(ncol=3)
+        plt.axhline(sigma_limit, c='red', linestyle='--', alpha=0.5)
+        plt.legend(ncol=2)
         plt.xlabel('MJD [UTC]')
-        plt.ylabel(r'$\chi$, (O-C)/$\sigma$ $[\cdot]$')
+        plt.ylabel(r'Weighted Residuals, (O-C)/$\sigma$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
             plt.yscale('log')
+        else:
+            lim = np.max(np.abs(plt.ylim()))
+            plt.ylim(-lim, lim)
         if plot_chi_squared:
             plt.subplot(1,2,2)
             plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')

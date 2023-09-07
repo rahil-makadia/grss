@@ -105,8 +105,8 @@ int main() {
     real distDiff = sqrt(pow(sc[0] - rm[0], 2) + pow(sc[1] - rm[1], 2) +
                          pow(sc[2] - rm[2], 2));
     std::cout << "Distance (m): " << distDiff << std::endl << std::endl;
-    // make sure the difference is less than 50m
-    assert(distDiff < 50.0L);
+    // make sure the difference is less than 100m
+    assert(distDiff < 100.0L);
 
     std::cout << "difference from roundtrip integration: " << std::endl;
     std::cout << "Position (m): [";

@@ -24,9 +24,11 @@ jobs:
           pip3 install .
       - name: Run tests
         run: |
-          python3 -m pip install jupyter ipykernel
+          python3 -m pip install jupyter ipykernel pytest pytest-cov
           python3 -m ipykernel install --user
-          jupyter nbconvert --to script tests/python/prop/*.ipynb
-          python3 tests/python/prop/*.py
-          jupyter nbconvert --to script tests/python/fit/*.ipynb
-          python3 tests/python/fit/*.py
+          cd tests/python
+          source run_python_tests.sh
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
