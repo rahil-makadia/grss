@@ -223,11 +223,14 @@ void get_ca_parameters(propSimulation *propSim, const size_t &i,
     real radius;
     if (j < propSim->integParams.nInteg) {
         ca.centralBody = propSim->integBodies[j].name;
+        ca.centralBodySpiceId = propSim->integBodies[j].spiceId;
         mu = propSim->integBodies[j].mass * propSim->consts.G;
         radius = propSim->integBodies[j].radius;
     } else {
         ca.centralBody =
             propSim->spiceBodies[j - propSim->integParams.nInteg].name;
+        ca.centralBodySpiceId =
+            propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId;
         mu = propSim->spiceBodies[j - propSim->integParams.nInteg].mass *
             propSim->consts.G;
         radius = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
@@ -249,10 +252,10 @@ void get_ca_parameters(propSimulation *propSim, const size_t &i,
     }
     vcross(pos, vel, hVec);
     vnorm(hVec, 3, h);
-    real hCrossV[3], eVec[3], e;
-    vcross(hVec, vel, hCrossV);
+    real vCrossH[3], eVec[3], e;
+    vcross(vel, hVec, vCrossH);
     for (size_t k = 0; k < 3; k++) {
-        eVec[k] = hCrossV[k] / mu - pos[k] / r;
+        eVec[k] = vCrossH[k] / mu - pos[k] / r;
     }
     vnorm(eVec, 3, e);
     real pHat[3], qHat[3], hCrossPHat[3];
@@ -298,25 +301,22 @@ void get_ca_parameters(propSimulation *propSim, const size_t &i,
     ca.tPeri = tCA + (vInf * posDotVel / mu - F) / n;
     ca.tLin = ca.tPeri - log(e) / n;
     // calculate B-plane parameters (Öpik xi, zeta formulation)
-    size_t starti = 0;
-    for (size_t k = 0; k < i; k++) {
-        starti += propSim->integBodies[k].n2Derivs;
-    }
     std::vector<real> xInterp = propSim->interpolate(tCA);
+    double xCentralBody[9];
+    get_spk_state(ca.centralBodySpiceId, tCA, propSim->ephem, xCentralBody);
     double xSun[9];
     get_spk_state(10, tCA, propSim->ephem, xSun);
     real vCentralBodyHelio[3];
     for (size_t k = 0; k < 3; k++) {
-        vCentralBodyHelio[k] =
-            xInterp[starti + 3 + k] + xRelCA[3 + k] - xSun[3 + k];
+        vCentralBodyHelio[k] = xCentralBody[3+k]-xSun[3+k];
     }
-    real xiHat[3], zetaHat[3], vCentralBodyHelioCrossSHat[3], negSHat[3];
+    real xiHat[3], zetaHat[3], vCentralBodyHelioCrossSHat[3];
     vcross(vCentralBodyHelio, sHat, vCentralBodyHelioCrossSHat);
     vunit(vCentralBodyHelioCrossSHat, 3, xiHat);
+    vcross(sHat, xiHat, zetaHat);
     for (size_t k = 0; k < 3; k++) {
-        negSHat[k] = -sHat[k];
+        zetaHat[k] = -zetaHat[k];
     }
-    vcross(negSHat, xiHat, zetaHat);
     vdot(bVec, xiHat, 3, ca.opik.x);
     vdot(bVec, zetaHat, 3, ca.opik.y);
     vdot(bVec, sHat, 3, ca.opik.z);

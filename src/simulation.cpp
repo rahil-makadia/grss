@@ -46,6 +46,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->t0 = t0;
     this->mass = mass;
     this->radius = radius;
+    this->caTol = 0.0;
     std::vector<real> cartesianStateEclip(6);
     std::vector<real> cartesianPos(3);
     std::vector<real> cartesianVel(3);
@@ -97,6 +98,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->t0 = t0;
     this->mass = mass;
     this->radius = radius;
+    this->caTol = 0.0;
     this->isCometary = false;
     this->pos[0] = pos[0];
     this->pos[1] = pos[1];

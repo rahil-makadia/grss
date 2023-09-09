@@ -193,6 +193,10 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Name of the central body.
             )mydelimiter")
+        .def_readwrite("centralBodySpiceId",
+                       &CloseApproachParameters::centralBodySpiceId, R"mydelimiter(
+            SPICE ID of the central body.
+            )mydelimiter")
         .def_readwrite("impact", &CloseApproachParameters::impact,
                        R"mydelimiter(
             Whether the close approach is an impact when accounting for gravitational focusing.

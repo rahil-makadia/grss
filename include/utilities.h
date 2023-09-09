@@ -114,6 +114,7 @@ struct CloseApproachParameters {
     real vInf;
     std::string flybyBody;
     std::string centralBody;
+    int centralBodySpiceId;
     bool impact;
     real tPeri;
     real tLin;
