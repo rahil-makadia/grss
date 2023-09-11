@@ -308,7 +308,7 @@ void gr15(propSimulation *propSim) {
             vabs_max(accIntegArr[7], accIntegNextMax);
             relError = b6Max / accIntegNextMax;
             if (propSim->integParams.adaptiveTimestep) {
-                if (isnormal(relError)) {
+                if (std::isnormal(relError)) {
                     dtReq = root7(propSim->integParams.tolInteg/relError)*dt;
                 } else {
                     dtReq = dt/propSim->integParams.dtChangeFactor;
