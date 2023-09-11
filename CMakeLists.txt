@@ -10,7 +10,8 @@ project(grss VERSION ${ver})
 # TODO: add gprof profiling, iee standards for floats
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_compile_options(-std=c++11 -DLONGDOUBLE -O2 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result)
+add_compile_options(-std=c++11 -O3 -fPIC) # operational flags
+# add_compile_options(-std=c++11 -DLONGDOUBLE -O2 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result)
 # if not clang, add -Wno-maybe-uninitialized
 if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wno-maybe-uninitialized)

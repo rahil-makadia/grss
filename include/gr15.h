@@ -37,9 +37,8 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
 void compute_g_and_b(const std::vector<std::vector<real> > &AccIntegArr,
                      const size_t &hIdx, real *g,
                      std::vector<std::vector<real> > &b, const size_t &dim);
-void refine_b(std::vector<std::vector<real> > &b,
-              real *e, const real &dtRatio,
-              const size_t &dim, const size_t &timestepCounter);
+void refine_b(std::vector<std::vector<real> > &b, real *e, const real &dtRatio,
+              const size_t &dim);
 void check_and_apply_events(propSimulation *propSim, const real &t,
                             real &tNextEvent, size_t &nextEventIdx,
                             std::vector<real> &xInteg);

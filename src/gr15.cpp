@@ -18,7 +18,6 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
     std::vector<real> posInteg0(3 * propSim->integParams.nInteg, 0.0);
     std::vector<real> accInteg1Minus0(3 * propSim->integParams.nInteg, 0.0);
     std::vector<real> xIntegNext(6 * propSim->integParams.nInteg, 0.0);
-
     std::vector<real> accInteg0 =
         get_state_der(t, xInteg0, propSim);
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
@@ -71,64 +70,33 @@ void approx_xInteg(const std::vector<real> &xInteg0,
                    const std::vector<std::vector<real>> &b,
                    const size_t &nInteg) {
     for (size_t i = 0; i < nInteg; i++) {
-        xIntegNext[6*i]   = xInteg0[6*i]   + dt * h * (xInteg0[6*i+3] + dt * h * (accInteg0[3*i]   + h * (b[0][3*i]   / 0.3e1 + h * (b[1][3*i]   / 0.6e1 + h * (b[2][3*i]   / 0.10e2 + h * (b[3][3*i]   / 0.15e2 + h * (b[4][3*i]   / 0.21e2 + h * (b[5][3*i]   / 0.28e2 + h * b[6][3*i]   / 0.36e2))))))) / 0.2e1);
-        xIntegNext[6*i+1] = xInteg0[6*i+1] + dt * h * (xInteg0[6*i+4] + dt * h * (accInteg0[3*i+1] + h * (b[0][3*i+1] / 0.3e1 + h * (b[1][3*i+1] / 0.6e1 + h * (b[2][3*i+1] / 0.10e2 + h * (b[3][3*i+1] / 0.15e2 + h * (b[4][3*i+1] / 0.21e2 + h * (b[5][3*i+1] / 0.28e2 + h * b[6][3*i+1] / 0.36e2))))))) / 0.2e1);
-        xIntegNext[6*i+2] = xInteg0[6*i+2] + dt * h * (xInteg0[6*i+5] + dt * h * (accInteg0[3*i+2] + h * (b[0][3*i+2] / 0.3e1 + h * (b[1][3*i+2] / 0.6e1 + h * (b[2][3*i+2] / 0.10e2 + h * (b[3][3*i+2] / 0.15e2 + h * (b[4][3*i+2] / 0.21e2 + h * (b[5][3*i+2] / 0.28e2 + h * b[6][3*i+2] / 0.36e2))))))) / 0.2e1);
-
-        xIntegNext[6*i+3] = xInteg0[6*i+3] + dt * h * (accInteg0[3*i]   + h * (b[0][3*i]   / 0.2e1 + h * (b[1][3*i]   / 0.3e1 + h * (b[2][3*i]   / 0.4e1 + h * (b[3][3*i]   / 0.5e1 + h * (b[4][3*i]   / 0.6e1 + h * (b[5][3*i]   / 0.7e1 + h * b[6][3*i]   / 0.8e1)))))));
-        xIntegNext[6*i+4] = xInteg0[6*i+4] + dt * h * (accInteg0[3*i+1] + h * (b[0][3*i+1] / 0.2e1 + h * (b[1][3*i+1] / 0.3e1 + h * (b[2][3*i+1] / 0.4e1 + h * (b[3][3*i+1] / 0.5e1 + h * (b[4][3*i+1] / 0.6e1 + h * (b[5][3*i+1] / 0.7e1 + h * b[6][3*i+1] / 0.8e1)))))));
-        xIntegNext[6*i+5] = xInteg0[6*i+5] + dt * h * (accInteg0[3*i+2] + h * (b[0][3*i+2] / 0.2e1 + h * (b[1][3*i+2] / 0.3e1 + h * (b[2][3*i+2] / 0.4e1 + h * (b[3][3*i+2] / 0.5e1 + h * (b[4][3*i+2] / 0.6e1 + h * (b[5][3*i+2] / 0.7e1 + h * b[6][3*i+2] / 0.8e1)))))));
+        xIntegNext[6*i]   = xInteg0[6*i]   + ((((((((b[6][3*i]*7.*h/9.   + b[5][3*i])*3.*h/4.   + b[4][3*i])*5.*h/7.   + b[3][3*i])*2.*h/3.   + b[2][3*i])*3.*h/5.   + b[1][3*i])*h/2.      + b[0][3*i])*h/3.   + accInteg0[3*i]  )*dt*h/2. + xInteg0[6*i+3])*dt*h;
+        xIntegNext[6*i+1] = xInteg0[6*i+1] + ((((((((b[6][3*i+1]*7.*h/9. + b[5][3*i+1])*3.*h/4. + b[4][3*i+1])*5.*h/7. + b[3][3*i+1])*2.*h/3. + b[2][3*i+1])*3.*h/5. + b[1][3*i+1])*h/2.    + b[0][3*i+1])*h/3. + accInteg0[3*i+1])*dt*h/2. + xInteg0[6*i+4])*dt*h;
+        xIntegNext[6*i+2] = xInteg0[6*i+2] + ((((((((b[6][3*i+2]*7.*h/9. + b[5][3*i+2])*3.*h/4. + b[4][3*i+2])*5.*h/7. + b[3][3*i+2])*2.*h/3. + b[2][3*i+2])*3.*h/5. + b[1][3*i+2])*h/2.    + b[0][3*i+2])*h/3. + accInteg0[3*i+2])*dt*h/2. + xInteg0[6*i+5])*dt*h;
+        xIntegNext[6*i+3] = xInteg0[6*i+3] + (((((((b[6][3*i]*7.*h/8.    + b[5][3*i])*6.*h/7.   + b[4][3*i])*5.*h/6.   + b[3][3*i])*4.*h/5.   + b[2][3*i])*3.*h/4.   + b[1][3*i])*2.*h/3.   + b[0][3*i])*h/2.   + accInteg0[3*i]  )*dt*h;
+        xIntegNext[6*i+4] = xInteg0[6*i+4] + (((((((b[6][3*i+1]*7.*h/8.  + b[5][3*i+1])*6.*h/7. + b[4][3*i+1])*5.*h/6. + b[3][3*i+1])*4.*h/5. + b[2][3*i+1])*3.*h/4. + b[1][3*i+1])*2.*h/3. + b[0][3*i+1])*h/2. + accInteg0[3*i+1])*dt*h;
+        xIntegNext[6*i+5] = xInteg0[6*i+5] + (((((((b[6][3*i+2]*7.*h/8.  + b[5][3*i+2])*6.*h/7. + b[4][3*i+2])*5.*h/6. + b[3][3*i+2])*4.*h/5. + b[2][3*i+2])*3.*h/4. + b[1][3*i+2])*2.*h/3. + b[0][3*i+2])*h/2. + accInteg0[3*i+2])*dt*h;
     }
 }
 
 void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                      const size_t &hIdx, real *g,
                      std::vector<std::vector<real>> &b, const size_t &dim) {
-    const std::vector<real> Acc1 = AccIntegArr[0];
-    const std::vector<real> Acc2 = AccIntegArr[1];
-    const std::vector<real> Acc3 = AccIntegArr[2];
-    const std::vector<real> Acc4 = AccIntegArr[3];
-    const std::vector<real> Acc5 = AccIntegArr[4];
-    const std::vector<real> Acc6 = AccIntegArr[5];
-    const std::vector<real> Acc7 = AccIntegArr[6];
-    const std::vector<real> Acc8 = AccIntegArr[7];
-
     for (size_t i=0; i<dim; i++){
         if (hIdx == 1) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
+            g[0*dim+i] = (AccIntegArr[1][i] - AccIntegArr[0][i]) * rMat[1][0];
         } else if (hIdx == 2) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
+            g[1*dim+i] = ((AccIntegArr[2][i] - AccIntegArr[0][i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
         } else if (hIdx == 3) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
-            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
+            g[2*dim+i] = (((AccIntegArr[3][i] - AccIntegArr[0][i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
         } else if (hIdx == 4) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
-            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
-            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
+            g[3*dim+i] = ((((AccIntegArr[4][i] - AccIntegArr[0][i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
         } else if (hIdx == 5) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
-            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
-            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
-            g[4*dim+i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
+            g[4*dim+i] = (((((AccIntegArr[5][i] - AccIntegArr[0][i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
         } else if (hIdx == 6) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
-            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
-            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
-            g[4*dim+i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
-            g[5*dim+i] = ((((((Acc7[i] - Acc1[i]) * rMat[6][0] - g[0*dim+i]) * rMat[6][1] - g[1*dim+i]) * rMat[6][2] - g[2*dim+i]) * rMat[6][3] - g[3*dim+i]) * rMat[6][4] - g[4*dim+i]) * rMat[6][5];
+            g[5*dim+i] = ((((((AccIntegArr[6][i] - AccIntegArr[0][i]) * rMat[6][0] - g[0*dim+i]) * rMat[6][1] - g[1*dim+i]) * rMat[6][2] - g[2*dim+i]) * rMat[6][3] - g[3*dim+i]) * rMat[6][4] - g[4*dim+i]) * rMat[6][5];
         } else if (hIdx == 7) {
-            g[0*dim+i] = (Acc2[i] - Acc1[i]) * rMat[1][0];
-            g[1*dim+i] = ((Acc3[i] - Acc1[i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
-            g[2*dim+i] = (((Acc4[i] - Acc1[i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
-            g[3*dim+i] = ((((Acc5[i] - Acc1[i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
-            g[4*dim+i] = (((((Acc6[i] - Acc1[i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
-            g[5*dim+i] = ((((((Acc7[i] - Acc1[i]) * rMat[6][0] - g[0*dim+i]) * rMat[6][1] - g[1*dim+i]) * rMat[6][2] - g[2*dim+i]) * rMat[6][3] - g[3*dim+i]) * rMat[6][4] - g[4*dim+i]) * rMat[6][5];
-            g[6*dim+i] = (((((((Acc8[i] - Acc1[i]) * rMat[7][0] - g[0*dim+i]) * rMat[7][1] - g[1*dim+i]) * rMat[7][2] - g[2*dim+i]) * rMat[7][3] - g[3*dim+i]) * rMat[7][4] - g[4*dim+i]) * rMat[7][5] - g[5*dim+i]) * rMat[7][6];
+            g[6*dim+i] = (((((((AccIntegArr[7][i] - AccIntegArr[0][i]) * rMat[7][0] - g[0*dim+i]) * rMat[7][1] - g[1*dim+i]) * rMat[7][2] - g[2*dim+i]) * rMat[7][3] - g[3*dim+i]) * rMat[7][4] - g[4*dim+i]) * rMat[7][5] - g[5*dim+i]) * rMat[7][6];
         }
     }
     for (size_t i=0; i<dim; i++){
@@ -136,55 +104,53 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
         } else if (hIdx == 2) {
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
         } else if (hIdx == 3) {
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
         } else if (hIdx == 4) {
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
         } else if (hIdx == 5) {
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-            b[4][i] =                                                                                   + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
+            b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[4][i] =                                                                                               + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
         } else if (hIdx == 6) {
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-            b[4][i] =                                                                                   + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
-            b[5][i] =                                                                                                        + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
+            b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[4][i] =                                                                                               + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
+            b[5][i] =                                                                                                                       + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
         } else if (hIdx == 7) {
             b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-            b[1][i] =                    + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-            b[2][i] =                                         + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-            b[3][i] =                                                              + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-            b[4][i] =                                                                                   + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
-            b[5][i] =                                                                                                        + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
-            b[6][i] =                                                                                                                             + cMat[6][6]*g[6*dim+i];
+            b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
+            b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
+            b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
+            b[4][i] =                                                                                               + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
+            b[5][i] =                                                                                                                       + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
+            b[6][i] =                                                                                                                                               + cMat[6][6]*g[6*dim+i];
         }
     }
 }
 
 void refine_b(std::vector<std::vector<real>> &b,
               real *e, const real &dtRatio,
-              const size_t &dim, const size_t &timestepCounter) {
+              const size_t &dim) {
     std::vector<std::vector<real>> bDiff(7, std::vector<real>(dim, 0.0L));
-    if (timestepCounter > 1){
-        for (size_t i = 0; i < dim; i++){
-            bDiff[0][i] = b[0][i] - e[0*dim+i];
-            bDiff[1][i] = b[1][i] - e[1*dim+i];
-            bDiff[2][i] = b[2][i] - e[2*dim+i];
-            bDiff[3][i] = b[3][i] - e[3*dim+i];
-            bDiff[4][i] = b[4][i] - e[4*dim+i];
-            bDiff[5][i] = b[5][i] - e[5*dim+i];
-            bDiff[6][i] = b[6][i] - e[6*dim+i];
-        }
+    for (size_t i = 0; i < dim; i++){
+        bDiff[0][i] = b[0][i] - e[0*dim+i];
+        bDiff[1][i] = b[1][i] - e[1*dim+i];
+        bDiff[2][i] = b[2][i] - e[2*dim+i];
+        bDiff[3][i] = b[3][i] - e[3*dim+i];
+        bDiff[4][i] = b[4][i] - e[4*dim+i];
+        bDiff[5][i] = b[5][i] - e[5*dim+i];
+        bDiff[6][i] = b[6][i] - e[6*dim+i];
     }
 
     real q = dtRatio;
@@ -238,6 +204,21 @@ void check_and_apply_events(propSimulation *propSim, const real &t,
     }
 }
 
+static real root7(const real num){
+    real root = 1.;
+    real rootPrev = 0.;
+    real eps = 1e-14;
+    int iter = 0;
+    while (fabs(root - rootPrev) > eps) {
+        rootPrev = root;
+        real root6 = root*root*root*root*root*root;
+        root += (num/root6-root)/7.;
+        iter++;
+    }
+    // printf("iter: %d\n", iter);
+    return root;
+}
+
 void gr15(propSimulation *propSim) {
     real t = propSim->t;
     std::vector<real> xInteg0 = propSim->xInteg;
@@ -259,9 +240,8 @@ void gr15(propSimulation *propSim) {
     real *b6Tilde = new real[dim];
     memset(b6Tilde, 0.0, dim * sizeof(real));
     real b6TildeMax, accIntegArr7Max;
-    real b6TildeEstim, b6Max, accIntegNextMax;
+    real b6Max, accIntegNextMax;
     real relError, dtReq;
-
     real tNextEvent = propSim->integParams.tf;
     static size_t nextEventIdx = 0;
     if (t == propSim->integParams.t0) {
@@ -277,10 +257,7 @@ void gr15(propSimulation *propSim) {
          t + dt < tNextEvent)) {
         dt = tNextEvent - t;
     }
-
     size_t PCmaxIter = 12;
-    int maxLoops = 100;
-    int loopCounter = 0;
     int keepStepping = 1;
     int oneStepDone = 0;
     if (propSim->integParams.t0 == propSim->integParams.tf) {
@@ -291,95 +268,106 @@ void gr15(propSimulation *propSim) {
         xInteg0 = propSim->xInteg;
         oneStepDone = 0;
         while (!oneStepDone) {
-            for (size_t PCidx = 1; PCidx < PCmaxIter; PCidx++) {
-                for (size_t hIdx = 0; hIdx < nh; hIdx++) {
+            real PCerr = 1.0/propSim->integParams.tolPC;
+            real PCerrPrev = PCerr + 1.0;
+            accIntegArr[0] = accInteg0;
+            size_t PCIter = 0;
+            while (true) {
+                if (PCerr < propSim->integParams.tolPC) {
+                    break;
+                }
+                if (PCerr > PCerrPrev && PCIter > 2) {
+                    break;
+                }
+                if (PCIter > PCmaxIter) {
+                    break;
+                }
+                PCerrPrev = PCerr;
+                PCIter++;
+                for (size_t hIdx = 1; hIdx < nh; hIdx++) {
                     approx_xInteg(xInteg0, accInteg0, xInteg, dt, hVec[hIdx], b,
                                   propSim->integParams.nInteg);
                     accIntegArr[hIdx] = get_state_der(
                         t + hVec[hIdx] * dt, xInteg, propSim);
                     compute_g_and_b(accIntegArr, hIdx, g, b, dim);
+                    if (hIdx == 7) {
+                        for (size_t i = 0; i < dim; i++) {
+                            b6Tilde[i] = b[6][i] - bOld[6][i];
+                        }
+                        vabs_max(b6Tilde, dim, b6TildeMax);
+                        vabs_max(accIntegArr[7], accIntegArr7Max);
+                        PCerr = b6TildeMax / accIntegArr7Max;
+                        bOld = b;
+                    }
                 }
-                for (size_t i = 0; i < dim; i++) {
-                    b6Tilde[i] = b[6][i] - bOld[6][i];
-                }
-                vabs_max(b6Tilde, dim, b6TildeMax);
-                vabs_max(accIntegArr[7], accIntegArr7Max);
-                if (b6TildeMax / accIntegArr7Max < propSim->integParams.tolPC) {
-                    break;
-                }
-                bOld = b;
             }
-            approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b,
-                          propSim->integParams.nInteg);
-            accIntegNext = get_state_der(t + dt, xInteg, propSim);
-
+            // printf("ks: %d. osd: %d. t: %0.10e, dt: %0.8e", keepStepping, oneStepDone,t, dt);
+            // printf(". iterations: %d",PCIter);
+            // printf(". predictor_corrector_error: %e",PCerr);
             vabs_max(b[6], b6Max);
-            vabs_max(accIntegNext, accIntegNextMax);
-            b6TildeEstim = b6Max / accIntegNextMax;
+            vabs_max(accIntegArr[7], accIntegNextMax);
+            relError = b6Max / accIntegNextMax;
             if (propSim->integParams.adaptiveTimestep) {
-                relError = pow(b6TildeEstim / propSim->integParams.tolInteg,
-                               1.0L / 7.0L);
+                if (isnormal(relError)) {
+                    dtReq = root7(propSim->integParams.tolInteg/relError)*dt;
+                } else {
+                    dtReq = dt/propSim->integParams.dtChangeFactor;
+                }
             } else {
-                relError =
-                    pow(b6TildeEstim / propSim->integParams.tolInteg, 0.0L);
+                dtReq = dt;
             }
-            dtReq = dt / relError;
-
-            if (relError <= 1 || loopCounter > maxLoops) {
-                propSim->interpParams.bStack.push_back(bOld);
-                propSim->interpParams.accIntegStack.push_back(accInteg0);
-                if (propSim->tEval.size() != propSim->xIntegEval.size()) {
-                    // interpolate(t, dt, xInteg0, accInteg0, b, propSim);
-                    interpolate_on_the_fly(propSim, t, dt);
+            // printf(". dtReq: %e. relError: %e", dtReq,relError);
+            if (fabs(dtReq) < propSim->integParams.dtMin) {
+                dtReq = copysign(propSim->integParams.dtMin, dtReq);
+            }
+            if (fabs(dtReq/dt) < propSim->integParams.dtChangeFactor) {
+                if (propSim->integParams.timestepCounter > 1) {
+                    refine_b(b, e, dtReq / dt, dim);
                 }
-                accInteg0 = accIntegNext;
-                t += dt;
-                propSim->t = t;
-                check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
-                                       xInteg);
-                propSim->xInteg = xInteg;
-                propSim->interpParams.tStack.push_back(t);
-                propSim->interpParams.xIntegStack.push_back(xInteg);
-                loopCounter = 0;
-                oneStepDone = 1;
-                propSim->integParams.timestepCounter += 1;
-                refine_b(b, e, dtReq / dt, dim,
-                         propSim->integParams.timestepCounter);
-                check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg, keepStepping);
-                if ((propSim->integParams.tf > propSim->integParams.t0 &&
-                     t >= propSim->integParams.tf) ||
-                    (propSim->integParams.tf < propSim->integParams.t0 &&
-                     t <= propSim->integParams.tf)) {
-                    keepStepping = 0;
-                }
-            } else {
-                loopCounter += 1;
+                dt = dtReq;
+                std::cout << "Restarting next while loop at time t = " << t << std::endl;
+                continue;
             }
             if (dtReq / dt > 1.0 / propSim->integParams.dtChangeFactor) {
-                dt /= propSim->integParams.dtChangeFactor;
-            } else if (fabs(dtReq) < 1.0e-12L) {
-                dt *= propSim->integParams.dtChangeFactor;
-            } else {
-                dt = dtReq;
+                dtReq = dt / propSim->integParams.dtChangeFactor;
             }
+            // final cleanup
+            // printf(". cleaning up...\n");
+            propSim->interpParams.bStack.push_back(bOld);
+            propSim->interpParams.accIntegStack.push_back(accInteg0);
+            if (propSim->tEval.size() != propSim->xIntegEval.size()) {
+                // interpolate(t, dt, xInteg0, accInteg0, b, propSim);
+                interpolate_on_the_fly(propSim, t, dt);
+            }
+            approx_xInteg(xInteg0, accInteg0, xInteg, dt, 1.0, b,
+                        propSim->integParams.nInteg);
+            accInteg0 = get_state_der(t + dt, xInteg, propSim);
+            t += dt;
+            propSim->t = t;
+            check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
+                                    xInteg);
+            propSim->xInteg = xInteg;
+            propSim->interpParams.tStack.push_back(t);
+            propSim->interpParams.xIntegStack.push_back(xInteg);
+            propSim->integParams.timestepCounter++;
+            if (propSim->integParams.timestepCounter > 1) {
+                refine_b(b, e, dtReq / dt, dim);
+            }
+            check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg, keepStepping);
             if ((propSim->integParams.tf > propSim->integParams.t0 &&
-                 dt > propSim->integParams.dtMax) ||
+                    t >= propSim->integParams.tf) ||
                 (propSim->integParams.tf < propSim->integParams.t0 &&
-                 dt < propSim->integParams.dtMax)) {
-                dt = propSim->integParams.dtMax;
+                    t <= propSim->integParams.tf)) {
+                keepStepping = 0;
             }
-            if ((propSim->integParams.tf > propSim->integParams.t0 &&
-                 dt < propSim->integParams.dtMin) ||
-                (propSim->integParams.tf < propSim->integParams.t0 &&
-                 dt > propSim->integParams.dtMin)) {
-                dt = propSim->integParams.dtMin;
-            }
+            dt = dtReq;
             if ((propSim->integParams.tf > propSim->integParams.t0 &&
                  t + dt > tNextEvent) ||
                 (propSim->integParams.tf < propSim->integParams.t0 &&
                  t + dt < tNextEvent)) {
                 dt = tNextEvent - t;
             }
+            oneStepDone = 1;
         }
     }
     delete[] g;

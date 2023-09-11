@@ -13,7 +13,7 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
 
 SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
                      real radius) {
-    this->name = std::to_string(spiceId) + " " + name;
+    this->name = name;
     this->spiceId = spiceId;
     if (this->spiceId > 1000000) {
         this->caTol = 0.05;

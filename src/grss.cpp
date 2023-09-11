@@ -173,7 +173,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("xRelCA", &CloseApproachParameters::xRelCA,
                        R"mydelimiter(
-            Relative position of the close approach.
+            Relative state of the close approach.
             )mydelimiter")
         .def_readwrite("dist", &CloseApproachParameters::dist, R"mydelimiter(
             Distance of the close approach.
