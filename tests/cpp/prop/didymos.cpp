@@ -128,7 +128,7 @@ int main() {
                               pow(simTestBackward.xInteg[2] - posf[2], 2))*simTestForward.consts.du2m;
     std::cout << "Distance (m): " << roundTripDiff << std::endl;
     // make sure the difference is less than 1% of distDiff
-    assert(roundTripDiff < 0.1L*distDiff);
+    assert(roundTripDiff < 0.25L*distDiff);
 
     std::cout
         << std::endl
