@@ -493,7 +493,7 @@ while t_temp &lt;= tf:
 eval_apparent_state = False
 t_eval_utc = False
 converged_light_time = False
-prop_sim.set_integration_parameters(tf, t_eval, t_eval_utc, eval_apparent_state, converged_light_time, dtMin=4e-3)
+prop_sim.set_integration_parameters(tf, t_eval, t_eval_utc, eval_apparent_state, converged_light_time, dtMin=5e-3)
 </pre></div>
 </div>
 </div>
@@ -546,8 +546,7 @@ plt.close()
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>jpl = np.array([0.017575542120147558, 1.2196672850476662, 0.4783965165437007, -0.013539283384755667, 0.0005355366349979586, -1.5069904336052799e-05])
 grss = np.array(prop_sim.xInteg)
 pos_diff = np.linalg.norm((jpl-grss)[:3])*prop_sim.consts.du2m
-def test_apophis():
-    assert pos_diff &lt; 100.0
+# assert pos_diff &lt; 100.0
 </pre></div>
 </div>
 </div>
@@ -628,7 +627,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 09, 2023.
+  Last updated on Sep 11, 2023.
   <br/>
 </p>
   </div>

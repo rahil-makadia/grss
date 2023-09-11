@@ -548,8 +548,7 @@ plt.close()
 grss = np.array(prop_sim.xInteg) * prop_sim.consts.du2m
 grss[3:6] /= 86400.0
 pos_diff = np.linalg.norm((jpl-grss)[:3])
-def test_didymos():
-    assert pos_diff &lt; 100.0
+assert pos_diff &lt; 100.0
 </pre></div>
 </div>
 </div>
@@ -630,7 +629,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 09, 2023.
+  Last updated on Sep 11, 2023.
   <br/>
 </p>
   </div>

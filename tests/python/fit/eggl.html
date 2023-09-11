@@ -546,20 +546,20 @@ Converged after rejecting outliers.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 4 (of 4):
 =======================================================
-RMS unweighted: 0.412344241749085
-RMS weighted: 0.5101055546365446
-chi-squared: 732.456383567605
-reduced chi-squared: 0.25397239374743585
-square root of reduced chi-squared: 0.5039567379720563
+RMS unweighted: 0.4123442426840814
+RMS weighted: 0.510105554715336
+chi-squared: 732.4563859488501
+reduced chi-squared: 0.25397239457311027
+square root of reduced chi-squared: 0.5039567387912481
 =======================================================
 t: MJD 57677.0 TDB
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.13396432914e-01               1.27800041908e-08               1.13396431356e-01               1.26708937862e-08               -1.55764326437e-09              -0.122
-q                       2.23476404725e+00               3.33004611652e-08               2.23476405154e+00               3.29854377345e-08               +4.28983826239e-09              +0.129
-tp                      5.79392319939e+04               2.57307598942e-05               5.79392319984e+04               2.57637167044e-05               +4.48185892310e-06              +0.174
-om                      2.76279148598e+02               1.60843188009e-05               2.76279145808e+02               1.60583345044e-05               -2.79028648720e-06              -0.173
-w                       4.93285360211e+01               1.60260169337e-05               4.93285393112e+01               1.60472649699e-05               +3.29007215782e-06              +0.205
-i                       1.74609955155e+00               4.22811877452e-07               1.74609988668e+00               4.22876586386e-07               +3.35137323004e-07              +0.793
+e                       1.13396432914e-01               1.27800041908e-08               1.13396431356e-01               1.26708888661e-08               -1.55767616861e-09              -0.122
+q                       2.23476404725e+00               3.33004611652e-08               2.23476405154e+00               3.29854312709e-08               +4.28992796841e-09              +0.129
+tp                      5.79392319939e+04               2.57307598942e-05               5.79392319984e+04               2.57637255307e-05               +4.48180799140e-06              +0.174
+om                      2.76279148598e+02               1.60843188009e-05               2.76279145808e+02               1.60583442427e-05               -2.79026698990e-06              -0.173
+w                       4.93285360211e+01               1.60260169337e-05               4.93285393111e+01               1.60472673097e-05               +3.29003970023e-06              +0.205
+i                       1.74609955155e+00               4.22811877452e-07               1.74609988668e+00               4.22876594434e-07               +3.35138131025e-07              +0.793
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -631,11 +631,10 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.9999
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>def test_eggl():
-    assert maha_dist_f &lt; 5.0
-    assert maha_dist_0 &lt; 5.0
-    assert bhattacharya &lt; 0.10
-    assert bhatt_coeff &gt; 0.90
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>assert maha_dist_f &lt; 5.0
+assert maha_dist_0 &lt; 5.0
+assert bhattacharya &lt; 0.10
+assert bhatt_coeff &gt; 0.90
 </pre></div>
 </div>
 </div>
@@ -716,7 +715,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 09, 2023.
+  Last updated on Sep 11, 2023.
   <br/>
 </p>
   </div>
