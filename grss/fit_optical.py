@@ -238,7 +238,8 @@ def _get_gaia_query_results(body_id, release='gaiadr3', verbose=False):
         print(f"Found {len(res)} observations from Gaia DR3.")
     return res
 
-def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=False):
+def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
+                                t_max_tdb=None, verbose=False):
     """
     Assemble the optical observations for a given body from Gaia DR3.
 
@@ -282,11 +283,9 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_td
         cosdec = np.cos(data['dec']*np.pi/180)
         obs_array[i, 0] = obs_time.utc.mjd
         obs_array[i, 1] = data['ra']*3600
-        obs_array[i, 1]-= data['ra_error_systematic']/cosdec/1000
         obs_array[i, 2] = data['dec']*3600
-        obs_array[i, 2]-= data['dec_error_systematic']/1000
-        obs_array[i, 3] = data['ra_error_random']/cosdec/1000
-        obs_array[i, 4] = data['dec_error_random']/1000
+        obs_array[i, 3] = (data['ra_error_random']+data['ra_error_systematic'])/cosdec/1000
+        obs_array[i, 4] = (data['dec_error_random']+data['dec_error_systematic'])/1000
         obs_array[i, 5] = data['ra_dec_correlation_random']
         pos_x = data['x_gaia_geocentric']*au2km
         pos_y = data['y_gaia_geocentric']*au2km

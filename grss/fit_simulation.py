@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import spiceypy as spice
+from astropy.time import Time
 
 from . import prop
 from .fit_utils import get_observer_info, get_radec
@@ -288,7 +289,7 @@ class IterationParams:
         ax1.plot(t_arr[is_rejected], dec_residuals[is_rejected], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
         ax1.legend()
-        ax1.set_xlabel('MJD [UTC]')
+        ax1.set_xlabel('Time [UTC]')
         ax1.set_ylabel('Residuals, O-C [arcsec]')
         ax1.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
@@ -314,7 +315,7 @@ class IterationParams:
         ax3.plot(t_arr, doppler_residuals, '.', mfc='C3', mec='C3', label='Doppler',
                     markersize=radar_scale*markersize)
         ax3.legend()
-        ax3.set_xlabel('MJD [UTC]')
+        ax3.set_xlabel('Time [UTC]')
         ax3.set_ylabel(r'Residuals, O-C [$\mu$s, Hz]')
         ax3.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
@@ -428,7 +429,7 @@ class IterationParams:
                         label=fr'$\pm{sigma_limit:.0f}\sigma$')
         plt.axhline(sigma_limit, c='red', linestyle='--', alpha=0.5)
         plt.legend(ncol=2)
-        plt.xlabel('MJD [UTC]')
+        plt.xlabel('Time [UTC]')
         plt.ylabel(r'Weighted Residuals, (O-C)/$\sigma$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
@@ -449,7 +450,7 @@ class IterationParams:
             plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
             plt.legend(ncol=2)
-            plt.xlabel('MJD [UTC]')
+            plt.xlabel('Time [UTC]')
             plt.ylabel(r'$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
             plt.grid(True, which='both', axis='both', alpha=0.2)
             # if show_logarithmic: plt.yscale('log')
@@ -496,6 +497,7 @@ class IterationParams:
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
         t_arr = self.obs_array[:, 0]
+        t_arr = Time(t_arr, format='mjd', scale='utc').utc.datetime
         if show_logarithmic:
             ra_residuals = np.abs(self.all_info['ra_res'])
             dec_residuals = np.abs(self.all_info['dec_res'])

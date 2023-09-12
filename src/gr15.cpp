@@ -7,8 +7,6 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
         dt = fabs(propSim->integParams.dt0);
         if (propSim->integParams.tf < propSim->integParams.t0) {
             dt *= -1.0;
-            propSim->integParams.dtMax = -fabs(propSim->integParams.dtMax);
-            propSim->integParams.dtMin = -fabs(propSim->integParams.dtMin);
         }
         return dt;
     }
@@ -58,8 +56,6 @@ real get_initial_timestep(const real &t, const std::vector<real> &xInteg0,
     }
     if (propSim->integParams.tf < propSim->integParams.t0) {
         dt *= -1.0;
-        propSim->integParams.dtMax = -fabs(propSim->integParams.dtMax);
-        propSim->integParams.dtMin = -fabs(propSim->integParams.dtMin);
     }
     return dt;
 }
