@@ -523,11 +523,11 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.417                   0.527                   784.339                         0.271
-2                        0.417                   0.527                   783.702                         0.271
+1                        0.417                   0.527                   784.354                         0.271
+2                        0.417                   0.527                   783.730                         0.271
 Converged without rejecting outliers. Starting outlier rejection now.
-3                        0.412                   0.510                   733.080                         0.254
-4                        0.412                   0.510                   732.992                         0.254
+3                        0.412                   0.511                   733.107                         0.254
+4                        0.412                   0.511                   733.018                         0.254
 Converged after rejecting outliers.
 </pre></div></div>
 </div>
@@ -546,20 +546,20 @@ Converged after rejecting outliers.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 4 (of 4):
 =======================================================
-RMS unweighted: 0.4124296940887493
-RMS weighted: 0.5104521575041808
-chi-squared: 732.9915223747895
-reduced chi-squared: 0.25415794811885906
-square root of reduced chi-squared: 0.5041408018786607
+RMS unweighted: 0.41243245624162866
+RMS weighted: 0.5105078971809847
+chi-squared: 733.0184580602538
+reduced chi-squared: 0.254167287815622
+square root of reduced chi-squared: 0.5041500647779608
 =======================================================
 t: MJD 57677.0 TDB
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.13396432914e-01               1.27800041908e-08               1.13396429986e-01               1.27075963019e-08               -2.92803752078e-09              -0.229
-q                       2.23476404725e+00               3.33004611652e-08               2.23476405496e+00               3.30736574601e-08               +7.71107711017e-09              +0.232
-tp                      5.79392319939e+04               2.57307598942e-05               5.79392319980e+04               2.58232882100e-05               +4.10436041420e-06              +0.160
-om                      2.76279148598e+02               1.60843188009e-05               2.76279148930e+02               1.61151641108e-05               +3.32370177603e-07              +0.021
-w                       4.93285360211e+01               1.60260169337e-05               4.93285363713e+01               1.61010393746e-05               +3.50193495535e-07              +0.022
-i                       1.74609955155e+00               4.22811877452e-07               1.74609953451e+00               4.24386664606e-07               -1.70360807683e-08              -0.040
+e                       1.13396432914e-01               1.27800041908e-08               1.13396430039e-01               1.26712218820e-08               -2.87498437557e-09              -0.225
+q                       2.23476404725e+00               3.33004611652e-08               2.23476405482e+00               3.29862322224e-08               +7.57590390421e-09              +0.228
+tp                      5.79392319939e+04               2.57307598942e-05               5.79392319980e+04               2.57640803107e-05               +4.03701415053e-06              +0.157
+om                      2.76279148598e+02               1.60843188009e-05               2.76279148984e+02               1.60590572948e-05               +3.86205442737e-07              +0.024
+w                       4.93285360211e+01               1.60260169337e-05               4.93285363067e+01               1.60479354165e-05               +2.85616621909e-07              +0.018
+i                       1.74609955155e+00               4.22811877452e-07               1.74609953318e+00               4.22897439780e-07               -1.83673138920e-08              -0.043
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -622,7 +622,7 @@ print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Mahalonobis distance between JPL and GRSS solution: 0.38
-Mahalonobis distance between GRSS and JPL solution: 0.38
+Mahalonobis distance between GRSS and JPL solution: 0.37
 Bhattacharya distance between JPL and GRSS solution: 0.0001
 Bhattacharya coefficient between JPL and GRSS solution: 0.9999
 </pre></div></div>
