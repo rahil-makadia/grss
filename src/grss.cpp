@@ -592,21 +592,32 @@ PYBIND11_MODULE(prop_simulation, m) {
             xIntegInterp : list of real
                 Interpolated states of the integration bodies.
             )mydelimiter")
-        .def("add_spice_body",
-             static_cast<void (propSimulation::*)(SpiceBody)>(
-                 &propSimulation::add_spice_body),
+        .def("add_spice_body", &propSimulation::add_spice_body,
              py::arg("body"), R"mydelimiter(
             Adds a SPICE body to the simulation.
 
+            Parameters
+            ----------
             body : propSimulation.SpiceBody
                 SPICE body to add to the simulation.
             )mydelimiter")
-        .def("add_integ_body",
-             static_cast<void (propSimulation::*)(IntegBody)>(
-                 &propSimulation::add_integ_body),
+        .def("get_spiceBody_state", &propSimulation::get_spiceBody_state,
+             py::arg("t"), py::arg("bodyName"), R"mydelimiter(
+            Gets the state of a SPICE body at a given time.
+
+            Parameters
+            ----------
+            t : real
+                Time to get the state at.
+            bodyName : str
+                Name of the SPICE body in the simulation.
+            )mydelimiter")
+        .def("add_integ_body", &propSimulation::add_integ_body,
              py::arg("body"), R"mydelimiter(
             Adds an integration body to the simulation.
 
+            Parameters
+            ----------
             body : propSimulation.IntegBody
                 Integration body to add to the simulation.
             )mydelimiter")

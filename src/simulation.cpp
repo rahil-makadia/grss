@@ -630,6 +630,26 @@ void propSimulation::add_spice_body(SpiceBody body) {
     this->integParams.nTotal++;
 }
 
+std::vector<real> propSimulation::get_spiceBody_state(const real t, const std::string &bodyName) {
+    int spiceID = -1;
+    for (size_t i = 0; i < this->spiceBodies.size(); i++){
+        if (this->spiceBodies[i].name == bodyName){
+            spiceID = this->spiceBodies[i].spiceId;
+            break;
+        }
+    }
+    if (spiceID == -1){
+        throw std::invalid_argument("SPICE Body with name " + bodyName +
+                                        " does not exist in simulation " +
+                                        this->name);
+    }
+    real spiceState[9];
+    get_spk_state(spiceID, t, this->ephem, spiceState);
+    std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
+                               spiceState[3], spiceState[4], spiceState[5]};
+    return state;
+}
+
 void propSimulation::add_integ_body(IntegBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->integBodies.size(); i++) {

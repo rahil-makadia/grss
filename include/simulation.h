@@ -89,6 +89,7 @@ class propSimulation {
 
     // memory-mapped ephemeris
     Ephemeris ephem;
+    std::vector<real> get_spiceBody_state(const real t, const std::string &bodyName);
 
     // constants
     Constants consts;
