@@ -437,6 +437,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.extend"><code class="docutils literal notranslate"><span class="pre">propSimulation.extend()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.get_integration_parameters"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_integration_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.get_sim_constants"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_sim_constants()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.get_spiceBody_state"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_spiceBody_state()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.integBodies"><code class="docutils literal notranslate"><span class="pre">propSimulation.integBodies</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.integParams"><code class="docutils literal notranslate"><span class="pre">propSimulation.integParams</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.integrate"><code class="docutils literal notranslate"><span class="pre">propSimulation.integrate()</span></code></a></li>
@@ -536,19 +537,22 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.get_sim_constants" title="grss.prop_simulation.propSimulation.get_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_sim_constants</span></code></a>(self)</p></td>
 <td><p>Gets the constants of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.integrate" title="grss.prop_simulation.propSimulation.integrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.get_spiceBody_state" title="grss.prop_simulation.propSimulation.get_spiceBody_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_spiceBody_state</span></code></a>(self, t, bodyName)</p></td>
+<td><p>Gets the state of a SPICE body at a given time.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.integrate" title="grss.prop_simulation.propSimulation.integrate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integrate</span></code></a>(self)</p></td>
 <td><p>Propagates the simulation using the Gauss-Radau integrator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.interpolate" title="grss.prop_simulation.propSimulation.interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate</span></code></a>(self, t)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.interpolate" title="grss.prop_simulation.propSimulation.interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate</span></code></a>(self, t)</p></td>
 <td><p>Interpolates the states of the integrated bodies to a given time.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.remove_body" title="grss.prop_simulation.propSimulation.remove_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_body</span></code></a>(self, name)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.remove_body" title="grss.prop_simulation.propSimulation.remove_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_body</span></code></a>(self, name)</p></td>
 <td><p>Removes a body from the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.set_integration_parameters" title="grss.prop_simulation.propSimulation.set_integration_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_integration_parameters</span></code></a>(self, tf[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.set_integration_parameters" title="grss.prop_simulation.propSimulation.set_integration_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_integration_parameters</span></code></a>(self, tf[, ...])</p></td>
 <td><p>Sets the integration parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.set_sim_constants" title="grss.prop_simulation.propSimulation.set_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sim_constants</span></code></a>(self[, du2m, tu2s, G, clight])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop_simulation.propSimulation.set_sim_constants" title="grss.prop_simulation.propSimulation.set_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sim_constants</span></code></a>(self[, du2m, tu2s, G, clight])</p></td>
 <td><p>Sets the constants of the simulation.</p></td>
 </tr>
 </tbody>
@@ -653,8 +657,9 @@ document.write(`
 <dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_integ_body">
 <span class="sig-name descname"><span class="pre">add_integ_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.IntegBody.html#grss.prop_simulation.IntegBody" title="grss.prop_simulation.IntegBody"><span class="pre">grss.prop_simulation.IntegBody</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_integ_body" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds an integration body to the simulation.</p>
-<dl class="simple">
-<dt>body<span class="classifier">propSimulation.IntegBody</span></dt><dd><p>Integration body to add to the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<em>propSimulation.IntegBody</em>) – Integration body to add to the simulation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -663,8 +668,9 @@ document.write(`
 <dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.add_spice_body">
 <span class="sig-name descname"><span class="pre">add_spice_body</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop_simulation.SpiceBody.html#grss.prop_simulation.SpiceBody" title="grss.prop_simulation.SpiceBody"><span class="pre">grss.prop_simulation.SpiceBody</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.add_spice_body" title="Permalink to this definition">#</a></dt>
 <dd><p>Adds a SPICE body to the simulation.</p>
-<dl class="simple">
-<dt>body<span class="classifier">propSimulation.SpiceBody</span></dt><dd><p>SPICE body to add to the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> (<em>propSimulation.SpiceBody</em>) – SPICE body to add to the simulation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -763,6 +769,20 @@ This information might be repeated for bistatic radar observations.</p></li>
 <li><p><strong>JdMinusMjd</strong> (<em>real</em>) – Difference between Julian date and modified Julian date.</p></li>
 </ul>
 </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop_simulation.propSimulation.get_spiceBody_state">
+<span class="sig-name descname"><span class="pre">get_spiceBody_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop_simulation.propSimulation" title="grss.prop_simulation.propSimulation"><span class="pre">grss.prop_simulation.propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bodyName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.prop_simulation.propSimulation.get_spiceBody_state" title="Permalink to this definition">#</a></dt>
+<dd><p>Gets the state of a SPICE body at a given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>real</em>) – Time to get the state at.</p></li>
+<li><p><strong>bodyName</strong> (<em>str</em>) – Name of the SPICE body in the simulation.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1011,6 +1031,7 @@ as opposed to TDB.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.extend"><code class="docutils literal notranslate"><span class="pre">propSimulation.extend()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.get_integration_parameters"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_integration_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.get_sim_constants"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_sim_constants()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.get_spiceBody_state"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_spiceBody_state()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.integBodies"><code class="docutils literal notranslate"><span class="pre">propSimulation.integBodies</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.integParams"><code class="docutils literal notranslate"><span class="pre">propSimulation.integParams</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop_simulation.propSimulation.integrate"><code class="docutils literal notranslate"><span class="pre">propSimulation.integrate()</span></code></a></li>
@@ -1066,7 +1087,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 12, 2023.
+  Last updated on Sep 15, 2023.
   <br/>
 </p>
   </div>

@@ -23,6 +23,7 @@ grss.prop\_simulation.propSimulation
         ~propSimulation.extend
         ~propSimulation.get_integration_parameters
         ~propSimulation.get_sim_constants
+        ~propSimulation.get_spiceBody_state
         ~propSimulation.integrate
         ~propSimulation.interpolate
         ~propSimulation.remove_body
