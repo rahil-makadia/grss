@@ -1,4 +1,4 @@
-name: JOSS paper
+name: JOSS build
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
       - dev
 
 jobs:
-  build-paper:
+  paper:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,5 +21,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v1
         with:
-          name: build-paper
-          path: ./joss/joss_paper.pdf
+          name: paper
+          path: ../joss/joss_paper.pdf
