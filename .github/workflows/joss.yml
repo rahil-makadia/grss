@@ -18,10 +18,6 @@ jobs:
         with:
           journal: joss
           paper-path: ./joss/joss_paper.md
-      - name: list files in both directories
-        run: |
-          ls -l
-          ls -l joss
       - name: Upload
         uses: actions/upload-artifact@v1
         with:
