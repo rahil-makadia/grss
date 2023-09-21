@@ -496,8 +496,8 @@ propSimulation::propSimulation(std::string name, const propSimulation& simRef) {
 
 void propSimulation::prepare_for_evaluation(
     std::vector<real>& tEval, std::vector<std::vector<real>>& observerInfo) {
-    bool forwardProp = this->integParams.t0 <= this->integParams.tf;
-    bool backwardProp = this->integParams.t0 >= this->integParams.tf;
+    const bool forwardProp = this->integParams.t0 <= this->integParams.tf;
+    const bool backwardProp = this->integParams.t0 >= this->integParams.tf;
     if (forwardProp && backwardProp) {
         throw std::invalid_argument(
             "The initial and final times must be different.");
@@ -699,8 +699,8 @@ void propSimulation::remove_body(std::string name) {
 void propSimulation::add_event(IntegBody body, real tEvent,
                                std::vector<real> deltaV, real multiplier) {
     // check if tEvent is valid
-    bool forwardProp = this->integParams.tf > this->integParams.t0;
-    bool backwardProp = this->integParams.tf < this->integParams.t0;
+    const bool forwardProp = this->integParams.tf > this->integParams.t0;
+    const bool backwardProp = this->integParams.tf < this->integParams.t0;
     if ((forwardProp &&
          (tEvent < this->integParams.t0 || tEvent >= this->integParams.tf)) ||
         (backwardProp &&

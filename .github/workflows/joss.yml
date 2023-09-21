@@ -1,0 +1,26 @@
+name: JOSS paper
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-paper:
+    runs-on: ubuntu-latest
+    name: Build JOSS paper draft PDF
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: joss/joss_paper.md
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-paper
+          path: joss/joss_paper.pdf

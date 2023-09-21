@@ -7,6 +7,8 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
     // If a close approach is detected, the time of closest approach is
     // determined by root finding using Brent's method.
     // If an impact is detected, the simulation is terminated.
+    const bool forwardProp = propSim->integParams.t0 < propSim->integParams.tf;
+    const bool backwardProp = propSim->integParams.t0 > propSim->integParams.tf;
     size_t starti = 0;
     real posOld[3], pos[3], velOld[3], vel[3];
     real relPosOld[3], relPos[3], relVelOld[3], relVel[3];
@@ -71,8 +73,11 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                 radialVel = (relPos[0] * relVel[0] + relPos[1] * relVel[1] +
                              relPos[2] * relVel[2]) /
                     relDist;
-                if (radialVelOld * radialVel < 0.0 &&
-                    (relDist <= bodyj->caTol || relDistOld <= bodyj->caTol)) {
+                const bool relDistMinimum = (forwardProp && radialVelOld < 0.0 && radialVel >= 0.0) ||
+                                            (backwardProp && radialVelOld > 0.0 && radialVel <= 0.0);
+                const bool relDistWithinTol = relDist <= bodyj->caTol ||
+                                              relDistOld <= bodyj->caTol;
+                if (relDistMinimum && relDistWithinTol) {
                     real tCA;
                     get_ca_time(propSim, i, j, tOld, t, tCA);
                     CloseApproachParameters ca;
