@@ -190,6 +190,9 @@ cython_debug/
 # gperftools profiler output
 *.prof
 
+# pytest settings are exempt from ignoring
+!pytest.ini
+
 # VS code setup directory
 .vscode/
 

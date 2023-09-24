@@ -1,5 +1,4 @@
 """Optical observation handling for the GRSS orbit determination code"""
-import os
 from astropy.time import Time
 from astroquery.mpc import MPC
 from astroquery.gaia import Gaia
@@ -9,6 +8,7 @@ import pandas as pd
 import spiceypy as spice
 
 from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec, rec2lat
+from .. import utils
 
 __all__ = [ 'get_ades_optical_obs_array',
             'get_gaia_optical_obs_array',
@@ -238,7 +238,8 @@ def _get_gaia_query_results(body_id, release='gaiadr3', verbose=False):
         print(f"Found {len(res)} observations from Gaia DR3.")
     return res
 
-def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=False):
+def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
+                                t_max_tdb=None, verbose=False):
     """
     Assemble the optical observations for a given body from Gaia DR3.
 
@@ -282,12 +283,24 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_td
         cosdec = np.cos(data['dec']*np.pi/180)
         obs_array[i, 0] = obs_time.utc.mjd
         obs_array[i, 1] = data['ra']*3600
-        obs_array[i, 1]-= data['ra_error_systematic']/cosdec/1000
         obs_array[i, 2] = data['dec']*3600
-        obs_array[i, 2]-= data['dec_error_systematic']/1000
-        obs_array[i, 3] = data['ra_error_random']/cosdec/1000
-        obs_array[i, 4] = data['dec_error_random']/1000
-        obs_array[i, 5] = data['ra_dec_correlation_random']
+        ra_sig_sys = data['ra_error_systematic']/cosdec/1000
+        ra_sig_rand = data['ra_error_random']/cosdec/1000
+        dec_sig_sys = data['dec_error_systematic']/1000
+        dec_sig_rand = data['dec_error_random']/1000
+        corr_sys = data['ra_dec_correlation_systematic']
+        corr_rand = data['ra_dec_correlation_random']
+        cov_sys = np.array([[ra_sig_sys**2, corr_sys*ra_sig_sys*dec_sig_sys],
+                            [corr_sys*ra_sig_sys*dec_sig_sys, dec_sig_sys**2]])
+        cov_rand = np.array([[ra_sig_rand**2, corr_rand*ra_sig_rand*dec_sig_rand],
+                            [corr_rand*ra_sig_rand*dec_sig_rand, dec_sig_rand**2]])
+        cov = cov_sys + cov_rand
+        ra_sig = cov[0,0]**0.5
+        dec_sig = cov[1,1]**0.5
+        corr = cov[0,1]/ra_sig/dec_sig
+        obs_array[i, 3] = ra_sig
+        obs_array[i, 4] = dec_sig
+        obs_array[i, 5] = corr
         pos_x = data['x_gaia_geocentric']*au2km
         pos_y = data['y_gaia_geocentric']*au2km
         pos_z = data['z_gaia_geocentric']*au2km
@@ -391,9 +404,8 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
     columns = []
     for cat in biased_catalogs:
         columns.extend([f"{cat}_ra", f"{cat}_dec", f"{cat}_pm_ra", f'{cat}_pm_dec'])
-    cwd = os.path.dirname(os.path.realpath(__file__))
-    debias_lowres_path = os.path.join(cwd,'debias/lowres_data')
-    debias_hires_path = os.path.join(cwd,'debias/hires_data')
+    debias_lowres_path = utils.grss_path+'/debias/lowres_data'
+    debias_hires_path = utils.grss_path+'/debias/hires_data'
     if lowres:
         biasfile = f'{debias_lowres_path}/bias.dat'
         nside = 64

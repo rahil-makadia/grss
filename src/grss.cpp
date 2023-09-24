@@ -173,7 +173,14 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("xRelCA", &CloseApproachParameters::xRelCA,
                        R"mydelimiter(
-            Relative position of the close approach.
+            Relative state of the close approach.
+            )mydelimiter")
+        .def_readwrite("tMap", &CloseApproachParameters::tMap, R"mydelimiter(
+            Time of the mapping point.
+            )mydelimiter")
+        .def_readwrite("xRelMap", &CloseApproachParameters::xRelMap,
+                       R"mydelimiter(
+            Relative state of the mapping point.
             )mydelimiter")
         .def_readwrite("dist", &CloseApproachParameters::dist, R"mydelimiter(
             Distance of the close approach.
@@ -192,6 +199,10 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("centralBody", &CloseApproachParameters::centralBody,
                        R"mydelimiter(
             Name of the central body.
+            )mydelimiter")
+        .def_readwrite("centralBodySpiceId",
+                       &CloseApproachParameters::centralBodySpiceId, R"mydelimiter(
+            SPICE ID of the central body.
             )mydelimiter")
         .def_readwrite("impact", &CloseApproachParameters::impact,
                        R"mydelimiter(
@@ -226,6 +237,22 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("mtp", &CloseApproachParameters::mtp, R"mydelimiter(
             Modified Target Plane (MTP) B-plane parameters of the close approach.
+            )mydelimiter")
+        .def("get_ca_parameters", &CloseApproachParameters::get_ca_parameters,
+             py::arg("propSim"), py::arg("tMap"), R"mydelimiter(
+            Calculate the close approach parameters.
+
+            Parameters
+            ----------
+            propSim : propSimulation
+                Simulation containing the close approach.
+            tMap : real
+                Time of the mapping point.
+
+            Returns
+            -------
+            None : NoneType
+                None.
             )mydelimiter");
 
     m.def(
@@ -588,21 +615,32 @@ PYBIND11_MODULE(prop_simulation, m) {
             xIntegInterp : list of real
                 Interpolated states of the integration bodies.
             )mydelimiter")
-        .def("add_spice_body",
-             static_cast<void (propSimulation::*)(SpiceBody)>(
-                 &propSimulation::add_spice_body),
+        .def("add_spice_body", &propSimulation::add_spice_body,
              py::arg("body"), R"mydelimiter(
             Adds a SPICE body to the simulation.
 
+            Parameters
+            ----------
             body : propSimulation.SpiceBody
                 SPICE body to add to the simulation.
             )mydelimiter")
-        .def("add_integ_body",
-             static_cast<void (propSimulation::*)(IntegBody)>(
-                 &propSimulation::add_integ_body),
+        .def("get_spiceBody_state", &propSimulation::get_spiceBody_state,
+             py::arg("t"), py::arg("bodyName"), R"mydelimiter(
+            Gets the state of a SPICE body at a given time.
+
+            Parameters
+            ----------
+            t : real
+                Time to get the state at.
+            bodyName : str
+                Name of the SPICE body in the simulation.
+            )mydelimiter")
+        .def("add_integ_body", &propSimulation::add_integ_body,
              py::arg("body"), R"mydelimiter(
             Adds an integration body to the simulation.
 
+            Parameters
+            ----------
             body : propSimulation.IntegBody
                 Integration body to add to the simulation.
             )mydelimiter")

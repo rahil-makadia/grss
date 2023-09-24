@@ -1,10 +1,11 @@
 """Simulation classes for the Python GRSS orbit determination code"""
-#pylint: disable=no-member, too-many-lines
+# pylint: disable=no-name-in-module, too-many-lines
 import numpy as np
 import matplotlib.pyplot as plt
 import spiceypy as spice
+from astropy.time import Time
 
-from . import prop
+from .. import prop
 from .fit_utils import get_observer_info, get_radec
 
 __all__ = [ 'FitSimulation',
@@ -288,7 +289,7 @@ class IterationParams:
         ax1.plot(t_arr[is_rejected], dec_residuals[is_rejected], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
         ax1.legend()
-        ax1.set_xlabel('MJD [UTC]')
+        ax1.set_xlabel('Time [UTC]')
         ax1.set_ylabel('Residuals, O-C [arcsec]')
         ax1.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
@@ -314,7 +315,7 @@ class IterationParams:
         ax3.plot(t_arr, doppler_residuals, '.', mfc='C3', mec='C3', label='Doppler',
                     markersize=radar_scale*markersize)
         ax3.legend()
-        ax3.set_xlabel('MJD [UTC]')
+        ax3.set_xlabel('Time [UTC]')
         ax3.set_ylabel(r'Residuals, O-C [$\mu$s, Hz]')
         ax3.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
@@ -411,28 +412,31 @@ class IterationParams:
         plt.suptitle(msg, y=0.95)
         if plot_chi_squared:
             plt.subplot(1,2,1)
-        plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
-        plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
-        plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
-        plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
-        plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2',
-                    markersize=radar_scale*markersize, label='Delay')
-        plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
-                    markersize=radar_scale*markersize, label='Doppler')
-        plt.axhline(-sigma_limit, c='khaki', linestyle='--', alpha=1.0,
+        if not np.all(np.isnan(ra_chi)) and not np.all(np.isnan(dec_chi)):
+            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
+            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
+                        markersize=2*markersize, markerfacecolor='none')#, label='Rejected Obs.')
+            plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
+                        markersize=2*markersize, markerfacecolor='none')
+        if not np.all(np.isnan(delay_chi)):
+            plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2',
+                        markersize=radar_scale*markersize, label='Delay')
+        if not np.all(np.isnan(doppler_chi)):
+            plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
+                        markersize=radar_scale*markersize, label='Doppler')
+        plt.axhline(-sigma_limit, c='red', linestyle='--', alpha=0.5,
                         label=fr'$\pm{sigma_limit:.0f}\sigma$')
-        plt.axhline(sigma_limit, c='khaki', linestyle='--', alpha=1.0)
-        plt.axhline(-2*sigma_limit, c='red', linestyle='--', alpha=0.5,
-                        label=fr'$\pm{2*sigma_limit:.0f}\sigma$')
-        plt.axhline(2*sigma_limit, c='red', linestyle='--', alpha=0.5)
-        plt.legend(ncol=3)
-        plt.xlabel('MJD [UTC]')
-        plt.ylabel(r'$\chi$, (O-C)/$\sigma$ $[\cdot]$')
+        plt.axhline(sigma_limit, c='red', linestyle='--', alpha=0.5)
+        plt.legend(ncol=2)
+        plt.xlabel('Time [UTC]')
+        plt.ylabel(r'Weighted Residuals, (O-C)/$\sigma$ $[\cdot]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
             plt.yscale('log')
+        else:
+            lim = np.max(np.abs(plt.ylim()))
+            plt.ylim(-lim, lim)
         if plot_chi_squared:
             plt.subplot(1,2,2)
             plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')
@@ -446,7 +450,7 @@ class IterationParams:
             plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
             plt.legend(ncol=2)
-            plt.xlabel('MJD [UTC]')
+            plt.xlabel('Time [UTC]')
             plt.ylabel(r'$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
             plt.grid(True, which='both', axis='both', alpha=0.2)
             # if show_logarithmic: plt.yscale('log')
@@ -493,6 +497,7 @@ class IterationParams:
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
         t_arr = self.obs_array[:, 0]
+        t_arr = Time(t_arr, format='mjd', scale='utc').utc.datetime
         if show_logarithmic:
             ra_residuals = np.abs(self.all_info['ra_res'])
             dec_residuals = np.abs(self.all_info['dec_res'])

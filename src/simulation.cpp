@@ -13,7 +13,7 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
 
 SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
                      real radius) {
-    this->name = std::to_string(spiceId) + " " + name;
+    this->name = name;
     this->spiceId = spiceId;
     if (this->spiceId > 1000000) {
         this->caTol = 0.05;
@@ -46,6 +46,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->t0 = t0;
     this->mass = mass;
     this->radius = radius;
+    this->caTol = 0.0;
     std::vector<real> cartesianStateEclip(6);
     std::vector<real> cartesianPos(3);
     std::vector<real> cartesianVel(3);
@@ -97,6 +98,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->t0 = t0;
     this->mass = mass;
     this->radius = radius;
+    this->caTol = 0.0;
     this->isCometary = false;
     this->pos[0] = pos[0];
     this->pos[1] = pos[1];
@@ -494,8 +496,8 @@ propSimulation::propSimulation(std::string name, const propSimulation& simRef) {
 
 void propSimulation::prepare_for_evaluation(
     std::vector<real>& tEval, std::vector<std::vector<real>>& observerInfo) {
-    bool forwardProp = this->integParams.t0 <= this->integParams.tf;
-    bool backwardProp = this->integParams.t0 >= this->integParams.tf;
+    const bool forwardProp = this->integParams.t0 <= this->integParams.tf;
+    const bool backwardProp = this->integParams.t0 >= this->integParams.tf;
     if (forwardProp && backwardProp) {
         throw std::invalid_argument(
             "The initial and final times must be different.");
@@ -628,6 +630,26 @@ void propSimulation::add_spice_body(SpiceBody body) {
     this->integParams.nTotal++;
 }
 
+std::vector<real> propSimulation::get_spiceBody_state(const real t, const std::string &bodyName) {
+    int spiceID = -1;
+    for (size_t i = 0; i < this->spiceBodies.size(); i++){
+        if (this->spiceBodies[i].name == bodyName){
+            spiceID = this->spiceBodies[i].spiceId;
+            break;
+        }
+    }
+    if (spiceID == -1){
+        throw std::invalid_argument("SPICE Body with name " + bodyName +
+                                        " does not exist in simulation " +
+                                        this->name);
+    }
+    real spiceState[9];
+    get_spk_state(spiceID, t, this->ephem, spiceState);
+    std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
+                               spiceState[3], spiceState[4], spiceState[5]};
+    return state;
+}
+
 void propSimulation::add_integ_body(IntegBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->integBodies.size(); i++) {
@@ -677,8 +699,8 @@ void propSimulation::remove_body(std::string name) {
 void propSimulation::add_event(IntegBody body, real tEvent,
                                std::vector<real> deltaV, real multiplier) {
     // check if tEvent is valid
-    bool forwardProp = this->integParams.tf > this->integParams.t0;
-    bool backwardProp = this->integParams.tf < this->integParams.t0;
+    const bool forwardProp = this->integParams.tf > this->integParams.t0;
+    const bool backwardProp = this->integParams.tf < this->integParams.t0;
     if ((forwardProp &&
          (tEvent < this->integParams.t0 || tEvent >= this->integParams.tf)) ||
         (backwardProp &&

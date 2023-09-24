@@ -38,6 +38,14 @@ using std::tanh;
 #define DEG2RAD PI / 180.0
 #define EARTH_OBLIQUITY 84381.448 / 3600.0 * DEG2RAD
 
+// forward declarations for simulation.h
+struct Body;
+class SpiceBody;
+class IntegBody;
+class Event;
+class ImpulseEvent;
+class propSimulation;
+
 struct Constants {
     real du2m = 149597870700.0L;  // default au to m
     real tu2s = 86400.0;          // default day to sec
@@ -106,14 +114,21 @@ struct BPlaneParameters {
     real z;
 };
 
-struct CloseApproachParameters {
+class CloseApproachParameters {
+   private:
+   public:
     real tCA;
     std::vector<real> xRelCA = std::vector<real>(6, 0.0L);
+    real tMap;
+    std::vector<real> xRelMap = std::vector<real>(6, 0.0L);
     real dist;
     real vel;
     real vInf;
     std::string flybyBody;
+    int flybyBodyIdx;
     std::string centralBody;
+    int centralBodyIdx;
+    int centralBodySpiceId;
     bool impact;
     real tPeri;
     real tLin;
@@ -124,6 +139,7 @@ struct CloseApproachParameters {
     BPlaneParameters opik;
     BPlaneParameters scaled;
     BPlaneParameters mtp;
+    void get_ca_parameters(propSimulation *propSim, const real &tMap);
 };
 
 void get_spice_state(const int &spiceID, const real &t0_mjd,
