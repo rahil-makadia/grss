@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <link href="../_static/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="../_static/favicon-32x32.png" sizes="32x32" rel="icon" type="image/png">
+    <link href="../_static/favicon-16x16.png" sizes="16x16" rel="icon" type="image/png">
+    <link rel="shortcut icon" sizes="any" href="../_static/favicon.ico" type="image/x-icon">
+    <link href="../_static/android-chrome-192x192.png" sizes="192x192" rel="icon" type="image/png">
+    <link rel="mask-icon" color="#67b934" href="../_static/safari-pinned-tab.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="../_static/apple-touch-icon.png" sizes="180x180" type="image/png">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="msapplication-TileImage" content="mstile-310x310.png">
+    <title>grss.fit.fit_utils.get_ra_from_hms &#8212; GRSS 0.9.9 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_utils.get_ra_from_hms';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="grss.fit.fit_utils.get_radar_codes_dict" href="grss.fit.fit_utils.get_radar_codes_dict.html" />
+    <link rel="prev" title="grss.fit.fit_utils.get_observer_info" href="grss.fit.fit_utils.get_observer_info.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="Sep 24, 2023"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/grss-cropped.svg" class="logo__image only-light" alt="GRSS - Home"/>
+    <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
+  
+  
+    <p class="title logo__title">GRSS v0.9.9 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/apophis.html">(99942) Apophis propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/didymos.html">(65803) Didymos propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/icarus.html">(1566) Icarus propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/prop/moshup.html">(66391) Moshup propagation test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/chesley.html">(12104) Chesley orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/eggl.html">(28751) Eggl orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/farnocchia.html">(84100) Farnocchia orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/shantanunaidu.html">(11468) Shantanunaidu orbit determination test</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.deweight_obs.html">grss.fit.fit_optical.deweight_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.eliminate_obs.html">grss.fit.fit_optical.eliminate_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_ades_optical_obs_array.html">grss.fit.fit_optical.get_ades_optical_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_obs_array.html">grss.fit.fit_radar.get_radar_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_raw_data.html">grss.fit.fit_radar.get_radar_raw_data</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_simulation.html">grss.fit.fit_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.create_simulated_obs_arrays.html">grss.fit.fit_simulation.create_simulated_obs_arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.FitSimulation.html">grss.fit.fit_simulation.FitSimulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.IterationParams.html">grss.fit.fit_simulation.IterationParams</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_utils.html">grss.fit.fit_utils</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.et2mjd.html">grss.fit.fit_utils.et2mjd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_codes_dict.html">grss.fit.fit_utils.get_codes_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_dec_from_dms.html">grss.fit.fit_utils.get_dec_from_dms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_mpc_observatory_info.html">grss.fit.fit_utils.get_mpc_observatory_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_observer_info.html">grss.fit.fit_utils.get_observer_info</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_utils.get_ra_from_hms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_radar_codes_dict.html">grss.fit.fit_utils.get_radar_codes_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_radec.html">grss.fit.fit_utils.get_radec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_elems.html">grss.fit.fit_utils.get_sbdb_elems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_info.html">grss.fit.fit_utils.get_sbdb_info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_raw_data.html">grss.fit.fit_utils.get_sbdb_raw_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_similarity_stats.html">grss.fit.fit_utils.get_similarity_stats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.icrf2radec.html">grss.fit.fit_utils.icrf2radec</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.mjd2et.html">grss.fit.fit_utils.mjd2et</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.parallax_constants_to_lat_lon_alt.html">grss.fit.fit_utils.parallax_constants_to_lat_lon_alt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.radec2icrf.html">grss.fit.fit_utils.radec2icrf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.rec2lat.html">grss.fit.fit_utils.rec2lat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_simulation.html">grss.prop.prop_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.cartesian_to_cometary.html">grss.prop.prop_simulation.cartesian_to_cometary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.cometary_to_cartesian.html">grss.prop.prop_simulation.cometary_to_cartesian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.BPlaneParameters.html">grss.prop.prop_simulation.BPlaneParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.Body.html">grss.prop.prop_simulation.Body</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.CloseApproachParameters.html">grss.prop.prop_simulation.CloseApproachParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.Constants.html">grss.prop.prop_simulation.Constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.Event.html">grss.prop.prop_simulation.Event</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.ImpulseEvent.html">grss.prop.prop_simulation.ImpulseEvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.IntegBody.html">grss.prop.prop_simulation.IntegBody</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.IntegrationParameters.html">grss.prop.prop_simulation.IntegrationParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.InterpolationParameters.html">grss.prop.prop_simulation.InterpolationParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.NongravParamaters.html">grss.prop.prop_simulation.NongravParamaters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.SpiceBody.html">grss.prop.prop_simulation.SpiceBody</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.propSimulation.html">grss.prop.prop_simulation.propSimulation</a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_utils.html">grss.prop.prop_utils</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.plot_solar_system.html">grss.prop.prop_utils.plot_solar_system</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.utils.html">grss.utils</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.default_kernel_path.html">grss.utils.default_kernel_path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.get_obs_codes_file.html">grss.utils.get_obs_codes_file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.initialize.html">grss.utils.initialize</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/rahil-makadia/grss" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_utils.get_ra_from_hms.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/_autosummary/grss.fit.fit_utils.get_ra_from_hms.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>grss.fit.fit_utils.get_ra_from_hms</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_utils.get_ra_from_hms"><code class="docutils literal notranslate"><span class="pre">get_ra_from_hms()</span></code></a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="grss-fit-fit-utils-get-ra-from-hms">
+<h1>grss.fit.fit_utils.get_ra_from_hms<a class="headerlink" href="#grss-fit-fit-utils-get-ra-from-hms" title="Permalink to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="grss.fit.fit_utils.get_ra_from_hms">
+<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_utils.</span></span><span class="sig-name descname"><span class="pre">get_ra_from_hms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra_hms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_utils.get_ra_from_hms" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert right ascension from HH:MM:SS.SSS to arcseconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ra_hms</strong> (<em>str</em>) – Right ascension in HH:MM:SS.SSS format</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>r_asc</strong> – Right ascension in arcseconds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="grss.fit.fit_utils.get_observer_info.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">grss.fit.fit_utils.get_observer_info</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="grss.fit.fit_utils.get_radar_codes_dict.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">grss.fit.fit_utils.get_radar_codes_dict</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_utils.get_ra_from_hms"><code class="docutils literal notranslate"><span class="pre">get_ra_from_hms()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Rahil Makadia
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023, Rahil Makadia.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="last-updated">
+  Last updated on Sep 24, 2023.
+  <br/>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<div class="extra_footer">
+  Created using <a href=https://sphinx-book-theme.readthedocs.io/>The Sphinx Book Theme</a>.
+</div>
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
