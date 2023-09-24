@@ -79,9 +79,17 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                                               relDistOld <= bodyj->caTol;
                 if (relDistMinimum && relDistWithinTol) {
                     real tCA;
+                    real xRelCA[6];
                     get_ca_time(propSim, i, j, tOld, t, tCA);
+                    get_ca_state(propSim, i, j, tCA, xRelCA);
                     CloseApproachParameters ca;
-                    get_ca_parameters(propSim, i, j, tCA, ca);
+                    ca.tCA = tCA;
+                    for (size_t k = 0; k < 6; k++) {
+                        ca.xRelCA[k] = xRelCA[k];
+                    }
+                    ca.flybyBodyIdx = i;
+                    ca.centralBodyIdx = j;
+                    ca.get_ca_parameters(propSim, tCA);
                     propSim->caParams.push_back(ca);
                 }
             }
@@ -213,47 +221,47 @@ void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
         "Maximum number of iterations exceeded in root_brent");
 }
 
-void get_ca_parameters(propSimulation *propSim, const size_t &i,
-                       const size_t &j, const real &tCA,
-                       CloseApproachParameters &ca) {
+void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const real &tMap) {
     // Calculate the parameters of a close approach
-    ca.tCA = tCA;
-    real xRelCA[6];
-    get_ca_state(propSim, i, j, tCA, xRelCA);
+    this->tMap = tMap;
+    real xRelMap[6];
+    const size_t i = this->flybyBodyIdx;
+    const size_t j = this->centralBodyIdx;
+    get_ca_state(propSim, i, j, tMap, xRelMap);
     for (size_t k = 0; k < 6; k++) {
-        ca.xRelCA[k] = xRelCA[k];
+        this->xRelMap[k] = xRelMap[k];
     }
-    ca.flybyBody = propSim->integBodies[i].name;
+    this->flybyBody = propSim->integBodies[i].name;
     real mu;
     real radius;
     if (j < propSim->integParams.nInteg) {
-        ca.centralBody = propSim->integBodies[j].name;
-        ca.centralBodySpiceId = propSim->integBodies[j].spiceId;
+        this->centralBody = propSim->integBodies[j].name;
+        this->centralBodySpiceId = propSim->integBodies[j].spiceId;
         mu = propSim->integBodies[j].mass * propSim->consts.G;
         radius = propSim->integBodies[j].radius;
     } else {
-        ca.centralBody =
+        this->centralBody =
             propSim->spiceBodies[j - propSim->integParams.nInteg].name;
-        ca.centralBodySpiceId =
+        this->centralBodySpiceId =
             propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId;
         mu = propSim->spiceBodies[j - propSim->integParams.nInteg].mass *
             propSim->consts.G;
         radius = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
     }
     // calculate B-plane parameters (Kizner B.R, B.T formulation)
-    const real r = sqrt(xRelCA[0] * xRelCA[0] + xRelCA[1] * xRelCA[1] +
-                        xRelCA[2] * xRelCA[2]);
-    ca.dist = r;
-    const real v = sqrt(xRelCA[3] * xRelCA[3] + xRelCA[4] * xRelCA[4] +
-                        xRelCA[5] * xRelCA[5]);
-    ca.vel = v;
+    const real r = sqrt(xRelMap[0] * xRelMap[0] + xRelMap[1] * xRelMap[1] +
+                        xRelMap[2] * xRelMap[2]);
+    this->dist = r;
+    const real v = sqrt(xRelMap[3] * xRelMap[3] + xRelMap[4] * xRelMap[4] +
+                        xRelMap[5] * xRelMap[5]);
+    this->vel = v;
     const real a = (mu * r) / (2 * mu - r * v * v);
     const real vInf = sqrt(-mu / a);
-    ca.vInf = vInf;
+    this->vInf = vInf;
     real h, pos[3], vel[3], hVec[3];
     for (size_t k = 0; k < 3; k++) {
-        pos[k] = xRelCA[k];
-        vel[k] = xRelCA[k + 3];
+        pos[k] = xRelMap[k];
+        vel[k] = xRelMap[k + 3];
     }
     vcross(pos, vel, hVec);
     vnorm(hVec, 3, h);
@@ -279,10 +287,10 @@ void get_ca_parameters(propSimulation *propSim, const size_t &i,
     vcross(sHat, hVec, sHatCrossHVec);
     for (size_t k = 0; k < 3; k++) {
         bVec[k] = sHatCrossHVec[k] / vInf;
-        ca.bVec[k] = bVec[k];
+        this->bVec[k] = bVec[k];
     }
     vnorm(bVec, 3, b);
-    ca.bMag = b;
+    this->bMag = b;
     real vVec[3];
     vVec[0] = 0;
     vVec[1] = 0;
@@ -291,26 +299,25 @@ void get_ca_parameters(propSimulation *propSim, const size_t &i,
     vcross(vVec, sHat, vCrossSHatVec);
     vunit(vCrossSHatVec, 3, tHat);
     vcross(sHat, tHat, rHat);
-    vdot(bVec, rHat, 3, ca.kizner.x);
-    vdot(bVec, tHat, 3, ca.kizner.y);
-    vdot(bVec, sHat, 3, ca.kizner.z);
-    ca.gravFocusFactor = sqrt(1.0 + 2 * mu / radius / vInf / vInf);
-    ca.impact = b <= radius * ca.gravFocusFactor;
-    ca.scaled.x = ca.kizner.x / ca.gravFocusFactor;
-    ca.scaled.y = ca.kizner.y / ca.gravFocusFactor;
-    ca.scaled.z = ca.kizner.z / ca.gravFocusFactor;
+    vdot(bVec, rHat, 3, this->kizner.x);
+    vdot(bVec, tHat, 3, this->kizner.y);
+    vdot(bVec, sHat, 3, this->kizner.z);
+    this->gravFocusFactor = sqrt(1.0 + 2 * mu / radius / vInf / vInf);
+    this->impact = b <= radius * this->gravFocusFactor;
+    this->scaled.x = this->kizner.x / this->gravFocusFactor;
+    this->scaled.y = this->kizner.y / this->gravFocusFactor;
+    this->scaled.z = this->kizner.z / this->gravFocusFactor;
     real posDotVel;
     vdot(pos, vel, 3, posDotVel);
     const real F = -asinh(vInf * posDotVel / mu / e);
     const real n = sqrt(-mu / a / a / a);
-    ca.tPeri = tCA + (vInf * posDotVel / mu - F) / n;
-    ca.tLin = ca.tPeri - log(e) / n;
+    this->tPeri = tMap - (vInf * posDotVel / mu - F) / n;
+    this->tLin = this->tPeri - log(e) / n;
     // calculate B-plane parameters (Öpik xi, zeta formulation)
-    std::vector<real> xInterp = propSim->interpolate(tCA);
     double xCentralBody[9];
-    get_spk_state(ca.centralBodySpiceId, tCA, propSim->ephem, xCentralBody);
+    get_spk_state(this->centralBodySpiceId, tMap, propSim->ephem, xCentralBody);
     double xSun[9];
-    get_spk_state(10, tCA, propSim->ephem, xSun);
+    get_spk_state(10, tMap, propSim->ephem, xSun);
     real vCentralBodyHelio[3];
     for (size_t k = 0; k < 3; k++) {
         vCentralBodyHelio[k] = xCentralBody[3+k]-xSun[3+k];
@@ -322,15 +329,15 @@ void get_ca_parameters(propSimulation *propSim, const size_t &i,
     for (size_t k = 0; k < 3; k++) {
         zetaHat[k] = -zetaHat[k];
     }
-    vdot(bVec, xiHat, 3, ca.opik.x);
-    vdot(bVec, zetaHat, 3, ca.opik.y);
-    vdot(bVec, sHat, 3, ca.opik.z);
+    vdot(bVec, xiHat, 3, this->opik.x);
+    vdot(bVec, zetaHat, 3, this->opik.y);
+    vdot(bVec, sHat, 3, this->opik.z);
     real eHatX[3], eHatY[3], eHatZ[3], vVecCrosseHatZ[3];
     vunit(vel, 3, eHatZ);
     vcross(vVec, eHatZ, vVecCrosseHatZ);
     vunit(vVecCrosseHatZ, 3, eHatY);
     vcross(eHatY, eHatZ, eHatX);
-    vdot(pos, eHatX, 3, ca.mtp.x);
-    vdot(pos, eHatY, 3, ca.mtp.y);
-    vdot(pos, eHatZ, 3, ca.mtp.z);
+    vdot(pos, eHatX, 3, this->mtp.x);
+    vdot(pos, eHatY, 3, this->mtp.y);
+    vdot(pos, eHatZ, 3, this->mtp.z);
 }

@@ -36,7 +36,7 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}/grss{os.sep}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}grss{os.sep}prop{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
         ]
@@ -93,12 +93,15 @@ if (not os.path.exists("./extern/cspice/lib/cspice.a") or
     subprocess.run(["python", "get_cspice.py"], cwd="./extern", check=True)
 setup(
     version=ver,
-    packages=["grss", "grss.debias", "grss.kernels"],
+    packages=["grss", "grss.fit", "grss.prop"],
     ext_modules=[CMakeExtension("prop_simulation")],
-    package_data={"grss": [ "version.txt"
-                            "debias/*.py",
-                            "kernels/*.py", "kernels/*.txt", "kernels/*.tm",
-                            "kernels/*.log", ],},
+    package_data={"grss": [ "debias/get_debiasing_data.py",
+                            "kernels/get_kernels.py",
+                            "kernels/*.txt",
+                            "kernels/*.tm",
+                            "kernels/*.log"
+                        ]
+    },
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )

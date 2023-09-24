@@ -200,19 +200,21 @@ void check_and_apply_events(propSimulation *propSim, const real &t,
     }
 }
 
-static real root7(const real num){
-    real root = 1.;
-    real rootPrev = 0.;
-    real eps = 1e-14;
-    int iter = 0;
-    while (fabs(root - rootPrev) > eps) {
-        rootPrev = root;
-        real root6 = root*root*root*root*root*root;
-        root += (num/root6-root)/7.;
-        iter++;
+static real root7(real num){
+    real fac = 1.0;
+    if (num<1e-7){
+        fac = 0.1;
+        num *= 1e7;
     }
-    // printf("iter: %d\n", iter);
-    return root;
+    if (num>1e2){
+        fac = 10.0;
+        num *= 1e-7;
+    }
+    real root = 1.0;
+    for (size_t i = 0; i < 20; i++) {
+        root += (num/(root*root*root*root*root*root)-root)/7.0;
+    }
+    return fac*root;
 }
 
 void gr15(propSimulation *propSim) {

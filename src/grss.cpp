@@ -175,6 +175,13 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Relative state of the close approach.
             )mydelimiter")
+        .def_readwrite("tMap", &CloseApproachParameters::tMap, R"mydelimiter(
+            Time of the mapping point.
+            )mydelimiter")
+        .def_readwrite("xRelMap", &CloseApproachParameters::xRelMap,
+                       R"mydelimiter(
+            Relative state of the mapping point.
+            )mydelimiter")
         .def_readwrite("dist", &CloseApproachParameters::dist, R"mydelimiter(
             Distance of the close approach.
             )mydelimiter")
@@ -230,6 +237,22 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("mtp", &CloseApproachParameters::mtp, R"mydelimiter(
             Modified Target Plane (MTP) B-plane parameters of the close approach.
+            )mydelimiter")
+        .def("get_ca_parameters", &CloseApproachParameters::get_ca_parameters,
+             py::arg("propSim"), py::arg("tMap"), R"mydelimiter(
+            Calculate the close approach parameters.
+
+            Parameters
+            ----------
+            propSim : propSimulation
+                Simulation containing the close approach.
+            tMap : real
+                Time of the mapping point.
+
+            Returns
+            -------
+            None : NoneType
+                None.
             )mydelimiter");
 
     m.def(

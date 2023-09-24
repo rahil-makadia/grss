@@ -1,11 +1,11 @@
 """Simulation classes for the Python GRSS orbit determination code"""
-#pylint: disable=no-member, too-many-lines
+# pylint: disable=no-name-in-module, too-many-lines
 import numpy as np
 import matplotlib.pyplot as plt
 import spiceypy as spice
 from astropy.time import Time
 
-from . import prop
+from .. import prop
 from .fit_utils import get_observer_info, get_radec
 
 __all__ = [ 'FitSimulation',

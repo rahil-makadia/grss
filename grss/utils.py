@@ -1,4 +1,4 @@
-"""General utilities for the GRSS package"""
+"""GRSS utilities subpackage"""
 import os
 import sys
 import datetime
@@ -52,7 +52,7 @@ def _download_obs_codes_file():
     req = request("GET", url, timeout=30)
     text = req.content.replace(b'<pre>',b'').replace(b'</pre>',b'')
 
-    with open(f'{grss_path}/obs_codes.txt', "wb") as file:
+    with open(f'{grss_path}/fit/obs_codes.txt', "wb") as file:
         now = datetime.datetime.now()
         file.write((f'{now.year}, {now.month}, {now.day}, '
                     f'{now.hour}, {now.minute}, {now.second}\n'.encode()))
@@ -67,8 +67,8 @@ def get_obs_codes_file():
     week ago.
     """
     # check if file exists
-    if os.path.isfile(f'{grss_path}/obs_codes.txt'):
-        with open(f'{grss_path}/obs_codes.txt', 'r', encoding='utf-8') as file:
+    if os.path.isfile(f'{grss_path}/fit/obs_codes.txt'):
+        with open(f'{grss_path}/fit/obs_codes.txt', 'r', encoding='utf-8') as file:
             now = datetime.datetime.now()
             data = file.read()
             last_updated = data.split('\n')[0]
@@ -91,12 +91,10 @@ def initialize():
     None : NoneType
         None
     """
-    # get the file directory
-    cwd = os.path.dirname(os.path.abspath(__file__))
     # run the get_debiasing_data.py script
-    os.system(f'python {cwd}/debias/get_debiasing_data.py')
+    os.system(f'python {grss_path}/debias/get_debiasing_data.py')
     # run the get_kernels.py script
-    os.system(f'python {cwd}/kernels/get_kernels.py')
+    os.system(f'python {grss_path}/kernels/get_kernels.py')
     # get the observatory codes file
     get_obs_codes_file()
     return None

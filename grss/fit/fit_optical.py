@@ -1,5 +1,4 @@
 """Optical observation handling for the GRSS orbit determination code"""
-import os
 from astropy.time import Time
 from astroquery.mpc import MPC
 from astroquery.gaia import Gaia
@@ -9,6 +8,7 @@ import pandas as pd
 import spiceypy as spice
 
 from .fit_utils import get_ra_from_hms, get_dec_from_dms, radec2icrf, icrf2radec, rec2lat
+from .. import utils
 
 __all__ = [ 'get_ades_optical_obs_array',
             'get_gaia_optical_obs_array',
@@ -404,9 +404,8 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
     columns = []
     for cat in biased_catalogs:
         columns.extend([f"{cat}_ra", f"{cat}_dec", f"{cat}_pm_ra", f'{cat}_pm_dec'])
-    cwd = os.path.dirname(os.path.realpath(__file__))
-    debias_lowres_path = os.path.join(cwd,'debias/lowres_data')
-    debias_hires_path = os.path.join(cwd,'debias/hires_data')
+    debias_lowres_path = utils.grss_path+'/debias/lowres_data'
+    debias_hires_path = utils.grss_path+'/debias/hires_data'
     if lowres:
         biasfile = f'{debias_lowres_path}/bias.dat'
         nside = 64
