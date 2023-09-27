@@ -7,20 +7,14 @@ message(STATUS "GRSS version: ${ver}")
 project(grss VERSION ${ver})
 
 # specify the C++ standard and compiler flags
-# TODO: add gprof profiling, iee standards for floats
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC) # operational flags
-# add_compile_options(-std=c++11 -DLONGDOUBLE -O2 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result)
-# if not clang, add -Wno-maybe-uninitialized
-if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wno-maybe-uninitialized)
-endif()
+# add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
-# include_directories(${CMAKE_SOURCE_DIR}/extern/pybind11/include)
 
 # Set source code directories
 add_subdirectory(extern/pybind11)

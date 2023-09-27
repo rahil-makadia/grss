@@ -95,13 +95,5 @@ setup(
     version=ver,
     packages=["grss", "grss.fit", "grss.prop"],
     ext_modules=[CMakeExtension("prop_simulation")],
-    package_data={"grss": [ "debias/get_debiasing_data.py",
-                            "kernels/get_kernels.py",
-                            "kernels/*.txt",
-                            "kernels/*.tm",
-                            "kernels/*.log"
-                        ]
-    },
     cmdclass={"build_ext": CMakeBuild},
-    zip_safe=False,
 )

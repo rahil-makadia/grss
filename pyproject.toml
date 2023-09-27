@@ -1,39 +1,71 @@
 [project]
 name = "grss"
 dynamic = ["version"]
-authors = [{name = "Rahil Makadia"}, {email = "makadia2@illinois.edu"}]
 description = "GRSS: Gauss-Radau Small-body Simulator"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies=[
-        "astropy>=5.0",
-        "astroquery>=0.4.0",
-        "healpy>=1.16.0",
-        "matplotlib>=3.3.0",
-        "numba>=0.55.0",
-        "numpy>=1.22.0",
-        "pandas>=1.5.0",
-        "requests>=2.22.0",
-        "spiceypy>=5.0.0",
+license = {file = "LICENSE"}
+keywords = [
+    "astronomy",
+    "asteroids",
+    "comets",
+    "orbit determination",
+    "orbit propagator"
+]
+authors = [
+    {name = "Rahil Makadia"},
+    {email = "makadia2@illinois.edu"}
+]
+maintainers = [
+    {name = "Rahil Makadia"},
+    {email = "makadia2@illinois.edu"}
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
-    "Topic :: Scientific/Engineering :: Astronomy",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-    "Programming Language :: Python :: 3",
+    "Natural Language :: English",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
     "Operating System :: Unix",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Astronomy",
 ]
-license = {file = "LICENSE"}
-keywords = ["astronomy", "asteroids", "integrator", "orbit determination"]
+dependencies=[
+    "astropy>=5.0",
+    "astroquery>=0.4.0",
+    "healpy>=1.16.0",
+    "matplotlib>=3.3.0",
+    "numba>=0.55.0",
+    "numpy>=1.22.0",
+    "pandas>=1.5.0",
+    "requests>=2.22.0",
+    "spiceypy>=5.0.0",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/rahil-makadia/grss"
+"Documentation" = "https://rahil-makadia.github.io/grss/"
+"Source Code" = "https://github.com/rahil-makadia/grss"
+"Bug Reports" = "https://github.com/rahil-makadia/grss/issues"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=43.0.0"]
+
+[tool.setuptools]
+package-data = {"grss" = [
+    "debias/get_debiasing_data.py",
+    "kernels/get_kernels.py",
+    "kernels/*.log",
+    "kernels/*.tm",
+    "kernels/*.txt",
+]}
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "arm64"]
