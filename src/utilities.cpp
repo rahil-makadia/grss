@@ -54,8 +54,23 @@ void get_observer_state(const real &tObsMjd,
     // real a, f;
     ConstSpiceChar *baseBodyFrame;
     switch ((int)observerInfo[0]) {
+        case 10:
+            baseBodyFrame = "IAU_SUN";
+            break;
+        case 1:
+        case 199:
+            baseBodyFrame = "IAU_MERCURY";
+            break;
+        case 2:
+        case 299:
+            baseBodyFrame = "IAU_VENUS";
+            break;
         case 399:
             baseBodyFrame = "ITRF93";
+            // High precision frame is not defined before 1972 JAN 01 00:00:42.183 TDB
+            if (tObsMjdTDB < 41317.0004882291666666666L) {
+                baseBodyFrame = "IAU_EARTH";
+            }
             break;
         case 500:
             observerState[0] = (real) baseBodyState[0] + observerInfo[1]/consts.du2m;
@@ -65,6 +80,24 @@ void get_observer_state(const real &tObsMjd,
             observerState[4] = (real) baseBodyState[4] + observerInfo[5]/consts.duptu2mps;
             observerState[5] = (real) baseBodyState[5] + observerInfo[6]/consts.duptu2mps;
             return;
+            break;
+        case 499:
+            baseBodyFrame = "IAU_MARS";
+            break;
+        case 599:
+            baseBodyFrame = "IAU_JUPITER";
+            break;
+        case 699:
+            baseBodyFrame = "IAU_SATURN";
+            break;
+        case 799:
+            baseBodyFrame = "IAU_URANUS";
+            break;
+        case 899:
+            baseBodyFrame = "IAU_NEPTUNE";
+            break;
+        case 999:
+            baseBodyFrame = "IAU_PLUTO";
             break;
         default:
             std::cout << "Given base body: " << baseBody << std::endl;
