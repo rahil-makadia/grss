@@ -430,7 +430,7 @@ class IterationParams:
         plt.axhline(sigma_limit, c='red', linestyle='--', alpha=0.5)
         plt.legend(ncol=2)
         plt.xlabel('Time [UTC]')
-        plt.ylabel(r'Weighted Residuals, (O-C)/$\sigma$ $[\cdot]$')
+        plt.ylabel(r'Weighted Residuals, (O-C) $[\sigma]$')
         plt.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
             plt.yscale('log')
@@ -451,7 +451,7 @@ class IterationParams:
                         markersize=radar_scale*markersize, label='Doppler')
             plt.legend(ncol=2)
             plt.xlabel('Time [UTC]')
-            plt.ylabel(r'$\chi^2$, (O-C)$^2/\sigma^2$ $[\cdot]$')
+            plt.ylabel(r'$\chi^2$')
             plt.grid(True, which='both', axis='both', alpha=0.2)
             # if show_logarithmic: plt.yscale('log')
             plt.yscale('log')
