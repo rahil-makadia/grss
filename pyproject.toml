@@ -64,6 +64,7 @@ package-data = {"grss" = [
     "kernels/get_kernels.py",
     "kernels/*.log",
     "kernels/*.tm",
+    "kernels/*.tpc",
     "kernels/*.txt",
 ]}
 

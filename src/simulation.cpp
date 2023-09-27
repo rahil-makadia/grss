@@ -1,5 +1,115 @@
 #include "simulation.h"
 
+void get_observer_state(const real &tObsMjd,
+                        const std::vector<real> &observerInfo,
+                        propSimulation *propSim, const bool tObsInUTC,
+                        std::vector<real> &observerState) {
+    SpiceInt baseBody = observerInfo[0];
+    if (observerInfo[0] == 500) baseBody = 399;
+    if (baseBody == 0) {
+        observerState[0] = 0.0L;
+        observerState[1] = 0.0L;
+        observerState[2] = 0.0L;
+        observerState[3] = 0.0L;
+        observerState[4] = 0.0L;
+        observerState[5] = 0.0L;
+        return;
+    }
+    real tObsET;
+    real tObsMjdTDB;
+    mjd_to_et(tObsMjd, tObsET);
+    if (tObsInUTC) {
+        // std::cout << tObsMjd << " MJD UTC" << tObsET << " s UTC -> ";
+        SpiceDouble et_minus_utc;
+        real sec_past_j2000_utc = tObsET;
+        deltet_c(sec_past_j2000_utc, "UTC", &et_minus_utc);
+        tObsET += et_minus_utc;
+        et_to_mjd(tObsET, tObsMjdTDB);
+        // std::cout << tObsET << " s ET " << tObsMjdTDB << " MJD TDB" <<
+        // std::endl;
+    } else {
+        tObsMjdTDB = tObsMjd;
+    }
+    double baseBodyState[9];
+    get_spk_state(baseBody, tObsMjdTDB, propSim->ephem, baseBodyState);
+    ConstSpiceChar *baseBodyFrame;
+    switch ((int)observerInfo[0]) {
+        case 10:
+            baseBodyFrame = "IAU_SUN";
+            break;
+        case 1:
+        case 199:
+            baseBodyFrame = "IAU_MERCURY";
+            break;
+        case 2:
+        case 299:
+            baseBodyFrame = "IAU_VENUS";
+            break;
+        case 399:
+            baseBodyFrame = "ITRF93";
+            // High precision frame is not defined before 1972 JAN 01 00:00:42.183 TDB
+            if (tObsMjdTDB < 41317.0004882291666666666L) {
+                baseBodyFrame = "IAU_EARTH";
+            }
+            break;
+        case 500:
+            observerState[0] = (real) baseBodyState[0] + observerInfo[1]/propSim->consts.du2m;
+            observerState[1] = (real) baseBodyState[1] + observerInfo[2]/propSim->consts.du2m;
+            observerState[2] = (real) baseBodyState[2] + observerInfo[3]/propSim->consts.du2m;
+            observerState[3] = (real) baseBodyState[3] + observerInfo[4]/propSim->consts.duptu2mps;
+            observerState[4] = (real) baseBodyState[4] + observerInfo[5]/propSim->consts.duptu2mps;
+            observerState[5] = (real) baseBodyState[5] + observerInfo[6]/propSim->consts.duptu2mps;
+            return;
+            break;
+        case 499:
+            baseBodyFrame = "IAU_MARS";
+            break;
+        case 599:
+            baseBodyFrame = "IAU_JUPITER";
+            break;
+        case 699:
+            baseBodyFrame = "IAU_SATURN";
+            break;
+        case 799:
+            baseBodyFrame = "IAU_URANUS";
+            break;
+        case 899:
+            baseBodyFrame = "IAU_NEPTUNE";
+            break;
+        case 999:
+            baseBodyFrame = "IAU_PLUTO";
+            break;
+        default:
+            std::cout << "Given base body: " << baseBody << std::endl;
+            throw std::invalid_argument("Given base body not supported");
+            break;
+    }
+    real lon = observerInfo[1];
+    real lat = observerInfo[2];
+    real rho = observerInfo[3];
+    ConstSpiceDouble bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
+    ConstSpiceDouble bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
+    ConstSpiceDouble bodyFixedZ = rho * sin(lat) / 1.0e3L;
+    ConstSpiceDouble bodyFixedState[6] = {bodyFixedX, bodyFixedY, bodyFixedZ,
+                                          0.0,        0.0,        0.0};
+    SpiceDouble observerStateInertial[6];
+    SpiceDouble rotMat[6][6];
+    sxform_c(baseBodyFrame, "J2000", tObsET, rotMat);
+    mxvg_c(rotMat, bodyFixedState, 6, 6, observerStateInertial);
+    observerStateInertial[0] *= (real)1.0e3L / propSim->consts.du2m;
+    observerStateInertial[1] *= (real)1.0e3L / propSim->consts.du2m;
+    observerStateInertial[2] *= (real)1.0e3L / propSim->consts.du2m;
+    observerStateInertial[3] *= (real)1.0e3L / propSim->consts.duptu2mps;
+    observerStateInertial[4] *= (real)1.0e3L / propSim->consts.duptu2mps;
+    observerStateInertial[5] *= (real)1.0e3L / propSim->consts.duptu2mps;
+    observerState[0] = baseBodyState[0] + observerStateInertial[0];
+    observerState[1] = baseBodyState[1] + observerStateInertial[1];
+    observerState[2] = baseBodyState[2] + observerStateInertial[2];
+    observerState[3] = baseBodyState[3] + observerStateInertial[3];
+    observerState[4] = baseBodyState[4] + observerStateInertial[4];
+    observerState[5] = baseBodyState[5] + observerStateInertial[5];
+}
+
 void Body::set_J2(real J2, real poleRA, real poleDec) {
     this->J2 = J2;
     if (this->J2 != 0.0L) {
@@ -593,7 +703,7 @@ void propSimulation::prepare_for_evaluation(
                     "The observerInfo vector must have 4/7 (optical), 9 (radar "
                     "delay), or 10 elements (radar doppler).");
             }
-            get_observer_state(tEval[i], observerInfo[i], this->consts,
+            get_observer_state(tEval[i], observerInfo[i], this,
                                this->tEvalUTC, xObserver[i]);
             // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " <<
             // xObserver[i][2] << " " << xObserver[i][3] << " " <<

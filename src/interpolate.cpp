@@ -336,7 +336,7 @@ void get_radar_measurement(propSimulation *propSim, const size_t interpIdx,
                                       propSim->observerInfo[interpIdx][1],
                                       propSim->observerInfo[interpIdx][2],
                                       propSim->observerInfo[interpIdx][3]};
-    get_observer_state(receiveTimeTDB, receiverInfo, propSim->consts, false,
+    get_observer_state(receiveTimeTDB, receiverInfo, propSim, false,
                        xObsBaryRcv);
 
     std::vector<real> xObsBaryTx(6, 0.0);
@@ -379,7 +379,7 @@ void get_radar_measurement(propSimulation *propSim, const size_t interpIdx,
             while (iter < maxIter &&
                    fabs(delayUpleg - delayUplegPrev) > lightTimeTol) {
                 get_observer_state(bounceTimeTDB - delayUpleg, transmitterInfo,
-                                   propSim->consts, false, xObsBaryTx);
+                                   propSim, false, xObsBaryTx);
                 std::vector<real> xRelativeOneBody(6, 0.0);
                 for (size_t j = 0; j < 6; j++) {
                     xRelativeOneBody[j] = xTrgtBaryBounce[j] - xObsBaryTx[j];
@@ -407,7 +407,7 @@ void get_radar_measurement(propSimulation *propSim, const size_t interpIdx,
             }
         }
         transmitTimeTDB = bounceTimeTDB - delayUpleg;
-        get_observer_state(transmitTimeTDB, transmitterInfo, propSim->consts,
+        get_observer_state(transmitTimeTDB, transmitterInfo, propSim,
                            false, xObsBaryTx);
         // get delay measurement
         delayMeasurement = (delayDownleg + delayUpleg) * 86400.0L *

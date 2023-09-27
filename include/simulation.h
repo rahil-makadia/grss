@@ -3,6 +3,11 @@
 
 #include "utilities.h"
 
+void get_observer_state(const real &tObsMjd,
+                        const std::vector<real> &observerInfo,
+                        propSimulation *propSim, const bool tObsInUTC,
+                        std::vector<real> &observerState);
+
 struct Body {
    private:
    public:

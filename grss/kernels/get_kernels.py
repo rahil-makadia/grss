@@ -52,13 +52,16 @@ os.system((f'wget --no-verbose --no-clobber {NAIF_SITE}/pck/earth_200101_990825_
             f'-O {script_dir}/earth_200101_990825_predict.bpc'))
 os.system((f'wget --no-verbose --no-clobber {NAIF_SITE}/pck/earth_200101_990825_predict.cmt '
             f'-O {script_dir}/earth_200101_990825_predict.cmt'))
+# generic frame kernels
+os.system((f'wget --no-verbose --no-clobber {NAIF_SITE}/pck/pck00011.tpc '
+            f'-O {script_dir}/pck00011.tpc'))
 
 # run this code if the no-tm-overwrite flag argument is not present
 if len(sys.argv) > 1:
-    tm_overwrite = sys.argv[1] != '--no-tm-overwrite'
+    TM_OVERWRITE = sys.argv[1] != '--no-tm-overwrite'
 else:
-    tm_overwrite = True
-if tm_overwrite:
+    TM_OVERWRITE = True
+if TM_OVERWRITE:
     # open the spice meta-kernels and update the line that defines
     # the PATH_VALUES variable to point to the same directory as this script
     meta_kernels = [
@@ -69,38 +72,38 @@ if tm_overwrite:
         # read the meta-kernel and find the line that defines the PATH_VALUES variable
         with open(mk, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-            num_chunks = 0
+            NUM_CHUNKS = 0
             for i, line in enumerate(lines):
                 if 'PATH_VALUES' in line and 'placeholder' in line:
                     # update the path to the directory containing this script
                     # if script_dir is more that 40 characters long, then break it up
                     # into chunks of 40 characters each
-                    cutoff = 40
-                    if len(script_dir) > cutoff:
-                        num_chunks, remainder = divmod(len(script_dir), cutoff)
-                        chunks = [script_dir[i*cutoff:(i+1)*cutoff] for i in range(num_chunks)]
+                    CUTOFF = 40
+                    if len(script_dir) > CUTOFF:
+                        NUM_CHUNKS, remainder = divmod(len(script_dir), CUTOFF)
+                        chunks = [script_dir[i*CUTOFF:(i+1)*CUTOFF] for i in range(NUM_CHUNKS)]
                         if remainder > 0:
                             chunks.append(script_dir[-remainder:])
-                            num_chunks += 1
+                            NUM_CHUNKS += 1
                         lines[i] = f"    PATH_VALUES  = ( '{chunks[0]}',\n"
                         for chunk in chunks[1:]:
-                            end_char = " )" if chunk == chunks[-1] else ","
-                            lines[i] += f"                     '{chunk}'{end_char}\n"
+                            END_CHAR = " )" if chunk == chunks[-1] else ","
+                            lines[i] += f"                     '{chunk}'{END_CHAR}\n"
                     else:
-                        num_chunks = 1
+                        NUM_CHUNKS = 1
                         lines[i] = f"    PATH_VALUES  = ( '{script_dir}" + "' )\n"
-                if 'PATH_SYMBOLS' in line and "'GRSS'" in line and num_chunks > 1:
+                if 'PATH_SYMBOLS' in line and "'GRSS'" in line and NUM_CHUNKS > 1:
                     # replace PATH_SYMBOLS = ( 'GRSS' ) with PATH_SYMBOLS = ( 'GRSS_1', ... )
                     lines[i] = "    PATH_SYMBOLS = ( 'GRSS1',\n"
-                    for j in range(2, num_chunks+1):
-                        end_char = " )" if j == num_chunks else ","
-                        lines[i] += f"                     'GRSS{j}'{end_char}\n"
-                if '$GRSS' in line and num_chunks > 1:
+                    for j in range(2, NUM_CHUNKS+1):
+                        END_CHAR = " )" if j == NUM_CHUNKS else ","
+                        lines[i] += f"                     'GRSS{j}'{END_CHAR}\n"
+                if '$GRSS' in line and NUM_CHUNKS > 1:
                     # replace '$GRSS' with '$GRSS1$GRSS2$GRSS3...' according to the number of chunks
-                    replacement_str = '$GRSS1'
-                    for j in range(2, num_chunks+1):
-                        replacement_str += f'$GRSS{j}'
-                    lines[i] = line.replace('$GRSS', replacement_str)
+                    REPLACE_STR = '$GRSS1'
+                    for j in range(2, NUM_CHUNKS+1):
+                        REPLACE_STR += f'$GRSS{j}'
+                    lines[i] = line.replace('$GRSS', REPLACE_STR)
         # write the updated meta-kernel
         with open(mk, 'w', encoding='utf-8') as f:
             f.writelines(lines)
