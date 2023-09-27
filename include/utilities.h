@@ -142,13 +142,6 @@ class CloseApproachParameters {
     void get_ca_parameters(propSimulation *propSim, const real &tMap);
 };
 
-void get_spice_state(const int &spiceID, const real &t0_mjd,
-                     const Constants &consts, double state[6]);
-void get_observer_state(const real &t_obs_mjd,
-                        const std::vector<real> &observerInfo,
-                        const Constants &consts, const bool &tObsInUTC,
-                        std::vector<real> &observerState);
-
 void jd_to_mjd(const real jd, real &mjd);
 real jd_to_mjd(const real jd);
 void mjd_to_jd(const real mjd, real &jd);
