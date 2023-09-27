@@ -14,6 +14,12 @@ grss.prop.prop\_utils
     .. autosummary::
         :toctree:
     
+        data_to_ellipse
+        days_to_dhms
+        get_scale_factor
+        plot_bplane
+        plot_ca_summary
+        plot_single_bplane
         plot_solar_system
     
     
