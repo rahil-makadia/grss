@@ -60,7 +60,8 @@ struct spkInfo {
 spkInfo *spk_init(const std::string &path);
 int spk_free(struct spkInfo *pl);
 int spk_calc(struct spkInfo *pl, double epoch, int m, double *x, double *y,
-             double *z, double *out_vx, double *out_vy, double *out_vz);
+             double *z, double *out_vx, double *out_vy, double *out_vz,
+             double *out_ax, double *out_ay, double *out_az);
 void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
                    double state[9]);
 #endif

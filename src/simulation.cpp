@@ -753,7 +753,7 @@ std::vector<real> propSimulation::get_spiceBody_state(const real t, const std::s
                                         " does not exist in simulation " +
                                         this->name);
     }
-    real spiceState[9];
+    double spiceState[9];
     get_spk_state(spiceID, t, this->ephem, spiceState);
     std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
                                spiceState[3], spiceState[4], spiceState[5]};

@@ -320,6 +320,7 @@ class IterationParams:
         ax3.grid(True, which='both', axis='both', alpha=0.2)
         if show_logarithmic:
             ax3.set_yscale('log')
+        fig.autofmt_xdate()
         plt.tight_layout()
         if savefig:
             figname = f'residuals_iter_{self.iter_number}' if figname is None else figname
@@ -437,6 +438,7 @@ class IterationParams:
         else:
             lim = np.max(np.abs(plt.ylim()))
             plt.ylim(-lim, lim)
+        plt.gcf().autofmt_xdate()
         if plot_chi_squared:
             plt.subplot(1,2,2)
             plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')
@@ -456,6 +458,7 @@ class IterationParams:
             # if show_logarithmic: plt.yscale('log')
             plt.yscale('log')
             plt.tight_layout()
+            plt.gcf().autofmt_xdate()
         if savefig:
             figname = f'chi_iter_{self.iter_number}' if figname is None else figname
             plt.savefig(f'{figname}_chi.pdf', bbox_inches='tight')

@@ -218,6 +218,15 @@ static real root7(real num){
 }
 
 void gr15(propSimulation *propSim) {
+    // make sure t and xInteg have numerical values
+    if (!std::isfinite(propSim->t)) {
+        throw std::runtime_error("t is not finite");
+    }
+    for (size_t i = 0; i < propSim->xInteg.size(); i++) {
+        if (!std::isfinite(propSim->xInteg[i])) {
+            throw std::runtime_error("xInteg is not finite");
+        }
+    }
     real t = propSim->t;
     std::vector<real> xInteg0 = propSim->xInteg;
     size_t nh = 8;

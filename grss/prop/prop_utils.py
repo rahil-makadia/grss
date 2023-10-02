@@ -187,13 +187,6 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     scale_factor, units = get_scale_factor(central_body)
     fac = prop_sim.consts.du2m/1000/scale_factor
 
-    times = Time(t_stack, format='mjd', scale='tdb').tdb.datetime
-    lwidth = 1
-    fig = plt.figure(figsize=(6, 6), dpi=150)
-    ax1 = plt.gca()
-    ax1.plot(times, rel_radial_vel, '-', lw=lwidth, color='C0', label="Relative Radial Velocity")
-    ax1.set_xlabel("Time [TDB]")
-    ax1.set_ylabel("Relative Radial Velocity [au/day]", color='C0')
     ca_times = [
         approach.tCA
         for approach in prop_sim.caParams
@@ -201,6 +194,16 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
         and approach.centralBody == central_body
     ]
     ca_times = Time(ca_times, format='mjd', scale='tdb').tdb.datetime
+    if len(ca_times) == 0:
+        print("No close approaches found")
+        return None
+    times = Time(t_stack, format='mjd', scale='tdb').tdb.datetime
+    lwidth = 1
+    fig = plt.figure(figsize=(6, 6), dpi=150)
+    ax1 = plt.gca()
+    ax1.plot(times, rel_radial_vel, '-', lw=lwidth, color='C0', label="Relative Radial Velocity")
+    ax1.set_xlabel("Time [TDB]")
+    ax1.set_ylabel("Relative Radial Velocity [au/day]", color='C0')
     for time in ca_times:
         ax1.axvline(time, ls=':', color='gray', lw=0.75)
     ax1.axvline(np.inf, ls=':', color='gray', lw=0.75, label="Close Approaches")
@@ -224,7 +227,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     plt.show()
     return None
 
-def data_to_ellipse(x_data, y_data, n_std=3.0, plot_offset=False):
+def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellipse_params):
     """
     Convert two sets of points to an ellipse.
 
@@ -235,9 +238,13 @@ def data_to_ellipse(x_data, y_data, n_std=3.0, plot_offset=False):
     y_data : np.ndarray
         y-coordinates of the points
     n_std : float, optional
-        Number of standard deviations to plot, by default 3.0
+        Number of standard deviations to plot
     plot_offset : bool, optional
-        True to plot the offset from the mean, False to plot the raw data, by default False.
+        True to plot the offset from the mean, False to plot the raw data
+    bplane_type : str
+        type of B-plane
+    print_ellipse_params : bool, optional
+        True to print the ellipse parameters, False to not print
 
     Returns
     -------
@@ -259,9 +266,10 @@ def data_to_ellipse(x_data, y_data, n_std=3.0, plot_offset=False):
         theta += np.pi
     sma = np.sqrt(eigvals[0]) * n_std
     smi = np.sqrt(eigvals[1]) * n_std
-    print(sma/n_std)
-    print(smi/n_std)
-    print(theta*180/np.pi)
+    if print_ellipse_params:
+        print(f'{bplane_type} ellipse sma: {sma/n_std} km')
+        print(f'{bplane_type} ellipse smi: {smi/n_std} km')
+        print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')
     theta_arr = np.linspace(0, 2*np.pi, 100)
     ellipse = np.array([sma*np.cos(theta_arr), smi*np.sin(theta_arr)])
     rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
@@ -301,7 +309,8 @@ def days_to_dhms(days):
     string = f'{day}d {hour:02d}:{mins:02d}:{sec:06.3f}'
     return day, hour, mins, sec, string
 
-def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3):
+def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_km=False,
+                equal_axis=True, print_ellipse_params=False, show_central_body=True):
     """
     Plot the B-planes of a list of close approaches.
 
@@ -315,53 +324,141 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3):
         True to scale the coordinates to the body's radius, False to leave in km, by default False.
     n_std : float, optional
         Number of standard deviations to plot, by default 3.0
+    units_km : bool, optional
+        True to plot in km, False to plot in AU, by default False.
+    equal_axis : bool, optional
+        True to make the x and y axes equal, False to leave them as is, by default True.
+    print_ellipse_params : bool, optional
+        True to print the ellipse parameters, False to not print, by default False.
+    show_central_body : bool, optional
+        True to show the central body, False to not show it, by default True.
 
     Returns
     -------
     None : NoneType
         None
     """
-    au2km = 149597870.7
+    if len(ca_list) == 0:
+        print("No close approaches found")
+        return None
+    au2units = 149597870.7 if units_km else 1.0
     times = np.array([approach.tCA for approach in ca_list])
-    kizner_x = np.array([approach.kizner.x*au2km for approach in ca_list])
-    kizner_y = np.array([approach.kizner.y*au2km for approach in ca_list])
-    opik_x = np.array([approach.opik.x*au2km for approach in ca_list])
-    opik_y = np.array([approach.opik.y*au2km for approach in ca_list])
-    scaled_x = np.array([approach.scaled.x*au2km for approach in ca_list])
-    scaled_y = np.array([approach.scaled.y*au2km for approach in ca_list])
-    mtp_x = np.array([approach.mtp.x*au2km for approach in ca_list])
-    mtp_y = np.array([approach.mtp.y*au2km for approach in ca_list])
-    kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset)
-    opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset)
-    scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset)
-    mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset)
-    if scale_coords:
-        body_id = ca_list[0].centralBodySpiceId
-        scale_factor, units = get_scale_factor(body_id)
-    else:
-        scale_factor = 1.0
+    map_times = np.array([approach.tMap for approach in ca_list])
+    kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
+    kizner_y = np.array([approach.kizner.y*au2units for approach in ca_list])
+    opik_x = np.array([approach.opik.x*au2units for approach in ca_list])
+    opik_y = np.array([approach.opik.y*au2units for approach in ca_list])
+    scaled_x = np.array([approach.scaled.x*au2units for approach in ca_list])
+    scaled_y = np.array([approach.scaled.y*au2units for approach in ca_list])
+    mtp_x = np.array([approach.mtp.x*au2units for approach in ca_list])
+    mtp_y = np.array([approach.mtp.y*au2units for approach in ca_list])
+    focus_factor = np.mean([approach.gravFocusFactor for approach in ca_list])
+    kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
+                                        'kizner', print_ellipse_params)
+    opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
+                                        'opik', print_ellipse_params)
+    scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
+                                        'scaled', print_ellipse_params)
+    mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
+                                        'mtp', print_ellipse_params)
+    body_id = ca_list[0].centralBodySpiceId
+    central_body_radius, units = get_scale_factor(body_id)
+    if not scale_coords:
         units = "km"
+    if not units_km:
+        central_body_radius /= 149597870.7
+        units = "AU"
     t_mean = np.mean(times)
     t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
+    t_map_mean = Time(np.mean(map_times), format='mjd', scale='tdb').tdb.iso
     t_std = n_std*np.std(times)
     *_, t_std_str = days_to_dhms(t_std)
     full_str = fr'{t_mean_str} $\pm$ {t_std_str}'
     fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=150)
-    fig.suptitle(fr"Close Approach at {full_str} TDB ({n_std}$\sigma$)")
     plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_ellipse, 'kizner',
-                        plot_offset, scale_factor, units)
+                        focus_factor, show_central_body, plot_offset, scale_coords,
+                        central_body_radius, units, equal_axis)
     plot_single_bplane(axes[0,1], opik_x, opik_y, opik_ellipse, 'opik',
-                        plot_offset, scale_factor, units)
+                        focus_factor, show_central_body, plot_offset, scale_coords,
+                        central_body_radius, units, equal_axis)
     plot_single_bplane(axes[1,0], scaled_x, scaled_y, scaled_ellipse, 'scaled',
-                        plot_offset, scale_factor, units)
+                        focus_factor, show_central_body, plot_offset, scale_coords,
+                        central_body_radius, units, equal_axis)
     plot_single_bplane(axes[1,1], mtp_x, mtp_y, mtp_ellipse, 'mtp',
-                        plot_offset, scale_factor, units)
+                        focus_factor, show_central_body, plot_offset, scale_coords,
+                        central_body_radius, units, equal_axis)
+    patches, labels = axes[0,0].get_legend_handles_labels()
+    if not show_central_body:
+        patches = patches[:-2]
+        labels = labels[:-2]
+    fig.legend(patches, labels, loc='upper center', ncol=4,
+                bbox_to_anchor=(0.5, 1.023), fontsize=10)
     fig.tight_layout()
+    fig.suptitle(fr"Close Approach at {full_str} TDB ({n_std}$\sigma$)", fontsize=14, y=1.07)
+    subtitle = f"B-plane map time: {t_map_mean} TDB"
+    plt.text(x=0.5, y=1.026, s=subtitle, fontsize=11, ha="center", transform=fig.transFigure)
     plt.show()
     return None
 
+def _get_bplane_labels(bplane_type, plot_offset, units):
+    """
+    Get the labels and titles for the B-plane plots.
+
+    Parameters
+    ----------
+    bplane_type : str
+        type of B-plane
+    plot_offset : bool
+        True to plot the offset from the mean, False to plot the raw data
+    units : str
+        units of the plot
+
+    Returns
+    -------
+    x_label : str
+        x-axis label
+    y_label : str
+        y-axis label
+    title : str
+        plot title
+    """
+    if bplane_type == 'kizner':
+        if plot_offset:
+            x_label = fr"B.R - B.R$_{{nom}}$ [{units}]"
+            y_label = fr"B.T - B.T$_{{nom}}$ [{units}]"
+        else:
+            x_label = fr"B.R [{units}]"
+            y_label = fr"B.T [{units}]"
+        title = "Kizner B-plane"
+    elif bplane_type == 'opik':
+        if plot_offset:
+            x_label = fr"$\xi$ - $\xi_{{nom}}$ [{units}]"
+            y_label = fr"$\zeta$ - $\zeta_{{nom}}$ [{units}]"
+        else:
+            x_label = fr"$\xi$ [{units}]"
+            y_label = fr"$\zeta$ [{units}]"
+        title = "Öpik B-plane"
+    elif bplane_type == 'scaled':
+        if plot_offset:
+            x_label = fr"B.R$_{{scaled}}$ - B.R$_{{scaled, nom}}$ [{units}]"
+            y_label = fr"B.T$_{{scaled}}$ - B.T$_{{scaled, nom}}$ [{units}]"
+        else:
+            x_label = fr"B.R$_{{scaled}}$ [{units}]"
+            y_label = fr"B.T$_{{scaled}}$ [{units}]"
+        title = "Scaled Kizner B-plane"
+    elif bplane_type == 'mtp':
+        if plot_offset:
+            x_label = fr"X - X$_{{nom}}$ [{units}]"
+            y_label = fr"Y - Y$_{{nom}}$ [{units}]"
+        else:
+            x_label = f"X [{units}]"
+            y_label = f"Y [{units}]"
+        title = "Modified Target Plane"
+    return x_label, y_label, title
+
 def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
-                        plot_offset, scale_factor, units):
+                        focus_factor, show_central_body, plot_offset, scale_coords,
+                        central_body_radius, units, equal_axis):
     """
     Plot a single B-plane.
 
@@ -377,12 +474,20 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
         ellipse points
     bplane_type : str
         type of B-plane
+    focus_factor : float
+        scaling factor of the central body B-plane due to gravitational focusing
+    show_central_body : bool
+        True to show the central body, False to not show it
     plot_offset : bool
         True to plot the offset from the mean, False to plot the raw data
-    scale_factor : float
-        scale factor for plotting close approaches, in km
+    scale_coords : bool
+        True to scale the coordinates to the body's radius, False to leave in km
+    central_body_radius : float
+        radius of the central body, in km
     units : str
         units of the plot
+    equal_axis : bool
+        True to make the x and y axes equal, False to leave them as is
 
     Returns
     -------
@@ -396,34 +501,10 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     """
     if bplane_type not in {'kizner', 'opik', 'scaled', 'mtp'}:
         raise ValueError("Unknown B-plane type")
-    if bplane_type == 'kizner':
-        if plot_offset:
-            x_label = fr"B.R - B.R$_{{nom}}$ [{units}]"
-            y_label = fr"B.T - B.T$_{{nom}}$ [{units}]"
-        else:
-            x_label = fr"B.R [{units}]"
-            y_label = fr"B.T [{units}]"
-    elif bplane_type == 'opik':
-        if plot_offset:
-            x_label = fr"$\xi$ - $\xi_{{nom}}$ [{units}]"
-            y_label = fr"$\zeta$ - $\zeta_{{nom}}$ [{units}]"
-        else:
-            x_label = fr"$\xi$ [{units}]"
-            y_label = fr"$\zeta$ [{units}]"
-    elif bplane_type == 'scaled':
-        if plot_offset:
-            x_label = fr"B.R$_{{scaled}}$ - B.R$_{{scaled, nom}}$ [{units}]"
-            y_label = fr"B.T$_{{scaled}}$ - B.T$_{{scaled, nom}}$ [{units}]"
-        else:
-            x_label = fr"B.R$_{{scaled}}$ [{units}]"
-            y_label = fr"B.T$_{{scaled}}$ [{units}]"
-    elif bplane_type == 'mtp':
-        if plot_offset:
-            x_label = fr"X - X$_{{nom}}$ [{units}]"
-            y_label = fr"Y - Y$_{{nom}}$ [{units}]"
-        else:
-            x_label = f"X [{units}]"
-            y_label = f"Y [{units}]"
+    scale_factor = central_body_radius if scale_coords else 1.0
+    if bplane_type == 'scaled':
+        focus_factor = 1.0
+    x_label, y_label, title = _get_bplane_labels(bplane_type, plot_offset, units)
     msize = 5
     malpha = 0.5
     mspec = 'b.'
@@ -431,12 +512,34 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     lalpha = 0.75
     lspec = 'r-'
     rotation = 30
-    axis.plot(x_coord/scale_factor, y_coord/scale_factor, mspec, ms=msize, alpha=malpha)
-    axis.plot(ellipse[0,:]/scale_factor, ellipse[1,:]/scale_factor, lspec, lw=lwidth, alpha=lalpha)
+    axis.plot(x_coord/scale_factor, y_coord/scale_factor, mspec,
+                ms=msize, alpha=malpha, label="Close Approaches")
+    axis.plot(ellipse[0,:]/scale_factor, ellipse[1,:]/scale_factor, lspec,
+                lw=lwidth, alpha=lalpha, label="Uncertainty Ellipse")
     axis.set_xlabel(x_label)
     axis.set_ylabel(y_label)
     axis.ticklabel_format(axis='both', style='sci', scilimits=(0,0), useOffset=False)
     axis.tick_params(axis='x', labelrotation=rotation)
-    axis.set_title("Kizner B-plane")
-    axis.axis('equal')
-    return None
+    axis.set_title(title, fontsize=12)
+    cclr = 'k'
+    calpha = 0.5
+    clst = '-'
+    if scale_coords:
+        circle = plt.Circle((0, 0), 1, label="Central Body Extent",
+                            color=cclr, fill=True, alpha=calpha, linestyle=clst)
+        circle2 = plt.Circle((0, 0), focus_factor, label="Impact Cross Section",
+                            color=cclr, fill=True, alpha=0.5*calpha, linestyle=clst)
+    else:
+        circle = plt.Circle((0, 0), central_body_radius, label="Central Body Extent",
+                            color=cclr, fill=True, alpha=calpha, linestyle=clst)
+        circle2 = plt.Circle((0, 0), focus_factor*central_body_radius, label="Impact Cross Section",
+                            color=cclr, fill=True, alpha=0.5*calpha, linestyle=clst)
+    if show_central_body:
+        axis.add_patch(circle)
+        axis.add_patch(circle2)
+    else:
+        axis.add_artist(circle)
+        axis.add_artist(circle2)
+    if equal_axis:
+        axis.axis('equal')
+    return axis
