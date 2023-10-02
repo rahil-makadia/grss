@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_utils.get_scale_factor" href="grss.prop.prop_utils.get_scale_factor.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 30, 2023"/>
+    <meta name="docbuild:last-update" content="Oct 02, 2023"/>
   </head>
   
   
@@ -465,7 +465,7 @@ document.write(`
 <h1>grss.prop.prop_utils.plot_bplane<a class="headerlink" href="#grss-prop-prop-utils-plot-bplane" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.prop.prop_utils.plot_bplane">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">plot_bplane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.plot_bplane" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">plot_bplane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units_km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_central_body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.plot_bplane" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot the B-planes of a list of close approaches.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -474,6 +474,10 @@ document.write(`
 <li><p><strong>plot_offset</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to plot the offset from the mean, False to plot the raw data, by default False.</p></li>
 <li><p><strong>scale_coords</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to scale the coordinates to the body’s radius, False to leave in km, by default False.</p></li>
 <li><p><strong>n_std</strong> (<em>float</em><em>, </em><em>optional</em>) – Number of standard deviations to plot, by default 3.0</p></li>
+<li><p><strong>units_km</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to plot in km, False to plot in AU, by default False.</p></li>
+<li><p><strong>equal_axis</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to make the x and y axes equal, False to leave them as is, by default True.</p></li>
+<li><p><strong>print_ellipse_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to print the ellipse parameters, False to not print, by default False.</p></li>
+<li><p><strong>show_central_body</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to show the central body, False to not show it, by default True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -564,7 +568,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 30, 2023.
+  Last updated on Oct 02, 2023.
   <br/>
 </p>
   </div>
