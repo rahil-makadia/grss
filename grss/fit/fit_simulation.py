@@ -1473,7 +1473,6 @@ class FitSimulation:
         j = 0
         residual_chi_squared = np.zeros(len(self.obs_array))
         rejected_indices = []
-        resid_cov_full = self.obs_cov - partials @ full_cov @ partials.T
         for i in range(len(self.obs_array)):
             obs_info_len = len(observer_info[i])
             if obs_info_len in {4, 7}:
@@ -1486,25 +1485,22 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
             # calculate chi-squared for each residual
             resid = residuals[j:j+size].reshape((1, size))
-            # resid_cov = covs - partials @ full_cov @ partials.T
-            resid_cov = resid_cov_full[j:j+size, j:j+size]
+            obs_cov = self.obs_cov[j:j+size, j:j+size]
+            obs_partials = partials[j:j+size, :]
+            if self.rejection_flag[i]:
+                resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
+            else:
+                resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
             residual_chi_squared[i] = resid @ np.linalg.inv(resid_cov) @ resid.T
             # outlier rejection, only reject RA/Dec measurements
-            if residual_chi_squared[i] > chi_reject**2 and size == 2:
-                self.rejection_flag[i] = True
-            if self.rejection_flag[i] and residual_chi_squared[i] < chi_recover**2:
-                self.rejection_flag[i] = False
-                print("Recovered observation at time", self.obs_array[i, 0])
-            # # sigma clipping
-            # if (abs(resid[0, 0])/self.obs_array[i,3] >= chi_reject
-            #         or abs(resid[0, 1])/self.obs_array[i,4] >= chi_reject):
-            #     self.rejection_flag[i] = True
-            # if (self.rejection_flag[i] and (abs(resid[0, 0])/self.obs_array[i,3] < chi_recover
-            #         and abs(resid[0, 1])/self.obs_array[i,4] < chi_recover)):
-            #     self.rejection_flag[i] = False
-            #     print("Recovered observation at time", self.obs_array[i, 0])
-            if self.rejection_flag[i]:
-                rejected_indices.extend((j, j+1))
+            # but not from Gaia/radar tuples
+            if isinstance(self.observer_codes[i], str):
+                if residual_chi_squared[i] > chi_reject**2 and size == 2:
+                    self.rejection_flag[i] = True
+                if self.rejection_flag[i] and residual_chi_squared[i] < chi_recover**2:
+                    self.rejection_flag[i] = False
+                if self.rejection_flag[i]:
+                    rejected_indices.extend((j, j+1))
             j += size
         # remove rejected residuals from partials, weights, and residuals
         partials = np.delete(partials, rejected_indices, axis=0)
