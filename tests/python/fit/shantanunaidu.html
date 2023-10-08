@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 1.1.1 documentation</title>
+    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 1.2.0 documentation</title>
   
   
   
@@ -65,7 +65,7 @@
     <link rel="prev" title="(84100) Farnocchia orbit determination test" href="farnocchia.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Oct 02, 2023"/>
+    <meta name="docbuild:last-update" content="Oct 08, 2023"/>
   </head>
   
   
@@ -150,7 +150,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v1.1.1 documentation</p>
+    <p class="title logo__title">GRSS v1.2.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -496,13 +496,13 @@ de_kernel_path = grss.utils.default_kernel_path(de_kernel)
 optical_obs_file = None
 t_min_tdb = None
 t_max_tdb = None
-debias = False
+debias_hires = False
 debias_lowres = True
 deweight = True
 eliminate = False
 max_obs_per_night = 4
 verbose = True
-obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
+obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
 obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
 if add_gaia_obs:
     obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=True)
@@ -550,12 +550,12 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.458                   0.521                   872.714                         0.266
-2                        0.458                   0.520                   871.334                         0.266
-3                        0.458                   0.520                   871.334                         0.266
+1                        0.458                   0.530                   904.672                         0.276
+2                        0.458                   0.529                   903.299                         0.275
+3                        0.458                   0.529                   903.299                         0.275
 Converged without rejecting outliers. Starting outlier rejection now.
-4                        0.414                   0.488                   761.792                         0.233
-5                        0.414                   0.488                   761.828                         0.233
+4                        0.414                   0.498                   793.755                         0.243
+5                        0.414                   0.498                   793.791                         0.243
 Converged after rejecting outliers.
 </pre></div></div>
 </div>
@@ -574,20 +574,20 @@ Converged after rejecting outliers.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 =======================================================
-RMS unweighted: 0.4135383259445579
-RMS weighted: 0.4877439426616351
-chi-squared: 761.828053933611
-reduced chi-squared: 0.2332602737090052
-square root of reduced chi-squared: 0.48297026172322993
+RMS unweighted: 0.4135497518511421
+RMS weighted: 0.49763532208835876
+chi-squared: 793.791396602302
+reduced chi-squared: 0.24304696772881262
+square root of reduced chi-squared: 0.49299793886872656
 =======================================================
 t: MJD 57500.0 TDB
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.66697868063e-01               6.73767951889e-09               1.66697862065e-01               6.70125691369e-09               -5.99818494873e-09              -0.890
-q                       2.56503023084e+00               2.00660624764e-08               2.56503024870e+00               1.99041246103e-08               +1.78629351311e-08              +0.890
-tp                      5.75113652724e+04               3.28498193378e-05               5.75113652731e+04               3.22351653415e-05               +6.36224285699e-07              +0.019
-om                      2.06376077176e+02               2.70610101692e-05               2.06376092127e+02               2.69519986799e-05               +1.49506073228e-05              +0.552
-w                       1.54026406216e+02               2.84582407556e-05               1.54026391294e+02               2.82536501665e-05               -1.49226940209e-05              -0.524
-i                       7.88793990680e-01               5.14004162240e-07               7.88794216056e-01               5.04414880446e-07               +2.25376306728e-07              +0.438
+e                       1.66697868063e-01               6.73767951889e-09               1.66697862160e-01               6.68233071258e-09               -5.90304666259e-09              -0.876
+q                       2.56503023084e+00               2.00660624764e-08               2.56503024841e+00               1.98877560112e-08               +1.75710126449e-08              +0.876
+tp                      5.75113652724e+04               3.28498193378e-05               5.75113652747e+04               3.21472229704e-05               +2.27587588597e-06              +0.069
+om                      2.06376077176e+02               2.70610101692e-05               2.06376092526e+02               2.69474797355e-05               +1.53496384883e-05              +0.567
+w                       1.54026406216e+02               2.84582407556e-05               1.54026391273e+02               2.82427247382e-05               -1.49437144898e-05              -0.525
+i                       7.88793990680e-01               5.14004162240e-07               7.88794213809e-01               5.04324626566e-07               +2.23128421850e-07              +0.434
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -649,10 +649,10 @@ print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 1.77
-Mahalonobis distance between GRSS and JPL solution: 1.79
-Bhattacharya distance between JPL and GRSS solution: 0.0005
-Bhattacharya coefficient between JPL and GRSS solution: 0.9995
+Mahalonobis distance between JPL and GRSS solution: 1.79
+Mahalonobis distance between GRSS and JPL solution: 1.81
+Bhattacharya distance between JPL and GRSS solution: 0.0006
+Bhattacharya coefficient between JPL and GRSS solution: 0.9994
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -739,7 +739,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 02, 2023.
+  Last updated on Oct 08, 2023.
   <br/>
 </p>
   </div>

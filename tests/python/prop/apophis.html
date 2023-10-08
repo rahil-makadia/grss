@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(99942) Apophis propagation test &#8212; GRSS 1.1.1 documentation</title>
+    <title>(99942) Apophis propagation test &#8212; GRSS 1.2.0 documentation</title>
   
   
   
@@ -65,7 +65,7 @@
     <link rel="prev" title="Examples" href="../../../examples.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Oct 02, 2023"/>
+    <meta name="docbuild:last-update" content="Oct 08, 2023"/>
   </head>
   
   
@@ -150,7 +150,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v1.1.1 documentation</p>
+    <p class="title logo__title">GRSS v1.2.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -573,7 +573,7 @@ plt.close()
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>jpl = np.array([0.017575542120147558, 1.2196672850476662, 0.4783965165437007, -0.013539283384755667, 0.0005355366349979586, -1.5069904336052799e-05])
 grss = np.array(prop_sim.xInteg)
 pos_diff = np.linalg.norm((jpl-grss)[:3])*prop_sim.consts.du2m
-# assert pos_diff &lt; 100.0
+assert pos_diff &lt; 1.0e4
 </pre></div>
 </div>
 </div>
@@ -650,7 +650,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 02, 2023.
+  Last updated on Oct 08, 2023.
   <br/>
 </p>
   </div>
