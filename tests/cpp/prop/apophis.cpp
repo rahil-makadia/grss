@@ -88,8 +88,8 @@ int main() {
                          pow(jplFromAssist[2] - rm[2], 2)) *
         simTest.consts.du2m;
     std::cout << "Distance (m): " << distDiff << std::endl;
-    // make sure the difference is less than 100m
-    // assert(distDiff < 100.0L);
+    // make sure the difference is less than 10km
+    assert(distDiff < 1.0e4L);
 
     std::cout
         << std::endl

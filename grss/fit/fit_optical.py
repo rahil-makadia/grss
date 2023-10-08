@@ -181,17 +181,6 @@ def get_ades_optical_obs_array(psv_obs_file, de_kernel_path, occultation_obs=Fal
             pos_z = float(obs['pos3'])
             lon, lat, rho = rec2lat(obs_times[i].tdb.mjd, pos_x, pos_y, pos_z)
             observer_codes_optical.append((str(obs['stn']), lon, lat, 1e3*rho))
-            # pos_itrf_x = rho*np.cos(lat)*np.cos(lon)
-            # pos_itrf_y = rho*np.cos(lat)*np.sin(lon)
-            # pos_itrf_z = rho*np.sin(lat)
-            # rot_mat2 = spice.sxform('ITRF93', 'J2000', mjd2et(obs_times[i].tdb.mjd))
-            # observer_state_j2000_2 = np.dot(rot_mat2, [pos_itrf_x, pos_itrf_y, pos_itrf_z,
-            #                                             0.0, 0.0, 0.0])
-            # pos_x, pos_y, pos_z = 1e3*observer_pos_j2000
-            # vel_x, vel_y, vel_z = 1e3*observer_state_j2000_2[3:]
-            # observer_codes_optical.append(('275', pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
-            # print(observer_state_j2000_2)
-            # print(np.linalg.norm(observer_state_j2000 - observer_state_j2000_2[:3]))
         else:
             observer_codes_optical.append(obs['stn'])
     spice.kclear()
@@ -490,8 +479,6 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
         obs_date_mjd = obs_array_optical[i, 0]
         obs_type = observation_type_codes[i]
         obs_program = observer_program_codes[i]
-        # obs_array_optical[i, 3:5] = 1.0
-        # continue
         if obs_type in ['P', 'A', 'N', ' ']:
             if obs_date_mjd <= Time('1890-01-01', format='iso', scale='utc').utc.mjd:
                 obs_array_optical[i, 3:5] = 10.0
@@ -509,8 +496,20 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
         elif obs_type in ['M']: # micrometer
             obs_array_optical[i, 3:5] = 2.0
         elif obs_type in ['S']: # satellite
-            if obs_code in '275': # non-geocentric occultation
+            if obs_code in ['275']: # non-geocentric occultation
                 obs_array_optical[i, 3:5] = 0.2
+            elif obs_code in ['250']: # HST
+                obs_array_optical[i, 3:5] = 1.3
+            elif obs_code in ['249', 'C49', 'C50']: # SOHO, STEREO-A, STEREO-B
+                obs_array_optical[i, 3:5] = 60.0
+            elif obs_code in ['C51']: # WISE
+                obs_array_optical[i, 3:5] = 1.0
+            elif obs_code in ['C53']: # NEOSSat
+                obs_array_optical[i, 3:5] = 3.0
+            elif obs_code in ['C57']: # TESS
+                obs_array_optical[i, 3:5] = 5.0
+            elif obs_code in ['258']: # Gaia
+                obs_array_optical[i, 3:5] = 0.5
             else:
                 obs_array_optical[i, 3:5] = 1.5
         elif obs_type in ['c', 'C', 'V', 'n', 'B', 'X', 'x']:
@@ -535,7 +534,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     obs_array_optical[i, 3:5] = 0.75
                 elif obs_code in ['704']:
                     obs_array_optical[i, 3:5] = 1.0
-                elif obs_code in ['691', '291']: # 291 as well?
+                elif obs_code in ['691', '291']:
                     if obs_date_mjd < Time('2003-01-01', format='iso', scale='utc').utc.mjd:
                         obs_array_optical[i, 3:5] = 0.6
                     else:
@@ -551,10 +550,8 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     obs_array_optical[i, 3:5] = 0.6
                 elif obs_code in ['D29']:
                     obs_array_optical[i, 3:5] = 0.75
-                elif obs_code in ['T07', 'M22', 'W68']:
+                elif obs_code in ['T05', 'T08', 'T07', 'M22', 'W68']:
                     obs_array_optical[i, 3:5] = 0.8
-                elif obs_code in ['T05', 'T08']:
-                    obs_array_optical[i, 3:5] = 1.0
                 elif obs_code in ['568']:
                     obs_array_optical[i, 3:5] = 0.5
                     if obs_program == '_' and star_catalog in ['t', 'q']:
@@ -622,11 +619,9 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     if obs_program  == '2':
                         obs_array_optical[i, 3:5] = 1.0
                 elif obs_code in ['H01']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if star_catalog in ['L', 't', 'U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['673']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '1':
                         obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['645']:
@@ -634,18 +629,23 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                 elif obs_code in ['689']:
                     obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['J04', 'Z84']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if star_catalog in ['U', 'V', 'W', 'X', 't', 'L', 'q', 'r', 'u', 'e']:
                         obs_array_optical[i, 3:5] = 0.5
+                    if obs_code in ['J04']:
+                        if obs_program == '2' and star_catalog in ['t', 'q', 'U', 'V', 'W', 'X']:
+                            obs_array_optical[i, 3:5] = 0.3
+                        elif obs_program == '#':
+                            obs_array_optical[i, 3:5] = 1.0
+                    elif obs_code in ['Z84']:
+                        if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
+                            obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['608']:
-                    obs_array_optical[i, 3:5] = 1.0
                     obs_array_optical[i, 3:5] = 0.6
                 elif obs_code in ['W84']:
                     obs_array_optical[i, 3:5] = 0.5
                     if obs_program == '&':
                         obs_array_optical[i, 3:5] = 1.0
                 elif obs_code in ['950']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if star_catalog in ['U', 'V', 'W', 'X', 't', 'L', 'q', 'r', 'u', 'e']:
                         obs_array_optical[i, 3:5] = 0.5
                     if obs_program == '@':
@@ -666,11 +666,9 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     if obs_program == '0':
                         obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['Y28']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if star_catalog in ['t', 'U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['309']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.2
                     elif star_catalog in ['t', 'q']:
@@ -681,56 +679,36 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                         elif star_catalog in ['t', 'q']:
                             obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['G83']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '2':
                         if star_catalog in ['U', 'V', 'W', 'X']:
                             obs_array_optical[i, 3:5] = 0.2
                         elif star_catalog in ['t', 'q']:
                             obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['C65']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '3' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.2
                 elif obs_code in ['094']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '9' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['Z18']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.2
                 elif obs_code in ['181']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['G37']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '5' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.2
-                elif obs_code in ['J04']:
-                    obs_array_optical[i, 3:5] = 1.0
-                    if obs_program == '2' and star_catalog in ['t', 'q', 'U', 'V', 'W', 'X']:
-                        obs_array_optical[i, 3:5] = 0.3
-                    elif obs_program == '#':
-                        obs_array_optical[i, 3:5] = 1.0
-                elif obs_code in ['Z84']:
-                    obs_array_optical[i, 3:5] = 1.0
-                    if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
-                        obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['D20']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['Z18']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.1
                 elif obs_code in ['N50']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == '2' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.3
                 elif obs_code in ['I41']:
-                    obs_array_optical[i, 3:5] = 1.0
                     if obs_program == 'Z':
                         obs_array_optical[i, 3:5] = 1.0
                 else:
@@ -738,7 +716,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     obs_array_optical[i, 3:5] = 1.0
             if star_catalog == ' ':
                 obs_array_optical[i, 3:5] = 1.5
-            if obs_type in ['V']:
+            if obs_code in ['270']:
                 obs_array_optical[i, 3:5] = 2.0
         else:
             raise ValueError(f"apply_weights: Observation type {obs_type} not recognized.")
@@ -863,7 +841,7 @@ def eliminate_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
     return obs_array_eliminated, tuple(catalog_eliminated), tuple(observer_loc_eliminated)
 
 def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None,
-                            debias=True, debias_lowres=False, deweight=True, eliminate=False,
+                            debias_hires=True, debias_lowres=False, deweight=True, eliminate=False,
                             num_obs_per_night=5, verbose=False):
     """
     Assemble the optical observations for a given body into an array for an orbit fit.
@@ -879,8 +857,8 @@ def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_
         Minimum time (MJD TDB) for observations to be included, by default None
     t_max_tdb : float, optional
         Maximum time (MJD TDB) for observations to be included, by default None
-    debias : bool, optional
-        Flag to debias the observations, by default True
+    debias_hires : bool, optional
+        Flag to debias the observations using the high resolution scheme, by default True
     debias_lowres : bool, optional
         Flag to debias the observations using the low resolution scheme, by default False
     deweight : bool, optional
@@ -906,25 +884,24 @@ def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_
     ValueError
         If deweight and eliminate are both False.
     ValueError
-        If debias and debias_lowres are both True.
+        If debias_hires and debias_lowres are both True.
     ValueError
-        If debias and debias_lowres are both False.
+        If debias_hires and debias_lowres are both False.
     """
     if eliminate and deweight:
         raise ValueError('Cannot deweight and eliminate observations at the same time.')
-    elif not eliminate and not deweight:
+    if not eliminate and not deweight:
         print("WARNING: No deweighting or elimination scheme applied",
                 "for observations during the same night.")
-        # raise ValueError('Must deweight or eliminate observations.')
-    if debias and debias_lowres:
-        raise ValueError('Cannot debias and debias_lowres at the same time.')
-    elif not debias and not debias_lowres:
-        raise ValueError('Must debias or debias_lowres.')
+    if debias_hires and debias_lowres:
+        raise ValueError('Cannot debias_hires and debias_lowres at the same time.')
+    if not debias_hires and not debias_lowres:
+        print("WARNING: No debiasing scheme applied for observations.")
     (obs_array_optical, star_catalog_codes,
         observer_codes_optical, observation_type_codes,
         observer_program_codes) = get_optical_data(body_id, optical_obs_file, t_min_tdb,
                                     t_max_tdb, verbose)
-    if debias or debias_lowres:
+    if debias_hires or debias_lowres:
         (obs_array_optical, star_catalog_codes,
             observer_codes_optical) = apply_debiasing_scheme(obs_array_optical, star_catalog_codes,
                                         observer_codes_optical, debias_lowres, verbose)

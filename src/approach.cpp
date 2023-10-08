@@ -332,6 +332,12 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
     vdot(bVec, xiHat, 3, this->opik.x);
     vdot(bVec, zetaHat, 3, this->opik.y);
     vdot(bVec, sHat, 3, this->opik.z);
+    pos[0] = this->xRelCA[0];
+    pos[1] = this->xRelCA[1];
+    pos[2] = this->xRelCA[2];
+    vel[0] = this->xRelCA[3];
+    vel[1] = this->xRelCA[4];
+    vel[2] = this->xRelCA[5];
     real eHatX[3], eHatY[3], eHatZ[3], vVecCrosseHatZ[3];
     vunit(vel, 3, eHatZ);
     vcross(vVec, eHatZ, vVecCrosseHatZ);
