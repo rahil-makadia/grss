@@ -232,6 +232,11 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
         this->ngParams.r0_au = ngParams.r0_au;
         this->isNongrav = true;
     }
+    this->isPPN = false;
+    this->isMajor = false;
+}
+
+void IntegBody::prepare_stm(){
     int stmSize = 36;
     if (this->isNongrav) {
         if (ngParams.a1 != 0.0L) {
@@ -248,10 +253,8 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     for (size_t i = 0; i < 6; i++) {
         this->stm[6 * i + i] = 1.0L;
     }
-    // this->n2Derivs += (size_t) stmSize/2;
-    this->propStm = false;
-    this->isPPN = false;
-    this->isMajor = false;
+    this->n2Derivs += (size_t) stmSize/2;
+    this->propStm = true;
 }
 
 void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,

@@ -34,8 +34,8 @@ std::vector<real> propSimulation::interpolate(const real t) {
     }
     const real h = (t - t0) / dt;
     approx_xInteg(this->interpParams.xIntegStack[idx],
-                  this->interpParams.accIntegStack[idx], xIntegInterp, dt, h,
-                  this->interpParams.bStack[idx], this->integParams.nInteg);
+                  this->interpParams.accIntegStack[idx], dt, h,
+                  this->interpParams.bStack[idx], this->integBodies, xIntegInterp);
     return xIntegInterp;
 }
 
@@ -96,8 +96,8 @@ void evaluate_one_interpolation(const propSimulation *propSim, const real &t,
     const real h = (tInterp - t) / dt;
     const size_t idx = propSim->interpParams.bStack.size() - 1;
     approx_xInteg(propSim->interpParams.xIntegStack[idx],
-                  propSim->interpParams.accIntegStack[idx], xInterp, dt, h,
-                  propSim->interpParams.bStack[idx], propSim->integParams.nInteg);
+                  propSim->interpParams.accIntegStack[idx], dt, h,
+                  propSim->interpParams.bStack[idx], propSim->integBodies, xInterp);
 }
 
 void get_interpIdxInWindow(const propSimulation *propSim,

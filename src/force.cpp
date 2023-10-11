@@ -8,13 +8,15 @@
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
                                 propSimulation *propSim) {
     std::vector<real> accInteg(propSim->integParams.n2Derivs, 0.0);
+    size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        propSim->integBodies[i].pos[0] = xInteg[6 * i];
-        propSim->integBodies[i].pos[1] = xInteg[6 * i + 1];
-        propSim->integBodies[i].pos[2] = xInteg[6 * i + 2];
-        propSim->integBodies[i].vel[0] = xInteg[6 * i + 3];
-        propSim->integBodies[i].vel[1] = xInteg[6 * i + 4];
-        propSim->integBodies[i].vel[2] = xInteg[6 * i + 5];
+        propSim->integBodies[i].pos[0] = xInteg[starti];
+        propSim->integBodies[i].pos[1] = xInteg[starti + 1];
+        propSim->integBodies[i].pos[2] = xInteg[starti + 2];
+        propSim->integBodies[i].vel[0] = xInteg[starti + 3];
+        propSim->integBodies[i].vel[1] = xInteg[starti + 4];
+        propSim->integBodies[i].vel[2] = xInteg[starti + 5];
+        starti += 2*propSim->integBodies[i].n2Derivs;
     }
     double xSpice[9];
     for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
@@ -57,11 +59,13 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
               << std::endl;
     forceFile.close();
     #endif
-    // for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-    //     propSim->integBodies[i].acc[0] = accInteg[3*i];
-    //     propSim->integBodies[i].acc[1] = accInteg[3*i+1];
-    //     propSim->integBodies[i].acc[2] = accInteg[3*i+2];
-    // }
+    starti = 0;
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+        propSim->integBodies[i].acc[0] = accInteg[starti];
+        propSim->integBodies[i].acc[1] = accInteg[starti+1];
+        propSim->integBodies[i].acc[2] = accInteg[starti+2];
+        starti += propSim->integBodies[i].n2Derivs;
+    }
     return accInteg;
 }
 
