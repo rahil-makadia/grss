@@ -5,12 +5,7 @@
 #include <gperftools/profiler.h>
 #endif
 /*
-export CPUPROFILE_FREQUENCY=10000 && g++ -DPROFILE_YES -std=c++11 -stdlib=libc++
--g3 apophis.cpp ../../../src/force.cpp ../../../src/gr15.cpp
-../../../src/interpolate.cpp ../../../src/simulation.cpp ../../../src/spk.cpp
-../../../src/utilities.cpp ../../../extern/cspice/lib/cspice.a -o apophis.out -I
-../../../include/ -I ../../../extern/cspice/include/ -lprofiler && ./apophis.out
-&& pprof --web ./apophis.out ./apophis.prof
+export CPUPROFILE_FREQUENCY=10000 && g++ -DPROFILE_YES -std=c++11 -stdlib=libc++ -g3 apophis.cpp ../../../src/approach.cpp ../../../src/force.cpp ../../../src/gr15.cpp ../../../src/interpolate.cpp ../../../src/simulation.cpp ../../../src/spk.cpp ../../../src/utilities.cpp ../../../extern/cspice/lib/cspice.a -o apophis.out -I ../../../include/ -I ../../../extern/cspice/include/ -lprofiler && ./apophis.out && pprof --web ./apophis.out ./apophis.prof
 */
 
 int main() {

@@ -186,7 +186,7 @@ def get_ades_optical_obs_array(psv_obs_file, de_kernel_path, occultation_obs=Fal
     spice.kclear()
     return obs_array_optical, tuple(observer_codes_optical)
 
-def _get_gaia_query_results(body_id, release='gaiadr3', verbose=False):
+def _get_gaia_query_results(body_id, release, verbose):
     """
     Submit a Gaia archive query for a given body ID from a specific
     Gaia data release.
@@ -197,9 +197,9 @@ def _get_gaia_query_results(body_id, release='gaiadr3', verbose=False):
         Target id, numbers are interpreted as asteroids,
         append 'P' for comets, start with comet type and a '/' for comet designations
     release : str, optional
-        Gaia data release version database name, by default 'gaiadr3'
+        Gaia data release version database name (should use 'gaiadr3' if unsure)
     verbose : bool, optional
-        Flag to print out information about the observations, by default False
+        Flag to print out information about the observations
 
     Returns
     -------
@@ -224,11 +224,11 @@ def _get_gaia_query_results(body_id, release='gaiadr3', verbose=False):
     res = job.get_results()
     res.sort('epoch_utc')
     if verbose:
-        print(f"Found {len(res)} observations from Gaia DR3.")
+        print(f"Found {len(res)} observations from {release}")
     return res
 
 def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
-                                t_max_tdb=None, verbose=False):
+                                t_max_tdb=None, gaia_dr='gaiadr3', verbose=False):
     """
     Assemble the optical observations for a given body from Gaia DR3.
 
@@ -243,6 +243,8 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
         Minimum time (MJD TDB) for observations to be included, by default None
     t_max_tdb : float, optional
         Maximum time (MJD TDB) for observations to be included, by default None
+    gaia_dr : str, optional
+        Gaia data release version database name, by default 'gaiadr3'
     verbose : bool, optional
         Flag to print out information about the observations, by default False
 
@@ -258,7 +260,7 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
     if t_max_tdb is None:
         t_max_tdb = np.inf
     # get gaia query results
-    res = _get_gaia_query_results(body_id, verbose=verbose)
+    res = _get_gaia_query_results(body_id, release=gaia_dr, verbose=verbose)
     spice.furnsh(de_kernel_path)
     au2km = 149597870.7
     obs_array = np.nan*np.ones((len(res), 6))
