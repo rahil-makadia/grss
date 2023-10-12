@@ -18,6 +18,7 @@ grss.fit.fit\_simulation.FitSimulation
     
         ~FitSimulation.__init__
         ~FitSimulation.add_iteration
+        ~FitSimulation.apply_outlier_rejection
         ~FitSimulation.assemble_and_propagate_bodies
         ~FitSimulation.assemble_observation_arrays
         ~FitSimulation.check_and_add_events
@@ -40,7 +41,6 @@ grss.fit.fit\_simulation.FitSimulation
         ~FitSimulation.merge_observation_arrays
         ~FitSimulation.plot_summary
         ~FitSimulation.print_summary
-        ~FitSimulation.reject_outliers
         ~FitSimulation.sort_array_by_another
         ~FitSimulation.x_dict_to_events
         ~FitSimulation.x_dict_to_nongrav_params
