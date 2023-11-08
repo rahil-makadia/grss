@@ -1,5 +1,20 @@
 #include "gr15.h"
 
+real get_initial_timestep(propSimulation *propSim){
+    real dt0 = propSim->integParams.dtMin;
+    if (propSim->integParams.dt0 != 0.0) {
+        dt0 = fabs(propSim->integParams.dt0);
+    }
+    real span = fabs(propSim->integParams.tf - propSim->integParams.t0);
+    if (span < dt0) {
+        dt0 = span;
+    }
+    if (propSim->integParams.tf < propSim->integParams.t0) {
+        dt0 *= -1.0;
+    }
+    return dt0;
+}
+
 void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const std::vector<real> &accInteg0, const real &dt,
                         const real &h, const std::vector<std::vector<real>> &b,
@@ -197,13 +212,7 @@ void gr15(propSimulation *propSim) {
     std::vector<real> xInteg0 = propSim->xInteg;
     size_t nh = 8;
     size_t dim = propSim->integParams.n2Derivs;
-    real dt = propSim->integParams.dtMin;
-    if (propSim->integParams.dt0 != 0.0) {
-        dt = fabs(propSim->integParams.dt0);
-    }
-    if (propSim->integParams.tf < propSim->integParams.t0) {
-        dt *= -1.0;
-    }
+    real dt = get_initial_timestep(propSim);
     propSim->integParams.timestepCounter = 0;
     std::vector<real> accInteg0 = get_state_der(t, xInteg0, propSim);
     std::vector<real> accIntegNext = std::vector<real>(accInteg0.size(), 0.0);

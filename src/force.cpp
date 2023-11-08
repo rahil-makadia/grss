@@ -16,6 +16,11 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
         propSim->integBodies[i].vel[0] = xInteg[starti + 3];
         propSim->integBodies[i].vel[1] = xInteg[starti + 4];
         propSim->integBodies[i].vel[2] = xInteg[starti + 5];
+        if (propSim->integBodies[i].propStm) {
+            for (size_t j = 0; j < propSim->integBodies[i].stm.size(); j++) {
+                propSim->integBodies[i].stm[j] = xInteg[starti + 6 + j];
+            }
+        }
         starti += 2*propSim->integBodies[i].n2Derivs;
     }
     double xSpice[9];
@@ -95,17 +100,21 @@ void force_newton(const propSimulation *propSim, std::vector<real> &accInteg) {
                 const real dy = y - bodyj->pos[1];
                 const real dz = z - bodyj->pos[2];
                 const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                const real rRel3 = rRel * rRel * rRel;
-                accInteg[3 * i + 0] -= G * massj * dx / rRel3;
-                accInteg[3 * i + 1] -= G * massj * dy / rRel3;
-                accInteg[3 * i + 2] -= G * massj * dz / rRel3;
+                const real fac = -G * massj / (rRel * rRel * rRel);
+                accInteg[3 * i + 0] += fac * dx;
+                accInteg[3 * i + 1] += fac * dy;
+                accInteg[3 * i + 2] += fac * dz;
+                if (propSim->integBodies[i].propStm) {
+                    stm_newton(propSim->integBodies[i], G*massj, dx, dy, dz, 3*i+3,
+                               accInteg);
+                }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << G * massj << std::setw(25) << dx << std::setw(25)
                           << dy << std::setw(25) << dz << std::setw(25)
-                          << -G * massj * dx / rRel3 << std::setw(25)
-                          << -G * massj * dy / rRel3 << std::setw(25)
-                          << -G * massj * dz / rRel3 << std::endl;
+                          << fac * dx << std::setw(25)
+                          << fac * dy << std::setw(25)
+                          << fac * dz << std::endl;
                 #endif
             }
         }
@@ -154,18 +163,21 @@ void force_ppn_simple(const propSimulation *propSim,
                 const real dvy = vy - bodyj->vel[1];
                 const real dvz = vz - bodyj->vel[2];
                 const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                const real rRel3 = rRel * rRel * rRel;
                 const real dPosDotVel = dx * dvx + dy * dvy + dz * dvz;
                 const real dVelDotVel = dvx * dvx + dvy * dvy + dvz * dvz;
                 // 1st order PPN approximation, equation 4-61 from Moyer (2003),
                 // https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                const real fac1 = gmOverC2 / rRel3;
+                const real fac1 = gmOverC2 / (rRel * rRel * rRel);
                 const real fac2 =
                     (2 * (beta + gamma) * gm / rRel - gamma * dVelDotVel);
                 const real fac3 = 2 * (1 + gamma) * dPosDotVel;
                 accInteg[3 * i + 0] += fac1 * (fac2 * dx + fac3 * dvx);
                 accInteg[3 * i + 1] += fac1 * (fac2 * dy + fac3 * dvy);
                 accInteg[3 * i + 2] += fac1 * (fac2 * dz + fac3 * dvz);
+                // if (propSim->integBodies[i].propStm) {
+                //     stm_ppn_simple(propSim->integBodies[i], gm, beta, gamma, dx,
+                //                    dy, dz, dvx, dvy, dvz, 3 * i + 3, accInteg);
+                // }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << G * massj << std::setw(25)
@@ -315,6 +327,11 @@ void force_ppn_eih(const propSimulation *propSim, std::vector<real> &accInteg) {
                 axi += term1X + term2X + term3X;
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
+                // if (propSim->integBodies[i].propStm && bodyj->spiceId == 10) {
+                //     stm_ppn_simple(propSim->integBodies[i], muj, beta, gamma,
+                //                    dxij, dyij, dzij, dvxij, dvyij, dvzij,
+                //                    3 * i + 3, accInteg);
+                // }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << term1X + term2X + term3X << std::setw(25)
@@ -435,8 +452,7 @@ void force_nongrav(const propSimulation *propSim, std::vector<real> &accInteg) {
                 const real k = propSim->integBodies[i].ngParams.k;
                 const real m = propSim->integBodies[i].ngParams.m;
                 const real n = propSim->integBodies[i].ngParams.n;
-                const real r0 = propSim->integBodies[i].ngParams.r0_au *
-                    1.495978707e11 / propSim->consts.du2m;
+                const real r0 = propSim->integBodies[i].ngParams.r0_au;
                 const real dx = x - bodyj->pos[0];
                 const real dy = y - bodyj->pos[1];
                 const real dz = z - bodyj->pos[2];
@@ -472,6 +488,12 @@ void force_nongrav(const propSimulation *propSim, std::vector<real> &accInteg) {
                     g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
                 accInteg[3 * i + 2] +=
                     g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
+                if (propSim->integBodies[i].propStm) {
+                    stm_nongrav(propSim->integBodies[i], g,
+                                propSim->integBodies[i].ngParams, dx, dy, dz,
+                                dvx, dvy, dvz, dpos, hRelVec, 3 * i + 3,
+                                accInteg);
+                }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])

@@ -32,6 +32,7 @@ const real cMat[8][8] = {
     {-0.12432012432012432012432013849038719237133940238163e-2, 0.39160839160839160839160841227582657239289159887563e-1, -0.39160839160839160839160841545895262429018228668896e0, 0.17948717948717948717948719027866738711862551337629e1, -0.43076923076923076923076925231853900723503338586335e1, 0.56000000000000000000000001961129300233768803845526e1, -0.37333333333333333333333334e1, 1}
     };
 
+real get_initial_timestep(propSimulation *propSim);
 void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const std::vector<real> &accInteg0, const real &dt,
                         const real &h, const std::vector<std::vector<real>> &b,
@@ -51,7 +52,6 @@ void refine_b(std::vector<std::vector<real> > &b, real *e, const real &dtRatio,
 void check_and_apply_events(propSimulation *propSim, const real &t,
                             real &tNextEvent, size_t &nextEventIdx,
                             std::vector<real> &xInteg);
-static real root7(real num);
 void gr15(propSimulation *propSim);
 
 #endif

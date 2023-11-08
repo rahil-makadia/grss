@@ -286,6 +286,24 @@ void mat3_inv(const std::vector<std::vector<real>> &A,
     Ainv[2][2] = (A[0][0] * A[1][1] - A[0][1] * A[1][0]) / det;
 }
 
+void mat3_mat3_mul(const real *A, const real *B, real *prod){
+    prod[0] = A[0]*B[0] + A[1]*B[3] + A[2]*B[6];
+    prod[1] = A[0]*B[1] + A[1]*B[4] + A[2]*B[7];
+    prod[2] = A[0]*B[2] + A[1]*B[5] + A[2]*B[8];
+    prod[3] = A[3]*B[0] + A[4]*B[3] + A[5]*B[6];
+    prod[4] = A[3]*B[1] + A[4]*B[4] + A[5]*B[7];
+    prod[5] = A[3]*B[2] + A[4]*B[5] + A[5]*B[8];
+    prod[6] = A[6]*B[0] + A[7]*B[3] + A[8]*B[6];
+    prod[7] = A[6]*B[1] + A[7]*B[4] + A[8]*B[7];
+    prod[8] = A[6]*B[2] + A[7]*B[5] + A[8]*B[8];
+}
+
+void mat3_mat3_add(const real *A, const real *B, real *sum){
+    for (size_t i = 0; i < 9; i++){
+        sum[i] = A[i] + B[i];
+    }
+}
+
 void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][0] = 1;
     R[0][1] = 0;
