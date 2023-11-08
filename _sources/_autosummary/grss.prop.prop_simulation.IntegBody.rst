@@ -17,6 +17,7 @@ grss.prop.prop\_simulation.IntegBody
     .. autosummary::
     
         ~IntegBody.__init__
+        ~IntegBody.prepare_stm
         ~IntegBody.set_J2
     
     

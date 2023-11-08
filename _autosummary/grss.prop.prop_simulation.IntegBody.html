@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_simulation.IntegBody &#8212; GRSS 1.2.0 documentation</title>
+    <title>grss.prop.prop_simulation.IntegBody &#8212; GRSS 1.2.1 documentation</title>
   
   
   
@@ -148,7 +148,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v1.2.0 documentation</p>
+    <p class="title logo__title">GRSS v1.2.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -467,6 +467,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.ngParams"><code class="docutils literal notranslate"><span class="pre">IntegBody.ngParams</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.poleDec"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleDec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.poleRA"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleRA</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.prepare_stm"><code class="docutils literal notranslate"><span class="pre">IntegBody.prepare_stm()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.propStm"><code class="docutils literal notranslate"><span class="pre">IntegBody.propStm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
@@ -550,7 +551,10 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.__init__" title="grss.prop.prop_simulation.IntegBody.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.set_J2" title="grss.prop.prop_simulation.IntegBody.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, poleRA, poleDec)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.prepare_stm" title="grss.prop.prop_simulation.IntegBody.prepare_stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_stm</span></code></a>(self)</p></td>
+<td><p>Prepare the state transition matrix of the body for propagation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.set_J2" title="grss.prop.prop_simulation.IntegBody.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, poleRA, poleDec)</p></td>
 <td><p>Set the J2 parameter of the body.</p></td>
 </tr>
 </tbody>
@@ -707,6 +711,12 @@ document.write(`
 <dd><p>Right ascension of the pole of the body.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.prepare_stm">
+<span class="sig-name descname"><span class="pre">prepare_stm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody" title="grss.prop.prop_simulation.IntegBody"><span class="pre">grss.prop.prop_simulation.IntegBody</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.prepare_stm" title="Permalink to this definition">#</a></dt>
+<dd><p>Prepare the state transition matrix of the body for propagation.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.propStm">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propStm</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.propStm" title="Permalink to this definition">#</a></dt>
@@ -817,6 +827,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.ngParams"><code class="docutils literal notranslate"><span class="pre">IntegBody.ngParams</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.poleDec"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleDec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.poleRA"><code class="docutils literal notranslate"><span class="pre">IntegBody.poleRA</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.prepare_stm"><code class="docutils literal notranslate"><span class="pre">IntegBody.prepare_stm()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.propStm"><code class="docutils literal notranslate"><span class="pre">IntegBody.propStm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
