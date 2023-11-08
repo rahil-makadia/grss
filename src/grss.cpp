@@ -465,6 +465,9 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("n2Derivs", &IntegBody::n2Derivs, R"mydelimiter(
             Number of second derivatives of the body.
+            )mydelimiter")
+        .def("prepare_stm", &IntegBody::prepare_stm, R"mydelimiter(
+            Prepare the state transition matrix of the body for propagation.
             )mydelimiter");
 
     py::class_<Event>(m, "Event", R"mydelimiter(

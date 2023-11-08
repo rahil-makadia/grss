@@ -164,15 +164,13 @@ void stm_newton(const IntegBody &bodyi, const real &gm, const real &dx,
     delete[] Ddot;
 }
 
-void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &beta,
-                    const real &gamma, const real &dx, const real &dy,
-                    const real &dz, const real &dvx, const real &dvy,
-                    const real &dvz, const size_t &stmStarti,
+void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &c,
+                    const real &beta, const real &gamma, const real &dx,
+                    const real &dy, const real &dz, const real &dvx,
+                    const real &dvy, const real &dvz, const size_t &stmStarti,
                     std::vector<real> &accInteg) {
-    throw std::runtime_error("stm_ppn_simple: NOT IMPLEMENTED YET (NEXT IN LINE THOUGH, STAY TUNED)");
     real *dfdpos = new real[9];
     real *dfdvel = new real[9];
-    memset(dfdvel, 0, 9 * sizeof(real));
     const size_t numParams = (bodyi.stm.size() - 36) / 6;
     real *dfdpar = new real[3 * numParams];
     memset(dfdpar, 0, 3 * numParams * sizeof(real));
@@ -185,11 +183,43 @@ void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &beta,
     real *Ddot = new real[3 * numParams];
     bcd_and_dot(bodyi.stm, B, Bdot, C, Cdot, D, Ddot);
 
+    const real c2 = c * c;
     const real r = sqrt(dx * dx + dy * dy + dz * dz);
     const real r3 = r * r * r;
     const real r5 = r3 * r * r;
 
+    const real rDotV = dx * dvx + dy * dvy + dz * dvz;
     const real v2 = dvx * dvx + dvy * dvy + dvz * dvz;
+
+    const real fac1 = gm / (c2 * r3);
+    const real dfac1dr = -3 * gm / (c2 * r3 * r);
+    const real fac2 =
+        (2 * (beta + gamma) * gm / r - gamma * v2);
+    const real dfac2dr = -2 * (beta + gamma) * gm / (r * r);
+    const real fac3 = 2 * (1 + gamma) * rDotV;
+
+    dfdpos[0] = dfac1dr*dx/r * (fac2*dx + fac3*dvx) + fac1*(fac2 + dfac2dr*dx*dx/r + 2*(1+gamma)*dvx*dvx);
+    dfdpos[1] = dfac1dr*dy/r * (fac2*dx + fac3*dvx) + fac1*(dfac2dr*dx*dy/r + 2*(1+gamma)*dvx*dvy);
+    dfdpos[2] = dfac1dr*dz/r * (fac2*dx + fac3*dvx) + fac1*(dfac2dr*dx*dz/r + 2*(1+gamma)*dvx*dvz);
+    dfdpos[3] = dfac1dr*dx/r * (fac2*dy + fac3*dvy) + fac1*(dfac2dr*dy*dx/r + 2*(1+gamma)*dvy*dvx);
+    dfdpos[4] = dfac1dr*dy/r * (fac2*dy + fac3*dvy) + fac1*(fac2 + dfac2dr*dy*dy/r + 2*(1+gamma)*dvy*dvy);
+    dfdpos[5] = dfac1dr*dz/r * (fac2*dy + fac3*dvy) + fac1*(dfac2dr*dy*dz/r + 2*(1+gamma)*dvy*dvz);
+    dfdpos[6] = dfac1dr*dx/r * (fac2*dz + fac3*dvz) + fac1*(dfac2dr*dz*dx/r + 2*(1+gamma)*dvz*dvx);
+    dfdpos[7] = dfac1dr*dy/r * (fac2*dz + fac3*dvz) + fac1*(dfac2dr*dz*dy/r + 2*(1+gamma)*dvz*dvy);
+    dfdpos[8] = dfac1dr*dz/r * (fac2*dz + fac3*dvz) + fac1*(fac2 + dfac2dr*dz*dz/r + 2*(1+gamma)*dvz*dvz);
+
+    dfdvel[0] = fac1*(-2*gamma*dvx*dx + fac3 + 2*(1+gamma)*dx*dvx);
+    dfdvel[1] = fac1*(-2*gamma*dvy*dx + 2*(1+gamma)*dy*dvx);
+    dfdvel[2] = fac1*(-2*gamma*dvz*dx + 2*(1+gamma)*dz*dvx);
+    dfdvel[3] = fac1*(-2*gamma*dvx*dy + 2*(1+gamma)*dx*dvy);
+    dfdvel[4] = fac1*(-2*gamma*dvy*dy + fac3 + 2*(1+gamma)*dy*dvy);
+    dfdvel[5] = fac1*(-2*gamma*dvz*dy + 2*(1+gamma)*dz*dvy);
+    dfdvel[6] = fac1*(-2*gamma*dvx*dz + 2*(1+gamma)*dx*dvz);
+    dfdvel[7] = fac1*(-2*gamma*dvy*dz + 2*(1+gamma)*dy*dvz);
+    dfdvel[8] = fac1*(-2*gamma*dvz*dz + fac3 + 2*(1+gamma)*dz*dvz);
+
+    bcd_2dot(B, Bdot, C, Cdot, D, Ddot, dfdpos, dfdvel, dfdpar, numParams,
+             stmStarti, accInteg);
 
     delete[] dfdpos;
     delete[] dfdvel;
@@ -212,10 +242,8 @@ void stm_nongrav(const IntegBody &bodyi, const real &g,
     // that gets passed into the STM functions
     real *dfdpos = new real[9];
     real *dfdvel = new real[9];
-    memset(dfdvel, 0, 9 * sizeof(real));
     const size_t numParams = (bodyi.stm.size() - 36) / 6;
     real *dfdpar = new real[3 * numParams];
-    memset(dfdpar, 0, 3 * numParams * sizeof(real));
 
     real *B = new real[9];
     real *Bdot = new real[9];

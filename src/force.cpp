@@ -155,7 +155,6 @@ void force_ppn_simple(const propSimulation *propSim,
             const real massj = bodyj->mass;
             if (i != j && massj != 0.0 && bodyj->spiceId == 10) {
                 const real gm = G * massj;
-                const real gmOverC2 = gm / c2;
                 const real dx = x - bodyj->pos[0];
                 const real dy = y - bodyj->pos[1];
                 const real dz = z - bodyj->pos[2];
@@ -167,17 +166,17 @@ void force_ppn_simple(const propSimulation *propSim,
                 const real dVelDotVel = dvx * dvx + dvy * dvy + dvz * dvz;
                 // 1st order PPN approximation, equation 4-61 from Moyer (2003),
                 // https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                const real fac1 = gmOverC2 / (rRel * rRel * rRel);
+                const real fac1 = gm / (c2 * rRel * rRel * rRel);
                 const real fac2 =
                     (2 * (beta + gamma) * gm / rRel - gamma * dVelDotVel);
                 const real fac3 = 2 * (1 + gamma) * dPosDotVel;
                 accInteg[3 * i + 0] += fac1 * (fac2 * dx + fac3 * dvx);
                 accInteg[3 * i + 1] += fac1 * (fac2 * dy + fac3 * dvy);
                 accInteg[3 * i + 2] += fac1 * (fac2 * dz + fac3 * dvz);
-                // if (propSim->integBodies[i].propStm) {
-                //     stm_ppn_simple(propSim->integBodies[i], gm, beta, gamma, dx,
-                //                    dy, dz, dvx, dvy, dvz, 3 * i + 3, accInteg);
-                // }
+                if (propSim->integBodies[i].propStm) {
+                    stm_ppn_simple(propSim->integBodies[i], gm, c, beta, gamma, dx,
+                                   dy, dz, dvx, dvy, dvz, 3 * i + 3, accInteg);
+                }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << G * massj << std::setw(25)
@@ -206,8 +205,8 @@ void force_ppn_eih(const propSimulation *propSim, std::vector<real> &accInteg) {
     forceFile.open("cpp.11", std::ios::app);
     #endif
     const real G = propSim->consts.G;
-    const real c2 = propSim->consts.clight * propSim->consts.clight;
-    const real oneOverC2 = 1.0 / c2;
+    const real c = propSim->consts.clight;
+    const real oneOverC2 = 1.0 / (c * c);
     const real beta = 1.0;
     const real gamma = 1.0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
@@ -245,12 +244,9 @@ void force_ppn_eih(const propSimulation *propSim, std::vector<real> &accInteg) {
                 const real rRelij =
                     sqrt(dxij * dxij + dyij * dyij + dzij * dzij);
                 const real rRelij3 = rRelij * rRelij * rRelij;
-                const real viDotVi = vxi * vxi + vyi * vyi + vzi * vzi;
-                const real term1c = viDotVi * oneOverC2;
-                const real vjDotVj = vxj * vxj + vyj * vyj + vzj * vzj;
-                const real term1d = vjDotVj * oneOverC2;
-                const real viDotVj = vxi * vxj + vyi * vyj + vzi * vzj;
-                const real term1e = viDotVj;
+                const real term1c = (vxi * vxi + vyi * vyi + vzi * vzi) * oneOverC2;
+                const real term1d = (vxj * vxj + vyj * vyj + vzj * vzj) * oneOverC2;
+                const real term1e = vxi * vxj + vyi * vyj + vzi * vzj;
                 const real rijDotVj = dxij * vxj + dyij * vyj + dzij * vzj;
                 const real term1f = rijDotVj * rijDotVj / (rRelij * rRelij);
                 real term1a = 0.0;
@@ -327,11 +323,11 @@ void force_ppn_eih(const propSimulation *propSim, std::vector<real> &accInteg) {
                 axi += term1X + term2X + term3X;
                 ayi += term1Y + term2Y + term3Y;
                 azi += term1Z + term2Z + term3Z;
-                // if (propSim->integBodies[i].propStm && bodyj->spiceId == 10) {
-                //     stm_ppn_simple(propSim->integBodies[i], muj, beta, gamma,
-                //                    dxij, dyij, dzij, dvxij, dvyij, dvzij,
-                //                    3 * i + 3, accInteg);
-                // }
+                if (propSim->integBodies[i].propStm && bodyj->spiceId == 10) {
+                    stm_ppn_simple(propSim->integBodies[i], muj, c, beta, gamma,
+                                   dxij, dyij, dzij, dvxij, dvyij, dvzij,
+                                   3 * i + 3, accInteg);
+                }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << term1X + term2X + term3X << std::setw(25)
