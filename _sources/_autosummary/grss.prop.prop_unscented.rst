@@ -9,16 +9,17 @@ grss.prop.prop\_unscented
 
     
     
-    .. rubric:: Functions
+    
+
+    
+    
+    .. rubric:: Classes
 
     .. autosummary::
         :toctree:
+        :template: custom-class.rst
     
-        generate_sigma_points
-    
-    
-
-    
+        SigmaPoints
     
     
 

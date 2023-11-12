@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_unscented.generate_sigma_points &#8212; GRSS 1.2.1 documentation</title>
+    <title>grss.prop.prop_unscented.SigmaPoints &#8212; GRSS 1.2.1 documentation</title>
   
   
   
@@ -55,14 +55,14 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop.prop_unscented.generate_sigma_points';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop.prop_unscented.SigmaPoints';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.prop.prop_utils" href="grss.prop.prop_utils.html" />
     <link rel="prev" title="grss.prop.prop_unscented" href="grss.prop.prop_unscented.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 08, 2023"/>
+    <meta name="docbuild:last-update" content="Nov 12, 2023"/>
   </head>
   
   
@@ -234,7 +234,7 @@
 </ul>
 </li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.prop.prop_unscented.html">grss.prop.prop_unscented</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.prop.prop_unscented.generate_sigma_points</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.prop.prop_unscented.SigmaPoints</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_utils.html">grss.prop.prop_utils</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -328,7 +328,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop.prop_unscented.generate_sigma_points.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop.prop_unscented.SigmaPoints.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -358,7 +358,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.prop.prop_unscented.generate_sigma_points.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.prop.prop_unscented.SigmaPoints.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -440,7 +440,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.prop.prop_unscented.generate_sigma_points</h1>
+    <h1>grss.prop.prop_unscented.SigmaPoints</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -450,7 +450,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.generate_sigma_points"><code class="docutils literal notranslate"><span class="pre">generate_sigma_points()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.SigmaPoints"><code class="docutils literal notranslate"><span class="pre">SigmaPoints</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.SigmaPoints.__init__"><code class="docutils literal notranslate"><span class="pre">SigmaPoints.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct"><code class="docutils literal notranslate"><span class="pre">SigmaPoints.reconstruct()</span></code></a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -462,27 +466,60 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="grss-prop-prop-unscented-generate-sigma-points">
-<h1>grss.prop.prop_unscented.generate_sigma_points<a class="headerlink" href="#grss-prop-prop-unscented-generate-sigma-points" title="Permalink to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="grss.prop.prop_unscented.generate_sigma_points">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_unscented.</span></span><span class="sig-name descname"><span class="pre">generate_sigma_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_unscented.generate_sigma_points" title="Permalink to this definition">#</a></dt>
-<dd><p>Generate sigma points for propagating uncertainties using the unscented
-transformation.</p>
+  <section id="grss-prop-prop-unscented-sigmapoints">
+<h1>grss.prop.prop_unscented.SigmaPoints<a class="headerlink" href="#grss-prop-prop-unscented-sigmapoints" title="Permalink to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="grss.prop.prop_unscented.SigmaPoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.prop.prop_unscented.</span></span><span class="sig-name descname"><span class="pre">SigmaPoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_unscented.SigmaPoints" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class for representing sigma points for the unscented transformation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop.prop_unscented.SigmaPoints.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sp_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_unscented.SigmaPoints.__init__" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize a sigma point object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sol</strong> (<em>dict</em>) – solution dictionary from the SBDB API</p></li>
-<li><p><strong>cov</strong> (<em>numpy.ndarray</em>) – covariance matrix of the solution</p></li>
+<li><p><strong>x_dict</strong> (<em>dict</em>) – solution dictionary containing cometary/cartesian elements</p></li>
+<li><p><strong>P</strong> (<em>numpy.ndarray</em>) – covariance matrix of the solution</p></li>
+<li><p><strong>type</strong> (<em>str</em>) – type of sigma point. Choose from merwe or julier</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – scaling parameter for sigma points</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – scaling parameter for sigma points</p></li>
+<li><p><strong>kappa</strong> (<em>float</em>) – scaling parameter for sigma points</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>sigma_points</strong> – list of dictionaries containing each of the sigma points</p>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_unscented.SigmaPoints.__init__" title="grss.prop.prop_unscented.SigmaPoints.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_dict, cov, sp_type[, alpha, ...])</p></td>
+<td><p>Initialize a sigma point object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct" title="grss.prop.prop_unscented.SigmaPoints.reconstruct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruct</span></code></a>(tr_sigma_points)</p></td>
+<td><p>Reconstruct the mean and covariance from transformed sigma points.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop.prop_unscented.SigmaPoints.reconstruct">
+<span class="sig-name descname"><span class="pre">reconstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tr_sigma_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct" title="Permalink to this definition">#</a></dt>
+<dd><p>Reconstruct the mean and covariance from transformed sigma points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tr_sigma_points</strong> (<em>np.ndarray</em>) – transformed sigma points</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>new_x</strong> (<em>np.ndarray</em>) – reconstructed mean</p></li>
+<li><p><strong>new_cov</strong> (<em>np.ndarray</em>) – reconstructed covariance</p></li>
+</ul>
+</p>
 </dd>
 </dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -531,7 +568,11 @@ transformation.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.generate_sigma_points"><code class="docutils literal notranslate"><span class="pre">generate_sigma_points()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.SigmaPoints"><code class="docutils literal notranslate"><span class="pre">SigmaPoints</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.SigmaPoints.__init__"><code class="docutils literal notranslate"><span class="pre">SigmaPoints.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct"><code class="docutils literal notranslate"><span class="pre">SigmaPoints.reconstruct()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -564,7 +605,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 08, 2023.
+  Last updated on Nov 12, 2023.
   <br/>
 </p>
   </div>
