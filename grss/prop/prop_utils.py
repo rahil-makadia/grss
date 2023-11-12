@@ -227,7 +227,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     plt.show()
     return None
 
-def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellipse_params):
+def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellipse_params, units):
     """
     Convert two sets of points to an ellipse.
 
@@ -245,6 +245,8 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellip
         type of B-plane
     print_ellipse_params : bool, optional
         True to print the ellipse parameters, False to not print
+    units : str
+        units of the plot
 
     Returns
     -------
@@ -267,8 +269,8 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellip
     sma = np.sqrt(eigvals[0]) * n_std
     smi = np.sqrt(eigvals[1]) * n_std
     if print_ellipse_params:
-        print(f'{bplane_type} ellipse sma: {sma/n_std} km')
-        print(f'{bplane_type} ellipse smi: {smi/n_std} km')
+        print(f'{bplane_type} ellipse sma: {sma/n_std} {units}')
+        print(f'{bplane_type} ellipse smi: {smi/n_std} {units}')
         print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')
     theta_arr = np.linspace(0, 2*np.pi, 100)
     ellipse = np.array([sma*np.cos(theta_arr), smi*np.sin(theta_arr)])
@@ -342,6 +344,13 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         print("No close approaches found")
         return None
     au2units = 149597870.7 if units_km else 1.0
+    body_id = ca_list[0].centralBodySpiceId
+    central_body_radius, units = get_scale_factor(body_id)
+    if not scale_coords:
+        units = "km"
+    if not units_km:
+        central_body_radius /= 149597870.7
+        units = "AU"
     times = np.array([approach.tCA for approach in ca_list])
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
@@ -354,20 +363,13 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     mtp_y = np.array([approach.mtp.y*au2units for approach in ca_list])
     focus_factor = np.mean([approach.gravFocusFactor for approach in ca_list])
     kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
-                                        'kizner', print_ellipse_params)
+                                        'kizner', print_ellipse_params, units)
     opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
-                                        'opik', print_ellipse_params)
+                                        'opik', print_ellipse_params, units)
     scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
-                                        'scaled', print_ellipse_params)
+                                        'scaled', print_ellipse_params, units)
     mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
-                                        'mtp', print_ellipse_params)
-    body_id = ca_list[0].centralBodySpiceId
-    central_body_radius, units = get_scale_factor(body_id)
-    if not scale_coords:
-        units = "km"
-    if not units_km:
-        central_body_radius /= 149597870.7
-        units = "AU"
+                                        'mtp', print_ellipse_params, units)
     t_mean = np.mean(times)
     t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
     t_map_mean = Time(np.mean(map_times), format='mjd', scale='tdb').tdb.iso
