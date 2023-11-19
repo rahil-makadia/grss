@@ -18,6 +18,7 @@ grss.prop.prop\_simulation.CloseApproachParameters
     
         ~CloseApproachParameters.__init__
         ~CloseApproachParameters.get_ca_parameters
+        ~CloseApproachParameters.print_summary
     
     
 

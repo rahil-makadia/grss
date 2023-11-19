@@ -464,6 +464,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.kizner"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.kizner</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.mtp"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.mtp</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.opik"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.opik</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.print_summary"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.print_summary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.scaled"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.scaled</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.tCA"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.tCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.tLin"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.tLin</span></code></a></li>
@@ -507,6 +508,9 @@ the close approach between two integrated bodies.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.CloseApproachParameters.get_ca_parameters" title="grss.prop.prop_simulation.CloseApproachParameters.get_ca_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ca_parameters</span></code></a>(self, propSim, tMap)</p></td>
 <td><p>Calculate the close approach parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.CloseApproachParameters.print_summary" title="grss.prop.prop_simulation.CloseApproachParameters.print_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_summary</span></code></a>(self[, prec])</p></td>
+<td><p>Print a summary of the close approach parameters.</p></td>
 </tr>
 </tbody>
 </table>
@@ -661,6 +665,23 @@ the close approach between two integrated bodies.</p>
 <dd><p>Öpik B-plane parameters of the close approach.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.CloseApproachParameters.print_summary">
+<span class="sig-name descname"><span class="pre">print_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop.prop_simulation.CloseApproachParameters" title="grss.prop.prop_simulation.CloseApproachParameters"><span class="pre">grss.prop.prop_simulation.CloseApproachParameters</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">prec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop.prop_simulation.CloseApproachParameters.print_summary" title="Permalink to this definition">#</a></dt>
+<dd><p>Print a summary of the close approach parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>prec</strong> (<em>int</em><em>, </em><em>optional</em>) – Precision of the printed values, by default 8.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NoneType</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.CloseApproachParameters.scaled">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scaled</span></span><a class="headerlink" href="#grss.prop.prop_simulation.CloseApproachParameters.scaled" title="Permalink to this definition">#</a></dt>
@@ -777,6 +798,7 @@ the close approach between two integrated bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.kizner"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.kizner</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.mtp"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.mtp</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.opik"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.opik</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.print_summary"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.print_summary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.scaled"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.scaled</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.tCA"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.tCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.CloseApproachParameters.tLin"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.tLin</span></code></a></li>
