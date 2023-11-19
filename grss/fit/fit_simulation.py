@@ -598,8 +598,9 @@ class FitSimulation:
         self.fixed_propsim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0,
                                         'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0,
                                         'r0_au': 1.0, 'radius': radius, 'mass': 0.0}
-        for key in nongrav_info:
-            self.fixed_propsim_params[key] = nongrav_info[key]
+        if nongrav_info is not None:
+            for key in nongrav_info:
+                self.fixed_propsim_params[key] = nongrav_info[key]
         if events is not None:
             self.fixed_propsim_params['events'] = events
             self.fit_events = True
@@ -607,7 +608,7 @@ class FitSimulation:
             self.fixed_propsim_params['events'] = []
             self.fit_events = False
         self.reject_outliers = True
-        self.residual_chi_squared = None
+        self.residual_chi_squared = [None]*len(self.obs_array)
         self.converged = False
         return None
 

@@ -390,9 +390,6 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
     patches, labels = axes[0,0].get_legend_handles_labels()
-    if not show_central_body:
-        patches = patches[:-2]
-        labels = labels[:-2]
     fig.legend(patches, labels, loc='upper center', ncol=4,
                 bbox_to_anchor=(0.5, 1.023), fontsize=10)
     fig.tight_layout()
@@ -539,9 +536,6 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     if show_central_body:
         axis.add_patch(circle)
         axis.add_patch(circle2)
-    else:
-        axis.add_artist(circle)
-        axis.add_artist(circle2)
     if equal_axis:
         axis.axis('equal')
     return axis
