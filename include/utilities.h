@@ -140,6 +140,7 @@ class CloseApproachParameters {
     BPlaneParameters scaled;
     BPlaneParameters mtp;
     void get_ca_parameters(propSimulation *propSim, const real &tMap);
+    void print_summary(int prec=8);
 };
 
 void jd_to_mjd(const real jd, real &mjd);

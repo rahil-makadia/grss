@@ -253,6 +253,20 @@ PYBIND11_MODULE(prop_simulation, m) {
             -------
             None : NoneType
                 None.
+            )mydelimiter")
+        .def("print_summary", &CloseApproachParameters::print_summary,
+            py::arg("prec") = 8, R"mydelimiter(
+            Print a summary of the close approach parameters.
+
+            Parameters
+            ----------
+            prec : int, optional
+                Precision of the printed values, by default 8.
+
+            Returns
+            -------
+            None : NoneType
+                None.
             )mydelimiter");
 
     m.def(

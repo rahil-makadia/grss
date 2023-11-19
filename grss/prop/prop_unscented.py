@@ -41,7 +41,7 @@ class SigmaPoints:
         self.n = len(self.x)
 
         self.w_m, self.w_c = self._get_weights()
-        self.sigma_points = self._get_points()
+        self.sigma_points, self.diff = self._get_points()
         self.sigma_points_dict = self._get_points_dict()
         return None
 
@@ -86,13 +86,16 @@ class SigmaPoints:
             raise ValueError("Invalid sigma point type")
         sqrt_cov = np.linalg.cholesky(fac * self.cov)
         sigma_points = np.zeros((2 * self.n + 1, self.n))
+        diff = np.zeros((2 * self.n + 1, self.n))
         sigma_points[0] = self.x
         for i in range(self.n):
             plus = self.x + sqrt_cov.T[i]
             minus = self.x - sqrt_cov.T[i]
             sigma_points[i + 1] = plus
+            diff[i + 1] = sqrt_cov.T[i]
             sigma_points[i + 1 + self.n] = minus
-        return sigma_points
+            diff[i + 1 + self.n] = -sqrt_cov.T[i]
+        return sigma_points, diff
 
     def _get_points_dict(self):
         dict_list = [None] * (2 * self.n + 1)
