@@ -28,35 +28,35 @@ void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const size_t starti, const size_t startb,
                         const size_t &iterStep, std::vector<real> &xIntegNext,
                         std::vector<real> &xIntegCompCoeffs) {
-    for (size_t j = 0; j < iterStep; j++) {
-        real inc0, inc1;
-        if (h == 1.0) {
-            inc0 = 0;
-            real dummy = 0;
-            comp_sum(b[6][startb+j]*dt*dt/72.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(b[5][startb+j]*dt*dt/56.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(b[4][startb+j]*dt*dt/42.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(b[3][startb+j]*dt*dt/30.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(b[2][startb+j]*dt*dt/20.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(b[1][startb+j]*dt*dt/12.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(b[0][startb+j]*dt*dt/6.0 , &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(accInteg0[startb+j]*dt*dt/2.0, &inc0, &(xIntegCompCoeffs[starti+j]));
-            comp_sum(xInteg0[starti+j+iterStep]*dt, &inc0, &(xIntegCompCoeffs[starti+j]));
-            inc1 = 0;
-            comp_sum(b[6][startb+j]*dt/8.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(b[5][startb+j]*dt/7.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(b[4][startb+j]*dt/6.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(b[3][startb+j]*dt/5.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(b[2][startb+j]*dt/4.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(b[1][startb+j]*dt/3.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(b[0][startb+j]*dt/2.0, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-            comp_sum(accInteg0[startb+j]*dt, &inc1, &(xIntegCompCoeffs[starti+j+iterStep]));
-        } else {
-            inc0 = ((((((((b[6][startb+j]*7.*h/9. + b[5][startb+j])*3.*h/4. + b[4][startb+j])*5.*h/7. + b[3][startb+j])*2.*h/3. + b[2][startb+j])*3.*h/5. + b[1][startb+j])*h/2.    + b[0][startb+j])*h/3. + accInteg0[startb+j])*dt*h/2. + xInteg0[starti+j+iterStep])*dt*h;;
-            inc1 = (((((((b[6][startb+j]*7.*h/8.  + b[5][startb+j])*6.*h/7. + b[4][startb+j])*5.*h/6. + b[3][startb+j])*4.*h/5. + b[2][startb+j])*3.*h/4. + b[1][startb+j])*2.*h/3. + b[0][startb+j])*h/2. + accInteg0[startb+j])*dt*h;
+    if (h == 1.0) {
+        for (size_t j = 0; j < iterStep; j++) {
+            xIntegNext[starti+j]          = xInteg0[starti+j];
+            xIntegNext[starti+j+iterStep] = xInteg0[starti+j+iterStep];
+            comp_sum(b[6][startb+j]*dt*dt/72.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[5][startb+j]*dt*dt/56.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[4][startb+j]*dt*dt/42.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[3][startb+j]*dt*dt/30.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[2][startb+j]*dt*dt/20.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[1][startb+j]*dt*dt/12.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[0][startb+j]*dt*dt/6.0 , &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(accInteg0[startb+j]*dt*dt/2.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(xInteg0[starti+j+iterStep]*dt, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[6][startb+j]*dt/8.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[5][startb+j]*dt/7.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[4][startb+j]*dt/6.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[3][startb+j]*dt/5.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[2][startb+j]*dt/4.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[1][startb+j]*dt/3.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[0][startb+j]*dt/2.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(accInteg0[startb+j]*dt, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
         }
-        xIntegNext[starti+j]          = xInteg0[starti+j] + inc0 - xIntegCompCoeffs[starti+j];
-        xIntegNext[starti+j+iterStep] = xInteg0[starti+j+iterStep] + inc1 - xIntegCompCoeffs[starti+j+iterStep];
+    } else {
+        for (size_t j = 0; j < iterStep; j++) {
+            const real inc0 = ((((((((b[6][startb+j]*7.*h/9. + b[5][startb+j])*3.*h/4. + b[4][startb+j])*5.*h/7. + b[3][startb+j])*2.*h/3. + b[2][startb+j])*3.*h/5. + b[1][startb+j])*h/2.    + b[0][startb+j])*h/3. + accInteg0[startb+j])*dt*h/2. + xInteg0[starti+j+iterStep])*dt*h;;
+            const real inc1 = (((((((b[6][startb+j]*7.*h/8.  + b[5][startb+j])*6.*h/7. + b[4][startb+j])*5.*h/6. + b[3][startb+j])*4.*h/5. + b[2][startb+j])*3.*h/4. + b[1][startb+j])*2.*h/3. + b[0][startb+j])*h/2. + accInteg0[startb+j])*dt*h;
+            xIntegNext[starti+j]          = xInteg0[starti+j] + inc0 - xIntegCompCoeffs[starti+j];
+            xIntegNext[starti+j+iterStep] = xInteg0[starti+j+iterStep] + inc1 - xIntegCompCoeffs[starti+j+iterStep];
+        }
     }
 }
 
@@ -111,9 +111,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             throw std::runtime_error("hIdx cannot be 0");
         case 1:
             for (size_t i = 0; i < dim; i++) {
-                // g[0*dim+i] = (AccIntegArr[1][i] - AccIntegArr[0][i]) * rMat[1][0];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                
                 real dummy = 0;
                 real temp = g[0*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -124,10 +121,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             break;
         case 2:
             for (size_t i = 0; i < dim; i++) {
-                // g[1*dim+i] = ((AccIntegArr[2][i] - AccIntegArr[0][i]) * rMat[2][0] - g[0*dim+i]) * rMat[2][1];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                // b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-                
                 real dummy = 0;
                 real temp = g[1*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -140,11 +133,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             break;
         case 3:
             for (size_t i = 0; i < dim; i++) {
-                // g[2*dim+i] = (((AccIntegArr[3][i] - AccIntegArr[0][i]) * rMat[3][0] - g[0*dim+i]) * rMat[3][1] - g[1*dim+i]) * rMat[3][2];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                // b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-                // b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-
                 real dummy = 0;
                 real temp = g[2*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -158,12 +146,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             break;
         case 4:
             for (size_t i = 0; i < dim; i++) {
-                // g[3*dim+i] = ((((AccIntegArr[4][i] - AccIntegArr[0][i]) * rMat[4][0] - g[0*dim+i]) * rMat[4][1] - g[1*dim+i]) * rMat[4][2] - g[2*dim+i]) * rMat[4][3];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                // b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-                // b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-                // b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-
                 real dummy = 0;
                 real temp = g[3*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -178,13 +160,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             break;
         case 5:
             for (size_t i = 0; i < dim; i++) {
-                // g[4*dim+i] = (((((AccIntegArr[5][i] - AccIntegArr[0][i]) * rMat[5][0] - g[0*dim+i]) * rMat[5][1] - g[1*dim+i]) * rMat[5][2] - g[2*dim+i]) * rMat[5][3] - g[3*dim+i]) * rMat[5][4];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                // b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-                // b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-                // b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-                // b[4][i] =                                                                                               + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
-
                 real dummy = 0;
                 real temp = g[4*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -200,14 +175,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             break;
         case 6:
             for (size_t i = 0; i < dim; i++) {
-                // g[5*dim+i] = ((((((AccIntegArr[6][i] - AccIntegArr[0][i]) * rMat[6][0] - g[0*dim+i]) * rMat[6][1] - g[1*dim+i]) * rMat[6][2] - g[2*dim+i]) * rMat[6][3] - g[3*dim+i]) * rMat[6][4] - g[4*dim+i]) * rMat[6][5];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                // b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-                // b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-                // b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-                // b[4][i] =                                                                                               + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
-                // b[5][i] =                                                                                                                       + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
-
                 real dummy = 0;
                 real temp = g[5*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -224,15 +191,6 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
             break;
         case 7:
             for (size_t i = 0; i < dim; i++) {
-                // g[6*dim+i] = (((((((AccIntegArr[7][i] - AccIntegArr[0][i]) * rMat[7][0] - g[0*dim+i]) * rMat[7][1] - g[1*dim+i]) * rMat[7][2] - g[2*dim+i]) * rMat[7][3] - g[3*dim+i]) * rMat[7][4] - g[4*dim+i]) * rMat[7][5] - g[5*dim+i]) * rMat[7][6];
-                // b[0][i] = cMat[0][0]*g[0*dim+i] + cMat[1][0]*g[1*dim+i] + cMat[2][0]*g[2*dim+i] + cMat[3][0]*g[3*dim+i] + cMat[4][0]*g[4*dim+i] + cMat[5][0]*g[5*dim+i] + cMat[6][0]*g[6*dim+i];
-                // b[1][i] =                       + cMat[1][1]*g[1*dim+i] + cMat[2][1]*g[2*dim+i] + cMat[3][1]*g[3*dim+i] + cMat[4][1]*g[4*dim+i] + cMat[5][1]*g[5*dim+i] + cMat[6][1]*g[6*dim+i];
-                // b[2][i] =                                               + cMat[2][2]*g[2*dim+i] + cMat[3][2]*g[3*dim+i] + cMat[4][2]*g[4*dim+i] + cMat[5][2]*g[5*dim+i] + cMat[6][2]*g[6*dim+i];
-                // b[3][i] =                                                                       + cMat[3][3]*g[3*dim+i] + cMat[4][3]*g[4*dim+i] + cMat[5][3]*g[5*dim+i] + cMat[6][3]*g[6*dim+i];
-                // b[4][i] =                                                                                               + cMat[4][4]*g[4*dim+i] + cMat[5][4]*g[5*dim+i] + cMat[6][4]*g[6*dim+i];
-                // b[5][i] =                                                                                                                       + cMat[5][5]*g[5*dim+i] + cMat[6][5]*g[6*dim+i];
-                // b[6][i] =                                                                                                                                               + cMat[6][6]*g[6*dim+i];
-
                 real dummy = 0;
                 real temp = g[6*dim+i];
                 real gVal = AccIntegArr[hIdx][i];
@@ -427,23 +385,6 @@ void gr15(propSimulation *propSim) {
                 PCerr = b6TildeMax / accIntegArr7Max;
                 bOld = b;
             }
-            // printf("g0[0] = %0.6e, g0[1] = %0.6e, g0[2] = %0.6e\n",g[0], g[1], g[2]);
-            // printf("g1[0] = %0.6e, g1[1] = %0.6e, g1[2] = %0.6e\n",g[3], g[4], g[5]);
-            // printf("g2[0] = %0.6e, g2[1] = %0.6e, g2[2] = %0.6e\n",g[6], g[7], g[8]);
-            // printf("g3[0] = %0.6e, g3[1] = %0.6e, g3[2] = %0.6e\n",g[9], g[10], g[11]);
-            // printf("g4[0] = %0.6e, g4[1] = %0.6e, g4[2] = %0.6e\n",g[12], g[13], g[14]);
-            // printf("g5[0] = %0.6e, g5[1] = %0.6e, g5[2] = %0.6e\n",g[15], g[16], g[17]);
-            // printf("g6[0] = %0.6e, g6[1] = %0.6e, g6[2] = %0.6e\n",g[18], g[19], g[20]);
-            // printf("b0[0] = %0.6e, b0[1] = %0.6e, b0[2] = %0.6e\n",b[0][0], b[0][1], b[0][2]);
-            // printf("b1[0] = %0.6e, b1[1] = %0.6e, b1[2] = %0.6e\n",b[1][0], b[1][1], b[1][2]);
-            // printf("b2[0] = %0.6e, b2[1] = %0.6e, b2[2] = %0.6e\n",b[2][0], b[2][1], b[2][2]);
-            // printf("b3[0] = %0.6e, b3[1] = %0.6e, b3[2] = %0.6e\n",b[3][0], b[3][1], b[3][2]);
-            // printf("b4[0] = %0.6e, b4[1] = %0.6e, b4[2] = %0.6e\n",b[4][0], b[4][1], b[4][2]);
-            // printf("b5[0] = %0.6e, b5[1] = %0.6e, b5[2] = %0.6e\n",b[5][0], b[5][1], b[5][2]);
-            // printf("b6[0] = %0.6e, b6[1] = %0.6e, b6[2] = %0.6e\n",b[6][0], b[6][1], b[6][2]);
-            // printf("ks: %d. osd: %d. t: %0.10e, dt: %0.8e", keepStepping, oneStepDone,t, dt);
-            // printf(". iterations: %zu",PCIter);
-            // printf(". predictor_corrector_error: %e\n",PCerr);
             vabs_max(b[6], b6Max);
             vabs_max(accIntegArr[7], accIntegNextMax);
             relError = b6Max / accIntegNextMax;
@@ -456,7 +397,6 @@ void gr15(propSimulation *propSim) {
             } else {
                 dtReq = dt;
             }
-            // printf(". dtReq: %e. relError: %e", dtReq,relError);
             if (fabs(dtReq) < propSim->integParams.dtMin) {
                 dtReq = copysign(propSim->integParams.dtMin, dtReq);
             }
