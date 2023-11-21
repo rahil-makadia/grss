@@ -253,6 +253,20 @@ PYBIND11_MODULE(prop_simulation, m) {
             -------
             None : NoneType
                 None.
+            )mydelimiter")
+        .def("print_summary", &CloseApproachParameters::print_summary,
+            py::arg("prec") = 8, R"mydelimiter(
+            Print a summary of the close approach parameters.
+
+            Parameters
+            ----------
+            prec : int, optional
+                Precision of the printed values, by default 8.
+
+            Returns
+            -------
+            None : NoneType
+                None.
             )mydelimiter");
 
     m.def(
@@ -465,6 +479,9 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("n2Derivs", &IntegBody::n2Derivs, R"mydelimiter(
             Number of second derivatives of the body.
+            )mydelimiter")
+        .def("prepare_stm", &IntegBody::prepare_stm, R"mydelimiter(
+            Prepare the state transition matrix of the body for propagation.
             )mydelimiter");
 
     py::class_<Event>(m, "Event", R"mydelimiter(

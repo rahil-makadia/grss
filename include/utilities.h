@@ -140,6 +140,7 @@ class CloseApproachParameters {
     BPlaneParameters scaled;
     BPlaneParameters mtp;
     void get_ca_parameters(propSimulation *propSim, const real &tMap);
+    void print_summary(int prec=8);
 };
 
 void jd_to_mjd(const real jd, real &mjd);
@@ -193,6 +194,8 @@ void mat_mat_mul(const std::vector<std::vector<real>> &A,
                  std::vector<std::vector<real>> &AB);
 void mat3_inv(const std::vector<std::vector<real>> &A,
               std::vector<std::vector<real>> &Ainv);
+void mat3_mat3_mul(const real *A, const real *B, real *prod);
+void mat3_mat3_add(const real *A, const real *B, real *sum);
 void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);

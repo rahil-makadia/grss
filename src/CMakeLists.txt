@@ -5,6 +5,7 @@ gr15.cpp
 interpolate.cpp
 simulation.cpp
 spk.cpp
+stm.cpp
 utilities.cpp
 )
 

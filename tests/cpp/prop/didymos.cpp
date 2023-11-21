@@ -5,7 +5,7 @@
     #include <gperftools/profiler.h>
 #endif
 /*
-export CPUPROFILE_FREQUENCY=10000 && g++ -DPROFILE_YES -std=c++11 -stdlib=libc++ -g3 didymos.cpp ../../../src/force.cpp ../../../src/gr15.cpp ../../../src/interpolate.cpp ../../../src/simulation.cpp ../../../src/spk.cpp ../../../src/utilities.cpp ../../../extern/cspice/lib/cspice.a -o didymos.out -I ../../../include/ -I ../../../extern/cspice/include/ -lprofiler && ./didymos.out && pprof --web ./didymos.out ./didymos.prof
+export CPUPROFILE_FREQUENCY=10000 && g++ -DPROFILE_YES -std=c++11 -stdlib=libc++ -g3 didymos.cpp ../../../src/approach.cpp ../../../src/force.cpp ../../../src/gr15.cpp ../../../src/interpolate.cpp ../../../src/simulation.cpp ../../../src/spk.cpp ../../../src/utilities.cpp ../../../extern/cspice/lib/cspice.a -o didymos.out -I ../../../include/ -I ../../../extern/cspice/include/ -lprofiler && ./didymos.out && pprof --web ./didymos.out ./didymos.prof
 */
 
 int main() {

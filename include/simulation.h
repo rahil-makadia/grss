@@ -57,6 +57,7 @@ class IntegBody : public Body {
               std::vector<real> pos, std::vector<real> vel,
               std::vector<std::vector<real>> covariance,
               NongravParamaters ngParams);
+    void prepare_stm();
 };
 
 class Event {

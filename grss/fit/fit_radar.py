@@ -77,7 +77,7 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
                             '-47': '-47', # DSS-47 (ATCA ref. W196)
                             '-73': '259',} # Tromso (32-m, EISCAT)
     raw_data = get_radar_raw_data(tdes)
-    if isinstance(raw_data, str):
+    if isinstance(raw_data, str) or ('code' in raw_data and raw_data['code'] == '400'):
         return None, None
     num_obs = int(raw_data['count'])
     data = raw_data['data']

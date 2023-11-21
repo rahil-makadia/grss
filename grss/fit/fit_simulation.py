@@ -598,15 +598,17 @@ class FitSimulation:
         self.fixed_propsim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0,
                                         'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0,
                                         'r0_au': 1.0, 'radius': radius, 'mass': 0.0}
-        for key in nongrav_info:
-            self.fixed_propsim_params[key] = nongrav_info[key]
+        if nongrav_info is not None:
+            for key in nongrav_info:
+                self.fixed_propsim_params[key] = nongrav_info[key]
         if events is not None:
             self.fixed_propsim_params['events'] = events
             self.fit_events = True
         else:
             self.fixed_propsim_params['events'] = []
             self.fit_events = False
-        self.residual_chi_squared = None
+        self.reject_outliers = True
+        self.residual_chi_squared = [None]*len(self.obs_array)
         self.converged = False
         return None
 
@@ -1435,7 +1437,7 @@ class FitSimulation:
         partials = self.get_partials(prop_sim_past, prop_sim_future, perturbation_info)
         return residuals, partials
 
-    def reject_outliers(self, partials, weights, residuals):
+    def apply_outlier_rejection(self, partials, weights, residuals):
         """
         Outlier rejection algorithm for the residuals.
 
@@ -1587,8 +1589,9 @@ class FitSimulation:
                 self.add_iteration(0, prefit_residuals, weights)
             clean_residuals = self.flatten_and_clean(residuals)
             # reject outliers here
-            if start_rejecting:
-                a_rej, w_rej, b_rej, _ = self.reject_outliers(partials, weights, clean_residuals)
+            if self.reject_outliers and start_rejecting:
+                a_rej, w_rej, b_rej, _ = self.apply_outlier_rejection(partials, weights,
+                                                                        clean_residuals)
             else:
                 a_rej, w_rej, b_rej = partials, weights, clean_residuals
             # get initial guess
@@ -1614,13 +1617,17 @@ class FitSimulation:
                         f"{self.iters[-1].reduced_chi_squared:.3f}")
             self.check_convergence()
             if self.converged:
-                if start_rejecting:
+                if self.reject_outliers and start_rejecting:
                     print("Converged after rejecting outliers.")
                     break
-                else:
-                    print("Converged without rejecting outliers. Starting outlier rejection now.")
+                msg = "Converged without rejecting outliers."
+                if self.reject_outliers:
+                    msg += " Starting outlier rejection now..."
                     start_rejecting = True
                     self.converged = False
+                print(msg)
+                if not self.reject_outliers:
+                    break
         if self.n_iter == self.n_iter_max and not self.converged:
             print("WARNING: Maximum number of iterations reached without converging.")
         spice.unload(self.de_kernel_path)

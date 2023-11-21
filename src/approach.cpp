@@ -347,3 +347,11 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
     vdot(pos, eHatY, 3, this->mtp.y);
     vdot(pos, eHatZ, 3, this->mtp.z);
 }
+
+void CloseApproachParameters::print_summary(int prec){
+    std::cout.precision(prec);
+    std::cout << "Close approach at MJD " << this->tCA << " TDB:" << std::endl;
+    std::cout << this->flybyBody << " - " << this->centralBody << " at " << this->dist << " AU." << std::endl;
+    std::cout << "Relative Velocity: " << this->vel << " AU/d. V-infinity: " << this->vInf << " AU/d." << std::endl;
+    std::cout << "Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
+}
