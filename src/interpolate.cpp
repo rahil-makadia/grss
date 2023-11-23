@@ -1,5 +1,74 @@
 #include "interpolate.h"
 
+void approx_xInteg_math(const std::vector<real> &xInteg0,
+                        const std::vector<real> &accInteg0, const real &dt,
+                        const real &h, const std::vector<std::vector<real>> &b,
+                        const size_t starti, const size_t startb,
+                        const size_t &iterStep, std::vector<real> &xIntegNext,
+                        std::vector<real> &xIntegCompCoeffs) {
+    if (h == 1.0) {
+        for (size_t j = 0; j < iterStep; j++) {
+            xIntegNext[starti+j]          = xInteg0[starti+j];
+            xIntegNext[starti+j+iterStep] = xInteg0[starti+j+iterStep];
+            comp_sum(b[6][startb+j]*dt*dt/72.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[5][startb+j]*dt*dt/56.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[4][startb+j]*dt*dt/42.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[3][startb+j]*dt*dt/30.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[2][startb+j]*dt*dt/20.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[1][startb+j]*dt*dt/12.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[0][startb+j]*dt*dt/6.0 , &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(accInteg0[startb+j]*dt*dt/2.0, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(xInteg0[starti+j+iterStep]*dt, &(xIntegNext[starti+j]), &(xIntegCompCoeffs[starti+j]));
+            comp_sum(b[6][startb+j]*dt/8.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[5][startb+j]*dt/7.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[4][startb+j]*dt/6.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[3][startb+j]*dt/5.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[2][startb+j]*dt/4.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[1][startb+j]*dt/3.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(b[0][startb+j]*dt/2.0, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+            comp_sum(accInteg0[startb+j]*dt, &(xIntegNext[starti+j+iterStep]), &(xIntegCompCoeffs[starti+j+iterStep]));
+        }
+    } else {
+        for (size_t j = 0; j < iterStep; j++) {
+            const real inc0 = ((((((((b[6][startb+j]*7.*h/9. + b[5][startb+j])*3.*h/4. + b[4][startb+j])*5.*h/7. + b[3][startb+j])*2.*h/3. + b[2][startb+j])*3.*h/5. + b[1][startb+j])*h/2.    + b[0][startb+j])*h/3. + accInteg0[startb+j])*dt*h/2. + xInteg0[starti+j+iterStep])*dt*h;;
+            const real inc1 = (((((((b[6][startb+j]*7.*h/8.  + b[5][startb+j])*6.*h/7. + b[4][startb+j])*5.*h/6. + b[3][startb+j])*4.*h/5. + b[2][startb+j])*3.*h/4. + b[1][startb+j])*2.*h/3. + b[0][startb+j])*h/2. + accInteg0[startb+j])*dt*h;
+            xIntegNext[starti+j]          = xInteg0[starti+j] + inc0 - xIntegCompCoeffs[starti+j];
+            xIntegNext[starti+j+iterStep] = xInteg0[starti+j+iterStep] + inc1 - xIntegCompCoeffs[starti+j+iterStep];
+        }
+    }
+}
+
+void approx_xInteg(const std::vector<real> &xInteg0,
+                   const std::vector<real> &accInteg0, const real &dt,
+                   const real &h, const std::vector<std::vector<real>> &b,
+                   const std::vector<IntegBody> &integBodies,
+                   std::vector<real> &xIntegNext,
+                   std::vector<real> &xIntegCompCoeffs) {
+    size_t starti = 0;
+    size_t startb = 0;
+    for (size_t i = 0; i < integBodies.size(); i++) {
+        // do pos/vel first, then STM
+        approx_xInteg_math(xInteg0, accInteg0, dt, h, b, starti, startb, 3, xIntegNext, xIntegCompCoeffs);
+        starti += 6;
+        startb += 3;
+        if (integBodies[i].propStm) {
+            // do 6x6 STM first, then 6x1 fitted parameters
+            approx_xInteg_math(xInteg0, accInteg0, dt, h, b, starti, startb, 18, xIntegNext, xIntegCompCoeffs);
+            starti += 36;
+            startb += 18;
+            if (integBodies[i].stm.size() > 36) {
+                // do fitted parameters
+                const size_t numParams = (integBodies[i].stm.size()-36)/6;
+                for (size_t param = 0; param < numParams; param++) {
+                    approx_xInteg_math(xInteg0, accInteg0, dt, h, b, starti, startb, 3, xIntegNext, xIntegCompCoeffs);
+                    starti += 6;
+                    startb += 3;
+                }
+            }
+        }
+    }
+}
+
 std::vector<real> propSimulation::interpolate(const real t) {
     std::vector<real> xIntegInterp = std::vector<real>(this->xInteg.size(), 0.0);
     // find the index of the last element in this->interpParams.tStack that is

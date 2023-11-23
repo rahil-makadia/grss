@@ -17,8 +17,8 @@ void propSimulation::integrate() {
     gr15(this);
     unload_c(this->DEkernelPath.c_str());
 
-    bool backwardProp = this->integParams.t0 > this->integParams.tf;
-    if (backwardProp) {
+    // if backwards integration
+    if (this->integParams.t0 > this->integParams.tf) {
         std::reverse(this->events.begin(), this->events.end());
         std::reverse(this->xObserver.begin(), this->xObserver.end());
         std::reverse(this->observerInfo.begin(), this->observerInfo.end());

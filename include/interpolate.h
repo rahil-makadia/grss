@@ -2,8 +2,25 @@
 #define INTERPOLATE_H
 
 #include "force.h"
-#include "gr15.h"
 
+inline void comp_sum(real num, real *sum, real *compCoeff) {
+    const real y = num - *compCoeff;
+    const real t = *sum + y;
+    *compCoeff = (t - *sum) - y;
+    *sum = t;
+}
+void approx_xInteg_math(const std::vector<real> &xInteg0,
+                        const std::vector<real> &accInteg0, const real &dt,
+                        const real &h, const std::vector<std::vector<real>> &b,
+                        const size_t starti, const size_t startb,
+                        const size_t &iterStep, std::vector<real> &xIntegNext,
+                        std::vector<real> &xIntegCompCoeffs);
+void approx_xInteg(const std::vector<real> &xInteg0,
+                   const std::vector<real> &accInteg0, const real &dt,
+                   const real &h, const std::vector<std::vector<real>> &b,
+                   const std::vector<IntegBody> &integBodies,
+                   std::vector<real> &xIntegNext,
+                   std::vector<real> &xIntegCompCoeffs);
 void interpolate_on_the_fly(propSimulation *propSim, const real &t, const real &dt);
 void evaluate_one_interpolation(const propSimulation *propSim, const real &t,
                                 const real &dt, const real &tInterp,

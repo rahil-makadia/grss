@@ -1,5 +1,4 @@
 #include "grss.h"
-#include <SpiceUsr.h>
 #include <sys/time.h>
 #include <assert.h>
 
