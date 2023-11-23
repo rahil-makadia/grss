@@ -43,12 +43,19 @@ void get_lightTimeOneBody(propSimulation *propSim, const size_t &i,
                           const real &dt, real &lightTimeOneBody);
 void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary);
-void get_radar_measurement(propSimulation *propSim, const size_t interpIdx,
+void get_radar_measurement(propSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            std::vector<real> &radarMeasurement);
-void get_delay_measurement(propSimulation *propSim, const size_t interpIdx,
+void get_measurement(propSimulation *propSim, const size_t &interpIdx,
+                     const real &t, const real &dt, const real tInterpGeom,
+                     const std::vector<real> &xInterpGeom,
+                     const std::vector<real> &xInterpApparent);
+void get_optical_measurement(propSimulation *propSim,
+                             const std::vector<real> &xInterpApparent,
+                             std::vector<real> &opticalMeasurement);
+void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt, const size_t &i,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,

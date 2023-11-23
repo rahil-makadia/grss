@@ -614,6 +614,10 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("xIntegEval", &propSimulation::xIntegEval, R"mydelimiter(
             States of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
+        .def_readwrite("opticalObsEval", &propSimulation::opticalObsEval,
+                       R"mydelimiter(
+            Optical observation of each integration body in the simulation for each value in propSimulation.tEval.
+            )mydelimiter")
         .def_readwrite("radarObsEval", &propSimulation::radarObsEval,
                        R"mydelimiter(
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
