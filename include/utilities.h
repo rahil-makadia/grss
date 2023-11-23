@@ -3,10 +3,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <limits>
 #include <numeric>
-#include <vector>
 using std::acos;
 using std::asin;
 using std::asinh;
