@@ -51,6 +51,7 @@ grss.prop.prop\_simulation.propSimulation
         ~propSimulation.lightTimeEval
         ~propSimulation.name
         ~propSimulation.observerInfo
+        ~propSimulation.opticalObsEval
         ~propSimulation.radarObsEval
         ~propSimulation.radarObserver
         ~propSimulation.spiceBodies
