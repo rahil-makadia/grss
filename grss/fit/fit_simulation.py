@@ -595,6 +595,7 @@ class FitSimulation:
         self.de_kernel = de_kernel
         self.de_kernel_path = de_kernel_path
         self.analytic_partials = False
+        self.prop_sims = [None, None]
         self.fixed_propsim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0,
                                         'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0,
                                         'r0_au': 1.0, 'radius': radius, 'mass': 0.0}
@@ -1291,44 +1292,31 @@ class FitSimulation:
             If the observer information is not well-defined.
         """
         if self.past_obs_exist and self.future_obs_exist:
-            apparent_states_past = np.array(prop_sim_past.xIntegEval)
-            apparent_states_future = np.array(prop_sim_future.xIntegEval)
-            apparent_states = np.vstack((apparent_states_past, apparent_states_future))
-            radar_observations_past = np.array(prop_sim_past.radarObsEval)
-            radar_observations_future = np.array(prop_sim_future.radarObsEval)
-            radar_observations = np.vstack((radar_observations_past, radar_observations_future))
+            optical_obs_past = np.array(prop_sim_past.opticalObsEval)
+            optical_obs_future = np.array(prop_sim_future.opticalObsEval)
+            optical_obs = np.vstack((optical_obs_past, optical_obs_future))
+            radar_obs_past = np.array(prop_sim_past.radarObsEval)
+            radar_obs_future = np.array(prop_sim_future.radarObsEval)
+            radar_obs = np.vstack((radar_obs_past, radar_obs_future))
         elif self.past_obs_exist:
-            apparent_states_past = np.array(prop_sim_past.xIntegEval)
-            apparent_states = apparent_states_past
-            radar_observations_past = np.array(prop_sim_past.radarObsEval)
-            radar_observations = radar_observations_past
+            optical_obs = np.array(prop_sim_past.opticalObsEval)
+            radar_obs = np.array(prop_sim_past.radarObsEval)
         elif self.future_obs_exist:
-            apparent_states_future = np.array(prop_sim_future.xIntegEval)
-            apparent_states = apparent_states_future
-            radar_observations_future = np.array(prop_sim_future.radarObsEval)
-            radar_observations = radar_observations_future
-        integ_body_start_col = 6*integ_body_idx
-        integ_body_end_col = 6*integ_body_idx+6
-        apparent_states = apparent_states[:,integ_body_start_col:integ_body_end_col]
-        radar_observations = radar_observations[:,integ_body_idx]
+            optical_obs = np.array(prop_sim_future.opticalObsEval)
+            radar_obs = np.array(prop_sim_future.radarObsEval)
+        optical_obs = optical_obs[:,2*integ_body_idx:2*integ_body_idx+2]
+        radar_obs = radar_obs[:,integ_body_idx]
         measured_obs = self.obs_array[:, 1:3]
         computed_obs = np.nan*np.ones_like(measured_obs)
         observer_info = get_observer_info(self.observer_codes)
         for i in range(len(self.obs_array)):
             obs_info_len = len(observer_info[i])
             if obs_info_len in {4, 7}:
-                computed_obs[i, :] = get_radec(apparent_states[i])
-                # if self.obs_array[i, 3] < 10e-3 or self.obs_array[i, 4] < 10e-3:
-                #     dist = np.linalg.norm(apparent_states[i, :3])*1.495978707e11
-                #     ang_diam = 2*np.arctan(self.fixed_propsim_params['radius']/dist)
-                #     ang_diam *= 180/np.pi*3600
-                #     print(f'Angular diameter at {self.obs_array[i, 0]} is {ang_diam} arcsec. ',
-                #             f'RA uncertainty fraction is {self.obs_array[i, 3]/ang_diam}. ',
-                #             f'Dec uncertainty fraction is {self.obs_array[i, 4]/ang_diam}.')
+                computed_obs[i, :] = optical_obs[i]
             elif obs_info_len == 9: # delay measurement
-                computed_obs[i, 0] = radar_observations[i]
+                computed_obs[i, 0] = radar_obs[i]
             elif obs_info_len == 10: # dopper measurement
-                computed_obs[i, 1] = radar_observations[i]
+                computed_obs[i, 1] = radar_obs[i]
             else:
                 raise ValueError("Observer info length not recognized.")
         return computed_obs
@@ -1430,6 +1418,7 @@ class FitSimulation:
         """
         perturbation_info = None if self.analytic_partials else self.get_perturbation_info()
         prop_sim_past, prop_sim_future = self.assemble_and_propagate_bodies(perturbation_info)
+        self.prop_sims = (prop_sim_past, prop_sim_future)
         # get residuals
         computed_obs = self.get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
         residuals = self.obs_array[:, 1:3] - computed_obs

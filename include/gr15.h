@@ -58,56 +58,8 @@ const real dVec[21] = {
     0.0000005637641639318207610, 0.0015297840025004658189490, 0.0978342365324440053653648, 0.8752546646840910912297246, 1.8704917729329500633517991,
     0.0000000317188154017613665, 0.0002762930909826476593130, 0.0360285539837364596003871, 0.5767330002770787313544596, 2.2485887607691597933926895, 2.7558127197720458314421588
 };
-const real w0PC[7] = {
-    1.0/3.0,
-    1.0/2.0,
-    3.0/5.0,
-    2.0/3.0,
-    5.0/7.0,
-    3.0/4.0,
-    7.0/9.0
-};
-const real w0Term[7] = {
-    1.0/6.0,
-    1.0/12.0,
-    1.0/20.0,
-    1.0/30.0,
-    1.0/42.0,
-    1.0/56.0,
-    1.0/72.0
-};
-const real w1PC[7] = {
-    1.0/2.0,
-    2.0/3.0,
-    3.0/4.0,
-    4.0/5.0,
-    5.0/6.0,
-    6.0/7.0,
-    7.0/8.0
-};
-const real w1Term[7] = {
-    1.0/2.0,
-    1.0/3.0,
-    1.0/4.0,
-    1.0/5.0,
-    1.0/6.0,
-    1.0/7.0,
-    1.0/8.0
-};
 
 real get_initial_timestep(propSimulation *propSim);
-void approx_xInteg_math(const std::vector<real> &xInteg0,
-                        const std::vector<real> &accInteg0, const real &dt,
-                        const real &h, const std::vector<std::vector<real>> &b,
-                        const size_t starti, const size_t startb,
-                        const size_t &iterStep, std::vector<real> &xIntegNext,
-                        std::vector<real> &xIntegCompCoeffs);
-void approx_xInteg(const std::vector<real> &xInteg0,
-                   const std::vector<real> &accInteg0, const real &dt,
-                   const real &h, const std::vector<std::vector<real>> &b,
-                   const std::vector<IntegBody> &integBodies,
-                   std::vector<real> &xIntegNext,
-                   std::vector<real> &xIntegCompCoeffs);
 void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim, real *g);
 void compute_g_and_b(const std::vector<std::vector<real> > &AccIntegArr,
                      const size_t &hIdx, real *g, real *bCompCoeffs,

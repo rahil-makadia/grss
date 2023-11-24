@@ -7,7 +7,9 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "utilities.h"
+#include <cstring>
+#include <iostream>
+#include <vector>
 
 struct CacheItem {
     int spiceID = -99999;

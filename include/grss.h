@@ -17,8 +17,8 @@ void propSimulation::integrate() {
     gr15(this);
     unload_c(this->DEkernelPath.c_str());
 
-    bool backwardProp = this->integParams.t0 > this->integParams.tf;
-    if (backwardProp) {
+    // if backwards integration
+    if (this->integParams.t0 > this->integParams.tf) {
         std::reverse(this->events.begin(), this->events.end());
         std::reverse(this->xObserver.begin(), this->xObserver.end());
         std::reverse(this->observerInfo.begin(), this->observerInfo.end());
@@ -26,6 +26,7 @@ void propSimulation::integrate() {
         std::reverse(this->radarObserver.begin(), this->radarObserver.end());
         std::reverse(this->lightTimeEval.begin(), this->lightTimeEval.end());
         std::reverse(this->xIntegEval.begin(), this->xIntegEval.end());
+        std::reverse(this->opticalObsEval.begin(), this->opticalObsEval.end());
         std::reverse(this->radarObsEval.begin(), this->radarObsEval.end());
     }
 }

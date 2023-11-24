@@ -944,14 +944,6 @@ void propSimulation::preprocess() {
 
 void propSimulation::extend(real tf, std::vector<real> tEvalNew,
                             std::vector<std::vector<real>> xObserverNew) {
-    // std::reverse(this->xObserver.begin(), this->xObserver.end());
-    // std::reverse(this->observerInfo.begin(), this->observerInfo.end());
-    // std::reverse(this->tEval.begin(), this->tEval.end());
-    // std::reverse(this->radarObserver.begin(), this->radarObserver.end());
-    // std::reverse(this->lightTimeEval.begin(), this->lightTimeEval.end());
-    // std::reverse(this->xIntegEval.begin(), this->xIntegEval.end());
-    // std::reverse(this->radarObsEval.begin(), this->radarObsEval.end());
-
     std::cout << "WARNING: The extend() method is under development and may "
                  "not work properly with the interpolation routines."
               << std::endl;

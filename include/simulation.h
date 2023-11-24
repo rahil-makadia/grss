@@ -128,6 +128,7 @@ class propSimulation {
     std::vector<int> radarObserver;
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
+    std::vector<std::vector<real>> opticalObsEval;
     std::vector<std::vector<real>> radarObsEval;
     std::vector<real> interpolate(const real t);
 
