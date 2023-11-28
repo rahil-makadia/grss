@@ -410,10 +410,9 @@ void cometary_to_keplerian(const real &epochMjD,
         kepler_solve_hyperbolic(M, cometaryState[0], E);
         nu = 2 * atan2(tanh(E / 2) * sqrt(e + 1), sqrt(e - 1));
     } else {
-        std::cout << "utilities.cpp: ERROR: cometary_to_keplerian: Cannot "
-                     "handle e = 1 right now!!!"
-                  << std::endl;
-        exit(1);
+        throw std::runtime_error(
+            "utilities.cpp: cometary_to_keplerian: Cannot handle e = 1 right "
+            "now!!!");
     }
     // std::cout << "a: " << a << std::endl;
     // std::cout << "M: " << M*RAD2DEG << std::endl;
@@ -580,4 +579,350 @@ void cartesian_to_cometary(const real &epochMjd,
     std::vector<real> keplerianState(6);
     cartesian_to_keplerian(cartesianState, keplerianState, GM);
     keplerian_to_cometary(epochMjd, keplerianState, cometaryState, GM);
+}
+
+void cartesian_cometary_partials(const real &epochMjd,
+                                 const std::vector<real> &cometaryState,
+                                 std::vector<std::vector<real>> &partials,
+                                 const real GM) {
+    std::vector<real> keplerianState(6);
+    partials = std::vector<std::vector<real>>(6, std::vector<real>(6, 0.0L));
+    cometary_to_keplerian(epochMjd, cometaryState, keplerianState, GM);
+    const real tp = cometaryState[2];
+    const real a = keplerianState[0];
+    const real e = keplerianState[1];
+    const real inc = keplerianState[2];
+    const real Omega = keplerianState[3];
+    const real omega = keplerianState[4];
+    const real nu = keplerianState[5];
+    const real E = 2 * atan2(tan(nu / 2) * sqrt(1 - e), sqrt(1 + e));
+    std::cout.precision(20);
+    std::cout << "a: " << a << ". nu: " << nu << ". E: " << E << std::endl;
+    real *part = new real[6];
+    dCartde(GM, a, e, inc, Omega, omega, E, part);
+    std::cout << "dCartde: " << std::endl;
+    for (size_t i = 0; i < 6; i++) {
+        std::cout << part[i] << ", ";
+    }
+    std::cout << std::endl;
+    dCartdeNum(epochMjd, GM, cometaryState, part);
+    for (size_t i = 0; i < 6; i++) {
+        partials[i][0] = part[i];
+    }
+    dCartdq(epochMjd, tp, GM, a, e, inc, Omega, omega, E, part);
+    for (size_t i = 0; i < 6; i++) {
+        partials[i][1] = part[i];
+    }
+    dCartdTp(epochMjd, tp, GM, a, e, inc, Omega, omega, E, part);
+    for (size_t i = 0; i < 6; i++) {
+        partials[i][2] = part[i];
+    }
+    dCartdOmega(GM, a, e, inc, Omega, omega, E, part);
+    for (size_t i = 0; i < 6; i++) {
+        partials[i][3] = part[i];
+    }
+    dCartdomega(GM, a, e, inc, Omega, omega, E, part);
+    for (size_t i = 0; i < 6; i++) {
+        partials[i][4] = part[i];
+    }
+    dCartdinc(GM, a, e, inc, Omega, omega, E, part);
+    for (size_t i = 0; i < 6; i++) {
+        partials[i][5] = part[i];
+    }
+    delete[] part;
+}
+
+// partials from 2 sources:
+// 1: Murison, https://www.researchgate.net/publication/271214791_Partial_Derivatives_of_Observables_with_Respect_to_Two-Body_Orbital_Elements
+// 2: Farnocchia et al, 10.1007/s10569-013-9476-9
+void dCartdeNum(const real &t, const real &GM,
+                const std::vector<real> &cometaryState, real *partial){
+    const real e = cometaryState[0];
+    const real delta = 1e-8;
+    const real pert = delta*e;
+    std::vector<real> comStatePlus = cometaryState;
+    std::vector<real> comStateMinus = cometaryState;
+    comStatePlus[0] += pert;
+    comStateMinus[0] -= pert;
+    std::vector<real> cartStatePlus(6);
+    std::vector<real> cartStateMinus(6);
+    cometary_to_cartesian(t, comStatePlus, cartStatePlus, GM);
+    cometary_to_cartesian(t, comStateMinus, cartStateMinus, GM);
+    for (size_t i = 0; i < 6; i++){
+        partial[i] = (cartStatePlus[i] - cartStateMinus[i])/(2.0L*pert);
+    }
+}
+
+void dCartde(const real &GM, const real &a, const real &e, const real &inc,
+             const real &Omega, const real &omega, const real &E,
+             real *partial) {
+    const real n = sqrt(GM / a / a / a);
+    const real cO = cos(Omega);
+    const real sO = sin(Omega);
+    const real co = cos(omega);
+    const real so = sin(omega);
+    const real ci = cos(inc);
+    const real si = sin(inc);
+    const real cE = cos(E);
+    const real sE = sin(E);
+    const real posFac = e / sqrt(1 - e * e);
+    partial[0] = a*(-cO*co + sO*so*ci + posFac*(cO*so+sO*co*ci)*sE);
+    partial[1] = a*(-sO*co - cO*so*ci + posFac*(sO*so-cO*co*ci)*sE);
+    partial[2] = -a*(so + posFac*co*sE)*si;
+    const real velFac1 = n*a*cE/(1-e*cos(E))/(1-e*cos(E));
+    const real velFac2 = (cE-e)/sqrt(1-e*e);
+    partial[3] = velFac1*((-cO*co + sO*so*ci)*sE - velFac2*(cO*so+sO*co*ci));
+    partial[4] = velFac1*(-(sO*co + cO*so*ci)*sE - velFac2*(sO*so-cO*co*ci));
+    partial[5] = velFac1*(-so*sE - velFac2*co)*si;
+}
+
+void dCartde2(const real &GM, const real &a, const real &e, const real &inc,
+             const real &Omega, const real &omega, const real &E,
+             real *partial) {
+    const real t2 = cos(Omega);
+    const real t3 = cos(omega);
+    const real t5 = sin(Omega);
+    const real t6 = cos(inc);
+    const real t7 = t5 * t6;
+    const real t8 = sin(omega);
+    const real t10 = -t2 * t3 + t7 * t8;
+    const real t11 = e * e;
+    const real t13 = sqrt(0.1e1 - t11);
+    const real t15 = sin(E);
+    const real t16 = t15 * e;
+    const real t19 = t2 * t8 + t3 * t7;
+    const real t22 = 0.1e1 / t13;
+    const real t25 = t2 * t6;
+    const real t27 = -t5 * t3 - t25 * t8;
+    const real t31 = t5 * t8 - t25 * t3;
+    const real t35 = sin(inc);
+    const real t37 = t8 * t13;
+    const real t43 = cos(E);
+    const real t45 = sqrt(a);
+    const real t47 = t22 * t43 / t45;
+    const real t50 = -t43 + e;
+    const real t53 = sqrt(GM);
+    const real t57 = pow(t43 * e - 0.1e1, 0.2e1);
+    const real t58 = 0.1e1 / t57;
+    partial[0] = (t10 * t13 + t16 * t19) * t22 * a;
+    partial[1] = (t27 * t13 + t16 * t31) * t22 * a;
+    partial[2] = -a * t35 * (t37 + t3 * t15 * e) * t22;
+    partial[3] = t47 * (t15 * t10 * t13 + t50 * t19) * t53 * t58;
+    partial[4] = t47 * t53 * (t15 * t27 * t13 + t31 * t50) * t58;
+    partial[5] = t47 * (-t37 * t15 - t3 * t50) * t53 * t35 * t58;
+}
+
+void dCartde3(const real &GM, const real &a, const real &e, const real &inc,
+             const real &Omega, const real &omega, const real &E,
+             real *partial) {
+    std::vector<std::vector<real>> R1(3, std::vector<real>(3));
+    std::vector<std::vector<real>> R2(3, std::vector<real>(3));
+    std::vector<std::vector<real>> R3(3, std::vector<real>(3));
+    std::vector<std::vector<real>> RTemp(3, std::vector<real>(3));
+    std::vector<std::vector<real>> Q(3, std::vector<real>(3));
+
+    rot_mat_z(Omega, R1);
+    rot_mat_x(inc, R2);
+    rot_mat_z(omega, R3);
+    mat_mat_mul(R1, R2, RTemp);
+    mat_mat_mul(RTemp, R3, Q);
+
+    std::vector<real> drdeFrame(3);
+    drdeFrame[0] = (a*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e)))*(e*e - 1)*(cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + (2*e*sin(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e)))*(tan(E/2)/(2*sqrt(1-e)*sqrt(e+1)) + (tan(E/2)*sqrt(e+1))/(2*pow(1-e, 1.5L))))/((tan(E/2)*tan(E/2)*(e + 1))/(e - 1) - 1)))/pow(e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + 1, 2.0L) - (2*a*e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))))/(e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + 1) - (2*a*sin(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e)))*(e*e - 1)*(tan(E/2)/(2*sqrt(1-e)*sqrt(e+1)) + (tan(E/2)*sqrt(e+1))/(2*pow(1-e, 1.5L))))/(((tan(E/2)*tan(E/2)*(e + 1))/(e - 1) - 1)*(e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + 1));
+    drdeFrame[1] = (a*sin(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e)))*(e*e - 1)*(cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + (2*e*sin(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e)))*(tan(E/2)/(2*sqrt(1-e)*sqrt(e+1)) + (tan(E/2)*sqrt(e+1))/(2*pow(1-e, 1.5L))))/((tan(E/2)*tan(E/2)*(e + 1))/(e - 1) - 1)))/pow(e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + 1, 2.0L) - (2*a*e*sin(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))))/(e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + 1) + (2*a*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e)))*(e*e - 1)*(tan(E/2)/(2*sqrt(1-e)*sqrt(e+1)) + (tan(E/2)*sqrt(e+1))/(2*pow(1-e, 1.5L))))/(((tan(E/2)*tan(E/2)*(e + 1))/(e - 1) - 1)*(e*cos(2*atan((tan(E/2)*sqrt(e+1))/sqrt(1-e))) + 1));
+    drdeFrame[2] = 0;
+
+    std::vector<real> drde(3);
+    mat_vec_mul(Q, drdeFrame, drde);
+    partial[0] = drde[0];
+    partial[1] = drde[1];
+    partial[2] = drde[2];
+    partial[3] = 0;
+    partial[4] = 0;
+    partial[5] = 0;
+}
+
+void dCartdq(const real &t, const real &tp, const real &GM, const real &a,
+             const real &e, const real &inc, const real &Omega,
+             const real &omega, const real &E, real *partial) {
+    const real t2 = cos(Omega);
+    const real t3 = sin(omega);
+    const real t5 = sin(Omega);
+    const real t6 = cos(inc);
+    const real t7 = t6 * t5;
+    const real t8 = cos(omega);
+    const real t10 = t2 * t3 + t7 * t8;
+    const real t11 = sin(E);
+    const real t12 = t11 * e;
+    const real t13 = t - tp;
+    const real t17 = cos(E);
+    const real n = sqrt(GM / a / a / a);
+    const real t19 = (t12 + 0.3e1 / 0.2e1 * n * t13) * t17 - t11;
+    const real t21 = e * e;
+    const real t23 = sqrt(0.1e1 - t21);
+    const real t27 = -t2 * t8 + t7 * t3;
+    const real t28 = t17 * t17;
+    const real t29 = t28 * e;
+    const real t30 = t21 + 0.1e1;
+    const real t32 = n * t11;
+    const real t34 = 0.3e1 / 0.2e1 * t32 * t13;
+    const real t35 = -t29 + t30 * t17 + t34 - e;
+    const real t40 = t17 * e - 0.1e1;
+    const real t42 = 0.1e1 / t40 / 0.2e1;
+    const real t44 = t2 * t6;
+    const real t46 = t5 * t3 - t44 * t8;
+    const real t51 = t5 * t8 + t44 * t3;
+    const real t62 = sin(inc);
+    const real t68 = -t13;
+    const real t71 = t28 * t17 * t21 - 0.2e1 * t29 + t17 + 0.3e1 * t32 * t68;
+    const real t84 = t11 * t21 * t28 + (-0.2e1 * t12 - 0.3e1 * n * t68) * t17 + t11 +
+            0.3e1 * n * t68 * e;
+    const real t87 = sqrt(GM);
+    const real t89 = sqrt(a);
+    const real t91 = 0.1e1 / t89 / a;
+    const real t92 = t40 * t40;
+    const real t94 = 0.1e1 / t92 / t40;
+    const real dadq = 1/(1-e);
+    partial[0] = (-0.2e1 * t10 * t19 * t23 + 0.2e1 * t27 * t35) * t42 * dadq;
+    partial[1] = (-0.2e1 * t46 * t19 * t23 - 0.2e1 * t35 * t51) * t42 * dadq;
+    partial[2] = 0.2e1 * (t8 * t19 * t23 + (t29 - t30 * t17 - t34 + e) * t3) * t62 * t42 * dadq;
+    partial[3] = (-t71 * t10 * t23 + t27 * t84) * t87 * t91 * t94 / 0.2e1 * dadq;
+    partial[4] = -t91 * t87 * (t71 * t46 * t23 + t84 * t51) * t94 / 0.2e1 * dadq;
+    partial[5] = -(-t71 * t8 * t23 + t3 * t84) * t91 * t87 * t62 * t94 / 0.2e1 * dadq;
+}
+
+void dCartdTp(const real &t, const real &tp, const real &GM, const real &a,
+              const real &e, const real &inc, const real &Omega,
+              const real &omega, const real &E, real *partial) {
+    const real t2 = cos(E);
+    const real t3 = cos(Omega);
+    const real t4 = sin(omega);
+    const real t6 = sin(Omega);
+    const real t7 = cos(inc);
+    const real t8 = t7 * t6;
+    const real t9 = cos(omega);
+    const real t11 = t3 * t4 + t8 * t9;
+    const real t13 = e * e;
+    const real t15 = sqrt(0.1e1 - t13);
+    const real t19 = t3 * t9 - t8 * t4;
+    const real t20 = sin(E);
+    const real t24 = t3 * t7;
+    const real t26 = t4 * t6 - t24 * t9;
+    const real t31 = t6 * t9 + t24 * t4;
+    const real t34 = sin(inc);
+    const real t37 = t15 * t9;
+    const real t40 = sqrt(a);
+    const real t41 = 0.1e1 / t40;
+    const real t45 = t2 - e;
+    const real t49 = sqrt(GM);
+    const real t52 = pow(t2 * e - 0.1e1, 0.2e1);
+    const real t53 = 0.1e1 / t52;
+    const real t54 = t49 * t53;
+    const real n = sqrt(GM / a / a / a);
+    const real r = a * (1 - e * t2);
+    const real dEda = -3*n*(t-tp)/(2*r);
+    const real dadq = 1/(1-e);
+    const real dqdTp = 2*a*(1-e)/(3*(t-tp));
+    const real fac = dEda*dadq*dqdTp;
+    partial[0] = (-t2 * t11 * t15 - t19 * t20) * a * fac;
+    partial[1] = (-t2 * t26 * t15 - t31 * t20) * a * fac;
+    partial[2] = a * t34 * (-t20 * t4 + t37 * t2) * fac;
+    partial[3] = t41 * (t20 * t11 * t15 - t19 * t45) * t54 * fac;
+    partial[4] = -t41 * (t31 * t45 - t26 * t15 * t20) * t54 * fac;
+    partial[5] = -t41 * t49 * t34 * (t37 * t20 + t4 * t45) * t53 * fac;
+}
+
+void dCartdOmega(const real &GM, const real &a, const real &e, const real &inc,
+                 const real &Omega, const real &omega, const real &E,
+                 real *partial) {
+    const real t2 = sin(Omega);
+    const real t3 = sin(omega);
+    const real t5 = cos(Omega);
+    const real t6 = cos(inc);
+    const real t7 = t5 * t6;
+    const real t8 = cos(omega);
+    const real t11 = e * e;
+    const real t13 = sqrt(0.1e1 - t11);
+    const real t14 = (-t3 * t2 + t8 * t7) * t13;
+    const real t15 = sin(E);
+    const real t17 = cos(E);
+    const real t18 = -t17 + e;
+    const real t21 = t2 * t8 + t7 * t3;
+    const real t25 = t2 * t6;
+    const real t27 = t3 * t5 + t25 * t8;
+    const real t32 = t5 * t8 - t25 * t3;
+    const real t39 = sqrt(GM);
+    const real t41 = sqrt(a);
+    const real t42 = 0.1e1 / t41;
+    const real t45 = 0.1e1 / (t17 * e - 0.1e1);
+    partial[0] = (-t15 * t14 + t18 * t21) * a;
+    partial[1] = (-t15 * t27 * t13 - t32 * t18) * a;
+    partial[2] = 0.0e0;
+    partial[3] = (-t21 * t15 + t14 * t17) * t39 * t42 * t45;
+    partial[4] = t42 * (t17 * t27 * t13 + t32 * t15) * t39 * t45;
+    partial[5] = 0.0e0;
+}
+
+void dCartdomega(const real &GM, const real &a, const real &e, const real &inc,
+                 const real &Omega, const real &omega, const real &E,
+                 real *partial) {
+    const real t2 = sin(E);
+    const real t3 = cos(Omega);
+    const real t4 = cos(omega);
+    const real t6 = sin(Omega);
+    const real t7 = cos(inc);
+    const real t8 = t6 * t7;
+    const real t9 = sin(omega);
+    const real t11 = -t3 * t4 + t8 * t9;
+    const real t13 = e * e;
+    const real t15 = sqrt(0.1e1 - t13);
+    const real t17 = cos(E);
+    const real t18 = -t17 + e;
+    const real t21 = t3 * t9 + t8 * t4;
+    const real t25 = t7 * t3;
+    const real t27 = t6 * t4 + t9 * t25;
+    const real t32 = t6 * t9 - t25 * t4;
+    const real t35 = t15 * t9;
+    const real t40 = sin(inc);
+    const real t42 = sqrt(GM);
+    const real t43 = sqrt(a);
+    const real t45 = t42 / t43;
+    const real t53 = 0.1e1 / (t17 * e - 0.1e1);
+    partial[0] = a * (t2 * t11 * t15 + t18 * t21);
+    partial[1] = (-t2 * t27 * t15 + t32 * t18) * a;
+    partial[2] = -a * (t35 * t2 + t4 * t18) * t40;
+    partial[3] = t45 * (-t17 * t11 * t15 - t2 * t21) * t53;
+    partial[4] = t45 * (t17 * t27 * t15 - t32 * t2) * t53;
+    partial[5] = t45 * t40 * (t4 * t2 + t35 * t17) * t53;
+}
+
+void dCartdinc(const real &GM, const real &a, const real &e, const real &inc,
+               const real &Omega, const real &omega, const real &E,
+               real *partial) {
+    const real t2 = sin(Omega);
+    const real t4 = cos(omega);
+    const real t5 = e * e;
+    const real t7 = sqrt(0.1e1 - t5);
+    const real t8 = t4 * t7;
+    const real t9 = sin(E);
+    const real t10 = t8 * t9;
+    const real t11 = sin(omega);
+    const real t12 = cos(E);
+    const real t13 = -t12 + e;
+    const real t15 = -t10 + t11 * t13;
+    const real t16 = sin(inc);
+    const real t20 = cos(Omega);
+    const real t25 = cos(inc);
+    const real t27 = sqrt(a);
+    const real t28 = 0.1e1 / t27;
+    const real t29 = sqrt(GM);
+    const real t30 = t29 * t28;
+    const real t34 = t9 * t11 - t8 * t12;
+    const real t38 = 0.1e1 / (t12 * e - 0.1e1);
+    partial[0] = -a * t2 * t15 * t16;
+    partial[1] = a * t15 * t20 * t16;
+    partial[2] = (t10 - t11 * t13) * t25 * a;
+    partial[3] = t30 * t2 * t16 * t34 * t38;
+    partial[4] = -t29 * t20 * t16 * t34 * t28 * t38;
+    partial[5] = t30 * t25 * t34 * t38;
 }

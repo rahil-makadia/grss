@@ -41,13 +41,15 @@ class IntegBody : public Body {
    public:
     int spiceId = -99999;
     bool isCometary = false;
+    std::vector<real> initState;
     bool isInteg = true;
     bool isThrusting = false;
     std::vector<std::vector<real>> covariance;
     NongravParamaters ngParams;
+    size_t n2Derivs = 3;
     bool propStm = false;
     std::vector<real> stm;
-    size_t n2Derivs = 3;
+    std::vector<std::vector<real>> dCartdState;
     // constructors
     IntegBody(std::string name, real t0, real mass, real radius,
               std::vector<real> cometaryState,

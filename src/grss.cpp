@@ -459,6 +459,15 @@ PYBIND11_MODULE(prop_simulation, m) {
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
             )mydelimiter")
+        .def_readwrite("spiceId", &IntegBody::spiceId, R"mydelimiter(
+            SPICE ID of the body.
+            )mydelimiter")
+        .def_readwrite("isCometary", &IntegBody::isCometary, R"mydelimiter(
+            Whether the body is a cometary body.
+            )mydelimiter")
+        .def_readwrite("initState", &IntegBody::initState, R"mydelimiter(
+            Initial state of the body.
+            )mydelimiter")
         .def_readwrite("isInteg", &IntegBody::isInteg, R"mydelimiter(
             Whether the body is an integrated body. Always True.
             )mydelimiter")
@@ -471,17 +480,25 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("ngParams", &IntegBody::ngParams, R"mydelimiter(
             Non-gravitational parameters of the body.
             )mydelimiter")
+        .def_readwrite("n2Derivs", &IntegBody::n2Derivs, R"mydelimiter(
+            Number of second derivatives of the body.
+            )mydelimiter")
         .def_readwrite("propStm", &IntegBody::propStm, R"mydelimiter(
             Boolean for whether to propagate the state transition matrix of the body.
             )mydelimiter")
         .def_readwrite("stm", &IntegBody::stm, R"mydelimiter(
             State transition matrix of the body.
             )mydelimiter")
-        .def_readwrite("n2Derivs", &IntegBody::n2Derivs, R"mydelimiter(
-            Number of second derivatives of the body.
+        .def_readwrite("dCartdState", &IntegBody::dCartdState, R"mydelimiter(
+            Partials of initial cartesian state with repect to initial input state of the body.
             )mydelimiter")
         .def("prepare_stm", &IntegBody::prepare_stm, R"mydelimiter(
             Prepare the state transition matrix of the body for propagation.
+
+            Returns
+            -------
+            None : NoneType
+                None.
             )mydelimiter");
 
     py::class_<Event>(m, "Event", R"mydelimiter(

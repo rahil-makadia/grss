@@ -224,5 +224,29 @@ void cartesian_to_cometary(const real &epochMjd,
                            const std::vector<real> &cartesianState,
                            std::vector<real> &cometaryState,
                            const real GM = 2.959122082855911e-4L);
+void cartesian_cometary_partials(const real &epochMjd,
+                                 const std::vector<real> &cometaryState,
+                                 std::vector<std::vector<real>> &partials,
+                                 const real GM = 2.959122082855911e-4L);
+void dCartdeNum(const real &t, const real &GM,
+                const std::vector<real> &cometaryState, real *partial);
+void dCartde(const real &GM, const real &a, const real &e, const real &inc,
+             const real &Omega, const real &omega, const real &E,
+             real *partial);
+void dCartdq(const real &t, const real &tp, const real &GM, const real &a,
+             const real &e, const real &inc, const real &Omega,
+             const real &omega, const real &E, real *partial);
+void dCartdTp(const real &t, const real &tp, const real &GM, const real &a,
+              const real &e, const real &inc, const real &Omega,
+              const real &omega, const real &E, real *partial);
+void dCartdOmega(const real &GM, const real &a, const real &e, const real &inc,
+                 const real &Omega, const real &omega, const real &E,
+                 real *partial);
+void dCartdomega(const real &GM, const real &a, const real &e, const real &inc,
+                 const real &Omega, const real &omega, const real &E,
+                 real *partial);
+void dCartdinc(const real &GM, const real &a, const real &e, const real &inc,
+               const real &Omega, const real &omega, const real &E,
+               real *partial);
 
 #endif
