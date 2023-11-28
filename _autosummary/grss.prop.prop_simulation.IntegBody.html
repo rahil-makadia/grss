@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-theme="light">
+<html lang="en" data-content_root="" data-theme="light">
 
   <head>
     <meta charset="utf-8" />
@@ -28,12 +28,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -44,9 +44,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
-  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_simulation.ImpulseEvent" href="grss.prop.prop_simulation.ImpulseEvent.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 24, 2023"/>
+    <meta name="docbuild:last-update" content="Nov 28, 2023"/>
   </head>
   
   
@@ -133,6 +133,7 @@
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
+
   
 
 <a class="navbar-brand logo" href="../index.html">
@@ -410,6 +411,7 @@
 </button>
 
 
+
 <script>
 document.write(`
   <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
@@ -419,6 +421,7 @@ document.write(`
   </button>
 `);
 </script>
+
 
 <script>
 document.write(`
@@ -455,6 +458,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.J2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.caTol"><code class="docutils literal notranslate"><span class="pre">IntegBody.caTol</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.covariance"><code class="docutils literal notranslate"><span class="pre">IntegBody.covariance</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.dCartdState"><code class="docutils literal notranslate"><span class="pre">IntegBody.dCartdState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.initState"><code class="docutils literal notranslate"><span class="pre">IntegBody.initState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isCometary"><code class="docutils literal notranslate"><span class="pre">IntegBody.isCometary</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isInteg"><code class="docutils literal notranslate"><span class="pre">IntegBody.isInteg</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isJ2"><code class="docutils literal notranslate"><span class="pre">IntegBody.isJ2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isMajor"><code class="docutils literal notranslate"><span class="pre">IntegBody.isMajor</span></code></a></li>
@@ -471,6 +477,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.propStm"><code class="docutils literal notranslate"><span class="pre">IntegBody.propStm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.spiceId"><code class="docutils literal notranslate"><span class="pre">IntegBody.spiceId</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.stm"><code class="docutils literal notranslate"><span class="pre">IntegBody.stm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.t0"><code class="docutils literal notranslate"><span class="pre">IntegBody.t0</span></code></a></li>
 </ul>
@@ -571,47 +578,59 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.covariance" title="grss.prop.prop_simulation.IntegBody.covariance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">covariance</span></code></a></p></td>
 <td><p>Covariance of the body's initial state.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isInteg" title="grss.prop.prop_simulation.IntegBody.isInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isInteg</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.dCartdState" title="grss.prop.prop_simulation.IntegBody.dCartdState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dCartdState</span></code></a></p></td>
+<td><p>Partials of initial cartesian state with repect to initial input state of the body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.initState" title="grss.prop.prop_simulation.IntegBody.initState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initState</span></code></a></p></td>
+<td><p>Initial state of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isCometary" title="grss.prop.prop_simulation.IntegBody.isCometary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isCometary</span></code></a></p></td>
+<td><p>Whether the body is a cometary body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isInteg" title="grss.prop.prop_simulation.IntegBody.isInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isInteg</span></code></a></p></td>
 <td><p>Whether the body is an integrated body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isJ2" title="grss.prop.prop_simulation.IntegBody.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isJ2" title="grss.prop.prop_simulation.IntegBody.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
 <td><p>Whether the body is a J2 body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isMajor" title="grss.prop.prop_simulation.IntegBody.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isMajor" title="grss.prop.prop_simulation.IntegBody.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
 <td><p>Whether the body is a major body (used for EIH PPN).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isNongrav" title="grss.prop.prop_simulation.IntegBody.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isNongrav" title="grss.prop.prop_simulation.IntegBody.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
 <td><p>Whether the body has non-gravitational accelerations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isPPN" title="grss.prop.prop_simulation.IntegBody.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isPPN" title="grss.prop.prop_simulation.IntegBody.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
 <td><p>Whether the body is a PPN body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isThrusting" title="grss.prop.prop_simulation.IntegBody.isThrusting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isThrusting</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.isThrusting" title="grss.prop.prop_simulation.IntegBody.isThrusting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isThrusting</span></code></a></p></td>
 <td><p>Whether the body is thrusting.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.mass" title="grss.prop.prop_simulation.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.mass" title="grss.prop.prop_simulation.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
 <td><p>Mass of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.n2Derivs" title="grss.prop.prop_simulation.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.n2Derivs" title="grss.prop.prop_simulation.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
 <td><p>Number of second derivatives of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.name" title="grss.prop.prop_simulation.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.name" title="grss.prop.prop_simulation.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.ngParams" title="grss.prop.prop_simulation.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.ngParams" title="grss.prop.prop_simulation.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
 <td><p>Non-gravitational parameters of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.poleDec" title="grss.prop.prop_simulation.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.poleDec" title="grss.prop.prop_simulation.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
 <td><p>Declination of the pole of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.poleRA" title="grss.prop.prop_simulation.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.poleRA" title="grss.prop.prop_simulation.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
 <td><p>Right ascension of the pole of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.propStm" title="grss.prop.prop_simulation.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.propStm" title="grss.prop.prop_simulation.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
 <td><p>Boolean for whether to propagate the state transition matrix of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.radius" title="grss.prop.prop_simulation.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.radius" title="grss.prop.prop_simulation.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
 <td><p>Radius of the body.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.spiceId" title="grss.prop.prop_simulation.IntegBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
+<td><p>SPICE ID of the body.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody.stm" title="grss.prop.prop_simulation.IntegBody.stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stm</span></code></a></p></td>
 <td><p>State transition matrix of the body.</p></td>
@@ -637,6 +656,24 @@ document.write(`
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.covariance">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">covariance</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.covariance" title="Permalink to this definition">#</a></dt>
 <dd><p>Covariance of the body’s initial state.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.dCartdState">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dCartdState</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.dCartdState" title="Permalink to this definition">#</a></dt>
+<dd><p>Partials of initial cartesian state with repect to initial input state of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.initState">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initState</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.initState" title="Permalink to this definition">#</a></dt>
+<dd><p>Initial state of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.isCometary">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isCometary</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.isCometary" title="Permalink to this definition">#</a></dt>
+<dd><p>Whether the body is a cometary body.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -715,6 +752,14 @@ document.write(`
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.prepare_stm">
 <span class="sig-name descname"><span class="pre">prepare_stm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.prop.prop_simulation.IntegBody" title="grss.prop.prop_simulation.IntegBody"><span class="pre">grss.prop.prop_simulation.IntegBody</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.prepare_stm" title="Permalink to this definition">#</a></dt>
 <dd><p>Prepare the state transition matrix of the body for propagation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – None.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>NoneType</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -751,6 +796,12 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.spiceId">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spiceId</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.spiceId" title="Permalink to this definition">#</a></dt>
+<dd><p>SPICE ID of the body.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.IntegBody.stm">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stm</span></span><a class="headerlink" href="#grss.prop.prop_simulation.IntegBody.stm" title="Permalink to this definition">#</a></dt>
 <dd><p>State transition matrix of the body.</p>
@@ -775,7 +826,7 @@ document.write(`
               
               
                 <footer class="prev-next-footer">
-                  <!-- Previous / next buttons -->
+                  
 <div class="prev-next-area">
     <a class="left-prev"
        href="grss.prop.prop_simulation.ImpulseEvent.html"
@@ -815,6 +866,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.J2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.caTol"><code class="docutils literal notranslate"><span class="pre">IntegBody.caTol</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.covariance"><code class="docutils literal notranslate"><span class="pre">IntegBody.covariance</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.dCartdState"><code class="docutils literal notranslate"><span class="pre">IntegBody.dCartdState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.initState"><code class="docutils literal notranslate"><span class="pre">IntegBody.initState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isCometary"><code class="docutils literal notranslate"><span class="pre">IntegBody.isCometary</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isInteg"><code class="docutils literal notranslate"><span class="pre">IntegBody.isInteg</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isJ2"><code class="docutils literal notranslate"><span class="pre">IntegBody.isJ2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.isMajor"><code class="docutils literal notranslate"><span class="pre">IntegBody.isMajor</span></code></a></li>
@@ -831,6 +885,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.propStm"><code class="docutils literal notranslate"><span class="pre">IntegBody.propStm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.radius"><code class="docutils literal notranslate"><span class="pre">IntegBody.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.set_J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.set_J2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.spiceId"><code class="docutils literal notranslate"><span class="pre">IntegBody.spiceId</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.stm"><code class="docutils literal notranslate"><span class="pre">IntegBody.stm</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.IntegBody.t0"><code class="docutils literal notranslate"><span class="pre">IntegBody.t0</span></code></a></li>
 </ul>
@@ -856,6 +911,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     
+
   <p class="copyright">
     
       © Copyright 2023, Rahil Makadia.
@@ -867,7 +923,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 24, 2023.
+  Last updated on Nov 28, 2023.
   <br/>
 </p>
   </div>
@@ -888,8 +944,8 @@ By Rahil Makadia
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
   </footer>

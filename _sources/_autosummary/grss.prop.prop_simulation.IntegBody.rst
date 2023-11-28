@@ -31,6 +31,9 @@ grss.prop.prop\_simulation.IntegBody
         ~IntegBody.J2
         ~IntegBody.caTol
         ~IntegBody.covariance
+        ~IntegBody.dCartdState
+        ~IntegBody.initState
+        ~IntegBody.isCometary
         ~IntegBody.isInteg
         ~IntegBody.isJ2
         ~IntegBody.isMajor
@@ -45,6 +48,7 @@ grss.prop.prop\_simulation.IntegBody
         ~IntegBody.poleRA
         ~IntegBody.propStm
         ~IntegBody.radius
+        ~IntegBody.spiceId
         ~IntegBody.stm
         ~IntegBody.t0
     
