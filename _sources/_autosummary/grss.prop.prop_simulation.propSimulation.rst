@@ -44,6 +44,7 @@ grss.prop.prop\_simulation.propSimulation
         ~propSimulation.convergedLightTime
         ~propSimulation.ephem
         ~propSimulation.evalApparentState
+        ~propSimulation.evalMeasurements
         ~propSimulation.events
         ~propSimulation.integBodies
         ~propSimulation.integParams
@@ -51,9 +52,11 @@ grss.prop.prop\_simulation.propSimulation
         ~propSimulation.lightTimeEval
         ~propSimulation.name
         ~propSimulation.observerInfo
-        ~propSimulation.opticalObsEval
-        ~propSimulation.radarObsEval
+        ~propSimulation.opticalObs
+        ~propSimulation.opticalPartials
+        ~propSimulation.radarObs
         ~propSimulation.radarObserver
+        ~propSimulation.radarPartials
         ~propSimulation.spiceBodies
         ~propSimulation.t
         ~propSimulation.tEval

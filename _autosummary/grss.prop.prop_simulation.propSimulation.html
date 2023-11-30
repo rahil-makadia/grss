@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_simulation.propSimulation &#8212; GRSS 1.5.0 documentation</title>
+    <title>grss.prop.prop_simulation.propSimulation &#8212; GRSS 2.0.0 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_simulation.SpiceBody" href="grss.prop.prop_simulation.SpiceBody.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 28, 2023"/>
+    <meta name="docbuild:last-update" content="Nov 30, 2023"/>
   </head>
   
   
@@ -149,7 +149,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v1.5.0 documentation</p>
+    <p class="title logo__title">GRSS v2.0.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -464,6 +464,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.convergedLightTime"><code class="docutils literal notranslate"><span class="pre">propSimulation.convergedLightTime</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.ephem"><code class="docutils literal notranslate"><span class="pre">propSimulation.ephem</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.evalApparentState"><code class="docutils literal notranslate"><span class="pre">propSimulation.evalApparentState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.evalMeasurements"><code class="docutils literal notranslate"><span class="pre">propSimulation.evalMeasurements</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.events"><code class="docutils literal notranslate"><span class="pre">propSimulation.events</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.extend"><code class="docutils literal notranslate"><span class="pre">propSimulation.extend()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.get_integration_parameters"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_integration_parameters()</span></code></a></li>
@@ -477,9 +478,11 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.lightTimeEval"><code class="docutils literal notranslate"><span class="pre">propSimulation.lightTimeEval</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.name"><code class="docutils literal notranslate"><span class="pre">propSimulation.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.observerInfo"><code class="docutils literal notranslate"><span class="pre">propSimulation.observerInfo</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.opticalObsEval"><code class="docutils literal notranslate"><span class="pre">propSimulation.opticalObsEval</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarObsEval"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarObsEval</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.opticalObs"><code class="docutils literal notranslate"><span class="pre">propSimulation.opticalObs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.opticalPartials"><code class="docutils literal notranslate"><span class="pre">propSimulation.opticalPartials</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarObs"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarObs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarObserver"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarObserver</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarPartials"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarPartials</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.remove_body"><code class="docutils literal notranslate"><span class="pre">propSimulation.remove_body()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.set_integration_parameters"><code class="docutils literal notranslate"><span class="pre">propSimulation.set_integration_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.set_sim_constants"><code class="docutils literal notranslate"><span class="pre">propSimulation.set_sim_constants()</span></code></a></li>
@@ -610,58 +613,67 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.evalApparentState" title="grss.prop.prop_simulation.propSimulation.evalApparentState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evalApparentState</span></code></a></p></td>
 <td><p>Whether to evaluate the apparent state of the integration bodies.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.events" title="grss.prop.prop_simulation.propSimulation.events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">events</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.evalMeasurements" title="grss.prop.prop_simulation.propSimulation.evalMeasurements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evalMeasurements</span></code></a></p></td>
+<td><p>Whether to evaluate the measurements of the integration bodies.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.events" title="grss.prop.prop_simulation.propSimulation.events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">events</span></code></a></p></td>
 <td><p>Events of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.integBodies" title="grss.prop.prop_simulation.propSimulation.integBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integBodies</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.integBodies" title="grss.prop.prop_simulation.propSimulation.integBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integBodies</span></code></a></p></td>
 <td><p>Integration bodies of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.integParams" title="grss.prop.prop_simulation.propSimulation.integParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integParams</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.integParams" title="grss.prop.prop_simulation.propSimulation.integParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">integParams</span></code></a></p></td>
 <td><p>Integration parameters of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.interpParams" title="grss.prop.prop_simulation.propSimulation.interpParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpParams</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.interpParams" title="grss.prop.prop_simulation.propSimulation.interpParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpParams</span></code></a></p></td>
 <td><p>Interpolation parameters of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.lightTimeEval" title="grss.prop.prop_simulation.propSimulation.lightTimeEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightTimeEval</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.lightTimeEval" title="grss.prop.prop_simulation.propSimulation.lightTimeEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightTimeEval</span></code></a></p></td>
 <td><p>Light time from the observer to each integration body for each value in propSimulation.tEval.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.name" title="grss.prop.prop_simulation.propSimulation.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.name" title="grss.prop.prop_simulation.propSimulation.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.observerInfo" title="grss.prop.prop_simulation.propSimulation.observerInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observerInfo</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.observerInfo" title="grss.prop.prop_simulation.propSimulation.observerInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observerInfo</span></code></a></p></td>
 <td><p>Observer information for each value in propSimulation.tEval.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.opticalObsEval" title="grss.prop.prop_simulation.propSimulation.opticalObsEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opticalObsEval</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.opticalObs" title="grss.prop.prop_simulation.propSimulation.opticalObs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opticalObs</span></code></a></p></td>
 <td><p>Optical observation of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.radarObsEval" title="grss.prop.prop_simulation.propSimulation.radarObsEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObsEval</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.opticalPartials" title="grss.prop.prop_simulation.propSimulation.opticalPartials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opticalPartials</span></code></a></p></td>
+<td><p>Optical observation partials of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.radarObs" title="grss.prop.prop_simulation.propSimulation.radarObs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObs</span></code></a></p></td>
 <td><p>Radar observation of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.radarObserver" title="grss.prop.prop_simulation.propSimulation.radarObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObserver</span></code></a></p></td>
 <td><p>Whether the observer for each value in propSimulation.tEval is for radar.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.spiceBodies" title="grss.prop.prop_simulation.propSimulation.spiceBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceBodies</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.radarPartials" title="grss.prop.prop_simulation.propSimulation.radarPartials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarPartials</span></code></a></p></td>
+<td><p>Radar observation partials of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.spiceBodies" title="grss.prop.prop_simulation.propSimulation.spiceBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceBodies</span></code></a></p></td>
 <td><p>SPICE bodies of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.t" title="grss.prop.prop_simulation.propSimulation.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.t" title="grss.prop.prop_simulation.propSimulation.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
 <td><p>Current time of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.tEval" title="grss.prop.prop_simulation.propSimulation.tEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEval</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.tEval" title="grss.prop.prop_simulation.propSimulation.tEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEval</span></code></a></p></td>
 <td><p>MJD Times to evaluate the states of the integrated bodies at.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.tEvalMargin" title="grss.prop.prop_simulation.propSimulation.tEvalMargin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalMargin</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.tEvalMargin" title="grss.prop.prop_simulation.propSimulation.tEvalMargin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalMargin</span></code></a></p></td>
 <td><p>Margin for allowing evaluation past the propagation start and end times.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.tEvalUTC" title="grss.prop.prop_simulation.propSimulation.tEvalUTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalUTC</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.tEvalUTC" title="grss.prop.prop_simulation.propSimulation.tEvalUTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalUTC</span></code></a></p></td>
 <td><p>Whether the MJD evaluation time is in UTC for each value in propSimulation.tEval, as opposed to TDB.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.xInteg" title="grss.prop.prop_simulation.propSimulation.xInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xInteg</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.xInteg" title="grss.prop.prop_simulation.propSimulation.xInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xInteg</span></code></a></p></td>
 <td><p>Current states of each integration body in the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.xIntegEval" title="grss.prop.prop_simulation.propSimulation.xIntegEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegEval</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.xIntegEval" title="grss.prop.prop_simulation.propSimulation.xIntegEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegEval</span></code></a></p></td>
 <td><p>States of each integration body in the simulation for each value in propSimulation.tEval.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.xObserver" title="grss.prop.prop_simulation.propSimulation.xObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xObserver</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.propSimulation.xObserver" title="grss.prop.prop_simulation.propSimulation.xObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xObserver</span></code></a></p></td>
 <td><p>State of the observer for each value in propSimulation.tEval.</p></td>
 </tr>
 </tbody>
@@ -738,6 +750,12 @@ document.write(`
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.evalApparentState">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evalApparentState</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.evalApparentState" title="Permalink to this definition">#</a></dt>
 <dd><p>Whether to evaluate the apparent state of the integration bodies.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.evalMeasurements">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evalMeasurements</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.evalMeasurements" title="Permalink to this definition">#</a></dt>
+<dd><p>Whether to evaluate the measurements of the integration bodies.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -882,14 +900,20 @@ This information might be repeated for bistatic radar observations.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.opticalObsEval">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">opticalObsEval</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.opticalObsEval" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.opticalObs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">opticalObs</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.opticalObs" title="Permalink to this definition">#</a></dt>
 <dd><p>Optical observation of each integration body in the simulation for each value in propSimulation.tEval.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.radarObsEval">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarObsEval</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.radarObsEval" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.opticalPartials">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">opticalPartials</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.opticalPartials" title="Permalink to this definition">#</a></dt>
+<dd><p>Optical observation partials of each integration body in the simulation for each value in propSimulation.tEval.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.radarObs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarObs</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.radarObs" title="Permalink to this definition">#</a></dt>
 <dd><p>Radar observation of each integration body in the simulation for each value in propSimulation.tEval.</p>
 </dd></dl>
 
@@ -897,6 +921,12 @@ This information might be repeated for bistatic radar observations.</p></li>
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.radarObserver">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarObserver</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.radarObserver" title="Permalink to this definition">#</a></dt>
 <dd><p>Whether the observer for each value in propSimulation.tEval is for radar.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSimulation.radarPartials">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarPartials</span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSimulation.radarPartials" title="Permalink to this definition">#</a></dt>
+<dd><p>Radar observation partials of each integration body in the simulation for each value in propSimulation.tEval.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1064,6 +1094,7 @@ as opposed to TDB.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.convergedLightTime"><code class="docutils literal notranslate"><span class="pre">propSimulation.convergedLightTime</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.ephem"><code class="docutils literal notranslate"><span class="pre">propSimulation.ephem</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.evalApparentState"><code class="docutils literal notranslate"><span class="pre">propSimulation.evalApparentState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.evalMeasurements"><code class="docutils literal notranslate"><span class="pre">propSimulation.evalMeasurements</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.events"><code class="docutils literal notranslate"><span class="pre">propSimulation.events</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.extend"><code class="docutils literal notranslate"><span class="pre">propSimulation.extend()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.get_integration_parameters"><code class="docutils literal notranslate"><span class="pre">propSimulation.get_integration_parameters()</span></code></a></li>
@@ -1077,9 +1108,11 @@ as opposed to TDB.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.lightTimeEval"><code class="docutils literal notranslate"><span class="pre">propSimulation.lightTimeEval</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.name"><code class="docutils literal notranslate"><span class="pre">propSimulation.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.observerInfo"><code class="docutils literal notranslate"><span class="pre">propSimulation.observerInfo</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.opticalObsEval"><code class="docutils literal notranslate"><span class="pre">propSimulation.opticalObsEval</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarObsEval"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarObsEval</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.opticalObs"><code class="docutils literal notranslate"><span class="pre">propSimulation.opticalObs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.opticalPartials"><code class="docutils literal notranslate"><span class="pre">propSimulation.opticalPartials</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarObs"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarObs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarObserver"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarObserver</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.radarPartials"><code class="docutils literal notranslate"><span class="pre">propSimulation.radarPartials</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.remove_body"><code class="docutils literal notranslate"><span class="pre">propSimulation.remove_body()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.set_integration_parameters"><code class="docutils literal notranslate"><span class="pre">propSimulation.set_integration_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSimulation.set_sim_constants"><code class="docutils literal notranslate"><span class="pre">propSimulation.set_sim_constants()</span></code></a></li>
@@ -1126,7 +1159,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 28, 2023.
+  Last updated on Nov 30, 2023.
   <br/>
 </p>
   </div>
