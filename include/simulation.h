@@ -122,6 +122,7 @@ class propSimulation {
     size_t interpIdx = 0;
     bool tEvalUTC = false;
     bool evalApparentState = false;
+    bool evalMeasurements = false;
     bool convergedLightTime = false;
     std::vector<std::vector<real>> xObserver;
     std::vector<std::vector<real>> observerInfo;
@@ -130,8 +131,10 @@ class propSimulation {
     std::vector<int> radarObserver;
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
-    std::vector<std::vector<real>> opticalObsEval;
-    std::vector<std::vector<real>> radarObsEval;
+    std::vector<std::vector<real>> opticalObs;
+    std::vector<std::vector<real>> opticalPartials;
+    std::vector<std::vector<real>> radarObs;
+    std::vector<std::vector<real>> radarPartials;
     std::vector<real> interpolate(const real t);
 
     // add/remove bodies and add events

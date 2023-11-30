@@ -593,17 +593,21 @@ PYBIND11_MODULE(prop_simulation, m) {
                        R"mydelimiter(
             Interpolation parameters of the simulation. propSimulation.InterpolationParameters object.
             )mydelimiter")
+        .def_readwrite("tEvalUTC", &propSimulation::tEvalUTC, R"mydelimiter(
+            Whether the MJD evaluation time is in UTC for each value in propSimulation.tEval,
+            as opposed to TDB.
+            )mydelimiter")
         .def_readwrite("evalApparentState", &propSimulation::evalApparentState,
                        R"mydelimiter(
             Whether to evaluate the apparent state of the integration bodies.
             )mydelimiter")
+        .def_readwrite("evalMeasurements", &propSimulation::evalMeasurements,
+                       R"mydelimiter(
+            Whether to evaluate the measurements of the integration bodies.
+            )mydelimiter")
         .def_readwrite("convergedLightTime",
                        &propSimulation::convergedLightTime, R"mydelimiter(
             Whether to use converged Newtonian light time correction.
-            )mydelimiter")
-        .def_readwrite("tEvalUTC", &propSimulation::tEvalUTC, R"mydelimiter(
-            Whether the MJD evaluation time is in UTC for each value in propSimulation.tEval,
-            as opposed to TDB.
             )mydelimiter")
         .def_readwrite("xObserver", &propSimulation::xObserver, R"mydelimiter(
             State of the observer for each value in propSimulation.tEval.
@@ -631,13 +635,21 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("xIntegEval", &propSimulation::xIntegEval, R"mydelimiter(
             States of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("opticalObsEval", &propSimulation::opticalObsEval,
+        .def_readwrite("opticalObs", &propSimulation::opticalObs,
                        R"mydelimiter(
             Optical observation of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("radarObsEval", &propSimulation::radarObsEval,
+        .def_readwrite("opticalPartials", &propSimulation::opticalPartials,
+                       R"mydelimiter(
+            Optical observation partials of each integration body in the simulation for each value in propSimulation.tEval.
+            )mydelimiter")
+        .def_readwrite("radarObs", &propSimulation::radarObs,
                        R"mydelimiter(
             Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
+            )mydelimiter")
+        .def_readwrite("radarPartials", &propSimulation::radarPartials,
+                       R"mydelimiter(
+            Radar observation partials of each integration body in the simulation for each value in propSimulation.tEval.
             )mydelimiter")
         .def("interpolate", &propSimulation::interpolate, py::arg("t"),
              R"mydelimiter(

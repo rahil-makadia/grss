@@ -272,9 +272,9 @@ void IntegBody::prepare_stm(){
         std::vector<std::vector<real>> partials(6, std::vector<real>(6, 0.0L));
         mat_mat_mul(bigRotMat, partialsEclip, partials);
         this->dCartdState = partials;
-        // for (size_t i = 0; i < 36; i++) {
-        //     this->stm[i] = partials[i/6][i%6];
-        // }
+        for (size_t i = 0; i < 36; i++) {
+            this->stm[i] = partials[i/6][i%6];
+        }
         for (size_t i = 0; i < 6; i++) {
             for (size_t j = 0; j < numParams; j++) {
                 this->dCartdState[i].push_back(0.0L);
@@ -1000,7 +1000,10 @@ void propSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->radarObserver.clear();
     this->lightTimeEval.clear();
     this->xIntegEval.clear();
-    this->radarObsEval.clear();
+    this->opticalObs.clear();
+    this->opticalPartials.clear();
+    this->radarObs.clear();
+    this->radarPartials.clear();
 
     this->integParams.t0 = this->t;
     this->interpParams.tStack.push_back(this->t);

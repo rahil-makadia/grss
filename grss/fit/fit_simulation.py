@@ -898,6 +898,7 @@ class FitSimulation:
         prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info)
+        prop_sim_past.evalMeasurements = True
         return prop_sim_past
 
     def get_prop_sim_future(self, name, t_eval_utc, eval_apparent_state,
@@ -930,6 +931,7 @@ class FitSimulation:
         prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info)
+        prop_sim_future.evalMeasurements = True
         return prop_sim_future
 
     def get_prop_sims(self, name):
@@ -1127,18 +1129,6 @@ class FitSimulation:
                 fd_pert = 1e-10
         elif self.fit_cometary:
             fd_pert = 1e-8
-            # if key in ['peri_dist']:
-            #     fd_pert = 5e-5
-            # elif key in ['ecc']:
-            #     fd_pert = 5e-4
-            # elif key in ['time_peri']:
-            #     fd_pert = 1e-5
-            # elif key in ['omega']:
-            #     fd_pert = 1e-6
-            # elif key in ['w']:
-            #     fd_pert = 1e-6
-            # elif key in ['i']:
-            #     fd_pert = 1e-6
         if key in ['a1', 'a2', 'a3']:
             fd_pert = 1e-3
         if key[:4] == 'mult':
@@ -1214,6 +1204,8 @@ class FitSimulation:
                                             state_nom, cov_nom, ng_params_nom)
         integ_body_nom.caTol = 0.0 # turn off close approach detection
         # add the nominal integ_body for the residuals
+        if self.analytic_partials:
+            integ_body_nom.prepare_stm()
         if self.past_obs_exist:
             prop_sim_past.add_integ_body(integ_body_nom)
         if self.future_obs_exist:
@@ -1292,18 +1284,18 @@ class FitSimulation:
             If the observer information is not well-defined.
         """
         if self.past_obs_exist and self.future_obs_exist:
-            optical_obs_past = np.array(prop_sim_past.opticalObsEval)
-            optical_obs_future = np.array(prop_sim_future.opticalObsEval)
+            optical_obs_past = np.array(prop_sim_past.opticalObs)
+            optical_obs_future = np.array(prop_sim_future.opticalObs)
             optical_obs = np.vstack((optical_obs_past, optical_obs_future))
-            radar_obs_past = np.array(prop_sim_past.radarObsEval)
-            radar_obs_future = np.array(prop_sim_future.radarObsEval)
+            radar_obs_past = np.array(prop_sim_past.radarObs)
+            radar_obs_future = np.array(prop_sim_future.radarObs)
             radar_obs = np.vstack((radar_obs_past, radar_obs_future))
         elif self.past_obs_exist:
-            optical_obs = np.array(prop_sim_past.opticalObsEval)
-            radar_obs = np.array(prop_sim_past.radarObsEval)
+            optical_obs = np.array(prop_sim_past.opticalObs)
+            radar_obs = np.array(prop_sim_past.radarObs)
         elif self.future_obs_exist:
-            optical_obs = np.array(prop_sim_future.opticalObsEval)
-            radar_obs = np.array(prop_sim_future.radarObsEval)
+            optical_obs = np.array(prop_sim_future.opticalObs)
+            radar_obs = np.array(prop_sim_future.radarObs)
         optical_obs = optical_obs[:,2*integ_body_idx:2*integ_body_idx+2]
         radar_obs = radar_obs[:,integ_body_idx]
         measured_obs = self.obs_array[:, 1:3]
@@ -1320,6 +1312,21 @@ class FitSimulation:
             else:
                 raise ValueError("Observer info length not recognized.")
         return computed_obs
+
+    def _get_analytic_stm(self, t_eval, prop_sim):
+        stm_state_full = np.array(prop_sim.interpolate(t_eval))
+        stm = stm_state_full[6:42].reshape((6,6))
+        if self.fit_cometary:
+            stm[:, 3:6] /= 180.0/np.pi # covert partial w.r.t. rad -> partial w.r.t. deg
+        if len(stm_state_full) > 42:
+            param_block = stm_state_full[42:].reshape((6, -1))
+            stm = np.hstack((stm, param_block))
+            num_params = param_block.shape[1]
+            if num_params > 0:
+                bottom_block = np.zeros((num_params, 6+num_params))
+                bottom_block[:,6:] = np.eye(num_params)
+                stm = np.vstack((stm, bottom_block))
+        return stm
 
     def get_analytic_partials(self, prop_sim_past, prop_sim_future):
         """
@@ -1338,8 +1345,39 @@ class FitSimulation:
         NotImplementedError
             Because analytic partials are not yet implemented.
         """
-        raise NotImplementedError("Analytic partials not yet implemented.",
-                                        "Please use numeric partials.")
+        observer_info = get_observer_info(self.observer_codes)
+        partials = np.zeros((self.n_obs, self.n_fit))
+        len_past_idx = len(self.past_obs_idx) if self.past_obs_exist else 0
+        partials_idx = 0
+        for i in range(self.obs_array.shape[0]):
+            obs_info_len = len(observer_info[i])
+            if obs_info_len in {4, 7}:
+                is_optical = True
+                size = 2
+            elif obs_info_len in {9, 10}:
+                is_optical = False
+                size = 1
+            else:
+                raise ValueError("Observer info length not recognized.")
+            part = np.zeros((size, self.n_fit))
+            if self.past_obs_exist and i < len_past_idx:
+                prop_sim = prop_sim_past
+                sim_idx = i
+            else:
+                prop_sim = prop_sim_future
+                sim_idx = i-len_past_idx
+            t_eval = Time(self.obs_array[i, 0], format='mjd', scale='utc').tdb.mjd
+            t_eval -= prop_sim.lightTimeEval[sim_idx][0]
+            stm = self._get_analytic_stm(t_eval, prop_sim)
+            if is_optical:
+                part[0, :6] = prop_sim.opticalPartials[sim_idx][:6]
+                part[1, :6] = prop_sim.opticalPartials[sim_idx][6:12]
+            else:
+                part[0, :6] = prop_sim.radarPartials[sim_idx][:6]
+            partial = part @ stm
+            partials[partials_idx:partials_idx+size, :] = partial
+            partials_idx += size
+        return partials
 
     def get_numeric_partials(self, prop_sim_past, prop_sim_future, perturbation_info):
         """
@@ -1639,16 +1677,18 @@ class FitSimulation:
         data = self.iters[iter_idx]
         print("Summary of the orbit fit calculations at iteration",
                     f"{data.iter_number} (of {self.n_iter}):")
-        print("=======================================================")
+        print("==============================================================")
         print(f"RMS unweighted: {data.unweighted_rms}")
         print(f"RMS weighted: {data.weighted_rms}")
         print(f"chi-squared: {data.chi_squared}")
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
-        print("=======================================================")
-        print(f"t: MJD {self.t_sol} TDB")
+        print("--------------------------------------------------------------")
+        print(f"Solution Time: MJD {self.t_sol} TDB = ",
+                f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
+        print("--------------------------------------------------------------")
         print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
-                    "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
+                "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
         init_sol = self.iters[0].x_nom
@@ -1899,18 +1939,18 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         apparent_states_past = np.array(prop_sim_past.xIntegEval)
         apparent_states_future = np.array(prop_sim_future.xIntegEval)
         apparent_states = np.vstack((apparent_states_past, apparent_states_future))
-        radar_observations_past = np.array(prop_sim_past.radarObsEval)
-        radar_observations_future = np.array(prop_sim_future.radarObsEval)
+        radar_observations_past = np.array(prop_sim_past.radarObs)
+        radar_observations_future = np.array(prop_sim_future.radarObs)
         radar_observations = np.vstack((radar_observations_past, radar_observations_future))
     elif past_obs_exist:
         apparent_states_past = np.array(prop_sim_past.xIntegEval)
         apparent_states = apparent_states_past
-        radar_observations_past = np.array(prop_sim_past.radarObsEval)
+        radar_observations_past = np.array(prop_sim_past.radarObs)
         radar_observations = radar_observations_past
     elif future_obs_exist:
         apparent_states_future = np.array(prop_sim_future.xIntegEval)
         apparent_states = apparent_states_future
-        radar_observations_future = np.array(prop_sim_future.radarObsEval)
+        radar_observations_future = np.array(prop_sim_future.radarObs)
         radar_observations = radar_observations_future
     optical_idx = 0
     radar_idx = 0

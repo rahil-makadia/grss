@@ -47,14 +47,16 @@ void get_radar_measurement(propSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
-                           std::vector<real> &radarMeasurement);
+                           std::vector<real> &radarMeasurement,
+                           std::vector<real> &radarPartials);
 void get_measurement(propSimulation *propSim, const size_t &interpIdx,
                      const real &t, const real &dt, const real tInterpGeom,
                      const std::vector<real> &xInterpGeom,
                      const std::vector<real> &xInterpApparent);
 void get_optical_measurement(propSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
-                             std::vector<real> &opticalMeasurement);
+                             std::vector<real> &opticalMeasurement,
+                             std::vector<real> &opticalPartials);
 void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt, const size_t &i,
                            const real tInterpGeom,
@@ -63,16 +65,19 @@ void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
                            std::vector<real> &xTrgtBaryRcv,
                            std::vector<real> &xObsBaryRcv,
                            std::vector<real> &xTrgtBaryBounce,
-                           std::vector<real> &xObsBaryTx, real &delayMeasurement);
+                           std::vector<real> &xObsBaryTx, real &delayMeasurement,
+                           std::vector<real> &delayPartials);
 void get_delta_delay_relativistic(propSimulation *propSim,
                                   const real &tForSpice,
                                   const std::vector<real> &targetState,
                                   real &deltaDelayRelativistic);
-void get_doppler_measurement(propSimulation *propSim, const real receiveTimeTDB,
+void get_doppler_measurement(propSimulation *propSim, const size_t &i,
+                             const real receiveTimeTDB,
                              const real transmitTimeTDB,
                              const std::vector<real> xObsBaryRcv,
                              const std::vector<real> xTrgtBaryBounce,
                              const std::vector<real> xObsBaryTx,
-                             const real transmitFreq, real &dopplerMeasurement);
+                             const real transmitFreq, real &dopplerMeasurement,
+                             std::vector<real> &dopplerPartials);
 
 #endif

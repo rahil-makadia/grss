@@ -596,15 +596,8 @@ void cartesian_cometary_partials(const real &epochMjd,
     const real omega = keplerianState[4];
     const real nu = keplerianState[5];
     const real E = 2 * atan2(tan(nu / 2) * sqrt(1 - e), sqrt(1 + e));
-    std::cout.precision(20);
-    std::cout << "a: " << a << ". nu: " << nu << ". E: " << E << std::endl;
     real *part = new real[6];
-    dCartde(GM, a, e, inc, Omega, omega, E, part);
-    std::cout << "dCartde: " << std::endl;
-    for (size_t i = 0; i < 6; i++) {
-        std::cout << part[i] << ", ";
-    }
-    std::cout << std::endl;
+    // dCartde(GM, a, e, inc, Omega, omega, E, part);
     dCartdeNum(epochMjd, GM, cometaryState, part);
     for (size_t i = 0; i < 6; i++) {
         partials[i][0] = part[i];

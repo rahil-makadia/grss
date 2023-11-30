@@ -26,8 +26,10 @@ void propSimulation::integrate() {
         std::reverse(this->radarObserver.begin(), this->radarObserver.end());
         std::reverse(this->lightTimeEval.begin(), this->lightTimeEval.end());
         std::reverse(this->xIntegEval.begin(), this->xIntegEval.end());
-        std::reverse(this->opticalObsEval.begin(), this->opticalObsEval.end());
-        std::reverse(this->radarObsEval.begin(), this->radarObsEval.end());
+        std::reverse(this->opticalObs.begin(), this->opticalObs.end());
+        std::reverse(this->opticalPartials.begin(), this->opticalPartials.end());
+        std::reverse(this->radarObs.begin(), this->radarObs.end());
+        std::reverse(this->radarPartials.begin(), this->radarPartials.end());
     }
 }
 

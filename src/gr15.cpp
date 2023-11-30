@@ -343,9 +343,9 @@ void gr15(propSimulation *propSim) {
             }
             approx_xInteg(xInteg0, accInteg0, dt, 1.0, b,
                         propSim->integBodies, xInteg, xIntegCompCoeffs);
-            accInteg0 = get_state_der(t + dt, xInteg, propSim);
             t += dt;
             propSim->t = t;
+            accInteg0 = get_state_der(t, xInteg, propSim);
             check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
                                     xInteg);
             propSim->xInteg = xInteg;
@@ -372,6 +372,8 @@ void gr15(propSimulation *propSim) {
             oneStepDone = 1;
         }
     }
+    propSim->interpParams.bStack.push_back(b);
+    propSim->interpParams.accIntegStack.push_back(accInteg0);
     delete[] bCompCoeffs;
     delete[] g;
     delete[] e;
