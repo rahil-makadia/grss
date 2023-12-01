@@ -41,13 +41,15 @@ class IntegBody : public Body {
    public:
     int spiceId = -99999;
     bool isCometary = false;
+    std::vector<real> initState;
     bool isInteg = true;
     bool isThrusting = false;
     std::vector<std::vector<real>> covariance;
     NongravParamaters ngParams;
+    size_t n2Derivs = 3;
     bool propStm = false;
     std::vector<real> stm;
-    size_t n2Derivs = 3;
+    std::vector<std::vector<real>> dCartdState;
     // constructors
     IntegBody(std::string name, real t0, real mass, real radius,
               std::vector<real> cometaryState,
@@ -120,6 +122,7 @@ class propSimulation {
     size_t interpIdx = 0;
     bool tEvalUTC = false;
     bool evalApparentState = false;
+    bool evalMeasurements = false;
     bool convergedLightTime = false;
     std::vector<std::vector<real>> xObserver;
     std::vector<std::vector<real>> observerInfo;
@@ -128,8 +131,10 @@ class propSimulation {
     std::vector<int> radarObserver;
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
-    std::vector<std::vector<real>> opticalObsEval;
-    std::vector<std::vector<real>> radarObsEval;
+    std::vector<std::vector<real>> opticalObs;
+    std::vector<std::vector<real>> opticalPartials;
+    std::vector<std::vector<real>> radarObs;
+    std::vector<std::vector<real>> radarPartials;
     std::vector<real> interpolate(const real t);
 
     // add/remove bodies and add events

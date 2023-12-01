@@ -161,6 +161,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     std::vector<real> cartesianPos(3);
     std::vector<real> cartesianVel(3);
     this->isCometary = true;
+    this->initState = cometaryState;
 
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
@@ -210,6 +211,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->radius = radius;
     this->caTol = 0.0;
     this->isCometary = false;
+    this->initState = {pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]};
     this->pos[0] = pos[0];
     this->pos[1] = pos[1];
     this->pos[2] = pos[2];
@@ -238,15 +240,19 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
 
 void IntegBody::prepare_stm(){
     int stmSize = 36;
+    size_t numParams = 0;
     if (this->isNongrav) {
         if (ngParams.a1 != 0.0L) {
             stmSize += 6;
+            numParams++;
         }
         if (ngParams.a2 != 0.0L) {
             stmSize += 6;
+            numParams++;
         }
         if (ngParams.a3 != 0.0L) {
             stmSize += 6;
+            numParams++;
         }
     }
     this->stm = std::vector<real>(stmSize, 0.0L);
@@ -255,6 +261,37 @@ void IntegBody::prepare_stm(){
     }
     this->n2Derivs += (size_t) stmSize/2;
     this->propStm = true;
+    if (this->isCometary){
+        std::vector<std::vector<real>> partialsEclip;
+        cartesian_cometary_partials(this->t0, this->initState, partialsEclip);
+        std::vector<std::vector<real>> bigRotMat(6, std::vector<real>(6, 0.0L));
+        bigRotMat[0][0] = bigRotMat[3][3] = 1.0L;
+        bigRotMat[1][1] = bigRotMat[4][4] = bigRotMat[2][2] = bigRotMat[5][5] = cos(EARTH_OBLIQUITY);
+        bigRotMat[1][2] = bigRotMat[4][5] = -sin(EARTH_OBLIQUITY);
+        bigRotMat[2][1] = bigRotMat[5][4] = sin(EARTH_OBLIQUITY);
+        std::vector<std::vector<real>> partials(6, std::vector<real>(6, 0.0L));
+        mat_mat_mul(bigRotMat, partialsEclip, partials);
+        this->dCartdState = partials;
+        for (size_t i = 0; i < 36; i++) {
+            this->stm[i] = partials[i/6][i%6];
+        }
+        for (size_t i = 0; i < 6; i++) {
+            for (size_t j = 0; j < numParams; j++) {
+                this->dCartdState[i].push_back(0.0L);
+            }
+        }
+    } else {
+        this->dCartdState = std::vector<std::vector<real>>(6, std::vector<real>(6+numParams, 0.0L));
+        for (size_t i = 0; i < 6; i++) {
+            this->dCartdState[i][i] = 1.0L;
+        }
+    }
+    for (size_t i = 0; i < numParams; i++) {
+        this->dCartdState.push_back(std::vector<real>(6+numParams, 0.0L));
+    }
+    for (size_t i = 6; i < 6+numParams; i++) {
+        this->dCartdState[i][i] = 1.0L;
+    }
 }
 
 void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,
@@ -782,6 +819,8 @@ void propSimulation::add_integ_body(IntegBody body) {
         body.vel[1] += sunState[4];
         body.vel[2] += sunState[5];
     }
+    body.initState = {body.pos[0], body.pos[1], body.pos[2],
+                      body.vel[0], body.vel[1], body.vel[2]};
     body.radius /= this->consts.du2m;
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
@@ -961,7 +1000,10 @@ void propSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->radarObserver.clear();
     this->lightTimeEval.clear();
     this->xIntegEval.clear();
-    this->radarObsEval.clear();
+    this->opticalObs.clear();
+    this->opticalPartials.clear();
+    this->radarObs.clear();
+    this->radarPartials.clear();
 
     this->integParams.t0 = this->t;
     this->interpParams.tStack.push_back(this->t);
