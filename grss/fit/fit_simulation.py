@@ -582,6 +582,7 @@ class FitSimulation:
         self.covariance = None
         self.obs_array = None
         self.observer_codes = None
+        self.observer_info = None
         self.check_initial_solution(x_init, cov_init)
         self.check_input_observation_arrays(obs_array_optical, observer_codes_optical,
                                             obs_array_radar, observer_codes_radar)
@@ -781,6 +782,7 @@ class FitSimulation:
                                                                     self.obs_array_radar[:, 0])
             self.observer_codes = tuple(np.array(self.observer_codes_radar,
                                                     dtype=tuple)[sort_idx])
+        self.observer_info = get_observer_info(self.observer_codes)
         # number of observations is the number of non-nan values
         # in the second and third columns of the observation array
         self.n_obs = np.count_nonzero(~np.isnan(self.obs_array[:, 1:3]))
@@ -953,7 +955,7 @@ class FitSimulation:
         t_eval_utc = True
         eval_apparent_state = True
         converged_light_time = True
-        observer_info = np.array(get_observer_info(self.observer_codes), dtype=tuple)
+        observer_info = np.array(self.observer_info, dtype=tuple)
         observer_info_past = tuple(observer_info[self.past_obs_idx])
         observer_info_future = tuple(observer_info[self.future_obs_idx])
         prop_sim_past = None
@@ -1300,9 +1302,8 @@ class FitSimulation:
         radar_obs = radar_obs[:,integ_body_idx]
         measured_obs = self.obs_array[:, 1:3]
         computed_obs = np.nan*np.ones_like(measured_obs)
-        observer_info = get_observer_info(self.observer_codes)
         for i in range(len(self.obs_array)):
-            obs_info_len = len(observer_info[i])
+            obs_info_len = len(self.observer_info[i])
             if obs_info_len in {4, 7}:
                 computed_obs[i, :] = optical_obs[i]
             elif obs_info_len == 9: # delay measurement
@@ -1319,7 +1320,7 @@ class FitSimulation:
         if self.fit_cometary:
             stm[:, 3:6] /= 180.0/np.pi # covert partial w.r.t. rad -> partial w.r.t. deg
         if len(stm_state_full) > 42:
-            param_block = stm_state_full[42:].reshape((6, -1))
+            param_block = stm_state_full[42:].reshape((6, -1), order='F')
             stm = np.hstack((stm, param_block))
             num_params = param_block.shape[1]
             if num_params > 0:
@@ -1345,12 +1346,11 @@ class FitSimulation:
         NotImplementedError
             Because analytic partials are not yet implemented.
         """
-        observer_info = get_observer_info(self.observer_codes)
         partials = np.zeros((self.n_obs, self.n_fit))
         len_past_idx = len(self.past_obs_idx) if self.past_obs_exist else 0
         partials_idx = 0
         for i in range(self.obs_array.shape[0]):
-            obs_info_len = len(observer_info[i])
+            obs_info_len = len(self.observer_info[i])
             if obs_info_len in {4, 7}:
                 is_optical = True
                 size = 2
@@ -1498,12 +1498,11 @@ class FitSimulation:
         chi_reject = 3.0
         chi_recover = 2.8
         full_cov = np.linalg.inv(partials.T @ self.obs_weight @ partials)
-        observer_info = get_observer_info(self.observer_codes)
         j = 0
         residual_chi_squared = np.zeros(len(self.obs_array))
         rejected_indices = []
         for i in range(len(self.obs_array)):
-            obs_info_len = len(observer_info[i])
+            obs_info_len = len(self.observer_info[i])
             if obs_info_len in {4, 7}:
                 size = 2
             elif obs_info_len in {9, 10}:
