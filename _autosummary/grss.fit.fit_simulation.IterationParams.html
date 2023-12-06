@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.fit.fit_simulation.FitSimulation" href="grss.fit.fit_simulation.FitSimulation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 05, 2023"/>
+    <meta name="docbuild:last-update" content="Dec 06, 2023"/>
   </head>
   
   
@@ -455,14 +455,7 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams"><code class="docutils literal notranslate"><span class="pre">IterationParams</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.__init__"><code class="docutils literal notranslate"><span class="pre">IterationParams.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.assemble_info"><code class="docutils literal notranslate"><span class="pre">IterationParams.assemble_info()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.calculate_chis"><code class="docutils literal notranslate"><span class="pre">IterationParams.calculate_chis()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.calculate_rms"><code class="docutils literal notranslate"><span class="pre">IterationParams.calculate_rms()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.flatten_and_clean"><code class="docutils literal notranslate"><span class="pre">IterationParams.flatten_and_clean()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.plot_chi"><code class="docutils literal notranslate"><span class="pre">IterationParams.plot_chi()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.plot_iteration_summary"><code class="docutils literal notranslate"><span class="pre">IterationParams.plot_iteration_summary()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.plot_residuals"><code class="docutils literal notranslate"><span class="pre">IterationParams.plot_residuals()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.scatter_hist"><code class="docutils literal notranslate"><span class="pre">IterationParams.scatter_hist()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -511,127 +504,11 @@ and chi-squared values for each iteration.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.__init__" title="grss.fit.fit_simulation.IterationParams.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(iter_number, x_nom, covariance, ...)</p></td>
 <td><p>Constructor for the IterationParams class</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.assemble_info" title="grss.fit.fit_simulation.IterationParams.assemble_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assemble_info</span></code></a>()</p></td>
-<td><p>Assembles the information for the iteration into a dictionary</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.calculate_chis" title="grss.fit.fit_simulation.IterationParams.calculate_chis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_chis</span></code></a>()</p></td>
-<td><p>Calculates the chi and chi-squared values for the residuals</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.calculate_rms" title="grss.fit.fit_simulation.IterationParams.calculate_rms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_rms</span></code></a>()</p></td>
-<td><p>Calculate the weighted and unweighted RMS values for the residuals</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.flatten_and_clean" title="grss.fit.fit_simulation.IterationParams.flatten_and_clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten_and_clean</span></code></a>(arr)</p></td>
-<td><p>Flatten an array and remove NaNs</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.plot_chi" title="grss.fit.fit_simulation.IterationParams.plot_chi"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_chi</span></code></a>(t_arr, ra_chi, dec_chi, delay_chi, ...)</p></td>
-<td><p>Plot the chi and chi-squared values for the residuals</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.plot_iteration_summary" title="grss.fit.fit_simulation.IterationParams.plot_iteration_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_iteration_summary</span></code></a>([show_logarithmic, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.plot_iteration_summary" title="grss.fit.fit_simulation.IterationParams.plot_iteration_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_iteration_summary</span></code></a>([show_logarithmic, ...])</p></td>
 <td><p>Plot the summary of the iteration, including residuals, chi values, and chi squared values.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.plot_residuals" title="grss.fit.fit_simulation.IterationParams.plot_residuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_residuals</span></code></a>(t_arr, ra_residuals, ...)</p></td>
-<td><p>Plot the residuals</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.scatter_hist" title="grss.fit.fit_simulation.IterationParams.scatter_hist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter_hist</span></code></a>(x_val, y_val, axis, ax_histx, ...)</p></td>
-<td><p>Create a scatter plot with histograms on the right and top 4x4 grid</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.assemble_info">
-<span class="sig-name descname"><span class="pre">assemble_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.assemble_info" title="Permalink to this definition">#</a></dt>
-<dd><p>Assembles the information for the iteration into a dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.calculate_chis">
-<span class="sig-name descname"><span class="pre">calculate_chis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.calculate_chis" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculates the chi and chi-squared values for the residuals</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.calculate_rms">
-<span class="sig-name descname"><span class="pre">calculate_rms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.calculate_rms" title="Permalink to this definition">#</a></dt>
-<dd><p>Calculate the weighted and unweighted RMS values for the residuals</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.flatten_and_clean">
-<span class="sig-name descname"><span class="pre">flatten_and_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.flatten_and_clean" title="Permalink to this definition">#</a></dt>
-<dd><p>Flatten an array and remove NaNs</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>arr</strong> (<em>array</em>) – Array to be flattened and cleaned</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>arr</strong> – Flattened and cleaned array</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>array</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.plot_chi">
-<span class="sig-name descname"><span class="pre">plot_chi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doppler_chi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_chi_squared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_chi_squared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_chi_squared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doppler_chi_squared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_chi_squared</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radar_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markersize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_logarithmic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_close</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.plot_chi" title="Permalink to this definition">#</a></dt>
-<dd><p>Plot the chi and chi-squared values for the residuals</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t_arr</strong> (<em>vector</em>) – time array</p></li>
-<li><p><strong>ra_chi</strong> (<em>vector</em>) – right ascension chi values</p></li>
-<li><p><strong>dec_chi</strong> (<em>vector</em>) – declination chi values</p></li>
-<li><p><strong>delay_chi</strong> (<em>vector</em>) – delay chi values</p></li>
-<li><p><strong>doppler_chi</strong> (<em>vector</em>) – doppler chi values</p></li>
-<li><p><strong>ra_chi_squared</strong> (<em>vector</em>) – right ascension chi-squared values</p></li>
-<li><p><strong>dec_chi_squared</strong> (<em>vector</em>) – declination chi-squared values</p></li>
-<li><p><strong>delay_chi_squared</strong> (<em>vector</em>) – delay chi-squared values</p></li>
-<li><p><strong>doppler_chi_squared</strong> (<em>vector</em>) – doppler chi-squared values</p></li>
-<li><p><strong>plot_chi_squared</strong> (<em>bool</em>) – Flag to plot the chi-squared values</p></li>
-<li><p><strong>sigma_limit</strong> (<em>float</em>) – reference sigma limit for plotting the chi values</p></li>
-<li><p><strong>radar_scale</strong> (<em>float</em>) – scale factor for the radar scatter points</p></li>
-<li><p><strong>markersize</strong> (<em>float</em>) – size of the scatter points</p></li>
-<li><p><strong>show_logarithmic</strong> (<em>bool</em>) – Flag to show the chi values on a logarithmic scale</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – title for the plot</p></li>
-<li><p><strong>savefig</strong> (<em>bool</em>) – Flag to save the figure</p></li>
-<li><p><strong>figname</strong> (<em>str</em>) – name of the figure to save</p></li>
-<li><p><strong>auto_close</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to automatically close the figure</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.plot_iteration_summary">
 <span class="sig-name descname"><span class="pre">plot_iteration_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_logarithmic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_chi_squared</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.plot_iteration_summary" title="Permalink to this definition">#</a></dt>
@@ -646,62 +523,6 @@ and chi squared values.</p>
 <li><p><strong>savefig</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to save the figure, by default False</p></li>
 <li><p><strong>figname</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the figure, by default None</p></li>
 <li><p><strong>auto_close</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to automatically close the figure, by default False</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.plot_residuals">
-<span class="sig-name descname"><span class="pre">plot_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ra_cosdec_residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doppler_residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radar_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markersize</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_logarithmic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_close</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.plot_residuals" title="Permalink to this definition">#</a></dt>
-<dd><p>Plot the residuals</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t_arr</strong> (<em>vector</em>) – time array</p></li>
-<li><p><strong>ra_residuals</strong> (<em>vector</em>) – right ascension residuals</p></li>
-<li><p><strong>dec_residuals</strong> (<em>vector</em>) – declination residuals</p></li>
-<li><p><strong>ra_cosdec_residuals</strong> (<em>vector</em>) – right ascension residuals multiplied by the cosine of the declination</p></li>
-<li><p><strong>delay_residuals</strong> (<em>vector</em>) – delay residuals</p></li>
-<li><p><strong>doppler_residuals</strong> (<em>vector</em>) – doppler residuals</p></li>
-<li><p><strong>radar_scale</strong> (<em>float</em>) – scale factor for the radar scatter points</p></li>
-<li><p><strong>markersize</strong> (<em>float</em>) – size of the scatter points</p></li>
-<li><p><strong>show_logarithmic</strong> (<em>bool</em>) – Flag to show the logarithmic scale on the plot</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – title of the plot</p></li>
-<li><p><strong>savefig</strong> (<em>bool</em>) – Flag to save the figure</p></li>
-<li><p><strong>figname</strong> (<em>str</em>) – Name of the figure to save</p></li>
-<li><p><strong>auto_close</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to automatically close the figure</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.scatter_hist">
-<span class="sig-name descname"><span class="pre">scatter_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_histx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax_histy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_logarithmic</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.scatter_hist" title="Permalink to this definition">#</a></dt>
-<dd><p>Create a scatter plot with histograms on the right and top 4x4 grid</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x_val</strong> (<em>vector</em>) – x values to plot</p></li>
-<li><p><strong>y_val</strong> (<em>vector</em>) – y values to plot</p></li>
-<li><p><strong>axis</strong> (<em>matplotlib axis</em>) – axis to plot the scatter points on</p></li>
-<li><p><strong>ax_histx</strong> (<em>matplotlib axis</em>) – axis to plot the x histogram on</p></li>
-<li><p><strong>ax_histy</strong> (<em>matplotlib axis</em>) – axis to plot the y histogram on</p></li>
-<li><p><strong>size</strong> (<em>float</em>) – size of the scatter points</p></li>
-<li><p><strong>show_logarithmic</strong> (<em>bool</em>) – Flag to show the logarithmic scale on the histograms</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -763,14 +584,7 @@ and chi squared values.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams"><code class="docutils literal notranslate"><span class="pre">IterationParams</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.__init__"><code class="docutils literal notranslate"><span class="pre">IterationParams.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.assemble_info"><code class="docutils literal notranslate"><span class="pre">IterationParams.assemble_info()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.calculate_chis"><code class="docutils literal notranslate"><span class="pre">IterationParams.calculate_chis()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.calculate_rms"><code class="docutils literal notranslate"><span class="pre">IterationParams.calculate_rms()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.flatten_and_clean"><code class="docutils literal notranslate"><span class="pre">IterationParams.flatten_and_clean()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.plot_chi"><code class="docutils literal notranslate"><span class="pre">IterationParams.plot_chi()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.plot_iteration_summary"><code class="docutils literal notranslate"><span class="pre">IterationParams.plot_iteration_summary()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.plot_residuals"><code class="docutils literal notranslate"><span class="pre">IterationParams.plot_residuals()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.IterationParams.scatter_hist"><code class="docutils literal notranslate"><span class="pre">IterationParams.scatter_hist()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -806,7 +620,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 05, 2023.
+  Last updated on Dec 06, 2023.
   <br/>
 </p>
   </div>
