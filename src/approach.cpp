@@ -57,10 +57,23 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                 // check impacts with spiceBodies first
                 if (j > propSim->integParams.nInteg &&
                     relDist <= radius + radiusj) {
-                    std::cout << "Impact detected at MJD " << t << " TDB. Body "
+                    real tImp;
+                    real xRelImp[6];
+                    get_ca_or_impact_time(propSim, i, j, tOld, t, tImp, impact_r_calc);
+                    get_rel_state(propSim, i, j, tImp, xRelImp);
+                    CloseApproachParameters ca;
+                    ca.tCA = tImp;
+                    for (size_t k = 0; k < 6; k++) {
+                        ca.xRelCA[k] = xRelImp[k];
+                    }
+                    ca.flybyBodyIdx = i;
+                    ca.centralBodyIdx = j;
+                    ca.get_ca_parameters(propSim, tImp);
+                    propSim->caParams.push_back(ca);
+                    std::cout << "Impact detected at MJD " << t << " TDB. "
                               << propSim->integBodies[i].name
-                              << " collided with body " << bodyj->name
-                              << ". Terminating simulation!" << std::endl;
+                              << " collided with " << bodyj->name
+                              << ". Terminating propagation!" << std::endl;
                     keepStepping = 0;
                     return;
                 }
@@ -80,8 +93,8 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                 if (relDistMinimum && relDistWithinTol) {
                     real tCA;
                     real xRelCA[6];
-                    get_ca_time(propSim, i, j, tOld, t, tCA);
-                    get_ca_state(propSim, i, j, tCA, xRelCA);
+                    get_ca_or_impact_time(propSim, i, j, tOld, t, tCA, ca_rdot_calc);
+                    get_rel_state(propSim, i, j, tCA, xRelCA);
                     CloseApproachParameters ca;
                     ca.tCA = tCA;
                     for (size_t k = 0; k < 6; k++) {
@@ -104,17 +117,35 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
 void ca_rdot_calc(propSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &rDot) {
     // Calculate the radial velocity between two bodies at a given time
-    // This is used in root_brent to find the time of closest approach
+    // This is used in get_ca_or_impact_time to find the time of closest approach
     real xRel[6];
-    get_ca_state(propSim, i, j, t, xRel);
+    get_rel_state(propSim, i, j, t, xRel);
     real relDist =
         sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
     rDot =
         (xRel[0] * xRel[3] + xRel[1] * xRel[4] + xRel[2] * xRel[5]) / relDist;
 }
 
-void get_ca_state(propSimulation *propSim, const size_t &i, const size_t &j,
-                  const real &t, real xRelCA[6]) {
+void impact_r_calc(propSimulation *propSim, const size_t &i, const size_t &j,
+                  const real &t, real &r) {
+    // Calculate the distance between two bodies at a given time, accounting for
+    // the radius of the bodies
+    real xRel[6];
+    get_rel_state(propSim, i, j, t, xRel);
+    real relDist =
+        sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
+    real radius, radiusj;
+    radius = propSim->integBodies[i].radius;
+    if (j < propSim->integParams.nInteg) {
+        radiusj = propSim->integBodies[j].radius;
+    } else {
+        radiusj = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
+    }
+    r = relDist - radius - radiusj;
+}
+
+void get_rel_state(propSimulation *propSim, const size_t &i, const size_t &j,
+                   const real &t, real xRel[6]) {
     std::vector<real> xInterp = propSim->interpolate(t);
     size_t starti = 0;
     for (size_t k = 0; k < i; k++) {
@@ -126,7 +157,7 @@ void get_ca_state(propSimulation *propSim, const size_t &i, const size_t &j,
             startj += 2*propSim->integBodies[k].n2Derivs;
         }
         for (size_t k = 0; k < 6; k++) {
-            xRelCA[k] = xInterp[starti + k] - xInterp[startj + k];
+            xRel[k] = xInterp[starti + k] - xInterp[startj + k];
         }
     } else {
         double xSpice[9];
@@ -134,16 +165,20 @@ void get_ca_state(propSimulation *propSim, const size_t &i, const size_t &j,
             propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId, t,
             propSim->ephem, xSpice);
         for (size_t k = 0; k < 6; k++) {
-            xRelCA[k] = xInterp[starti + k] - xSpice[k];
+            xRel[k] = xInterp[starti + k] - xSpice[k];
         }
     }
 }
 
-void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
-                 const real &x1, const real &x2, real &tCA) {
+void get_ca_or_impact_time(propSimulation *propSim, const size_t &i,
+                           const size_t &j, const real &x1, const real &x2,
+                           real &tCA,
+                           void (*zero_func)(propSimulation *, const size_t &,
+                                             const size_t &, const real &,
+                                             real &)) {
     // Brent's method for root finding, from Numerical Recipes in C/C++, 3rd
     // edition, p. 454
-    const real tol = 1.0e-3 / 86400.0;  // 1 millisecond
+    const real tol = 1.0e-6 / 86400.0;  // 1 microsecond
     const size_t maxIter = 100;
     const real eps = std::numeric_limits<real>::epsilon();
     real a = x1;
@@ -153,10 +188,10 @@ void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
     real e = 0.0;
     real min1, min2;
     real fa, fb, fc, p, q, r, s, tol1, xm;
-    ca_rdot_calc(propSim, i, j, a, fa);
-    ca_rdot_calc(propSim, i, j, b, fb);
+    zero_func(propSim, i, j, a, fa);
+    zero_func(propSim, i, j, b, fb);
     if ((fa > 0.0 && fb > 0.0) || (fa < 0.0 && fb < 0.0)) {
-        throw std::runtime_error("Root must be bracketed in root_brent");
+        throw std::runtime_error("Root must be bracketed in get_ca_or_impact_time");
     }
     fc = fb;
     size_t iter;
@@ -215,10 +250,10 @@ void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
         } else {
             b += (xm > 0.0 ? fabs(tol1) : -fabs(tol1));
         }
-        ca_rdot_calc(propSim, i, j, b, fb);
+        zero_func(propSim, i, j, b, fb);
     }
-    throw std::runtime_error(
-        "Maximum number of iterations exceeded in root_brent");
+    std::cout << "WARNING: Maximum number of iterations exceeded in "
+                 "get_ca_or_impact_time!!! Impact/CA time may not be accurate.";
 }
 
 void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const real &tMap) {
@@ -227,7 +262,7 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
     real xRelMap[6];
     const size_t i = this->flybyBodyIdx;
     const size_t j = this->centralBodyIdx;
-    get_ca_state(propSim, i, j, tMap, xRelMap);
+    get_rel_state(propSim, i, j, tMap, xRelMap);
     for (size_t k = 0; k < 6; k++) {
         this->xRelMap[k] = xRelMap[k];
     }
