@@ -39,6 +39,8 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                     bodyj =
                         &propSim->spiceBodies[j - propSim->integParams.nInteg];
                     radiusj = bodyj->radius;
+                    const real atm_offset = 100.0e3/propSim->consts.du2m;
+                    radiusj += atm_offset;
                     double xSpiceOld[9];
                     get_spk_state(bodyj->spiceId, tOld, propSim->ephem,
                                   xSpiceOld);
@@ -140,6 +142,8 @@ void impact_r_calc(propSimulation *propSim, const size_t &i, const size_t &j,
         radiusj = propSim->integBodies[j].radius;
     } else {
         radiusj = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
+        const real atm_offset = 100.0e3/propSim->consts.du2m;
+        radiusj += atm_offset;
     }
     r = relDist - radius - radiusj;
 }

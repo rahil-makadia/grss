@@ -610,6 +610,7 @@ class FitSimulation:
             self.fit_events = False
         self.reject_outliers = True
         self.residual_chi_squared = [None]*len(self.obs_array)
+        self.num_rejected = 0
         self.converged = False
         return None
 
@@ -1535,9 +1536,9 @@ class FitSimulation:
         weights = np.delete(weights, rejected_indices, axis=1)
         residuals = np.delete(residuals, rejected_indices, axis=0)
         # print(rejected_indices)
-        num_rejected = len(rejected_indices)//2
-        num_total = len(self.obs_array)
-        if num_rejected/num_total > 0.25:
+        self.num_rejected = len(rejected_indices)//2
+        rejected_fraction = self.num_rejected/len(self.obs_array)
+        if rejected_fraction > 0.25:
             print("WARNING: More than 25% of observations rejected. Consider changing chi_reject",
                     "and chi_recover values, or turning off outlier rejection altogether.")
         self.residual_chi_squared = residual_chi_squared
@@ -1642,7 +1643,8 @@ class FitSimulation:
             self._check_convergence()
             if self.converged:
                 if self.reject_outliers and start_rejecting:
-                    print("Converged after rejecting outliers.")
+                    print(f"Converged after rejecting outliers. Rejected {self.num_rejected} out",
+                            f"of {len(self.obs_array_optical)} optical observations.")
                     break
                 msg = "Converged without rejecting outliers."
                 if self.reject_outliers:
