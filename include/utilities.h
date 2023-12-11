@@ -114,8 +114,8 @@ struct BPlaneParameters {
 class CloseApproachParameters {
    private:
    public:
-    real tCA;
-    std::vector<real> xRelCA = std::vector<real>(6, 0.0L);
+    real t;
+    std::vector<real> xRel = std::vector<real>(6, 0.0L);
     real tMap;
     std::vector<real> xRelMap = std::vector<real>(6, 0.0L);
     real dist;
@@ -137,6 +137,17 @@ class CloseApproachParameters {
     BPlaneParameters scaled;
     BPlaneParameters mtp;
     void get_ca_parameters(propSimulation *propSim, const real &tMap);
+    void print_summary(int prec=8);
+};
+
+class ImpactParameters : public CloseApproachParameters {
+   private:
+   public:
+    std::vector<real> xRelBodyFixed = std::vector<real>(6, 0.0L);
+    real lon;
+    real lat;
+    real alt;
+    void get_impact_parameters(propSimulation *propSim);
     void print_summary(int prec=8);
 };
 

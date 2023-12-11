@@ -100,7 +100,7 @@ std::vector<real> propSimulation::interpolate(const real t) {
         real tRef;
         if (forwardProp) {
             tRef = this->integParams.tf + this->tEvalMargin;
-        } else if (backwardProp) {
+        } else {
             tRef = this->integParams.tf - this->tEvalMargin;
         }
         dt = tRef - t0;
@@ -492,8 +492,8 @@ void get_radar_measurement(propSimulation *propSim, const size_t &interpIdx,
         real delayMeasurement;
         get_delay_measurement(propSim, interpIdx, t, dt, i, tInterpGeom,
                               xInterpGeom, receiveTimeTDB, transmitTimeTDB,
-                              xTrgtBaryRcv, xObsBaryRcv, xTrgtBaryBounce,
-                              xObsBaryTx, delayMeasurement, radarPartials);
+                              xObsBaryRcv, xTrgtBaryBounce, xObsBaryTx,
+                              delayMeasurement, radarPartials);
         if (propSim->radarObserver[interpIdx] == 1) {
             radarMeasurement[i] = delayMeasurement;
         } else if (propSim->radarObserver[interpIdx] == 2) {
@@ -511,7 +511,6 @@ void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            const real &receiveTimeTDB, real &transmitTimeTDB,
-                           std::vector<real> &xTrgtBaryRcv,
                            std::vector<real> &xObsBaryRcv,
                            std::vector<real> &xTrgtBaryBounce,
                            std::vector<real> &xObsBaryTx, real &delayMeasurement,

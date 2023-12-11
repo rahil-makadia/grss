@@ -188,15 +188,15 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     fac = prop_sim.consts.du2m/1000/scale_factor
 
     ca_times = [
-        approach.tCA
+        approach.t
         for approach in prop_sim.caParams
         if approach.flybyBody == flyby_body
         and approach.centralBody == central_body
         and approach.impact is False
     ]
     impact_times = [
-        approach.tCA
-        for approach in prop_sim.caParams
+        approach.t
+        for approach in prop_sim.impactParams
         if approach.flybyBody == flyby_body
         and approach.centralBody == central_body
         and approach.impact is True
@@ -366,7 +366,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     if not units_km:
         central_body_radius /= 149597870.7
         units = "AU"
-    times = np.array([approach.tCA for approach in ca_list])
+    times = np.array([approach.t for approach in ca_list])
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
     kizner_y = np.array([approach.kizner.y*au2units for approach in ca_list])

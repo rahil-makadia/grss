@@ -705,7 +705,7 @@ void dCartde2(const real &GM, const real &a, const real &e, const real &inc,
     partial[5] = t47 * (-t37 * t15 - t3 * t50) * t53 * t35 * t58;
 }
 
-void dCartde3(const real &GM, const real &a, const real &e, const real &inc,
+void dCartde3(const real &a, const real &e, const real &inc,
              const real &Omega, const real &omega, const real &E,
              real *partial) {
     std::vector<std::vector<real>> R1(3, std::vector<real>(3));

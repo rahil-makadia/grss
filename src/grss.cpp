@@ -165,13 +165,13 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<CloseApproachParameters>(m, "CloseApproachParameters",
                                         R"mydelimiter(
         The CloseApproachParameters class contains parameters used for calculating
-        the close approach between two integrated bodies.
+        the close approach between two integrated or SPICE bodies.
         )mydelimiter")
         .def(py::init<>())
-        .def_readwrite("tCA", &CloseApproachParameters::tCA, R"mydelimiter(
+        .def_readwrite("t", &CloseApproachParameters::t, R"mydelimiter(
             Time of the close approach.
             )mydelimiter")
-        .def_readwrite("xRelCA", &CloseApproachParameters::xRelCA,
+        .def_readwrite("xRel", &CloseApproachParameters::xRel,
                        R"mydelimiter(
             Relative state of the close approach.
             )mydelimiter")
@@ -257,6 +257,40 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def("print_summary", &CloseApproachParameters::print_summary,
             py::arg("prec") = 8, R"mydelimiter(
             Print a summary of the close approach parameters.
+
+            Parameters
+            ----------
+            prec : int, optional
+                Precision of the printed values, by default 8.
+
+            Returns
+            -------
+            None : NoneType
+                None.
+            )mydelimiter");
+
+    py::class_<ImpactParameters, CloseApproachParameters>(m, "ImpactParameters",
+                                        R"mydelimiter(
+        The ImpactParameters class contains parameters used for calculating
+        the impact between two integrated or SPICE bodies.
+        )mydelimiter")
+        .def(py::init<>())
+        .def_readwrite("xRelBodyFixed", &ImpactParameters::xRelBodyFixed,
+                       R"mydelimiter(
+            Relative state of the impact in the body-fixed frame of the central body.
+            )mydelimiter")
+        .def_readwrite("lon", &ImpactParameters::lon, R"mydelimiter(
+            Longitude of the impact.
+            )mydelimiter")
+        .def_readwrite("lat", &ImpactParameters::lat, R"mydelimiter(
+            Latitude of the impact.
+            )mydelimiter")
+        .def_readwrite("alt", &ImpactParameters::alt, R"mydelimiter(
+            Altitude of the impact.
+            )mydelimiter")
+        .def("print_summary", &ImpactParameters::print_summary,
+            py::arg("prec") = 8, R"mydelimiter(
+            Print a summary of the impact parameters.
 
             Parameters
             ----------
@@ -582,6 +616,9 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("caParams", &propSimulation::caParams, R"mydelimiter(
             Close approach parameters of the simulation. List of propSimulation.CloseApproachParameters objects.
+            )mydelimiter")
+        .def_readwrite("impactParams", &propSimulation::impactParams, R"mydelimiter(
+            Impact parameters of the simulation. List of propSimulation.ImpactParameters objects.
             )mydelimiter")
         .def_readwrite("t", &propSimulation::t, R"mydelimiter(
             Current time of the simulation.

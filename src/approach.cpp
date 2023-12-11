@@ -63,21 +63,22 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                     real xRelImp[6];
                     get_ca_or_impact_time(propSim, i, j, tOld, t, tImp, impact_r_calc);
                     get_rel_state(propSim, i, j, tImp, xRelImp);
-                    CloseApproachParameters ca;
-                    ca.tCA = tImp;
+                    ImpactParameters impact;
+                    impact.t = tImp;
                     for (size_t k = 0; k < 6; k++) {
-                        ca.xRelCA[k] = xRelImp[k];
+                        impact.xRel[k] = xRelImp[k];
                     }
-                    ca.flybyBodyIdx = i;
-                    ca.centralBodyIdx = j;
-                    ca.get_ca_parameters(propSim, tImp);
-                    propSim->caParams.push_back(ca);
+                    impact.flybyBodyIdx = i;
+                    impact.centralBodyIdx = j;
+                    impact.get_ca_parameters(propSim, tImp);
+                    impact.get_impact_parameters(propSim);
+                    propSim->impactParams.push_back(impact);
                     std::cout << "Impact detected at MJD " << t << " TDB. "
                               << propSim->integBodies[i].name
                               << " collided with " << bodyj->name
                               << ". Terminating propagation!" << std::endl;
                     keepStepping = 0;
-                    return;
+                    // return;
                 }
                 // check close approach
                 real radialVel, radialVelOld;
@@ -94,13 +95,13 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                                               relDistOld <= bodyj->caTol;
                 if (relDistMinimum && relDistWithinTol) {
                     real tCA;
-                    real xRelCA[6];
+                    real xRel[6];
                     get_ca_or_impact_time(propSim, i, j, tOld, t, tCA, ca_rdot_calc);
-                    get_rel_state(propSim, i, j, tCA, xRelCA);
+                    get_rel_state(propSim, i, j, tCA, xRel);
                     CloseApproachParameters ca;
-                    ca.tCA = tCA;
+                    ca.t = tCA;
                     for (size_t k = 0; k < 6; k++) {
-                        ca.xRelCA[k] = xRelCA[k];
+                        ca.xRel[k] = xRel[k];
                     }
                     ca.flybyBodyIdx = i;
                     ca.centralBodyIdx = j;
@@ -371,12 +372,12 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
     vdot(bVec, xiHat, 3, this->opik.x);
     vdot(bVec, zetaHat, 3, this->opik.y);
     vdot(bVec, sHat, 3, this->opik.z);
-    pos[0] = this->xRelCA[0];
-    pos[1] = this->xRelCA[1];
-    pos[2] = this->xRelCA[2];
-    vel[0] = this->xRelCA[3];
-    vel[1] = this->xRelCA[4];
-    vel[2] = this->xRelCA[5];
+    pos[0] = this->xRel[0];
+    pos[1] = this->xRel[1];
+    pos[2] = this->xRel[2];
+    vel[0] = this->xRel[3];
+    vel[1] = this->xRel[4];
+    vel[2] = this->xRel[5];
     real eHatX[3], eHatY[3], eHatZ[3], vVecCrosseHatZ[3];
     vunit(vel, 3, eHatZ);
     vcross(vVec, eHatZ, vVecCrosseHatZ);
@@ -389,8 +390,106 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
 
 void CloseApproachParameters::print_summary(int prec){
     std::cout.precision(prec);
-    std::cout << "Close approach at MJD " << this->tCA << " TDB:" << std::endl;
-    std::cout << this->flybyBody << " - " << this->centralBody << " at " << this->dist << " AU." << std::endl;
-    std::cout << "Relative Velocity: " << this->vel << " AU/d. V-infinity: " << this->vInf << " AU/d." << std::endl;
-    std::cout << "Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
+    std::cout << "MJD " << this->t << " TDB:" << std::endl;
+    std::cout << "    " << this->flybyBody << " approached " << this->centralBody << " at " << this->dist << " AU." << std::endl;
+    std::cout << "    Relative Velocity: " << this->vel << " AU/d. V-infinity: " << this->vInf << " AU/d." << std::endl;
+    std::cout << "    Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
+}
+
+void ImpactParameters::get_impact_parameters(propSimulation *propSim){
+    ConstSpiceChar *baseBodyFrame;
+    switch (this->centralBodySpiceId) {
+        case 10:
+            baseBodyFrame = "IAU_SUN";
+            break;
+        case 1:
+        case 199:
+            baseBodyFrame = "IAU_MERCURY";
+            break;
+        case 2:
+        case 299:
+            baseBodyFrame = "IAU_VENUS";
+            break;
+        case 399:
+            baseBodyFrame = "ITRF93";
+            // High precision frame is not defined before 1972 JAN 01 00:00:42.183 TDB
+            if (this->t < 41317.0004882291666666666L) {
+                baseBodyFrame = "IAU_EARTH";
+            }
+            break;
+        case 499:
+            baseBodyFrame = "IAU_MARS";
+            break;
+        case 599:
+            baseBodyFrame = "IAU_JUPITER";
+            break;
+        case 699:
+            baseBodyFrame = "IAU_SATURN";
+            break;
+        case 799:
+            baseBodyFrame = "IAU_URANUS";
+            break;
+        case 899:
+            baseBodyFrame = "IAU_NEPTUNE";
+            break;
+        case 999:
+            baseBodyFrame = "IAU_PLUTO";
+            break;
+        default:
+            std::cout << "get_impact_parameters: Given impacted body: "
+                      << this->centralBody << std::endl;
+            throw std::invalid_argument("Given base body not supported");
+            break;
+    }
+    real tET;
+    mjd_to_et(this->t, tET);
+    SpiceDouble rotMat[6][6];
+    sxform_c("J2000", baseBodyFrame, tET, rotMat);
+    SpiceDouble impactRelStateInertial[6];
+    impactRelStateInertial[0] = this->xRel[0]*propSim->consts.du2m/1.0e3L;
+    impactRelStateInertial[1] = this->xRel[1]*propSim->consts.du2m/1.0e3L;
+    impactRelStateInertial[2] = this->xRel[2]*propSim->consts.du2m/1.0e3L;
+    impactRelStateInertial[3] = this->xRel[3]*propSim->consts.duptu2mps/1.0e3L;
+    impactRelStateInertial[4] = this->xRel[4]*propSim->consts.duptu2mps/1.0e3L;
+    impactRelStateInertial[5] = this->xRel[5]*propSim->consts.duptu2mps/1.0e3L;
+    SpiceDouble impactRelStateBodyFixed[6];
+    mxvg_c(rotMat, impactRelStateInertial, 6, 6, impactRelStateBodyFixed);
+    impactRelStateBodyFixed[0] *= 1.0e3L/propSim->consts.du2m;
+    impactRelStateBodyFixed[1] *= 1.0e3L/propSim->consts.du2m;
+    impactRelStateBodyFixed[2] *= 1.0e3L/propSim->consts.du2m;
+    impactRelStateBodyFixed[3] *= 1.0e3L/propSim->consts.duptu2mps;
+    impactRelStateBodyFixed[4] *= 1.0e3L/propSim->consts.duptu2mps;
+    impactRelStateBodyFixed[5] *= 1.0e3L/propSim->consts.duptu2mps;
+    for (size_t i = 0; i < 6; i++) {
+        this->xRelBodyFixed[i] = (real)impactRelStateBodyFixed[i];
+    }
+    SpiceDouble bodyFixedPos[3];
+    for (size_t i = 0; i < 3; i++) {
+        bodyFixedPos[i] = impactRelStateBodyFixed[i];
+    }
+    SpiceDouble lon, lat, alt;
+    reclat_c(bodyFixedPos, &alt, &lon, &lat);
+    if (lon < 0.0) {
+        lon += 2 * PI;
+    }
+    real radiusj;
+    if ((size_t) this->centralBodyIdx < propSim->integParams.nInteg) {
+        radiusj = propSim->integBodies[this->centralBodyIdx].radius;
+    } else {
+        radiusj = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
+    }
+    alt -= radiusj;
+    this->lon = lon;
+    this->lat = lat;
+    this->alt = alt*propSim->consts.du2m/1.0e3L;
+}
+
+void ImpactParameters::print_summary(int prec){
+    std::cout.precision(prec);
+    std::cout << "MJD " << this->t << " TDB:" << std::endl;
+    std::cout << "    " << this->flybyBody << " impacted " << this->centralBody << " with a relative velocity of " << this->vel << " AU/d." << std::endl;
+    std::cout << "    Impact location: " << std::endl;
+    std::cout << "        Longitude: " << this->lon*180.0L/PI << " deg" << std::endl;
+    std::cout << "        Latitude: " << this->lat*180.0L/PI << " deg" << std::endl;
+    std::cout << "        Altitude: " << this->alt << " km" << std::endl;
 }
