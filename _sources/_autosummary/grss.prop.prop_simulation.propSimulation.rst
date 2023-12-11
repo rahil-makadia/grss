@@ -46,6 +46,7 @@ grss.prop.prop\_simulation.propSimulation
         ~propSimulation.evalApparentState
         ~propSimulation.evalMeasurements
         ~propSimulation.events
+        ~propSimulation.impactParams
         ~propSimulation.integBodies
         ~propSimulation.integParams
         ~propSimulation.interpParams

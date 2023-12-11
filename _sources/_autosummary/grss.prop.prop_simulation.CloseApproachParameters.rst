@@ -40,13 +40,13 @@ grss.prop.prop\_simulation.CloseApproachParameters
         ~CloseApproachParameters.mtp
         ~CloseApproachParameters.opik
         ~CloseApproachParameters.scaled
-        ~CloseApproachParameters.tCA
+        ~CloseApproachParameters.t
         ~CloseApproachParameters.tLin
         ~CloseApproachParameters.tMap
         ~CloseApproachParameters.tPeri
         ~CloseApproachParameters.vInf
         ~CloseApproachParameters.vel
-        ~CloseApproachParameters.xRelCA
+        ~CloseApproachParameters.xRel
         ~CloseApproachParameters.xRelMap
     
     

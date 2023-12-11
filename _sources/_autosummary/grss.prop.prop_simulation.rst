@@ -32,6 +32,7 @@ grss.prop.prop\_simulation
         CloseApproachParameters
         Constants
         Event
+        ImpactParameters
         ImpulseEvent
         IntegBody
         IntegrationParameters
