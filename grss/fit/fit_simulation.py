@@ -1125,22 +1125,26 @@ class FitSimulation:
             Finite difference perturbation.
         """
         if self.fit_cartesian:
-            if key in ['x', 'y', 'z']:
+            if key in {'x', 'y', 'z'}:
                 fd_pert = 1e-8
-            elif key in ['vx', 'vy', 'vz']:
+            elif key in {'vx', 'vy', 'vz'}:
                 fd_pert = 1e-10
         elif self.fit_cometary:
-            fd_pert = 1e-8
-        if key in ['a1', 'a2', 'a3']:
-            fd_pert = 1e-3
+            fd_pert = 1e-7
+            if key == 'e':
+                fd_pert = 7.5e-9
+            elif key == 'q':
+                fd_pert = 1e-9
+        if key in {'a1', 'a2', 'a3'}:
+            fd_pert = 1e-12
         if key[:4] == 'mult':
             fd_pert = 1e0
-        if key[:3] in ['dvx', 'dvy', 'dvz']:
-            fd_pert = 1e-4
+        if key[:3] in {'dvx', 'dvy', 'dvz'}:
+            fd_pert = 1e-11
         x_plus = self.x_nom.copy()
         x_minus = self.x_nom.copy()
         # fd_pert = finite difference perturbation to nominal state for calculating derivatives
-        fd_delta = self.x_nom[key]*fd_pert
+        fd_delta = fd_pert
         x_plus[key] = self.x_nom[key]+fd_delta
         state_plus = self._x_dict_to_state(x_plus)
         ng_params_plus = self._x_dict_to_nongrav_params(x_plus)
@@ -1682,7 +1686,7 @@ class FitSimulation:
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
         print("--------------------------------------------------------------")
-        print(f"Solution Time: MJD {self.t_sol} TDB = ",
+        print(f"Solution Time: MJD {self.t_sol:0.2f} TDB = ",
                 f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
         print("--------------------------------------------------------------")
         print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
@@ -1909,11 +1913,13 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
                                                 eval_apparent_state, converged_light_time,
                                                 observer_info_past)
+        prop_sim_past.evalMeasurements = True
         prop_sim_past.add_integ_body(target_body)
     if future_obs_exist:
         prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info_future)
+        prop_sim_future.evalMeasurements = True
         prop_sim_future.add_integ_body(target_body)
     # add events
     if events is not None:
@@ -1937,19 +1943,20 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         apparent_states_past = np.array(prop_sim_past.xIntegEval)
         apparent_states_future = np.array(prop_sim_future.xIntegEval)
         apparent_states = np.vstack((apparent_states_past, apparent_states_future))
-        radar_observations_past = np.array(prop_sim_past.radarObs)
-        radar_observations_future = np.array(prop_sim_future.radarObs)
-        radar_observations = np.vstack((radar_observations_past, radar_observations_future))
+        optical_obs_past = np.array(prop_sim_past.opticalObs)
+        optical_obs_future = np.array(prop_sim_future.opticalObs)
+        optical_obs = np.vstack((optical_obs_past, optical_obs_future))
+        radar_obs_past = np.array(prop_sim_past.radarObs)
+        radar_obs_future = np.array(prop_sim_future.radarObs)
+        radar_obs = np.vstack((radar_obs_past, radar_obs_future))
     elif past_obs_exist:
-        apparent_states_past = np.array(prop_sim_past.xIntegEval)
-        apparent_states = apparent_states_past
-        radar_observations_past = np.array(prop_sim_past.radarObs)
-        radar_observations = radar_observations_past
+        apparent_states = np.array(prop_sim_past.xIntegEval)
+        optical_obs = np.array(prop_sim_past.opticalObs)
+        radar_obs = np.array(prop_sim_past.radarObs)
     elif future_obs_exist:
-        apparent_states_future = np.array(prop_sim_future.xIntegEval)
-        apparent_states = apparent_states_future
-        radar_observations_future = np.array(prop_sim_future.radarObs)
-        radar_observations = radar_observations_future
+        apparent_states = np.array(prop_sim_future.xIntegEval)
+        optical_obs = np.array(prop_sim_future.opticalObs)
+        radar_obs = np.array(prop_sim_future.radarObs)
     optical_idx = 0
     radar_idx = 0
     for idx in range(len(obs_times)):
@@ -1957,14 +1964,9 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         info_len = len(observer_info[idx])
         if info_len in {4, 7}:
             if typ != 'actual_obs_optical':
-                if typ == 'actual_obs_to_sim_optical':
-                    r_asc, dec = get_radec(apparent_states[idx])
-                    obs_array_optical[optical_idx, 1] = r_asc
-                    obs_array_optical[optical_idx, 2] = dec
-                else:
-                    r_asc, dec = get_radec(apparent_states[idx])
-                    obs_array_optical[optical_idx, 1] = r_asc
-                    obs_array_optical[optical_idx, 2] = dec
+                obs_array_optical[optical_idx, 1] = optical_obs[idx, 0]
+                obs_array_optical[optical_idx, 2] = optical_obs[idx, 1]
+                if typ != 'actual_obs_to_sim_optical':
                     obs_array_optical[optical_idx, 3] = obs_sigma_dict[typ]
                     obs_array_optical[optical_idx, 4] = obs_sigma_dict[typ]
                     if typ == 'occultation':
@@ -1984,16 +1986,16 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
             if typ != 'actual_obs_radar':
                 if typ == 'actual_obs_to_sim_radar':
                     if info_len == 9:
-                        obs_array_radar[radar_idx, 1] = radar_observations[idx]
+                        obs_array_radar[radar_idx, 1] = radar_obs[idx]
                     elif info_len == 10:
-                        obs_array_radar[radar_idx, 2] = radar_observations[idx]
+                        obs_array_radar[radar_idx, 2] = radar_obs[idx]
                 else:
                     if info_len == 9:
-                        obs_array_radar[radar_idx, 1] = radar_observations[idx]
+                        obs_array_radar[radar_idx, 1] = radar_obs[idx]
                         obs_array_radar[radar_idx, 3] = obs_sigma_dict[typ]
                         obs_array_radar[radar_idx, 5] = np.nan
                     elif info_len == 10:
-                        obs_array_radar[radar_idx, 2] = radar_observations[idx]
+                        obs_array_radar[radar_idx, 2] = radar_obs[idx]
                         obs_array_radar[radar_idx, 4] = obs_sigma_dict[typ]
                         obs_array_radar[radar_idx, 5] = np.nan
                 if noise:
@@ -2101,7 +2103,7 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
                                                 num_extra_radar_obs)))
         # add extra rows to observer_codes_radar
         extra_simulated_radar_observer_codes = []
-        for i, typ in enumerate(extra_simulated_radar_obs_types):
+        for typ in extra_simulated_radar_obs_types:
             if typ == 'doppler':
                 extra_simulated_radar_observer_codes.append((('-14','-14'),0,8560e6))
             else:
