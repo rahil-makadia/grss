@@ -807,8 +807,16 @@ class FitSimulation:
         self.sigmas = self.obs_array[:, 3:5]
         sigma_corr = self.obs_array[:, 5]
         obs_cov = np.zeros((self.sigmas.size, self.sigmas.size))
+        obs_wgt = np.zeros((self.sigmas.size, self.sigmas.size))
         idx_to_remove = []
-        for i in range(self.sigmas.shape[0]):
+        for i in range(self.obs_array.shape[0]):
+            obs_info_len = len(self.observer_info[i])
+            if obs_info_len in {4, 7}:
+                is_optical = True
+            elif obs_info_len in {9, 10}:
+                is_optical = False
+            else:
+                raise ValueError("Observer info length not recognized.")
             sig_1, sig_2 = self.sigmas[i]
             sig_1_nan = np.isnan(sig_1)
             sig_2_nan = np.isnan(sig_2)
@@ -816,8 +824,12 @@ class FitSimulation:
             sig_corr_nan = np.isnan(sig_corr)
             off_diag = 0.0 if (sig_1_nan or sig_2_nan or sig_corr_nan) else sig_corr*sig_1*sig_2
             sub_cov = np.array([[sig_1**2, off_diag],
-                                    [off_diag, sig_2**2]])
+                                [off_diag, sig_2**2]])
             obs_cov[2*i:2*i+2, 2*i:2*i+2] = sub_cov
+            if is_optical:
+                obs_wgt[2*i:2*i+2, 2*i:2*i+2] = np.linalg.inv(sub_cov)
+            else:
+                obs_wgt[2*i:2*i+2, 2*i:2*i+2] = np.diag([1.0/sig_1**2, 1.0/sig_2**2])
             if sig_1_nan:
                 idx_to_remove.append(2*i)
             if sig_2_nan:
@@ -827,8 +839,11 @@ class FitSimulation:
         # remove all rows and columns with NaN values from the obs_cov
         obs_cov = np.delete(obs_cov, idx_to_remove, axis=0)
         obs_cov = np.delete(obs_cov, idx_to_remove, axis=1)
+        # remove all rows and columns with NaN values from the obs_wgt
+        obs_wgt = np.delete(obs_wgt, idx_to_remove, axis=0)
+        obs_wgt = np.delete(obs_wgt, idx_to_remove, axis=1)
         self.obs_cov = obs_cov
-        self.obs_weight = np.linalg.inv(self.obs_cov)
+        self.obs_weight = obs_wgt
         return None
 
     def _sort_array_by_another(self, array, sort_by):
