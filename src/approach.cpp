@@ -39,6 +39,8 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                     bodyj =
                         &propSim->spiceBodies[j - propSim->integParams.nInteg];
                     radiusj = bodyj->radius;
+                    const real atm_offset = 100.0e3/propSim->consts.du2m;
+                    radiusj += atm_offset;
                     double xSpiceOld[9];
                     get_spk_state(bodyj->spiceId, tOld, propSim->ephem,
                                   xSpiceOld);
@@ -57,12 +59,26 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                 // check impacts with spiceBodies first
                 if (j > propSim->integParams.nInteg &&
                     relDist <= radius + radiusj) {
-                    std::cout << "Impact detected at MJD " << t << " TDB. Body "
+                    real tImp;
+                    real xRelImp[6];
+                    get_ca_or_impact_time(propSim, i, j, tOld, t, tImp, impact_r_calc);
+                    get_rel_state(propSim, i, j, tImp, xRelImp);
+                    ImpactParameters impact;
+                    impact.t = tImp;
+                    for (size_t k = 0; k < 6; k++) {
+                        impact.xRel[k] = xRelImp[k];
+                    }
+                    impact.flybyBodyIdx = i;
+                    impact.centralBodyIdx = j;
+                    impact.get_ca_parameters(propSim, tImp);
+                    impact.get_impact_parameters(propSim);
+                    propSim->impactParams.push_back(impact);
+                    std::cout << "Impact detected at MJD " << t << " TDB. "
                               << propSim->integBodies[i].name
-                              << " collided with body " << bodyj->name
-                              << ". Terminating simulation!" << std::endl;
+                              << " collided with " << bodyj->name
+                              << ". Terminating propagation!" << std::endl;
                     keepStepping = 0;
-                    return;
+                    // return;
                 }
                 // check close approach
                 real radialVel, radialVelOld;
@@ -79,13 +95,13 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                                               relDistOld <= bodyj->caTol;
                 if (relDistMinimum && relDistWithinTol) {
                     real tCA;
-                    real xRelCA[6];
-                    get_ca_time(propSim, i, j, tOld, t, tCA);
-                    get_ca_state(propSim, i, j, tCA, xRelCA);
+                    real xRel[6];
+                    get_ca_or_impact_time(propSim, i, j, tOld, t, tCA, ca_rdot_calc);
+                    get_rel_state(propSim, i, j, tCA, xRel);
                     CloseApproachParameters ca;
-                    ca.tCA = tCA;
+                    ca.t = tCA;
                     for (size_t k = 0; k < 6; k++) {
-                        ca.xRelCA[k] = xRelCA[k];
+                        ca.xRel[k] = xRel[k];
                     }
                     ca.flybyBodyIdx = i;
                     ca.centralBodyIdx = j;
@@ -104,17 +120,37 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
 void ca_rdot_calc(propSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &rDot) {
     // Calculate the radial velocity between two bodies at a given time
-    // This is used in root_brent to find the time of closest approach
+    // This is used in get_ca_or_impact_time to find the time of closest approach
     real xRel[6];
-    get_ca_state(propSim, i, j, t, xRel);
+    get_rel_state(propSim, i, j, t, xRel);
     real relDist =
         sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
     rDot =
         (xRel[0] * xRel[3] + xRel[1] * xRel[4] + xRel[2] * xRel[5]) / relDist;
 }
 
-void get_ca_state(propSimulation *propSim, const size_t &i, const size_t &j,
-                  const real &t, real xRelCA[6]) {
+void impact_r_calc(propSimulation *propSim, const size_t &i, const size_t &j,
+                  const real &t, real &r) {
+    // Calculate the distance between two bodies at a given time, accounting for
+    // the radius of the bodies
+    real xRel[6];
+    get_rel_state(propSim, i, j, t, xRel);
+    real relDist =
+        sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
+    real radius, radiusj;
+    radius = propSim->integBodies[i].radius;
+    if (j < propSim->integParams.nInteg) {
+        radiusj = propSim->integBodies[j].radius;
+    } else {
+        radiusj = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
+        const real atm_offset = 100.0e3/propSim->consts.du2m;
+        radiusj += atm_offset;
+    }
+    r = relDist - radius - radiusj;
+}
+
+void get_rel_state(propSimulation *propSim, const size_t &i, const size_t &j,
+                   const real &t, real xRel[6]) {
     std::vector<real> xInterp = propSim->interpolate(t);
     size_t starti = 0;
     for (size_t k = 0; k < i; k++) {
@@ -126,7 +162,7 @@ void get_ca_state(propSimulation *propSim, const size_t &i, const size_t &j,
             startj += 2*propSim->integBodies[k].n2Derivs;
         }
         for (size_t k = 0; k < 6; k++) {
-            xRelCA[k] = xInterp[starti + k] - xInterp[startj + k];
+            xRel[k] = xInterp[starti + k] - xInterp[startj + k];
         }
     } else {
         double xSpice[9];
@@ -134,16 +170,20 @@ void get_ca_state(propSimulation *propSim, const size_t &i, const size_t &j,
             propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId, t,
             propSim->ephem, xSpice);
         for (size_t k = 0; k < 6; k++) {
-            xRelCA[k] = xInterp[starti + k] - xSpice[k];
+            xRel[k] = xInterp[starti + k] - xSpice[k];
         }
     }
 }
 
-void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
-                 const real &x1, const real &x2, real &tCA) {
+void get_ca_or_impact_time(propSimulation *propSim, const size_t &i,
+                           const size_t &j, const real &x1, const real &x2,
+                           real &tCA,
+                           void (*zero_func)(propSimulation *, const size_t &,
+                                             const size_t &, const real &,
+                                             real &)) {
     // Brent's method for root finding, from Numerical Recipes in C/C++, 3rd
     // edition, p. 454
-    const real tol = 1.0e-3 / 86400.0;  // 1 millisecond
+    const real tol = 1.0e-6 / 86400.0;  // 1 microsecond
     const size_t maxIter = 100;
     const real eps = std::numeric_limits<real>::epsilon();
     real a = x1;
@@ -153,10 +193,10 @@ void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
     real e = 0.0;
     real min1, min2;
     real fa, fb, fc, p, q, r, s, tol1, xm;
-    ca_rdot_calc(propSim, i, j, a, fa);
-    ca_rdot_calc(propSim, i, j, b, fb);
+    zero_func(propSim, i, j, a, fa);
+    zero_func(propSim, i, j, b, fb);
     if ((fa > 0.0 && fb > 0.0) || (fa < 0.0 && fb < 0.0)) {
-        throw std::runtime_error("Root must be bracketed in root_brent");
+        throw std::runtime_error("Root must be bracketed in get_ca_or_impact_time");
     }
     fc = fb;
     size_t iter;
@@ -215,10 +255,10 @@ void get_ca_time(propSimulation *propSim, const size_t &i, const size_t &j,
         } else {
             b += (xm > 0.0 ? fabs(tol1) : -fabs(tol1));
         }
-        ca_rdot_calc(propSim, i, j, b, fb);
+        zero_func(propSim, i, j, b, fb);
     }
-    throw std::runtime_error(
-        "Maximum number of iterations exceeded in root_brent");
+    std::cout << "WARNING: Maximum number of iterations exceeded in "
+                 "get_ca_or_impact_time!!! Impact/CA time may not be accurate.";
 }
 
 void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const real &tMap) {
@@ -227,7 +267,7 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
     real xRelMap[6];
     const size_t i = this->flybyBodyIdx;
     const size_t j = this->centralBodyIdx;
-    get_ca_state(propSim, i, j, tMap, xRelMap);
+    get_rel_state(propSim, i, j, tMap, xRelMap);
     for (size_t k = 0; k < 6; k++) {
         this->xRelMap[k] = xRelMap[k];
     }
@@ -332,12 +372,12 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
     vdot(bVec, xiHat, 3, this->opik.x);
     vdot(bVec, zetaHat, 3, this->opik.y);
     vdot(bVec, sHat, 3, this->opik.z);
-    pos[0] = this->xRelCA[0];
-    pos[1] = this->xRelCA[1];
-    pos[2] = this->xRelCA[2];
-    vel[0] = this->xRelCA[3];
-    vel[1] = this->xRelCA[4];
-    vel[2] = this->xRelCA[5];
+    pos[0] = this->xRel[0];
+    pos[1] = this->xRel[1];
+    pos[2] = this->xRel[2];
+    vel[0] = this->xRel[3];
+    vel[1] = this->xRel[4];
+    vel[2] = this->xRel[5];
     real eHatX[3], eHatY[3], eHatZ[3], vVecCrosseHatZ[3];
     vunit(vel, 3, eHatZ);
     vcross(vVec, eHatZ, vVecCrosseHatZ);
@@ -350,8 +390,106 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
 
 void CloseApproachParameters::print_summary(int prec){
     std::cout.precision(prec);
-    std::cout << "Close approach at MJD " << this->tCA << " TDB:" << std::endl;
-    std::cout << this->flybyBody << " - " << this->centralBody << " at " << this->dist << " AU." << std::endl;
-    std::cout << "Relative Velocity: " << this->vel << " AU/d. V-infinity: " << this->vInf << " AU/d." << std::endl;
-    std::cout << "Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
+    std::cout << "MJD " << this->t << " TDB:" << std::endl;
+    std::cout << "    " << this->flybyBody << " approached " << this->centralBody << " at " << this->dist << " AU." << std::endl;
+    std::cout << "    Relative Velocity: " << this->vel << " AU/d. V-infinity: " << this->vInf << " AU/d." << std::endl;
+    std::cout << "    Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
+}
+
+void ImpactParameters::get_impact_parameters(propSimulation *propSim){
+    ConstSpiceChar *baseBodyFrame;
+    switch (this->centralBodySpiceId) {
+        case 10:
+            baseBodyFrame = "IAU_SUN";
+            break;
+        case 1:
+        case 199:
+            baseBodyFrame = "IAU_MERCURY";
+            break;
+        case 2:
+        case 299:
+            baseBodyFrame = "IAU_VENUS";
+            break;
+        case 399:
+            baseBodyFrame = "ITRF93";
+            // High precision frame is not defined before 1972 JAN 01 00:00:42.183 TDB
+            if (this->t < 41317.0004882291666666666L) {
+                baseBodyFrame = "IAU_EARTH";
+            }
+            break;
+        case 499:
+            baseBodyFrame = "IAU_MARS";
+            break;
+        case 599:
+            baseBodyFrame = "IAU_JUPITER";
+            break;
+        case 699:
+            baseBodyFrame = "IAU_SATURN";
+            break;
+        case 799:
+            baseBodyFrame = "IAU_URANUS";
+            break;
+        case 899:
+            baseBodyFrame = "IAU_NEPTUNE";
+            break;
+        case 999:
+            baseBodyFrame = "IAU_PLUTO";
+            break;
+        default:
+            std::cout << "get_impact_parameters: Given impacted body: "
+                      << this->centralBody << std::endl;
+            throw std::invalid_argument("Given base body not supported");
+            break;
+    }
+    real tET;
+    mjd_to_et(this->t, tET);
+    SpiceDouble rotMat[6][6];
+    sxform_c("J2000", baseBodyFrame, tET, rotMat);
+    SpiceDouble impactRelStateInertial[6];
+    impactRelStateInertial[0] = this->xRel[0]*propSim->consts.du2m/1.0e3L;
+    impactRelStateInertial[1] = this->xRel[1]*propSim->consts.du2m/1.0e3L;
+    impactRelStateInertial[2] = this->xRel[2]*propSim->consts.du2m/1.0e3L;
+    impactRelStateInertial[3] = this->xRel[3]*propSim->consts.duptu2mps/1.0e3L;
+    impactRelStateInertial[4] = this->xRel[4]*propSim->consts.duptu2mps/1.0e3L;
+    impactRelStateInertial[5] = this->xRel[5]*propSim->consts.duptu2mps/1.0e3L;
+    SpiceDouble impactRelStateBodyFixed[6];
+    mxvg_c(rotMat, impactRelStateInertial, 6, 6, impactRelStateBodyFixed);
+    impactRelStateBodyFixed[0] *= 1.0e3L/propSim->consts.du2m;
+    impactRelStateBodyFixed[1] *= 1.0e3L/propSim->consts.du2m;
+    impactRelStateBodyFixed[2] *= 1.0e3L/propSim->consts.du2m;
+    impactRelStateBodyFixed[3] *= 1.0e3L/propSim->consts.duptu2mps;
+    impactRelStateBodyFixed[4] *= 1.0e3L/propSim->consts.duptu2mps;
+    impactRelStateBodyFixed[5] *= 1.0e3L/propSim->consts.duptu2mps;
+    for (size_t i = 0; i < 6; i++) {
+        this->xRelBodyFixed[i] = (real)impactRelStateBodyFixed[i];
+    }
+    SpiceDouble bodyFixedPos[3];
+    for (size_t i = 0; i < 3; i++) {
+        bodyFixedPos[i] = impactRelStateBodyFixed[i];
+    }
+    SpiceDouble lon, lat, alt;
+    reclat_c(bodyFixedPos, &alt, &lon, &lat);
+    if (lon < 0.0) {
+        lon += 2 * PI;
+    }
+    real radiusj;
+    if ((size_t) this->centralBodyIdx < propSim->integParams.nInteg) {
+        radiusj = propSim->integBodies[this->centralBodyIdx].radius;
+    } else {
+        radiusj = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
+    }
+    alt -= radiusj;
+    this->lon = lon;
+    this->lat = lat;
+    this->alt = alt*propSim->consts.du2m/1.0e3L;
+}
+
+void ImpactParameters::print_summary(int prec){
+    std::cout.precision(prec);
+    std::cout << "MJD " << this->t << " TDB:" << std::endl;
+    std::cout << "    " << this->flybyBody << " impacted " << this->centralBody << " with a relative velocity of " << this->vel << " AU/d." << std::endl;
+    std::cout << "    Impact location: " << std::endl;
+    std::cout << "        Longitude: " << this->lon*180.0L/PI << " deg" << std::endl;
+    std::cout << "        Latitude: " << this->lat*180.0L/PI << " deg" << std::endl;
+    std::cout << "        Altitude: " << this->alt << " km" << std::endl;
 }

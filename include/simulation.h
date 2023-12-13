@@ -112,6 +112,7 @@ class propSimulation {
 
     // close approach parameters
     std::vector<CloseApproachParameters> caParams;
+    std::vector<ImpactParameters> impactParams;
 
     // preprocessor variables
     real t;

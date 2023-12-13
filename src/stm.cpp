@@ -186,7 +186,6 @@ void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &c,
     const real c2 = c * c;
     const real r = sqrt(dx * dx + dy * dy + dz * dz);
     const real r3 = r * r * r;
-    const real r5 = r3 * r * r;
 
     const real rDotV = dx * dvx + dy * dvy + dz * dvz;
     const real v2 = dvx * dvx + dvy * dvy + dvz * dvz;

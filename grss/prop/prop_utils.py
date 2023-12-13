@@ -188,14 +188,23 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     fac = prop_sim.consts.du2m/1000/scale_factor
 
     ca_times = [
-        approach.tCA
+        approach.t
         for approach in prop_sim.caParams
         if approach.flybyBody == flyby_body
         and approach.centralBody == central_body
+        and approach.impact is False
+    ]
+    impact_times = [
+        approach.t
+        for approach in prop_sim.impactParams
+        if approach.flybyBody == flyby_body
+        and approach.centralBody == central_body
+        and approach.impact is True
     ]
     ca_times = Time(ca_times, format='mjd', scale='tdb').tdb.datetime
-    if len(ca_times) == 0:
-        print("No close approaches found")
+    impact_times = Time(impact_times, format='mjd', scale='tdb').tdb.datetime
+    if len(ca_times) == 0 and len(impact_times) == 0:
+        print("No close approaches or impacts found")
         return None
     times = Time(t_stack, format='mjd', scale='tdb').tdb.datetime
     lwidth = 1
@@ -206,7 +215,12 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     ax1.set_ylabel("Relative Radial Velocity [au/day]", color='C0')
     for time in ca_times:
         ax1.axvline(time, ls=':', color='gray', lw=0.75)
-    ax1.axvline(np.inf, ls=':', color='gray', lw=0.75, label="Close Approaches")
+    if len(ca_times) > 0:
+        ax1.axvline(np.inf, ls=':', color='gray', lw=0.75, label="CA Time")
+    for time in impact_times:
+        ax1.axvline(time, ls=':', color='red', lw=0.75)
+    if len(impact_times) > 0:
+        ax1.axvline(np.inf, ls=':', color='red', lw=0.75, label="Impact Time")
     if x_min is not None:
         ax1.set_xlim(xmin=x_min.tdb.datetime)
     if x_max is not None:
@@ -214,6 +228,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     ax1.tick_params(axis='y', colors='C0', which='both', direction='in')
     ax2 = plt.gca().twinx()
     ax2.semilogy(times, fac*rel_dist, '--', lw=lwidth, color='C1', label="Relative Distance")
+    ax2.axhline(1, ls=':', color='C1', lw=0.75, label=f"1 {units}")
     ax2.set_ylabel(fr"Relative Distance [{units}]", color='C1')
     if y_min is not None:
         ax2.set_ylim(ymin=y_min)
@@ -222,7 +237,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     ax2.tick_params(axis='y', colors='C1', which='both', direction='in')
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc='lower right')
+    ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
     fig.autofmt_xdate()
     plt.show()
     return None
@@ -341,7 +356,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         None
     """
     if len(ca_list) == 0:
-        print("No close approaches found")
+        print("No close approaches given (list is empty)")
         return None
     au2units = 149597870.7 if units_km else 1.0
     body_id = ca_list[0].centralBodySpiceId
@@ -351,7 +366,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     if not units_km:
         central_body_radius /= 149597870.7
         units = "AU"
-    times = np.array([approach.tCA for approach in ca_list])
+    times = np.array([approach.t for approach in ca_list])
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
     kizner_y = np.array([approach.kizner.y*au2units for approach in ca_list])
@@ -361,15 +376,23 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     scaled_y = np.array([approach.scaled.y*au2units for approach in ca_list])
     mtp_x = np.array([approach.mtp.x*au2units for approach in ca_list])
     mtp_y = np.array([approach.mtp.y*au2units for approach in ca_list])
-    focus_factor = np.mean([approach.gravFocusFactor for approach in ca_list])
-    kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
-                                        'kizner', print_ellipse_params, units)
-    opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
-                                        'opik', print_ellipse_params, units)
-    scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
-                                        'scaled', print_ellipse_params, units)
-    mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
-                                        'mtp', print_ellipse_params, units)
+    focus_factor = np.max([approach.gravFocusFactor for approach in ca_list])
+    impact_bool = np.array([approach.impact for approach in ca_list])
+    impact_any = np.any(impact_bool)
+    if len(ca_list) >= 13:
+        kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
+                                            'kizner', print_ellipse_params, units)
+        opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
+                                            'opik', print_ellipse_params, units)
+        scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
+                                            'scaled', print_ellipse_params, units)
+        mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
+                                            'mtp', print_ellipse_params, units)
+    else:
+        kizner_ellipse = None
+        opik_ellipse = None
+        scaled_ellipse = None
+        mtp_ellipse = None
     t_mean = np.mean(times)
     t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
     t_map_mean = Time(np.mean(map_times), format='mjd', scale='tdb').tdb.iso
@@ -393,7 +416,8 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     fig.legend(patches, labels, loc='upper center', ncol=4,
                 bbox_to_anchor=(0.5, 1.023), fontsize=10)
     fig.tight_layout()
-    fig.suptitle(fr"Close Approach at {full_str} TDB ({n_std}$\sigma$)", fontsize=14, y=1.07)
+    event = "Impact" if impact_any else "Close Approach"
+    fig.suptitle(fr"{event} at {full_str} TDB ({n_std}$\sigma$)", fontsize=14, y=1.07)
     subtitle = f"B-plane map time: {t_map_mean} TDB"
     plt.text(x=0.5, y=1.026, s=subtitle, fontsize=11, ha="center", transform=fig.transFigure)
     plt.show()
@@ -501,20 +525,21 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     if bplane_type not in {'kizner', 'opik', 'scaled', 'mtp'}:
         raise ValueError("Unknown B-plane type")
     scale_factor = central_body_radius if scale_coords else 1.0
-    if bplane_type == 'scaled':
+    if bplane_type in {'scaled', 'mtp'}:
         focus_factor = 1.0
     x_label, y_label, title = _get_bplane_labels(bplane_type, plot_offset, units)
     msize = 5
     malpha = 0.5
     mspec = 'b.'
-    lwidth = 1.0
-    lalpha = 0.75
-    lspec = 'r-'
     rotation = 30
     axis.plot(x_coord/scale_factor, y_coord/scale_factor, mspec,
                 ms=msize, alpha=malpha, label="Close Approaches")
-    axis.plot(ellipse[0,:]/scale_factor, ellipse[1,:]/scale_factor, lspec,
-                lw=lwidth, alpha=lalpha, label="Uncertainty Ellipse")
+    if ellipse is not None:
+        lwidth = 1.0
+        lalpha = 0.75
+        lspec = 'r-'
+        axis.plot(ellipse[0,:]/scale_factor, ellipse[1,:]/scale_factor, lspec,
+                    lw=lwidth, alpha=lalpha, label="Uncertainty Ellipse")
     axis.set_xlabel(x_label)
     axis.set_ylabel(y_label)
     axis.ticklabel_format(axis='both', style='sci', scilimits=(0,0), useOffset=False)
@@ -525,14 +550,14 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     clst = '-'
     if scale_coords:
         circle = plt.Circle((0, 0), 1, label="Central Body Extent",
-                            color=cclr, fill=True, alpha=calpha, linestyle=clst)
+                            color=cclr, fill=True, alpha=0.55*calpha, linestyle=clst)
         circle2 = plt.Circle((0, 0), focus_factor, label="Impact Cross Section",
-                            color=cclr, fill=True, alpha=0.5*calpha, linestyle=clst)
+                            color=cclr, fill=True, alpha=0.4*calpha, linestyle=clst)
     else:
         circle = plt.Circle((0, 0), central_body_radius, label="Central Body Extent",
-                            color=cclr, fill=True, alpha=calpha, linestyle=clst)
+                            color=cclr, fill=True, alpha=0.55*calpha, linestyle=clst)
         circle2 = plt.Circle((0, 0), focus_factor*central_body_radius, label="Impact Cross Section",
-                            color=cclr, fill=True, alpha=0.5*calpha, linestyle=clst)
+                            color=cclr, fill=True, alpha=0.4*calpha, linestyle=clst)
     if show_central_body:
         axis.add_patch(circle)
         axis.add_patch(circle2)
