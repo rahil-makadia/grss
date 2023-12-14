@@ -400,6 +400,11 @@ void force_J2(const propSimulation *propSim, std::vector<real> &accInteg) {
                 accInteg[3 * i + 1] += axBody * cosRA -
                     ayBody * sinRA * sinDec + azBody * sinRA * cosDec;
                 accInteg[3 * i + 2] += ayBody * cosDec + azBody * sinDec;
+                if (propSim->integBodies[i].propStm && rRel < 0.1) {
+                    stm_J2(propSim->integBodies[i], G*massj, bodyj->J2, dxBody,
+                           dyBody, dzBody, radius, sinRA, cosRA, sinDec, cosDec,
+                           3*i+3, accInteg);
+                }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << -axBody * sinRA - ayBody * cosRA * sinDec +
