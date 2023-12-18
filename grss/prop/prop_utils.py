@@ -143,6 +143,7 @@ def get_scale_factor(body_id):
 
 def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
                     x_min=None, x_max=None, y_min=1e-1, y_max=None):
+    # sourcery skip: low-code-quality
     """
     Plot the relative radial velocity and distance of the close approaches of
     a given prop_sim object.
@@ -242,7 +243,8 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     plt.show()
     return None
 
-def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellipse_params, units):
+def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
+                    print_ellipse_params, units, sigma_points):
     """
     Convert two sets of points to an ellipse.
 
@@ -262,18 +264,26 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellip
         True to print the ellipse parameters, False to not print
     units : str
         units of the plot
+    sigma_points : prop.SigmaPoints, optional
+        SigmaPoints object for reconstructing mean and cov, by default None.
 
     Returns
     -------
     ellipse : np.ndarray
         ellipse points
     """
-    x_mean = np.mean(x_data)
-    y_mean = np.mean(y_data)
+    if sigma_points is None:
+        x_mean = np.mean(x_data)
+        y_mean = np.mean(y_data)
+        cov = np.cov(x_data, y_data)
+    else:
+        xy_data = np.vstack((x_data, y_data)).T
+        mean, cov = sigma_points.reconstruct(xy_data)
+        x_mean = mean[0]
+        y_mean = mean[1]
     if plot_offset:
         x_data -= x_mean
         y_data -= y_mean
-    cov = np.cov(x_data, y_data)
     eigvals, eigvecs = np.linalg.eig(cov)
     idx = eigvals.argsort()[::-1]
     eigvals = eigvals[idx]
@@ -327,7 +337,8 @@ def days_to_dhms(days):
     return day, hour, mins, sec, string
 
 def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_km=False,
-                equal_axis=True, print_ellipse_params=False, show_central_body=True):
+                equal_axis=True, print_ellipse_params=False, show_central_body=True,
+                sigma_points=None):
     """
     Plot the B-planes of a list of close approaches.
 
@@ -349,6 +360,8 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         True to print the ellipse parameters, False to not print, by default False.
     show_central_body : bool, optional
         True to show the central body, False to not show it, by default True.
+    sigma_points : prop.SigmaPoints, optional
+        SigmaPoints object for reconstructing mean and cov, by default None.
 
     Returns
     -------
@@ -381,22 +394,27 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     impact_any = np.any(impact_bool)
     if len(ca_list) >= 13:
         kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
-                                            'kizner', print_ellipse_params, units)
+                                            'kizner', print_ellipse_params, units, sigma_points)
         opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
-                                            'opik', print_ellipse_params, units)
+                                            'opik', print_ellipse_params, units, sigma_points)
         scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
-                                            'scaled', print_ellipse_params, units)
+                                            'scaled', print_ellipse_params, units, sigma_points)
         mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
-                                            'mtp', print_ellipse_params, units)
+                                            'mtp', print_ellipse_params, units, sigma_points)
     else:
         kizner_ellipse = None
         opik_ellipse = None
         scaled_ellipse = None
         mtp_ellipse = None
-    t_mean = np.mean(times)
+    if sigma_points is None:
+        t_mean = np.mean(times)
+        t_dev = np.std(times)
+    else:
+        t_mean, t_var = sigma_points.reconstruct(times)
+        t_dev = np.sqrt(t_var[0,0])
     t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
     t_map_mean = Time(np.mean(map_times), format='mjd', scale='tdb').tdb.iso
-    t_std = n_std*np.std(times)
+    t_std = n_std*t_dev
     *_, t_std_str = days_to_dhms(t_std)
     full_str = fr'{t_mean_str} $\pm$ {t_std_str}'
     fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=150)

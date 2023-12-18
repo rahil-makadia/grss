@@ -123,8 +123,16 @@ class SigmaPoints:
         new_cov : np.ndarray
             reconstructed covariance
         """
-        new_x = np.zeros(self.n)
-        new_cov = np.zeros((self.n, self.n))
+        if transformed_sigma_points.ndim == 2:
+            size = len(transformed_sigma_points[0])
+            new_x = np.zeros(size)
+            new_cov = np.zeros((size, size))
+        elif transformed_sigma_points.ndim == 1:
+            size = 1
+            new_x = 0
+            new_cov = 0
+        else:
+            raise ValueError("Invalid dimension for transformed sigma points")
         for i in range(2 * self.n + 1):
             new_x += self.w_m[i] * transformed_sigma_points[i]
         for i in range(2 * self.n + 1):
