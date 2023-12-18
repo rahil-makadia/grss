@@ -631,8 +631,7 @@ void cartesian_cometary_partials(const real &epochMjd,
 void dCartdeNum(const real &t, const real &GM,
                 const std::vector<real> &cometaryState, real *partial){
     const real e = cometaryState[0];
-    const real delta = 1e-8;
-    const real pert = delta*e;
+    const real pert = 7.5e-9L;
     std::vector<real> comStatePlus = cometaryState;
     std::vector<real> comStateMinus = cometaryState;
     comStatePlus[0] += pert;
