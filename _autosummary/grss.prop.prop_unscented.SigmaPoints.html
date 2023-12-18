@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_unscented" href="grss.prop.prop_unscented.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 14, 2023"/>
+    <meta name="docbuild:last-update" content="Dec 18, 2023"/>
   </head>
   
   
@@ -485,8 +485,8 @@ document.write(`
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x_dict</strong> (<em>dict</em>) – solution dictionary containing cometary/cartesian elements</p></li>
-<li><p><strong>P</strong> (<em>numpy.ndarray</em>) – covariance matrix of the solution</p></li>
-<li><p><strong>type</strong> (<em>str</em>) – type of sigma point. Choose from merwe or julier</p></li>
+<li><p><strong>cov</strong> (<em>numpy.ndarray</em>) – covariance matrix of the solution</p></li>
+<li><p><strong>sp_type</strong> (<em>str</em>) – type of sigma point. Choose from merwe or julier</p></li>
 <li><p><strong>alpha</strong> (<em>float</em>) – scaling parameter for sigma points</p></li>
 <li><p><strong>beta</strong> (<em>float</em>) – scaling parameter for sigma points</p></li>
 <li><p><strong>kappa</strong> (<em>float</em>) – scaling parameter for sigma points</p></li>
@@ -501,18 +501,18 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_unscented.SigmaPoints.__init__" title="grss.prop.prop_unscented.SigmaPoints.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_dict, cov, sp_type[, alpha, ...])</p></td>
 <td><p>Initialize a sigma point object.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct" title="grss.prop.prop_unscented.SigmaPoints.reconstruct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruct</span></code></a>(tr_sigma_points)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct" title="grss.prop.prop_unscented.SigmaPoints.reconstruct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruct</span></code></a>(transformed_sigma_points)</p></td>
 <td><p>Reconstruct the mean and covariance from transformed sigma points.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.prop.prop_unscented.SigmaPoints.reconstruct">
-<span class="sig-name descname"><span class="pre">reconstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tr_sigma_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">reconstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformed_sigma_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_unscented.SigmaPoints.reconstruct" title="Permalink to this definition">#</a></dt>
 <dd><p>Reconstruct the mean and covariance from transformed sigma points.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tr_sigma_points</strong> (<em>np.ndarray</em>) – transformed sigma points</p>
+<dd class="field-odd"><p><strong>transformed_sigma_points</strong> (<em>np.ndarray</em>) – transformed sigma points</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
@@ -610,7 +610,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 14, 2023.
+  Last updated on Dec 18, 2023.
   <br/>
 </p>
   </div>
