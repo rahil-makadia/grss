@@ -100,7 +100,7 @@ class SigmaPoints:
     def _get_points_dict(self):
         dict_list = [None] * (2 * self.n + 1)
         for i in range(2 * self.n + 1):
-            dict_i = {"t": self.x_dict["t"]}
+            dict_i = {"t": self.x_dict["t"]} if "t" in self.x_dict else {}
             for j, key in enumerate(self.x_dict):
                 if key != "t":
                     dict_i[key] = self.sigma_points[i][j - 1]

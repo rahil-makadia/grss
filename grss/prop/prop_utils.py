@@ -406,17 +406,6 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         opik_ellipse = None
         scaled_ellipse = None
         mtp_ellipse = None
-    if sigma_points is None:
-        t_mean = np.mean(times)
-        t_dev = np.std(times)
-    else:
-        t_mean, t_var = sigma_points.reconstruct(times)
-        t_dev = np.sqrt(t_var[0,0])
-    t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
-    t_map_mean = Time(np.mean(map_times), format='mjd', scale='tdb').tdb.iso
-    t_std = n_std*t_dev
-    *_, t_std_str = days_to_dhms(t_std)
-    full_str = fr'{t_mean_str} $\pm$ {t_std_str}'
     fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=150)
     plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_ellipse, 'kizner',
                         focus_factor, show_central_body, plot_offset, scale_coords,
@@ -435,8 +424,26 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
                 bbox_to_anchor=(0.5, 1.023), fontsize=10)
     fig.tight_layout()
     event = "Impact" if impact_any else "Close Approach"
-    fig.suptitle(fr"{event} at {full_str} TDB ({n_std}$\sigma$)", fontsize=14, y=1.07)
-    subtitle = f"B-plane map time: {t_map_mean} TDB"
+    unit = "UTC" if impact_any else "TDB"
+    if sigma_points is None:
+        t_mean = np.mean(times)
+        t_dev = np.std(times)
+        t_map_mean = np.mean(map_times)
+    else:
+        t_mean, t_var = sigma_points.reconstruct(times)
+        t_dev = np.sqrt(t_var[0,0])
+        t_map_mean, _ = sigma_points.reconstruct(map_times)
+    if impact_any:
+        t_mean_str = Time(t_mean, format='mjd', scale='tdb').utc.iso
+        t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').utc.iso
+    else:
+        t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
+        t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').tdb.iso
+    t_std = n_std*t_dev
+    *_, t_std_str = days_to_dhms(t_std)
+    full_str = fr'{t_mean_str} $\pm$ {t_std_str}'
+    fig.suptitle(fr"{event} at {full_str} {unit} ({n_std}$\sigma$)", fontsize=14, y=1.07)
+    subtitle = f"B-plane map time: {t_map_mean} {unit}"
     plt.text(x=0.5, y=1.026, s=subtitle, fontsize=11, ha="center", transform=fig.transFigure)
     plt.show()
     return None
