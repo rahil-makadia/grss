@@ -1604,6 +1604,52 @@ class FitSimulation:
                 self.converged = True
         return None
 
+    def _get_lsq_state_correction(self, partials, weights, residuals):
+        """
+        Get the state correction using least-squares.
+
+        Parameters
+        ----------
+        partials : array
+            The partials of the observations with respect to the
+            initial nominal state.
+        weights : array
+            The weights of the observations.
+        residuals : array
+            The residuals of the observations
+
+        Returns
+        -------
+        delta_x : array
+            The state correction.
+        """
+        atwa = np.zeros((self.n_fit, self.n_fit))
+        atwb = np.zeros((self.n_fit, 1))
+        j = 0
+        for i in range(len(self.obs_array)):
+            if j >= len(residuals):
+                break
+            obs_info_len = len(self.observer_info[i])
+            if obs_info_len in {4, 7}:
+                size = 2
+            elif obs_info_len in {9, 10}:
+                size = 1
+            else:
+                raise ValueError("Observer info length not recognized.")
+            if self.rejection_flag[i]:
+                j += size
+                continue
+            atwa += partials[j:j+size, :].T @ weights[j:j+size, j:j+size] @ partials[j:j+size, :]
+            atwb += (partials[j:j+size, :].T @ weights[j:j+size, j:j+size]
+                        @ residuals[j:j+size].reshape((size, 1)))
+            j += size
+        atwa = partials.T @ weights @ partials
+        atwb = partials.T @ weights @ residuals
+        cov = np.linalg.inv(atwa)
+        delta_x = cov @ atwb
+        # delta_x = np.linalg.solve(atwa, atwb)
+        return delta_x.ravel(), cov
+
     def filter_lsq(self, verbose=True):
         """
         Performs a least-squares fit on the observations.
@@ -1641,11 +1687,7 @@ class FitSimulation:
             # get initial guess
             curr_state = np.array(list(self.x_nom.values()))
             # get state correction
-            atwa = a_rej.T @ w_rej @ a_rej
-            cov = np.linalg.inv(atwa)
-            atwb = a_rej.T @ w_rej @ b_rej
-            delta_x = cov @ atwb
-            # delta_x = np.linalg.solve(atwa, atwb)
+            delta_x, cov = self._get_lsq_state_correction(a_rej, w_rej, b_rej)
             # get new state
             next_state = curr_state + delta_x
             self.x_nom = dict(zip(self.x_nom.keys(), next_state))
