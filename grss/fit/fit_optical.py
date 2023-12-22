@@ -761,7 +761,6 @@ def deweight_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
     observer_loc_deweighted : tuple
         Observer locations for each observation in obs_array_deweighted
     """
-    obs_array_optical = obs_array_optical[obs_array_optical[:,0].argsort()]
     obs_array_deweighted = obs_array_optical[0,None].copy()
     catalog_deweighted = [star_catalog_codes[0]]
     observer_loc_deweighted = [observer_codes_optical[0]]
@@ -816,7 +815,6 @@ def eliminate_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
     observer_loc_eliminated : tuple
         Observer locations for each observation in obs_array_eliminated
     """
-    obs_array_optical = obs_array_optical[obs_array_optical[:,0].argsort()]
     obs_array_eliminated = obs_array_optical[0,None].copy()
     catalog_eliminated = [star_catalog_codes[0]]
     observer_loc_eliminated = [observer_codes_optical[0]]

@@ -234,7 +234,8 @@ void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &c,
 void stm_J2(const IntegBody &bodyi, const real &gm, const real &J2,
             const real &dxBody, const real &dyBody, const real &dzBody,
             const real &radius, const real &sinRA, const real &cosRA,
-            const real &sinDec, const real &cosDec, const size_t &stmStarti,
+            const real &sinDec, const real &cosDec,
+            const real &smoothing_threshold, const size_t &stmStarti,
             std::vector<real> &accInteg) {
     real *dfdpos = new real[9];
     real *dfdvel = new real[9];
@@ -278,6 +279,43 @@ void stm_J2(const IntegBody &bodyi, const real &gm, const real &J2,
     dfBodydposBody[6] = dfac1dxBody*(fac2 - 2)*dzBody + fac1*dfac2dxBody*dzBody;
     dfBodydposBody[7] = dfac1dyBody*(fac2 - 2)*dzBody + fac1*dfac2dyBody*dzBody;
     dfBodydposBody[8] = dfac1dzBody*(fac2 - 2)*dzBody + fac1*(dfac2dzBody*dzBody + fac2 - 2);
+
+    if (r <= radius+smoothing_threshold) {
+        const real depth = radius+smoothing_threshold-r;
+        real smoothing = cos(PI*depth/(2*smoothing_threshold));
+        if (depth > smoothing_threshold){
+            smoothing = 0.0;
+        }
+        if (smoothing != 0.0){
+            const real dsmoothingdxBody =
+                sin(PI * depth / (2 * smoothing_threshold)) * PI * dxBody /
+                (2 * smoothing_threshold * r);
+            const real dsmoothingdyBody =
+                sin(PI * depth / (2 * smoothing_threshold)) * PI * dyBody /
+                (2 * smoothing_threshold * r);
+            const real dsmoothingdzBody =
+                sin(PI * depth / (2 * smoothing_threshold)) * PI * dzBody /
+                (2 * smoothing_threshold * r);
+            dfBodydposBody[0] *= smoothing;
+            dfBodydposBody[0] += fac1*fac2*dxBody*dsmoothingdxBody;
+            dfBodydposBody[1] *= smoothing;
+            dfBodydposBody[1] += fac1*fac2*dxBody*dsmoothingdyBody;
+            dfBodydposBody[2] *= smoothing;
+            dfBodydposBody[2] += fac1*fac2*dxBody*dsmoothingdzBody;
+            dfBodydposBody[3] *= smoothing;
+            dfBodydposBody[3] += fac1*fac2*dyBody*dsmoothingdxBody;
+            dfBodydposBody[4] *= smoothing;
+            dfBodydposBody[4] += fac1*fac2*dyBody*dsmoothingdyBody;
+            dfBodydposBody[5] *= smoothing;
+            dfBodydposBody[5] += fac1*fac2*dyBody*dsmoothingdzBody;
+            dfBodydposBody[6] *= smoothing;
+            dfBodydposBody[6] += fac1*(fac2-2)*dzBody*dsmoothingdxBody;
+            dfBodydposBody[7] *= smoothing;
+            dfBodydposBody[7] += fac1*(fac2-2)*dzBody*dsmoothingdyBody;
+            dfBodydposBody[8] *= smoothing;
+            dfBodydposBody[8] += fac1*(fac2-2)*dzBody*dsmoothingdzBody;
+        }
+    }
 
     real *dposBodydpos = new real[9];
     dposBodydpos[0] = -sinRA;
