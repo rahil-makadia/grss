@@ -638,10 +638,21 @@ propSimulation::propSimulation(std::string name, real t0,
 propSimulation::propSimulation(std::string name, const propSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
-    this->integParams = simRef.integParams;
+    this->ephem = simRef.ephem;
     this->consts = simRef.consts;
-    this->integBodies = simRef.integBodies;
+    this->integParams = simRef.integParams;
     this->spiceBodies = simRef.spiceBodies;
+    // this->integBodies = simRef.integBodies;
+    // this->events = simRef.events;
+    this->tEvalUTC = simRef.tEvalUTC;
+    this->evalApparentState = simRef.evalApparentState;
+    this->evalMeasurements = simRef.evalMeasurements;
+    this->convergedLightTime = simRef.convergedLightTime;
+    this->observerInfo = simRef.observerInfo;
+    this->xObserver = simRef.xObserver;
+    this->tEvalMargin = simRef.tEvalMargin;
+    this->tEval = simRef.tEval;
+    this->radarObserver = simRef.radarObserver;
 }
 
 void propSimulation::prepare_for_evaluation(
@@ -729,7 +740,9 @@ void propSimulation::prepare_for_evaluation(
     std::vector<std::vector<real>> xObserver = std::vector<std::vector<real>>(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
-    furnsh_c(this->DEkernelPath.c_str());
+    if (this->tEvalUTC) {
+        furnsh_c(this->DEkernelPath.c_str());
+    }
     if (tEval.size() != 0) {
         for (size_t i = 0; i < tEval.size(); i++) {
             if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
@@ -750,7 +763,9 @@ void propSimulation::prepare_for_evaluation(
             // xObserver[i][4] << " " << xObserver[i][5] << std::endl;
         }
     }
-    unload_c(this->DEkernelPath.c_str());
+    if (this->tEvalUTC) {
+        unload_c(this->DEkernelPath.c_str());
+    }
 
     if (this->tEval.size() == 0) {
         this->tEval = tEval;
@@ -927,11 +942,6 @@ void propSimulation::set_integration_parameters(
     this->integParams.adaptiveTimestep = adaptiveTimestep;
     this->integParams.tolPC = tolPC;
     this->integParams.tolInteg = tolInteg;
-
-    bool backwardProp = this->integParams.t0 > this->integParams.tf;
-    if (backwardProp) {
-        std::reverse(this->events.begin(), this->events.end());
-    }
 }
 
 std::vector<real> propSimulation::get_sim_constants() {
@@ -977,6 +987,10 @@ void propSimulation::preprocess() {
         }
         this->interpParams.tStack.push_back(t);
         this->interpParams.xIntegStack.push_back(xInteg);
+        bool backwardProp = this->integParams.t0 > this->integParams.tf;
+        if (backwardProp) {
+            std::reverse(this->events.begin(), this->events.end());
+        }
         this->isPreprocessed = true;
     }
 }

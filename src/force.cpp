@@ -358,6 +358,7 @@ void force_J2(const propSimulation *propSim, std::vector<real> &accInteg) {
     forceFile.open("cpp.11", std::ios::app);
     #endif
     const real G = propSim->consts.G;
+    const real smoothing_threshold = 100.0e3L/propSim->consts.du2m;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         const real x = propSim->integBodies[i].pos[0];
         const real y = propSim->integBodies[i].pos[1];
@@ -395,11 +396,26 @@ void force_J2(const propSimulation *propSim, std::vector<real> &accInteg) {
                 real axBody = fac1 * fac2 * dxBody;
                 real ayBody = fac1 * fac2 * dyBody;
                 real azBody = fac1 * (fac2 - 2) * dzBody;
+                if (rRel <= radius+smoothing_threshold) {
+                    const real depth = radius+smoothing_threshold-rRel;
+                    real smoothing = cos(PI*depth/(2*smoothing_threshold));
+                    if (depth > smoothing_threshold){
+                        smoothing = 0.0;
+                    }
+                    axBody *= smoothing;
+                    ayBody *= smoothing;
+                    azBody *= smoothing;
+                }
                 accInteg[3 * i + 0] += -axBody * sinRA -
                     ayBody * cosRA * sinDec + azBody * cosRA * cosDec;
                 accInteg[3 * i + 1] += axBody * cosRA -
                     ayBody * sinRA * sinDec + azBody * sinRA * cosDec;
                 accInteg[3 * i + 2] += ayBody * cosDec + azBody * sinDec;
+                if (propSim->integBodies[i].propStm && rRel < 0.1) {
+                    stm_J2(propSim->integBodies[i], G*massj, bodyj->J2, dxBody,
+                           dyBody, dzBody, radius, sinRA, cosRA, sinDec, cosDec,
+                           smoothing_threshold, 3*i+3, accInteg);
+                }
                 #ifdef PRINT_FORCES
                 forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
                           << -axBody * sinRA - ayBody * cosRA * sinDec +

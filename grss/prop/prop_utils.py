@@ -143,6 +143,7 @@ def get_scale_factor(body_id):
 
 def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
                     x_min=None, x_max=None, y_min=1e-1, y_max=None):
+    # sourcery skip: low-code-quality
     """
     Plot the relative radial velocity and distance of the close approaches of
     a given prop_sim object.
@@ -173,15 +174,20 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     rel_state = np.zeros((len(prop_sim.interpParams.tStack), 6))
     t_stack = np.array(prop_sim.interpParams.tStack)
     x_stack = np.array(prop_sim.interpParams.xIntegStack)
+    j = 0
+    for body in prop_sim.integBodies:
+        if body.name == flyby_body:
+            break
+        j += 2*body.n2Derivs
     for idx, time in enumerate(t_stack):
         central_body_state = prop_sim.get_spiceBody_state(time, central_body)
         ca_body_state = x_stack[idx]
-        rel_state[idx,0] = ca_body_state[0] - central_body_state[0]
-        rel_state[idx,1] = ca_body_state[1] - central_body_state[1]
-        rel_state[idx,2] = ca_body_state[2] - central_body_state[2]
-        rel_state[idx,3] = ca_body_state[3] - central_body_state[3]
-        rel_state[idx,4] = ca_body_state[4] - central_body_state[4]
-        rel_state[idx,5] = ca_body_state[5] - central_body_state[5]
+        rel_state[idx,0] = ca_body_state[j+0] - central_body_state[0]
+        rel_state[idx,1] = ca_body_state[j+1] - central_body_state[1]
+        rel_state[idx,2] = ca_body_state[j+2] - central_body_state[2]
+        rel_state[idx,3] = ca_body_state[j+3] - central_body_state[3]
+        rel_state[idx,4] = ca_body_state[j+4] - central_body_state[4]
+        rel_state[idx,5] = ca_body_state[j+5] - central_body_state[5]
     rel_dist = np.linalg.norm(rel_state[:,:3], axis=1)
     rel_radial_vel = np.sum(rel_state[:,:3]*rel_state[:,3:6], axis=1) / rel_dist
     scale_factor, units = get_scale_factor(central_body)
@@ -192,7 +198,6 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
         for approach in prop_sim.caParams
         if approach.flybyBody == flyby_body
         and approach.centralBody == central_body
-        and approach.impact is False
     ]
     impact_times = [
         approach.t
@@ -204,8 +209,8 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     ca_times = Time(ca_times, format='mjd', scale='tdb').tdb.datetime
     impact_times = Time(impact_times, format='mjd', scale='tdb').tdb.datetime
     if len(ca_times) == 0 and len(impact_times) == 0:
-        print("No close approaches or impacts found")
-        return None
+        print("WARNING: No close approaches or impacts found")
+        # return None
     times = Time(t_stack, format='mjd', scale='tdb').tdb.datetime
     lwidth = 1
     fig = plt.figure(figsize=(6, 6), dpi=150)
@@ -238,11 +243,12 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
+    ax1.set_title(f"{flyby_body} - {central_body}")
     fig.autofmt_xdate()
-    plt.show()
-    return None
+    return fig, ax1, ax2
 
-def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellipse_params, units):
+def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
+                    print_ellipse_params, units, sigma_points):
     """
     Convert two sets of points to an ellipse.
 
@@ -262,18 +268,26 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type, print_ellip
         True to print the ellipse parameters, False to not print
     units : str
         units of the plot
+    sigma_points : prop.SigmaPoints, optional
+        SigmaPoints object for reconstructing mean and cov, by default None.
 
     Returns
     -------
     ellipse : np.ndarray
         ellipse points
     """
-    x_mean = np.mean(x_data)
-    y_mean = np.mean(y_data)
+    if sigma_points is None:
+        x_mean = np.mean(x_data)
+        y_mean = np.mean(y_data)
+        cov = np.cov(x_data, y_data)
+    else:
+        xy_data = np.vstack((x_data, y_data)).T
+        mean, cov = sigma_points.reconstruct(xy_data)
+        x_mean = mean[0]
+        y_mean = mean[1]
     if plot_offset:
         x_data -= x_mean
         y_data -= y_mean
-    cov = np.cov(x_data, y_data)
     eigvals, eigvecs = np.linalg.eig(cov)
     idx = eigvals.argsort()[::-1]
     eigvals = eigvals[idx]
@@ -327,7 +341,9 @@ def days_to_dhms(days):
     return day, hour, mins, sec, string
 
 def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_km=False,
-                equal_axis=True, print_ellipse_params=False, show_central_body=True):
+                equal_axis=True, print_ellipse_params=False, show_central_body=True,
+                sigma_points=None):
+    # sourcery skip: low-code-quality
     """
     Plot the B-planes of a list of close approaches.
 
@@ -349,6 +365,8 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         True to print the ellipse parameters, False to not print, by default False.
     show_central_body : bool, optional
         True to show the central body, False to not show it, by default True.
+    sigma_points : prop.SigmaPoints, optional
+        SigmaPoints object for reconstructing mean and cov, by default None.
 
     Returns
     -------
@@ -366,6 +384,8 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     if not units_km:
         central_body_radius /= 149597870.7
         units = "AU"
+    if scale_coords:
+        au2units /= central_body_radius
     times = np.array([approach.t for approach in ca_list])
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
@@ -381,25 +401,19 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     impact_any = np.any(impact_bool)
     if len(ca_list) >= 13:
         kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
-                                            'kizner', print_ellipse_params, units)
+                                            'kizner', print_ellipse_params, units, sigma_points)
         opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
-                                            'opik', print_ellipse_params, units)
+                                            'opik', print_ellipse_params, units, sigma_points)
         scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
-                                            'scaled', print_ellipse_params, units)
+                                            'scaled', print_ellipse_params, units, sigma_points)
         mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
-                                            'mtp', print_ellipse_params, units)
+                                            'mtp', print_ellipse_params, units, sigma_points)
     else:
         kizner_ellipse = None
         opik_ellipse = None
         scaled_ellipse = None
         mtp_ellipse = None
-    t_mean = np.mean(times)
-    t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
-    t_map_mean = Time(np.mean(map_times), format='mjd', scale='tdb').tdb.iso
-    t_std = n_std*np.std(times)
-    *_, t_std_str = days_to_dhms(t_std)
-    full_str = fr'{t_mean_str} $\pm$ {t_std_str}'
-    fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=150)
+    fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=250)
     plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_ellipse, 'kizner',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
@@ -417,11 +431,28 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
                 bbox_to_anchor=(0.5, 1.023), fontsize=10)
     fig.tight_layout()
     event = "Impact" if impact_any else "Close Approach"
-    fig.suptitle(fr"{event} at {full_str} TDB ({n_std}$\sigma$)", fontsize=14, y=1.07)
-    subtitle = f"B-plane map time: {t_map_mean} TDB"
+    unit = "UTC" if impact_any else "TDB"
+    if sigma_points is None:
+        t_mean = np.mean(times)
+        t_dev = np.std(times)
+        t_map_mean = np.mean(map_times)
+    else:
+        t_mean, t_var = sigma_points.reconstruct(times)
+        t_dev = np.sqrt(t_var[0,0])
+        t_map_mean, _ = sigma_points.reconstruct(map_times)
+    if impact_any:
+        t_mean_str = Time(t_mean, format='mjd', scale='tdb').utc.iso
+        t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').utc.iso
+    else:
+        t_mean_str = Time(t_mean, format='mjd', scale='tdb').tdb.iso
+        t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').tdb.iso
+    t_std = n_std*t_dev
+    *_, t_std_str = days_to_dhms(t_std)
+    full_str = fr'{t_mean_str} $\pm$ {t_std_str}'
+    fig.suptitle(fr"{event} at {full_str} {unit} ({n_std}$\sigma$)", fontsize=14, y=1.07)
+    subtitle = f"B-plane map time: {t_map_mean} {unit}"
     plt.text(x=0.5, y=1.026, s=subtitle, fontsize=11, ha="center", transform=fig.transFigure)
-    plt.show()
-    return None
+    return fig, axes
 
 def _get_bplane_labels(bplane_type, plot_offset, units):
     """
@@ -524,7 +555,6 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     """
     if bplane_type not in {'kizner', 'opik', 'scaled', 'mtp'}:
         raise ValueError("Unknown B-plane type")
-    scale_factor = central_body_radius if scale_coords else 1.0
     if bplane_type in {'scaled', 'mtp'}:
         focus_factor = 1.0
     x_label, y_label, title = _get_bplane_labels(bplane_type, plot_offset, units)
@@ -532,13 +562,13 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     malpha = 0.5
     mspec = 'b.'
     rotation = 30
-    axis.plot(x_coord/scale_factor, y_coord/scale_factor, mspec,
+    axis.plot(x_coord, y_coord, mspec,
                 ms=msize, alpha=malpha, label="Close Approaches")
     if ellipse is not None:
         lwidth = 1.0
         lalpha = 0.75
         lspec = 'r-'
-        axis.plot(ellipse[0,:]/scale_factor, ellipse[1,:]/scale_factor, lspec,
+        axis.plot(ellipse[0,:], ellipse[1,:], lspec,
                     lw=lwidth, alpha=lalpha, label="Uncertainty Ellipse")
     axis.set_xlabel(x_label)
     axis.set_ylabel(y_label)

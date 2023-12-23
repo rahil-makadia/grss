@@ -58,7 +58,7 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                                relPos[2] * relPos[2]);
                 // check impacts with spiceBodies first
                 if (j > propSim->integParams.nInteg &&
-                    relDist <= radius + radiusj) {
+                    relDist <= radius + radiusj && relDistOld > radius + radiusj) {
                     real tImp;
                     real xRelImp[6];
                     get_ca_or_impact_time(propSim, i, j, tOld, t, tImp, impact_r_calc);
@@ -75,10 +75,7 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                     propSim->impactParams.push_back(impact);
                     std::cout << "Impact detected at MJD " << t << " TDB. "
                               << propSim->integBodies[i].name
-                              << " collided with " << bodyj->name
-                              << ". Terminating propagation!" << std::endl;
-                    keepStepping = 0;
-                    // return;
+                              << " collided with " << bodyj->name << "!" << std::endl;
                 }
                 // check close approach
                 real radialVel, radialVelOld;

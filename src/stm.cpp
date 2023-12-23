@@ -231,6 +231,136 @@ void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &c,
     delete[] Ddot;
 }
 
+void stm_J2(const IntegBody &bodyi, const real &gm, const real &J2,
+            const real &dxBody, const real &dyBody, const real &dzBody,
+            const real &radius, const real &sinRA, const real &cosRA,
+            const real &sinDec, const real &cosDec,
+            const real &smoothing_threshold, const size_t &stmStarti,
+            std::vector<real> &accInteg) {
+    real *dfdpos = new real[9];
+    real *dfdvel = new real[9];
+    memset(dfdvel, 0, 9 * sizeof(real));
+    const size_t numParams = (bodyi.stm.size() - 36) / 6;
+    real *dfdpar = new real[3 * numParams];
+    memset(dfdpar, 0, 3 * numParams * sizeof(real));
+
+    real *B = new real[9];
+    real *Bdot = new real[9];
+    real *C = new real[9];
+    real *Cdot = new real[9];
+    real *D = new real[3 * numParams];
+    real *Ddot = new real[3 * numParams];
+    bcd_and_dot(bodyi.stm, B, Bdot, C, Cdot, D, Ddot);
+
+    const real r2 = dxBody * dxBody + dyBody * dyBody + dzBody * dzBody;
+    const real r = sqrt(r2);
+    const real r4 = r2 * r2;
+    const real r5 = r2 * r2 * r;
+    const real r7 = r5 * r2;
+
+    const real fac1 = 3 * gm * J2 * radius * radius / (2 * r5);
+    const real dfac1Fac = -(15*gm*J2*radius*radius)/(2*r7);
+    const real dfac1dxBody = dfac1Fac*dxBody;
+    const real dfac1dyBody = dfac1Fac*dyBody;
+    const real dfac1dzBody = dfac1Fac*dzBody;
+
+    const real fac2 = 5 * dzBody * dzBody / r2 - 1;
+    const real dfac2dxBody = -10*dzBody*dzBody*dxBody/r4;
+    const real dfac2dyBody = -10*dzBody*dzBody*dyBody/r4;
+    const real dfac2dzBody = 10*dzBody/r2 - 10*dzBody*dzBody*dzBody/r4;
+
+    real *dfBodydposBody = new real[9];
+    dfBodydposBody[0] = dfac1dxBody*fac2*dxBody + fac1*(dfac2dxBody*dxBody + fac2);
+    dfBodydposBody[1] = dfac1dyBody*fac2*dxBody + fac1*dfac2dyBody*dxBody;
+    dfBodydposBody[2] = dfac1dzBody*fac2*dxBody + fac1*dfac2dzBody*dxBody;
+    dfBodydposBody[3] = dfac1dxBody*fac2*dyBody + fac1*dfac2dxBody*dyBody;
+    dfBodydposBody[4] = dfac1dyBody*fac2*dyBody + fac1*(dfac2dyBody*dyBody + fac2);
+    dfBodydposBody[5] = dfac1dzBody*fac2*dyBody + fac1*dfac2dzBody*dyBody;
+    dfBodydposBody[6] = dfac1dxBody*(fac2 - 2)*dzBody + fac1*dfac2dxBody*dzBody;
+    dfBodydposBody[7] = dfac1dyBody*(fac2 - 2)*dzBody + fac1*dfac2dyBody*dzBody;
+    dfBodydposBody[8] = dfac1dzBody*(fac2 - 2)*dzBody + fac1*(dfac2dzBody*dzBody + fac2 - 2);
+
+    if (r <= radius+smoothing_threshold) {
+        const real depth = radius+smoothing_threshold-r;
+        real smoothing = cos(PI*depth/(2*smoothing_threshold));
+        if (depth > smoothing_threshold){
+            smoothing = 0.0;
+        }
+        if (smoothing != 0.0){
+            const real dsmoothingdxBody =
+                sin(PI * depth / (2 * smoothing_threshold)) * PI * dxBody /
+                (2 * smoothing_threshold * r);
+            const real dsmoothingdyBody =
+                sin(PI * depth / (2 * smoothing_threshold)) * PI * dyBody /
+                (2 * smoothing_threshold * r);
+            const real dsmoothingdzBody =
+                sin(PI * depth / (2 * smoothing_threshold)) * PI * dzBody /
+                (2 * smoothing_threshold * r);
+            dfBodydposBody[0] *= smoothing;
+            dfBodydposBody[0] += fac1*fac2*dxBody*dsmoothingdxBody;
+            dfBodydposBody[1] *= smoothing;
+            dfBodydposBody[1] += fac1*fac2*dxBody*dsmoothingdyBody;
+            dfBodydposBody[2] *= smoothing;
+            dfBodydposBody[2] += fac1*fac2*dxBody*dsmoothingdzBody;
+            dfBodydposBody[3] *= smoothing;
+            dfBodydposBody[3] += fac1*fac2*dyBody*dsmoothingdxBody;
+            dfBodydposBody[4] *= smoothing;
+            dfBodydposBody[4] += fac1*fac2*dyBody*dsmoothingdyBody;
+            dfBodydposBody[5] *= smoothing;
+            dfBodydposBody[5] += fac1*fac2*dyBody*dsmoothingdzBody;
+            dfBodydposBody[6] *= smoothing;
+            dfBodydposBody[6] += fac1*(fac2-2)*dzBody*dsmoothingdxBody;
+            dfBodydposBody[7] *= smoothing;
+            dfBodydposBody[7] += fac1*(fac2-2)*dzBody*dsmoothingdyBody;
+            dfBodydposBody[8] *= smoothing;
+            dfBodydposBody[8] += fac1*(fac2-2)*dzBody*dsmoothingdzBody;
+        }
+    }
+
+    real *dposBodydpos = new real[9];
+    dposBodydpos[0] = -sinRA;
+    dposBodydpos[1] = cosRA;
+    dposBodydpos[2] = 0.0;
+    dposBodydpos[3] = -cosRA*sinDec;
+    dposBodydpos[4] = -sinRA*sinDec;
+    dposBodydpos[5] = cosDec;
+    dposBodydpos[6] = cosRA*cosDec;
+    dposBodydpos[7] = sinRA*cosDec;
+    dposBodydpos[8] = sinDec;
+
+    real* dfdfBody = new real[9];
+    dfdfBody[0] = -sinRA;
+    dfdfBody[1] = -cosRA*sinDec;
+    dfdfBody[2] = cosDec*cosRA;
+    dfdfBody[3] = cosRA;
+    dfdfBody[4] = -sinRA*sinDec;
+    dfdfBody[5] = cosDec*sinRA;
+    dfdfBody[6] = 0.0;
+    dfdfBody[7] = cosDec;
+    dfdfBody[8] = sinDec;
+
+    real *dfBodydpos = new real[9];
+    mat3_mat3_mul(dfBodydposBody, dposBodydpos, dfBodydpos);
+    mat3_mat3_mul(dfdfBody, dfBodydpos, dfdpos);
+
+    bcd_2dot(B, Bdot, C, Cdot, D, Ddot, dfdpos, dfdvel, dfdpar, numParams,
+             stmStarti, accInteg);
+
+    delete[] dfdpos;
+    delete[] dfdvel;
+    delete[] dfdpar;
+    delete[] B;
+    delete[] Bdot;
+    delete[] C;
+    delete[] Cdot;
+    delete[] D;
+    delete[] Ddot;
+    delete[] dfBodydposBody;
+    delete[] dposBodydpos;
+    delete[] dfdfBody;
+    delete[] dfBodydpos;
+}
+
 void stm_nongrav(const IntegBody &bodyi, const real &g,
                  const NongravParamaters &ngParams, const real &dx, const real &dy,
                  const real &dz, const real &dvx, const real &dvy, const real &dvz,

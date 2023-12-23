@@ -14,9 +14,9 @@ class SigmaPoints:
         ----------
         x_dict : dict
             solution dictionary containing cometary/cartesian elements
-        P : numpy.ndarray
+        cov : numpy.ndarray
             covariance matrix of the solution
-        type : str
+        sp_type : str
             type of sigma point. Choose from merwe or julier
         alpha : float
             scaling parameter for sigma points
@@ -100,20 +100,20 @@ class SigmaPoints:
     def _get_points_dict(self):
         dict_list = [None] * (2 * self.n + 1)
         for i in range(2 * self.n + 1):
-            dict_i = {"t": self.x_dict["t"]}
+            dict_i = {"t": self.x_dict["t"]} if "t" in self.x_dict else {}
             for j, key in enumerate(self.x_dict):
                 if key != "t":
                     dict_i[key] = self.sigma_points[i][j - 1]
             dict_list[i] = dict_i
         return dict_list
 
-    def reconstruct(self, tr_sigma_points):
+    def reconstruct(self, transformed_sigma_points):
         """
         Reconstruct the mean and covariance from transformed sigma points.
 
         Parameters
         ----------
-        tr_sigma_points : np.ndarray
+        transformed_sigma_points : np.ndarray
             transformed sigma points
 
         Returns
@@ -123,11 +123,19 @@ class SigmaPoints:
         new_cov : np.ndarray
             reconstructed covariance
         """
-        new_x = np.zeros(self.n)
-        new_cov = np.zeros((self.n, self.n))
+        if transformed_sigma_points.ndim == 2:
+            size = len(transformed_sigma_points[0])
+            new_x = np.zeros(size)
+            new_cov = np.zeros((size, size))
+        elif transformed_sigma_points.ndim == 1:
+            size = 1
+            new_x = 0
+            new_cov = 0
+        else:
+            raise ValueError("Invalid dimension for transformed sigma points")
         for i in range(2 * self.n + 1):
-            new_x += self.w_m[i] * tr_sigma_points[i]
+            new_x += self.w_m[i] * transformed_sigma_points[i]
         for i in range(2 * self.n + 1):
-            diff = tr_sigma_points[i] - new_x
+            diff = transformed_sigma_points[i] - new_x
             new_cov += self.w_c[i] * np.outer(diff, diff)
         return new_x, new_cov
