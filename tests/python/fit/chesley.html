@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(12104) Chesley orbit determination test &#8212; GRSS 2.3.0 documentation</title>
+    <title>(12104) Chesley orbit determination test &#8212; GRSS 2.4.1 documentation</title>
   
   
   
@@ -65,7 +65,7 @@
     <link rel="prev" title="(66391) Moshup propagation test" href="../prop/moshup.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 18, 2023"/>
+    <meta name="docbuild:last-update" content="Dec 23, 2023"/>
   </head>
   
   
@@ -152,7 +152,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.3.0 documentation</p>
+    <p class="title logo__title">GRSS v2.4.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -184,6 +184,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -507,7 +508,7 @@ deweight = True
 eliminate = False
 max_obs_per_night = 4
 verbose = True
-obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
+obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, de_kernel_path, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
 obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
 if add_gaia_obs:
     obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=True)
@@ -521,14 +522,14 @@ if add_gaia_obs:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Skipped 28 observations
-         28 of which were non-geocentric occultations or space-based observations,
+Skipped 0 observations
+         0 of which were non-geocentric occultations or space-based observations,
          0 were either roving or radar observations (radar is handled separately),
          0 of which were outside the specified time range.
-No debiasing needed for 1822 observations. Debiased 1273 observations. No biasing information for 10 observations.
-Applied default weight of 1 arcsec to 153 CCD observations
-Deweighted 800 observations as part of deweighting scheme.
-Found 257 observations from Gaia DR3.
+No debiasing needed for 1832 observations. Debiased 1301 observations. No biasing information for 10 observations.
+Applied default weight of 1 arcsec to 163 CCD observations
+Deweighted 804 observations as part of deweighting scheme.
+Found 257 observations from gaiadr3
          Added 32 of those observations.
 </pre></div></div>
 </div>
@@ -555,13 +556,13 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.428                   0.507                   1543.305                        0.246
-2                        0.428                   0.505                   1544.271                        0.246
-3                        0.428                   0.505                   1544.271                        0.246
-Converged without rejecting outliers. Starting outlier rejection now.
-4                        0.397                   0.458                   1247.942                        0.200
-5                        0.397                   0.458                   1247.925                        0.200
-Converged after rejecting outliers.
+1                        0.427                   0.505                   1548.300                        0.244
+2                        0.427                   0.503                   1549.252                        0.244
+3                        0.427                   0.503                   1549.253                        0.244
+Converged without rejecting outliers. Starting outlier rejection now...
+4                        0.396                   0.456                   1252.918                        0.199
+5                        0.396                   0.456                   1252.856                        0.199
+Converged after rejecting outliers. Rejected 19 out of 3175 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -578,21 +579,22 @@ Converged after rejecting outliers.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
-=======================================================
-RMS unweighted: 0.3972311942163293
-RMS weighted: 0.4577513379571854
-chi-squared: 1247.9245966611536
-reduced chi-squared: 0.20030892402265707
-square root of reduced chi-squared: 0.447558849786994
-=======================================================
-t: MJD 57747.0 TDB
+==============================================================
+RMS unweighted: 0.3958915894092033
+RMS weighted: 0.45585615321598
+chi-squared: 1252.8556861938494
+reduced chi-squared: 0.19867676596794312
+square root of reduced chi-squared: 0.44573171972380776
+--------------------------------------------------------------
+Solution Time: MJD 57750.00 TDB =  2016-12-28 00:00:00.000 TDB
+--------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.41663381933e-02               1.04627140790e-08               2.41663437904e-02               1.00855569710e-08               +5.59716246268e-09              +0.535
-q                       2.93823893665e+00               3.56230095612e-08               2.93823892453e+00               3.43069882433e-08               -1.21216454652e-08              -0.340
-tp                      5.68199298246e+04               1.13863320389e-04               5.68199299408e+04               1.09461727771e-04               +1.16242772492e-04              +1.021
-om                      7.80621900600e+01               3.59365037852e-07               7.80621894094e+01               3.44153323235e-07               -6.50635016086e-07              -1.811
-w                       1.82993622616e+02               2.04141793706e-05               1.82993644772e+02               1.96130801750e-05               +2.21563303171e-05              +1.085
-i                       1.11516133707e+01               2.06158828465e-07               1.11516137560e+01               2.01559503027e-07               +3.85341287767e-07              +1.869
+e                       2.41689520000e-02               1.04607535868e-08               2.41689577968e-02               1.01053994278e-08               +5.79680933116e-09              +0.554
+q                       2.93822335383e+00               3.56216212534e-08               2.93822334049e+00               3.43821547137e-08               -1.33351725218e-08              -0.374
+tp                      5.68199205284e+04               1.13796723893e-04               5.68199206444e+04               1.09565358485e-04               +1.16081064334e-04              +1.020
+om                      7.80621881248e+01               3.59338546606e-07               7.80621875036e+01               3.49449604872e-07               -6.21155649583e-07              -1.729
+w                       1.82991271643e+02               2.04012723963e-05               1.82991293688e+02               1.96322636780e-05               +2.20452943722e-05              +1.081
+i                       1.11516266721e+01               2.06153643961e-07               1.11516270617e+01               2.01678070162e-07               +3.89516110033e-07              +1.889
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -654,10 +656,10 @@ print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 2.98
-Mahalonobis distance between GRSS and JPL solution: 3.07
-Bhattacharya distance between JPL and GRSS solution: 0.0023
-Bhattacharya coefficient between JPL and GRSS solution: 0.9977
+Mahalonobis distance between JPL and GRSS solution: 2.94
+Mahalonobis distance between GRSS and JPL solution: 3.01
+Bhattacharya distance between JPL and GRSS solution: 0.0016
+Bhattacharya coefficient between JPL and GRSS solution: 0.9984
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -745,7 +747,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 18, 2023.
+  Last updated on Dec 23, 2023.
   <br/>
 </p>
   </div>

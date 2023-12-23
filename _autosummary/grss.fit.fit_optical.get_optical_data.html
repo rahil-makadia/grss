@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_optical.get_optical_data &#8212; GRSS 2.3.0 documentation</title>
+    <title>grss.fit.fit_optical.get_optical_data &#8212; GRSS 2.4.1 documentation</title>
   
   
   
@@ -58,11 +58,11 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.get_optical_data';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_radar" href="grss.fit.fit_radar.html" />
+    <link rel="next" title="grss.fit.fit_optical.get_space_based_observer_code" href="grss.fit.fit_optical.get_space_based_observer_code.html" />
     <link rel="prev" title="grss.fit.fit_optical.get_mpc_optical_obs_array" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 18, 2023"/>
+    <meta name="docbuild:last-update" content="Dec 23, 2023"/>
   </head>
   
   
@@ -149,7 +149,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.3.0 documentation</p>
+    <p class="title logo__title">GRSS v2.4.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -181,6 +181,7 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.get_optical_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -470,7 +471,7 @@ document.write(`
 <h1>grss.fit.fit_optical.get_optical_data<a class="headerlink" href="#grss-fit-fit-optical-get-optical-data" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.fit.fit_optical.get_optical_data">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_optical_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optical_obs_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_optical_data" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_optical_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optical_obs_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_optical_data" title="Permalink to this definition">#</a></dt>
 <dd><p>Get optical observation data from the Minor Planet Center for a desired small body
 and assemble the optical observations for the given body into an array for an orbit fit.</p>
 <dl class="field-list simple">
@@ -478,6 +479,7 @@ and assemble the optical observations for the given body into an array for an or
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>body_id</strong> (<em>str/int</em>) – Target id, numbers are interpreted as asteroids,
 append ‘P’ for comets, start with comet type and a ‘/’ for comet designations</p></li>
+<li><p><strong>de_kernel_path</strong> (<em>str</em>) – Path to the DE kernel file</p></li>
 <li><p><strong>optical_obs_file</strong> (<em>str</em><em>, </em><em>optional</em>) – Filepath to the optical observations file, by default None</p></li>
 <li><p><strong>t_min_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum time (MJD TDB) for observations to be included, by default None</p></li>
 <li><p><strong>t_max_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum time (MJD TDB) for observations to be included, by default None</p></li>
@@ -520,11 +522,11 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_radar.html"
+       href="grss.fit.fit_optical.get_space_based_observer_code.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_radar</p>
+        <p class="prev-next-title">grss.fit.fit_optical.get_space_based_observer_code</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -577,7 +579,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 18, 2023.
+  Last updated on Dec 23, 2023.
   <br/>
 </p>
   </div>

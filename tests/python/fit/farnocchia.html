@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 2.3.0 documentation</title>
+    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 2.4.1 documentation</title>
   
   
   
@@ -65,7 +65,7 @@
     <link rel="prev" title="(28751) Eggl orbit determination test" href="eggl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 18, 2023"/>
+    <meta name="docbuild:last-update" content="Dec 23, 2023"/>
   </head>
   
   
@@ -152,7 +152,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.3.0 documentation</p>
+    <p class="title logo__title">GRSS v2.4.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -184,6 +184,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -507,7 +508,7 @@ deweight = True
 eliminate = False
 max_obs_per_night = 4
 verbose = True
-obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
+obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, de_kernel_path, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
 obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
 if add_gaia_obs:
     obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=True)
@@ -521,14 +522,14 @@ if add_gaia_obs:
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Skipped 21 observations
-         21 of which were non-geocentric occultations or space-based observations,
+Skipped 0 observations
+         0 of which were non-geocentric occultations or space-based observations,
          0 were either roving or radar observations (radar is handled separately),
          0 of which were outside the specified time range.
-No debiasing needed for 505 observations. Debiased 417 observations. No biasing information for 0 observations.
+No debiasing needed for 505 observations. Debiased 438 observations. No biasing information for 0 observations.
 Applied default weight of 1 arcsec to 38 CCD observations
 Deweighted 208 observations as part of deweighting scheme.
-Found 111 observations from Gaia DR3.
+Found 111 observations from gaiadr3
          Added 17 of those observations.
 </pre></div></div>
 </div>
@@ -555,13 +556,13 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.425                   0.548                   541.934                         0.289
-2                        0.425                   0.547                   542.367                         0.290
-3                        0.425                   0.547                   542.367                         0.290
-Converged without rejecting outliers. Starting outlier rejection now.
-4                        0.398                   0.513                   473.340                         0.254
-5                        0.398                   0.513                   473.348                         0.254
-Converged after rejecting outliers.
+1                        0.430                   0.550                   559.048                         0.292
+2                        0.430                   0.549                   559.468                         0.292
+3                        0.430                   0.549                   559.468                         0.292
+Converged without rejecting outliers. Starting outlier rejection now...
+4                        0.405                   0.516                   490.463                         0.257
+5                        0.405                   0.516                   490.495                         0.257
+Converged after rejecting outliers. Rejected 4 out of 960 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -578,21 +579,22 @@ Converged after rejecting outliers.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
-=======================================================
-RMS unweighted: 0.39774077739865915
-RMS weighted: 0.5129236168193905
-chi-squared: 473.348328589723
-reduced chi-squared: 0.25394223636787716
-square root of reduced chi-squared: 0.5039268164802079
-=======================================================
-t: MJD 58005.0 TDB
+==============================================================
+RMS unweighted: 0.4045930768496239
+RMS weighted: 0.5160333117071398
+chi-squared: 490.4954870795384
+reduced chi-squared: 0.25734285785914923
+square root of reduced chi-squared: 0.5072897178724888
+--------------------------------------------------------------
+Solution Time: MJD 58005.00 TDB =  2017-09-09 00:00:00.000 TDB
+--------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02873972465e-01               8.68599899075e-09               2.02873970794e-01               8.61867399498e-09               -1.67098127002e-09              -0.192
-q                       2.17589058084e+00               2.17699673927e-08               2.17589058492e+00               2.17050309333e-08               +4.07390698953e-09              +0.187
-tp                      5.74183073230e+04               2.22097535155e-05               5.74183073042e+04               2.18924145434e-05               -1.88065023394e-05              -0.847
-om                      1.52357220932e+02               5.24227539771e-06               1.52357222010e+02               5.23561162214e-06               +1.07803350602e-06              +0.206
-w                       2.08340003612e+02               8.22401779928e-06               2.08339997631e+02               8.15297588383e-06               -5.98129668106e-06              -0.727
-i                       5.81863313345e+00               9.87617099651e-07               5.81863348899e+00               9.82744293187e-07               +3.55539265584e-07              +0.360
+e                       2.02873972465e-01               8.68599899075e-09               2.02873970684e-01               8.62276284006e-09               -1.78134940132e-09              -0.205
+q                       2.17589058084e+00               2.17699673927e-08               2.17589058532e+00               2.17046564636e-08               +4.47693304650e-09              +0.206
+tp                      5.74183073230e+04               2.22097535155e-05               5.74183073044e+04               2.18945109400e-05               -1.85278331628e-05              -0.834
+om                      1.52357220932e+02               5.24227539771e-06               1.52357222043e+02               5.23567986526e-06               +1.11076383291e-06              +0.212
+w                       2.08340003612e+02               8.22401779928e-06               2.08339997669e+02               8.15383363302e-06               -5.94310839119e-06              -0.723
+i                       5.81863313345e+00               9.87617099651e-07               5.81863349346e+00               9.82741543055e-07               +3.60013029166e-07              +0.365
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -745,7 +747,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 18, 2023.
+  Last updated on Dec 23, 2023.
   <br/>
 </p>
   </div>

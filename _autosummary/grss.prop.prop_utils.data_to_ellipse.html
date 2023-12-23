@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_utils.data_to_ellipse &#8212; GRSS 2.3.0 documentation</title>
+    <title>grss.prop.prop_utils.data_to_ellipse &#8212; GRSS 2.4.1 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_utils" href="grss.prop.prop_utils.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 18, 2023"/>
+    <meta name="docbuild:last-update" content="Dec 23, 2023"/>
   </head>
   
   
@@ -149,7 +149,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.3.0 documentation</p>
+    <p class="title logo__title">GRSS v2.4.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -181,6 +181,7 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -470,7 +471,7 @@ document.write(`
 <h1>grss.prop.prop_utils.data_to_ellipse<a class="headerlink" href="#grss-prop-prop-utils-data-to-ellipse" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.prop.prop_utils.data_to_ellipse">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">data_to_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bplane_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.data_to_ellipse" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">data_to_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bplane_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.data_to_ellipse" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert two sets of points to an ellipse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -482,6 +483,7 @@ document.write(`
 <li><p><strong>bplane_type</strong> (<em>str</em>) – type of B-plane</p></li>
 <li><p><strong>print_ellipse_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to print the ellipse parameters, False to not print</p></li>
 <li><p><strong>units</strong> (<em>str</em>) – units of the plot</p></li>
+<li><p><strong>sigma_points</strong> (<em>prop.SigmaPoints</em><em>, </em><em>optional</em>) – SigmaPoints object for reconstructing mean and cov, by default None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -573,7 +575,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 18, 2023.
+  Last updated on Dec 23, 2023.
   <br/>
 </p>
   </div>
