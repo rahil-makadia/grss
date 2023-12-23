@@ -174,15 +174,20 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     rel_state = np.zeros((len(prop_sim.interpParams.tStack), 6))
     t_stack = np.array(prop_sim.interpParams.tStack)
     x_stack = np.array(prop_sim.interpParams.xIntegStack)
+    j = 0
+    for body in prop_sim.integBodies:
+        if body.name == flyby_body:
+            break
+        j += 2*body.n2Derivs
     for idx, time in enumerate(t_stack):
         central_body_state = prop_sim.get_spiceBody_state(time, central_body)
         ca_body_state = x_stack[idx]
-        rel_state[idx,0] = ca_body_state[0] - central_body_state[0]
-        rel_state[idx,1] = ca_body_state[1] - central_body_state[1]
-        rel_state[idx,2] = ca_body_state[2] - central_body_state[2]
-        rel_state[idx,3] = ca_body_state[3] - central_body_state[3]
-        rel_state[idx,4] = ca_body_state[4] - central_body_state[4]
-        rel_state[idx,5] = ca_body_state[5] - central_body_state[5]
+        rel_state[idx,0] = ca_body_state[j+0] - central_body_state[0]
+        rel_state[idx,1] = ca_body_state[j+1] - central_body_state[1]
+        rel_state[idx,2] = ca_body_state[j+2] - central_body_state[2]
+        rel_state[idx,3] = ca_body_state[j+3] - central_body_state[3]
+        rel_state[idx,4] = ca_body_state[j+4] - central_body_state[4]
+        rel_state[idx,5] = ca_body_state[j+5] - central_body_state[5]
     rel_dist = np.linalg.norm(rel_state[:,:3], axis=1)
     rel_radial_vel = np.sum(rel_state[:,:3]*rel_state[:,3:6], axis=1) / rel_dist
     scale_factor, units = get_scale_factor(central_body)
@@ -193,7 +198,6 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
         for approach in prop_sim.caParams
         if approach.flybyBody == flyby_body
         and approach.centralBody == central_body
-        and approach.impact is False
     ]
     impact_times = [
         approach.t
@@ -205,8 +209,8 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     ca_times = Time(ca_times, format='mjd', scale='tdb').tdb.datetime
     impact_times = Time(impact_times, format='mjd', scale='tdb').tdb.datetime
     if len(ca_times) == 0 and len(impact_times) == 0:
-        print("No close approaches or impacts found")
-        return None
+        print("WARNING: No close approaches or impacts found")
+        # return None
     times = Time(t_stack, format='mjd', scale='tdb').tdb.datetime
     lwidth = 1
     fig = plt.figure(figsize=(6, 6), dpi=150)
@@ -240,8 +244,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
     fig.autofmt_xdate()
-    plt.show()
-    return None
+    return fig, ax1, ax2
 
 def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
                     print_ellipse_params, units, sigma_points):
@@ -339,6 +342,7 @@ def days_to_dhms(days):
 def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_km=False,
                 equal_axis=True, print_ellipse_params=False, show_central_body=True,
                 sigma_points=None):
+    # sourcery skip: low-code-quality
     """
     Plot the B-planes of a list of close approaches.
 
@@ -406,7 +410,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         opik_ellipse = None
         scaled_ellipse = None
         mtp_ellipse = None
-    fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=150)
+    fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=250)
     plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_ellipse, 'kizner',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
@@ -445,8 +449,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     fig.suptitle(fr"{event} at {full_str} {unit} ({n_std}$\sigma$)", fontsize=14, y=1.07)
     subtitle = f"B-plane map time: {t_map_mean} {unit}"
     plt.text(x=0.5, y=1.026, s=subtitle, fontsize=11, ha="center", transform=fig.transFigure)
-    plt.show()
-    return None
+    return fig, axes
 
 def _get_bplane_labels(bplane_type, plot_offset, units):
     """
