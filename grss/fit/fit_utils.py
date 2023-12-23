@@ -312,6 +312,10 @@ def get_observer_info(observer_codes):
     codes_dict = get_codes_dict()
     observer_info = []
     body_id = 399 # default to Earth
+    gaia = ['258']
+    occultation = ['275']
+    spacecraft = [ '245', '249', '250', '258', '274', 'C49', 'C50', 'C51',
+                    'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', 'S/C']
     for code in observer_codes:
         info_list = []
         # check if code is a tuple - corresponds to a radar observation
@@ -328,10 +332,8 @@ def get_observer_info(observer_codes):
                 freq = code[2]
                 info_list.append(freq)
         # code is a tuple but needs to be decomposed for the follwoing obs types:
-        # Gaia spacecraft (258)
-        # Occultations (275)
-        # generic spacecraft measurements (S/C)
-        elif isinstance(code, tuple) and code[0] in {'258', '275', 'S/C'}:
+        # Gaia spacecraft, Occultations, Spacecraft
+        elif isinstance(code, tuple) and code[0] in gaia+occultation+spacecraft:
             info_list.extend((body_id, code[1], code[2], code[3]))
             # info_list.extend((500, code[1], code[2], code[3], code[4], code[5], code[6]))
         else:

@@ -15,7 +15,39 @@ __all__ = [ 'get_ades_optical_obs_array',
             'get_mpc_optical_obs_array',
 ]
 
-def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None, verbose=False):
+def get_space_based_observer_code(obs_time_mjd_tdb, first_80, last_80):
+    """
+    Get the full observer code for a space-based observation from the Minor Planet Center.
+
+    Parameters
+    ----------
+    obs_time_mjd_tdb : float
+        Observation time (MJD TDB)
+    first_80 : str
+        First 80 characters of the space-based observation
+    last_80 : str
+        Last 80 characters of the space-based observation
+
+    Returns
+    -------
+    full_obs_code : tuple
+        Full observer code for the space-based observation
+    """
+    code = first_80[77:80]
+    if last_80[32] == '1':
+        fac = 1.0
+    elif last_80[32] == '2':
+        fac = 1.495978707e8
+    else:
+        raise ValueError(f"Space-based observation units code not recognized. Given: {last_80[32]}")
+    pos_x = float(last_80[34:45].replace(' ', ''))*fac
+    pos_y = float(last_80[46:57].replace(' ', ''))*fac
+    pos_z = float(last_80[58:69].replace(' ', ''))*fac
+    lon, lat, rho = rec2lat(obs_time_mjd_tdb, pos_x, pos_y, pos_z)
+    return (code, lon, lat, rho*1e3)
+
+def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=None,
+                        t_max_tdb=None, verbose=False):
     # sourcery skip: low-code-quality
     """
     Get optical observation data from the Minor Planet Center for a desired small body
@@ -26,6 +58,8 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
     body_id : str/int
         Target id, numbers are interpreted as asteroids,
         append 'P' for comets, start with comet type and a '/' for comet designations
+    de_kernel_path : str
+        Path to the DE kernel file
     optical_obs_file : str, optional
         Filepath to the optical observations file, by default None
     t_min_tdb : float, optional
@@ -75,6 +109,7 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
     unsupported_type_counter = 0
     out_of_range_counter = 0
     skip_counter = 0
+    spice.furnsh(de_kernel_path)
     for i, data in enumerate(obs_raw):
         obs_type = 'P' if data[14] == ' ' else data[14]
         date = data[15:32]
@@ -82,10 +117,11 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
         date_float = float(date[-7:])
         obs_time_mjd = Time(date_main, format='iso', scale='utc').utc.mjd+date_float
         obs_code = data[77:80]
-        disallow_code = obs_code in space_observatory_codes + non_geocentric_occultation_codes
-        disallow_type = obs_type in ['R', 'r', 'V', 'v', 'S', 's', 'O']
+        disallow_code = obs_code in non_geocentric_occultation_codes
+        disallow_type = obs_type in ['R', 'r', 'V', 'v', 'O']
+        disallow_line2 = obs_type in ['s']
         disallow_time = obs_time_mjd < t_min_utc or obs_time_mjd > t_max_utc
-        if not disallow_code and not disallow_type and not disallow_time:
+        if not disallow_code and not disallow_type and not disallow_time and not disallow_line2:
             observer_program = data[13]
             r_asc = get_ra_from_hms(data[32:44])
             dec = get_dec_from_dms(data[44:56])
@@ -94,7 +130,14 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
             obs_array_optical[i, 2] = dec
             star_catalog = data[71]
             star_catalog_codes.append(star_catalog)
-            observer_codes_optical.append(obs_code)
+            if obs_code in space_observatory_codes:
+                obs_time_mjd_tdb = Time(obs_time_mjd, format='mjd', scale='utc').tdb.mjd
+                first_80 = data
+                last_80 = data[80:] if optical_obs_file is None else obs_raw[i+1][:80]
+                full_obs_code = get_space_based_observer_code(obs_time_mjd_tdb, first_80, last_80)
+                observer_codes_optical.append(full_obs_code)
+            else:
+                observer_codes_optical.append(obs_code)
             observation_type_codes.append(obs_type)
             observer_program_codes.append(observer_program)
         else:
@@ -104,15 +147,18 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
             elif disallow_type:
                 increment = 0.5
                 unsupported_type_counter += increment
-            else: # disallow_time
+            elif disallow_time:
                 increment = 1
                 out_of_range_counter += increment
+            else: # disallow_line2
+                increment = 0
             skip_counter += increment
             obs_array_optical[i, :] = np.nan
             star_catalog_codes.append(np.nan)
             observer_codes_optical.append(np.nan)
             observation_type_codes.append(np.nan)
             observer_program_codes.append(np.nan)
+    spice.kclear()
     if verbose:
         print(f"Skipped {int(skip_counter)} observations \n\t {unsupported_code_counter} of",
                 "which were non-geocentric occultations or space-based observations,",
@@ -121,7 +167,7 @@ def get_optical_data(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=N
                 "the specified time range.")
     non_nan_idx = ~np.isnan(obs_array_optical[:, 0])
     star_catalog_codes = tuple(np.array(star_catalog_codes)[non_nan_idx])
-    observer_codes_optical = tuple(np.array(observer_codes_optical)[non_nan_idx])
+    observer_codes_optical = tuple(np.array(observer_codes_optical, dtype=object)[non_nan_idx])
     observation_type_codes = tuple(np.array(observation_type_codes)[non_nan_idx])
     observer_program_codes = tuple(np.array(observer_program_codes)[non_nan_idx])
     obs_array_optical = obs_array_optical[non_nan_idx]
@@ -435,7 +481,7 @@ def apply_debiasing_scheme(obs_array_optical, star_catalog_codes, observer_codes
                 f"observations. No biasing information for {no_bias_counter} observations.")
     non_nan_idx = ~np.isnan(obs_array_optical[:, 0])
     star_catalog_codes = tuple(np.array(star_catalog_codes)[non_nan_idx])
-    observer_codes_optical = tuple(np.array(observer_codes_optical)[non_nan_idx])
+    observer_codes_optical = tuple(np.array(observer_codes_optical, dtype=object)[non_nan_idx])
     obs_array_optical = obs_array_optical[non_nan_idx]
     return obs_array_optical, star_catalog_codes, observer_codes_optical
 
@@ -478,6 +524,8 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
     for i in range(len(obs_array_optical)):
         star_catalog = star_catalog_codes[i]
         obs_code = observer_codes_optical[i]
+        if isinstance(obs_code, tuple):
+            obs_code = obs_code[0]
         obs_date_mjd = obs_array_optical[i, 0]
         obs_type = observation_type_codes[i]
         obs_program = observer_program_codes[i]
@@ -840,9 +888,9 @@ def eliminate_obs(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     "as part of elimination scheme.")
     return obs_array_eliminated, tuple(catalog_eliminated), tuple(observer_loc_eliminated)
 
-def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_max_tdb=None,
-                            debias_hires=True, debias_lowres=False, deweight=True, eliminate=False,
-                            num_obs_per_night=5, verbose=False):
+def get_mpc_optical_obs_array(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=None,
+                            t_max_tdb=None, debias_hires=True, debias_lowres=False, deweight=True,
+                            eliminate=False, num_obs_per_night=5, verbose=False):
     """
     Assemble the optical observations for a given body into an array for an orbit fit.
 
@@ -851,6 +899,8 @@ def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_
     body_id : str/int
         Target id, numbers are interpreted as asteroids,
         append 'P' for comets, start with comet type and a '/' for comet designations
+    de_kernel_path : str
+        Path to the JPL DE kernel
     optical_obs_file : str, optional
         Filepath to the optical observations file, by default None
     t_min_tdb : float, optional
@@ -899,8 +949,8 @@ def get_mpc_optical_obs_array(body_id, optical_obs_file=None, t_min_tdb=None, t_
         print("WARNING: No debiasing scheme applied for observations.")
     (obs_array_optical, star_catalog_codes,
         observer_codes_optical, observation_type_codes,
-        observer_program_codes) = get_optical_data(body_id, optical_obs_file, t_min_tdb,
-                                    t_max_tdb, verbose)
+        observer_program_codes) = get_optical_data(body_id, de_kernel_path, optical_obs_file,
+                                    t_min_tdb, t_max_tdb, verbose)
     if debias_hires or debias_lowres:
         (obs_array_optical, star_catalog_codes,
             observer_codes_optical) = apply_debiasing_scheme(obs_array_optical, star_catalog_codes,
