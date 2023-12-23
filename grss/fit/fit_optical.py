@@ -161,8 +161,8 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
     spice.kclear()
     if verbose:
         print(f"Skipped {int(skip_counter)} observations \n\t {unsupported_code_counter} of",
-                f"which were non-geocentric occultations, \n\t {int(unsupported_type_counter)}"
-                "were either roving or radar observations(radar is handled separately),"
+                f"which were non-geocentric occultations, \n\t {int(unsupported_type_counter)}",
+                "were either roving or radar observations (radar is handled separately),",
                 f"\n\t {out_of_range_counter} of which were outside the specified time range.")
     non_nan_idx = ~np.isnan(obs_array_optical[:, 0])
     star_catalog_codes = tuple(np.array(star_catalog_codes)[non_nan_idx])
