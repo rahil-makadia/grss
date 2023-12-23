@@ -1643,8 +1643,8 @@ class FitSimulation:
             atwb += (partials[j:j+size, :].T @ weights[j:j+size, j:j+size]
                         @ residuals[j:j+size].reshape((size, 1)))
             j += size
-        atwa = partials.T @ weights @ partials
-        atwb = partials.T @ weights @ residuals
+        # atwa = partials.T @ weights @ partials
+        # atwb = partials.T @ weights @ residuals
         cov = np.linalg.inv(atwa)
         delta_x = cov @ atwb
         # delta_x = np.linalg.solve(atwa, atwb)

@@ -243,6 +243,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
+    ax1.set_title(f"{flyby_body} - {central_body}")
     fig.autofmt_xdate()
     return fig, ax1, ax2
 
@@ -383,6 +384,8 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     if not units_km:
         central_body_radius /= 149597870.7
         units = "AU"
+    if scale_coords:
+        au2units /= central_body_radius
     times = np.array([approach.t for approach in ca_list])
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
@@ -552,7 +555,6 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     """
     if bplane_type not in {'kizner', 'opik', 'scaled', 'mtp'}:
         raise ValueError("Unknown B-plane type")
-    scale_factor = central_body_radius if scale_coords else 1.0
     if bplane_type in {'scaled', 'mtp'}:
         focus_factor = 1.0
     x_label, y_label, title = _get_bplane_labels(bplane_type, plot_offset, units)
@@ -560,13 +562,13 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     malpha = 0.5
     mspec = 'b.'
     rotation = 30
-    axis.plot(x_coord/scale_factor, y_coord/scale_factor, mspec,
+    axis.plot(x_coord, y_coord, mspec,
                 ms=msize, alpha=malpha, label="Close Approaches")
     if ellipse is not None:
         lwidth = 1.0
         lalpha = 0.75
         lspec = 'r-'
-        axis.plot(ellipse[0,:]/scale_factor, ellipse[1,:]/scale_factor, lspec,
+        axis.plot(ellipse[0,:], ellipse[1,:], lspec,
                     lw=lwidth, alpha=lalpha, label="Uncertainty Ellipse")
     axis.set_xlabel(x_label)
     axis.set_ylabel(y_label)
