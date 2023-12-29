@@ -1,7 +1,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include "utilities.h"
+#include "elements.h"
 
 void get_observer_state(const real &tObsMjd,
                         const std::vector<real> &observerInfo,

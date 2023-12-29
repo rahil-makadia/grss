@@ -1,5 +1,6 @@
 add_library(${PROJECT_NAME}
 approach.cpp
+elements.cpp
 force.cpp
 gr15.cpp
 interpolate.cpp

@@ -262,8 +262,8 @@ void IntegBody::prepare_stm(){
     this->n2Derivs += (size_t) stmSize/2;
     this->propStm = true;
     if (this->isCometary){
-        std::vector<std::vector<real>> partialsEclip;
-        cartesian_cometary_partials(this->t0, this->initState, partialsEclip);
+        std::vector<std::vector<real>> partialsEclip(6, std::vector<real>(6, 0.0L));
+        get_cartesian_partials(this->t0, this->initState, "com2cart", partialsEclip);
         std::vector<std::vector<real>> bigRotMat(6, std::vector<real>(6, 0.0L));
         bigRotMat[0][0] = bigRotMat[3][3] = 1.0L;
         bigRotMat[1][1] = bigRotMat[4][4] = bigRotMat[2][2] = bigRotMat[5][5] = cos(EARTH_OBLIQUITY);
