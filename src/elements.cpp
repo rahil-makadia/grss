@@ -52,14 +52,11 @@ void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
     if (e < 1) {
         const real n = sqrt(GM / a3);
         M = n * (epochMjD - cometaryState[2]);
-        wrap_to_2pi(M);
         kepler_solve_elliptic(M, cometaryState[0], E, tol, max_iter);
         nu = 2 * atan2(tan(E / 2) * sqrt(1 + e), sqrt(1 - e));
-        wrap_to_2pi(nu);
     } else if (e > 1) {
         const real n = sqrt(-GM / a3);
         M = n * (epochMjD - cometaryState[2]);
-        wrap_to_2pi(M);
         kepler_solve_hyperbolic(M, cometaryState[0], E, tol, max_iter);
         nu = 2 * atan2(tanh(E / 2) * sqrt(e + 1), sqrt(e - 1));
     } else {
@@ -254,10 +251,7 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
         w = elems[4];
         i = elems[5];
         a = q / (1 - e);
-        // kepler_solve(epochMjd, elems, GM, M, E, nu);
-        M = (epochMjd - tp) * sqrt(GM / (a * a * a));
-        nu = 1.369140820413098; // would need to solve kepler's equation
-        E = 2 * atan(sqrt((1 - e) / (1 + e)) * tan(nu / 2));
+        kepler_solve(epochMjd, elems, GM, M, E, nu);
     } else if (conversion == "kep2cart") {
         a = elems[0];
         e = elems[1];
