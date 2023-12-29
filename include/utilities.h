@@ -208,11 +208,13 @@ void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
 
-void kepler_solve(const real &M, const real &e, real &E,
-                  const real &tol = 1.0e-12L, const int &max_iter = 100);
+void kepler_solve_elliptic(const real &M, const real &e, real &E,
+                           const real &tol, const int &max_iter);
 void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
-                             const real &tol = 1.0e-12L,
-                             const int &max_iter = 100);
+                             const real &tol, const int &max_iter);
+void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
+                  const real &GM, real &M, real &E, real &nu,
+                  const real &tol = 1.0e-12L, const int &max_iter = 100);
 void cometary_to_keplerian(const real &epochMjd,
                            const std::vector<real> &cometaryState,
                            std::vector<real> &keplerianState,

@@ -340,7 +340,7 @@ void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R) {
     R[2][2] = 1;
 }
 
-void kepler_solve(const real &M, const real &e, real &E, const real &tol,
+void kepler_solve_elliptic(const real &M, const real &e, real &E, const real &tol,
                   const int &max_iter) {
     if (e < 0.8) {
         E = M;
@@ -361,14 +361,10 @@ void kepler_solve(const real &M, const real &e, real &E, const real &tol,
                   << max_iter << " iterations!!!"
                   << " F: " << F << std::endl;
     }
-    // std::cout << "iter: " << iter << std::endl;
-    // std::cout << "E: " << E*RAD2DEG << std::endl;
-    // std::cout << "M: " << M*RAD2DEG << std::endl;
 }
 
 void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
                              const real &tol, const int &max_iter) {
-    // EHyp = log(2*M/e+1.8);
     EHyp = M;
     int iter = 0;
     real F = e * sinh(EHyp) - EHyp - M;
@@ -385,9 +381,32 @@ void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
                   << max_iter << " iterations!!!"
                   << " F: " << F << std::endl;
     }
-    // std::cout << "iter: " << iter << std::endl;
-    // std::cout << "EHyp: " << EHyp*RAD2DEG << std::endl;
-    // std::cout << "M: " << M*RAD2DEG << std::endl;
+}
+
+void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
+                  const real &GM, real &M, real &E, real &nu,
+                  const real &tol, const int &max_iter) {
+    const real a = cometaryState[1] / (1 - cometaryState[0]);
+    const real a3 = a*a*a;
+    const real e = cometaryState[0];
+    if (e < 1) {
+        const real n = sqrt(GM / a3);
+        M = n * (epochMjD - cometaryState[2]);
+        wrap_to_2pi(M);
+        kepler_solve_elliptic(M, cometaryState[0], E, tol, max_iter);
+        nu = 2 * atan2(tan(E / 2) * sqrt(1 + e), sqrt(1 - e));
+        wrap_to_2pi(nu);
+    } else if (e > 1) {
+        const real n = sqrt(-GM / a3);
+        M = n * (epochMjD - cometaryState[2]);
+        wrap_to_2pi(M);
+        kepler_solve_hyperbolic(M, cometaryState[0], E, tol, max_iter);
+        nu = 2 * atan2(tanh(E / 2) * sqrt(e + 1), sqrt(e - 1));
+    } else {
+        throw std::runtime_error(
+            "utilities.cpp: kepler_solve: Cannot handle e = 1 right "
+            "now!!!");
+    }
 }
 
 void cometary_to_keplerian(const real &epochMjD,
@@ -395,29 +414,8 @@ void cometary_to_keplerian(const real &epochMjD,
                            std::vector<real> &keplerianState, const real GM) {
     real a = cometaryState[1] / (1 - cometaryState[0]);
     real e = cometaryState[0];
-    real n, M, E, nu;
-    if (e < 1) {
-        n = sqrt(GM / pow(a, 3.0L));
-        M = n * (epochMjD - cometaryState[2]);
-        wrap_to_2pi(M);
-        kepler_solve(M, cometaryState[0], E);
-        nu = 2 * atan2(tan(E / 2) * sqrt(1 + e), sqrt(1 - e));
-        wrap_to_2pi(nu);
-    } else if (e > 1) {
-        n = sqrt(-GM / pow(a, 3.0L));
-        M = n * (epochMjD - cometaryState[2]);
-        wrap_to_2pi(M);
-        kepler_solve_hyperbolic(M, cometaryState[0], E);
-        nu = 2 * atan2(tanh(E / 2) * sqrt(e + 1), sqrt(e - 1));
-    } else {
-        throw std::runtime_error(
-            "utilities.cpp: cometary_to_keplerian: Cannot handle e = 1 right "
-            "now!!!");
-    }
-    // std::cout << "a: " << a << std::endl;
-    // std::cout << "M: " << M*RAD2DEG << std::endl;
-    // std::cout << "E: " << E*RAD2DEG << std::endl;
-    // std::cout << "nu: " << nu*RAD2DEG << std::endl;
+    real M, E, nu;
+    kepler_solve(epochMjD, cometaryState, GM, M, E, nu);
     keplerianState[0] = a;
     keplerianState[1] = cometaryState[0];
     keplerianState[2] = cometaryState[5];
