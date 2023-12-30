@@ -6,7 +6,7 @@ class SigmaPoints:
     Class for representing sigma points for the unscented transformation.
     """
 
-    def __init__(self, x_dict, cov, sp_type, alpha=None, beta=None, kappa=None):
+    def __init__(self, x_dict, cov, sp_type, alpha=None, beta=None, kappa=None, sqrt_func=None):
         """
         Initialize a sigma point object.
 
@@ -24,6 +24,8 @@ class SigmaPoints:
             scaling parameter for sigma points
         kappa : float
             scaling parameter for sigma points
+        sqrt_func : function
+            function to compute the square root of the covariance matrix
         """
         # References
         # .. [1] R. Van der Merwe "Sigma-Point Kalman Filters for Probabilitic
@@ -39,6 +41,7 @@ class SigmaPoints:
         self.beta = beta
         self.kappa = kappa
         self.n = len(self.x)
+        self.sqrt_func = sqrt_func
 
         self.w_m, self.w_c = self._get_weights()
         self.sigma_points, self.diff = self._get_points()
@@ -84,7 +87,15 @@ class SigmaPoints:
             fac = self.n + self.kappa
         else:
             raise ValueError("Invalid sigma point type")
-        sqrt_cov = np.linalg.cholesky(fac * self.cov)
+        try:
+            sqrt_cov = np.linalg.cholesky(fac * self.cov)
+        except np.linalg.LinAlgError as e:
+            if self.sqrt_func is None:
+                raise ValueError("Must specify sqrt function for "
+                                    "non-positive definite covariance matrix") from e
+            print("Non-positive definite covariance matrix used "
+                            "for generating sigma points")
+            sqrt_cov = self.sqrt_func(fac * self.cov)
         sigma_points = np.zeros((2 * self.n + 1, self.n))
         diff = np.zeros((2 * self.n + 1, self.n))
         sigma_points[0] = self.x

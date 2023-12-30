@@ -1647,7 +1647,6 @@ class FitSimulation:
         # atwb = partials.T @ weights @ residuals
         cov = np.linalg.inv(atwa)
         delta_x = cov @ atwb
-        # delta_x = np.linalg.solve(atwa, atwb)
         return delta_x.ravel(), cov
 
     def filter_lsq(self, verbose=True):
