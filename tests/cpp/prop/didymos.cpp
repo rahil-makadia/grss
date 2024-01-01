@@ -43,7 +43,6 @@ int main() {
                              5.270678006987460E-01};
     std::vector<real> velf = {-1.653652752454120E-02, -8.564528317342794E-04,
                              6.471815241318629E-04};
-    std::vector<std::vector<real> > cov(6, std::vector<real>(6, 0.0L));
     NongravParamaters ngPrms;
     ngPrms.a1 = 0.0L;
     ngPrms.a2 = -1.042309691002E-14;
@@ -54,7 +53,7 @@ int main() {
     ngPrms.n = 0.0L;
     ngPrms.r0_au = 1.0L;
     IntegBody Didymos204f("(65803) Didymos204", simTestForward.integParams.t0, 0.0L,
-                         390.0L, posf, velf, cov, ngPrms);
+                         390.0L, posf, velf, ngPrms);
     simTestForward.add_integ_body(Didymos204f);
     simTestForward.integrate();
 
@@ -65,7 +64,7 @@ int main() {
     std::vector<real> velb = {simTestForward.xInteg[3], simTestForward.xInteg[4],
             simTestForward.xInteg[5]};
     IntegBody Didymos204b("(65803) Didymos204", simTestBackward.integParams.t0, 0.0L,
-                         0.0L, posb, velb, cov, ngPrms);
+                         0.0L, posb, velb, ngPrms);
     simTestBackward.add_integ_body(Didymos204b);
     simTestBackward.integrate();
 

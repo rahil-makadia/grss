@@ -39,7 +39,6 @@ int main() {
     std::vector<real> vel = {-1.38187429130724199339e-02,
                              -6.00401017433447106719e-03,
                              -2.57842571752728202256e-03};
-    std::vector<std::vector<real>> cov(6, std::vector<real>(6, 0.0L));
     NongravParamaters ngPrms;
     ngPrms.a1 = 4.999999873689E-13L;
     ngPrms.a2 = -2.901085508711E-14;
@@ -50,7 +49,7 @@ int main() {
     ngPrms.n = 0.0L;
     ngPrms.r0_au = 1.0L;
     IntegBody Apophis("(99942) Apophis", simTest.integParams.t0, 0.0L, 0.0L,
-                      pos, vel, cov, ngPrms);
+                      pos, vel, ngPrms);
     simTest.add_integ_body(Apophis);
     simTest.integrate();
 

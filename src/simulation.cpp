@@ -150,7 +150,6 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> cometaryState,
-                     std::vector<std::vector<real>> covariance,
                      NongravParamaters ngParams) {
     this->name = name;
     this->t0 = t0;
@@ -184,7 +183,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[0] = 0.0L;
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
-    this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
         this->ngParams.a1 = ngParams.a1;
@@ -203,7 +201,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> pos, std::vector<real> vel,
-                     std::vector<std::vector<real>> covariance,
                      NongravParamaters ngParams) {
     this->name = name;
     this->t0 = t0;
@@ -221,7 +218,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[0] = 0.0L;
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
-    this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
         this->ngParams.a1 = ngParams.a1;
@@ -823,6 +819,13 @@ void propSimulation::add_integ_body(IntegBody body) {
                 "Integration body with name " + body.name +
                 " already exists in simulation " + this->name);
         }
+    }
+    if (body.t0 != this->integParams.t0) {
+        throw std::invalid_argument(
+            "Integration body " + body.name + " has initial time MJD " +
+            std::to_string(body.t0) +
+            " TDB which is different from the simulation initial time: MJD " +
+            std::to_string(this->integParams.t0) + " TDB.");
     }
     if (body.isCometary) {
         double sunState[9];

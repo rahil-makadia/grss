@@ -445,10 +445,9 @@ PYBIND11_MODULE(prop_simulation, m) {
         The IntegBody class contains the properties of an integrated body.
         )mydelimiter")
         .def(py::init<std::string, real, real, real, std::vector<real>,
-                      std::vector<std::vector<real>>, NongravParamaters>(),
+                      NongravParamaters>(),
              py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
-             py::arg("cometaryState"), py::arg("covariance"),
-             py::arg("ngParams"),
+             py::arg("cometaryState"), py::arg("ngParams"),
              R"mydelimiter(
             Constructor for the IntegBody class.
 
@@ -462,18 +461,14 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Radius of the body.
             cometaryState : list of real
                 Initial Heliocentric Ecliptic Cometary state of the body.
-            covariance : list of list of real
-                Covariance of the body's initial state.
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
             )mydelimiter")
 
         .def(py::init<std::string, real, real, real, std::vector<real>,
-                      std::vector<real>, std::vector<std::vector<real>>,
-                      NongravParamaters>(),
+                      std::vector<real>, NongravParamaters>(),
              py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
-             py::arg("pos"), py::arg("vel"), py::arg("covariance"),
-             py::arg("ngParams"), R"mydelimiter(
+             py::arg("pos"), py::arg("vel"), py::arg("ngParams"), R"mydelimiter(
             Constructor for the IntegBody class.
 
             name : str
@@ -488,8 +483,6 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Initial barycentric Cartesian position of the body.
             vel : list of real
                 Initial barycentric Cartesian velocity of the body.
-            covariance : list of list of real
-                Covariance of the body's initial state.
             ngParams : propSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
             )mydelimiter")
@@ -507,9 +500,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("isThrusting", &IntegBody::isThrusting, R"mydelimiter(
             Whether the body is thrusting.
-            )mydelimiter")
-        .def_readwrite("covariance", &IntegBody::covariance, R"mydelimiter(
-            Covariance of the body's initial state.
             )mydelimiter")
         .def_readwrite("ngParams", &IntegBody::ngParams, R"mydelimiter(
             Non-gravitational parameters of the body.

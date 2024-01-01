@@ -44,7 +44,6 @@ class IntegBody : public Body {
     std::vector<real> initState;
     bool isInteg = true;
     bool isThrusting = false;
-    std::vector<std::vector<real>> covariance;
     NongravParamaters ngParams;
     size_t n2Derivs = 3;
     bool propStm = false;
@@ -53,11 +52,9 @@ class IntegBody : public Body {
     // constructors
     IntegBody(std::string name, real t0, real mass, real radius,
               std::vector<real> cometaryState,
-              std::vector<std::vector<real>> covariance,
               NongravParamaters ngParams);
     IntegBody(std::string name, real t0, real mass, real radius,
               std::vector<real> pos, std::vector<real> vel,
-              std::vector<std::vector<real>> covariance,
               NongravParamaters ngParams);
     void prepare_stm();
 };
