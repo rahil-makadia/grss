@@ -70,7 +70,6 @@ void cometary_to_keplerian(const real &epochMjD,
                            const std::vector<real> &cometaryState,
                            std::vector<real> &keplerianState, const real GM) {
     real a = cometaryState[1] / (1 - cometaryState[0]);
-    real e = cometaryState[0];
     real M, E, nu;
     kepler_solve(epochMjD, cometaryState, GM, M, E, nu);
     keplerianState[0] = a;

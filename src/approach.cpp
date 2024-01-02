@@ -2,7 +2,7 @@
 
 void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                         const std::vector<real> xIntegOld, const real &t,
-                        const std::vector<real> xInteg, int &keepStepping) {
+                        const std::vector<real> xInteg) {
     // Check for close approach or impact
     // If a close approach is detected, the time of closest approach is
     // determined by root finding using Brent's method.

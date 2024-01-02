@@ -97,4 +97,6 @@ def initialize():
     os.system(f'python {grss_path}/kernels/get_kernels.py')
     # get the observatory codes file
     get_obs_codes_file()
+    # set openmp environment variable to number of cores
+    os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
     return None
