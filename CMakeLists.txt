@@ -15,8 +15,8 @@ project(grss VERSION ${ver})
 # specify the C++ standard and compiler flags
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-# add_compile_options(-std=c++11 -O3 -fPIC -Xpreprocessor -fopenmp) # operational flags
-add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -Xpreprocessor -fopenmp -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
+add_compile_options(-std=c++11 -O3 -fPIC -fopenmp) # operational flags
+# add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -31,7 +31,6 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # create pybind11 module
-set(pybind11_DIR ${CMAKE_SOURCE_DIR}/extern/pybind11)
 find_package(pybind11 REQUIRED)
 pybind11_add_module(prop_simulation src/${PROJECT_NAME}.cpp)
 target_link_libraries(prop_simulation PRIVATE ${PROJECT_NAME})
