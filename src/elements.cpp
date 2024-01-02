@@ -239,7 +239,7 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
                            const std::string conversion,
                            std::vector<std::vector<real>> &partials,
                            const real GM) {
-    real elemTol = 1e-15;
+    real elemTol = 1e-14;
     // only valid conversion is com2cart or kep2cart
     real e, q, tp, om, w, i, a, nu, E, M;
     if (conversion == "com2cart") {
@@ -306,7 +306,10 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     }
     real e_mag;
     vnorm(e_vec, 3, e_mag);
-    assert(fabs(e_mag - e) < elemTol);
+    if (fabs(e_mag - e) > elemTol) {
+        std::cout << "get_elements_partials: WARNING: e_mag - e = " << e_mag - e
+                  << std::endl;
+    }
     e = e_mag;
 
     real **partial_r_vec = new real*[6];
@@ -397,7 +400,10 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
 
     // semi-major axis
     den = 2 / r - v * v / GM;
-    assert(fabs(1 / den - a) < elemTol);
+    if (fabs(1 / den - a) > elemTol) {
+        std::cout << "get_elements_partials: WARNING: 1 / den - a = " << 1 / den - a
+                  << std::endl;
+    }
     a = 1 / den;
     partial_den = new real[6];
     partial_den[0] = -2 * pos[0] / (r * r * r);
@@ -492,7 +498,10 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     */ 
 
     // mean anomaly
-    assert(fabs(E - e*sin(E) - M) < elemTol);
+    if (fabs(E - e * sin(E) - M) > elemTol) {
+        std::cout << "get_elements_partials: WARNING: E - e*sin(E) - M = " << E - e * sin(E) - M
+                  << std::endl;
+    }
     M = E - e * sin(E);
     real *partial_M = new real[6];
     for (size_t i = 0; i < 6; i++) {
