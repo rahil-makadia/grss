@@ -1,12 +1,7 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
-#include "force.h"
-#include "gr15.h"
 #include "grss.h"
-#include "interpolate.h"
-#include "simulation.h"
-#include "utilities.h"
 
 namespace py = pybind11;
 
@@ -549,6 +544,28 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("multiplier", &ImpulseEvent::multiplier, R"mydelimiter(
             Multiplier on the delta-V the event.
             )mydelimiter");
+
+    m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
+        py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
+        Propagates a simulation in parallel using OpenMP.
+
+        Parameters
+        ----------
+        refSim : propSimulation
+            Reference simulation to copy.
+        allBodies : list of list of real
+            List of all bodies to propagate. Each list contains the initial MJD TDB time,
+            mass, radius, initial state, and list of non-gravitational parameters of the body.
+            The initial state is either the initial Heliocentric Ecliptic Cometary state
+            or the initial barycentric Cartesian state (position and velocity separated).
+        isCometary : bool
+            Whether the bodies are cometary bodies.
+
+        Returns
+        -------
+        allSims : list of propSimulation
+            List of all simulations propagated in parallel.
+        )mydelimiter");
 
     py::class_<propSimulation>(m, "propSimulation", R"mydelimiter(
         Class to perform an orbit propagation simulation.

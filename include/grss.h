@@ -1,7 +1,7 @@
 #ifndef GRSS_H
 #define GRSS_H
 
-#include "gr15.h"
+#include "parallel.h"
 
 void propSimulation::integrate() {
     // check that xInteg has a valid size. If not, raise error
