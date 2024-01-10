@@ -399,7 +399,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     focus_factor = np.max([approach.gravFocusFactor for approach in ca_list])
     impact_bool = np.array([approach.impact for approach in ca_list])
     impact_any = np.any(impact_bool)
-    if len(ca_list) >= 13:
+    if len(ca_list) >= 100 or sigma_points is not None:
         kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
                                             'kizner', print_ellipse_params, units, sigma_points)
         opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,

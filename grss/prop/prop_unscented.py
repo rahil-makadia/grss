@@ -144,9 +144,14 @@ class SigmaPoints:
             new_cov = 0
         else:
             raise ValueError("Invalid dimension for transformed sigma points")
-        for i in range(2 * self.n + 1):
+        num_points = len(transformed_sigma_points)
+        if num_points != 2 * self.n + 1:
+            print("Warning: number of transformed sigma points does not match "
+                            "number of sigma points! This will likely give nonsensical mean "
+                            "and covariance estimates.")
+        for i in range(num_points):
             new_x += self.w_m[i] * transformed_sigma_points[i]
-        for i in range(2 * self.n + 1):
+        for i in range(num_points):
             diff = transformed_sigma_points[i] - new_x
             new_cov += self.w_c[i] * np.outer(diff, diff)
         return new_x, new_cov
