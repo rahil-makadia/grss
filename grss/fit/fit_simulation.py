@@ -1731,6 +1731,7 @@ class FitSimulation:
             None
         """
         data = self.iters[iter_idx]
+        arc = self.obs_array[-1, 0] - self.obs_array[0, 0]
         print("Summary of the orbit fit calculations at iteration",
                     f"{data.iter_number} (of {self.n_iter}):")
         print("==============================================================")
@@ -1740,8 +1741,9 @@ class FitSimulation:
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
         print("--------------------------------------------------------------")
-        print(f"Solution Time: MJD {self.t_sol:0.2f} TDB = ",
+        print(f"Solution Time: MJD {self.t_sol:0.3f} TDB =",
                 f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
+        print(f"Solution Observation Arc: {arc:0.2f} days")
         print("--------------------------------------------------------------")
         print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
                 "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
