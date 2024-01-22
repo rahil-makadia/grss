@@ -1,13 +1,15 @@
 """Utilities for the GRSS orbit propagation code"""
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
 from astropy.time import Time
 
 __all__ = [ 'equat2eclip',
             'eclip2equat',
             'plot_solar_system',
             'plot_ca_summary',
-            'plot_bplane'
+            'plot_bplane',
+            'plot_impact',
 ]
 
 earth_obliq = 84381.448/3600.0*np.pi/180.0
@@ -376,16 +378,18 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     if len(ca_list) == 0:
         print("No close approaches given (list is empty)")
         return None
-    au2units = 149597870.7 if units_km else 1.0
     body_id = ca_list[0].centralBodySpiceId
     central_body_radius, units = get_scale_factor(body_id)
-    if not scale_coords:
-        units = "km"
-    if not units_km:
-        central_body_radius /= 149597870.7
+    au2km = 149597870.7
+    if not scale_coords and not units_km:
+        central_body_radius /= au2km
+        au2units = 1.0
         units = "AU"
-    if scale_coords:
-        au2units /= central_body_radius
+    elif not scale_coords:
+        au2units = au2km
+        units = "km"
+    else:
+        au2units = au2km/central_body_radius
     times = np.array([approach.t for approach in ca_list])
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
@@ -594,3 +598,79 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     if equal_axis:
         axis.axis('equal')
     return axis
+
+def plot_impact(impact_list, print_ellipse_params=False, sigma_points=None):
+    """
+    _summary_
+
+    Parameters
+    ----------
+    impact_list : _type_
+        _description_
+    """
+    if sigma_points is None and len(impact_list) < 2:
+        raise ValueError("sigma_points must be supplied if len(impact_list) < 2")
+    if sigma_points is not None and len(impact_list) < 13:
+        raise ValueError("sigma_points are not valid form of analysis if len(impact_list) < 13")
+    if not np.all([impact.impact for impact in impact_list]):
+        raise ValueError("Not all impactParameters objects supplied in list have impact=True")
+    for impact in impact_list:
+        if impact.centralBodySpiceId != 399:
+            raise ValueError("Not all impactParameters objects supplied in list impact Earth")
+
+    lon = np.array([impact.lon for impact in impact_list])*180.0/np.pi
+    lat = np.array([impact.lat for impact in impact_list])*180.0/np.pi
+    if sigma_points is None:
+        mean_lon = np.mean(lon)
+        mean_lat = np.mean(lat)
+    else:
+        lon_lat = np.vstack((lon, lat)).T
+        mean, _ = sigma_points.reconstruct(lon_lat)
+        mean_lon = mean[0]
+        mean_lat = mean[1]
+
+    impact_ell = data_to_ellipse(lon, lat, n_std=3.0, plot_offset=False, bplane_type='Impact',
+                                    print_ellipse_params=print_ellipse_params,
+                                    units='deg', sigma_points=sigma_points)
+
+    plt.figure(figsize=(12, 6), dpi=150)
+    plt.subplot(1, 2, 1)
+    water = 'C0'
+    land = 'C2'
+    m = Basemap(projection='ortho',lon_0=mean_lon,lat_0=mean_lat,resolution='c')
+    m.drawcoastlines()
+    m.fillcontinents(color=land,lake_color=water)
+    m.drawmapboundary(fill_color=water)
+    # convert to map projection coords.
+    # Note that lon,lat can be scalars, lists or numpy arrays.
+    x_lon,y_lat = m(lon,lat)
+    m.plot(x_lon,y_lat,'r.')
+
+    plt.subplot(1, 2, 2)
+    # setup Lambert Conformal basemap.
+    # lon_0,lat_0 is central point.
+    # rsphere=(6378137.00,6356752.3142) specifies WGS84 ellipsoid
+    # area_thresh=1000 means don't plot coastline features less
+    # than 1000 km^2 in area.
+    size = 5.0e6 # meters
+    m = Basemap(width=size,height=size,
+                rsphere=(6378137.00,6356752.3142),
+                resolution='l',area_thresh=10000,projection='lcc',
+                lat_0=mean_lat,lon_0=mean_lon)
+    m.shadedrelief()
+    # draw parallels and meridians.
+    parallels = np.arange(-90.,91.,5.)
+    # labels = [left,right,top,bottom]
+    m.drawparallels(parallels,labels=[True,False,False,False], color='gray')
+    meridians = np.arange(0.,361.,10.)
+    m.drawmeridians(meridians,labels=[False,False,False,True], color='gray')
+
+    x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
+    m.plot(x_ell, y_ell, 'k-')
+    x_lon,y_lat = m(lon,lat)
+    m.plot(x_lon,y_lat,'r.')
+    lat_half = 'N' if mean_lat > 0 else 'S'
+    plt.suptitle(f'Impact Location on Earth: {mean_lon:0.1f}$^o$E, {mean_lat:0.1f}$^o${lat_half}',
+                    y=0.93)
+    plt.show()
+    return None
