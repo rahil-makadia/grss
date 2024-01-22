@@ -1,6 +1,5 @@
 #include "grss.h"
 #include <sys/time.h>
-#include <assert.h>
 
 int main(){
     timeval t1, t2;

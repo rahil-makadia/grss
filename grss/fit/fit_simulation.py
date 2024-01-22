@@ -1211,18 +1211,16 @@ class FitSimulation:
         state_nom = self._x_dict_to_state(self.x_nom)
         ng_params_nom = self._x_dict_to_nongrav_params(self.x_nom)
         events_nom = self._x_dict_to_events(self.x_nom)
-        cov_nom = self.covariance
         if self.fit_cartesian:
             integ_body_nom = prop.IntegBody("integ_body_nom", self.t_sol,
                                             self.fixed_propsim_params['mass'],
                                             self.fixed_propsim_params['radius'],
-                                            state_nom[:3], state_nom[3:6],
-                                            cov_nom, ng_params_nom)
+                                            state_nom[:3], state_nom[3:6], ng_params_nom)
         elif self.fit_cometary:
             integ_body_nom = prop.IntegBody("integ_body_nom",
                                             self.t_sol, self.fixed_propsim_params['mass'],
-                                            self.fixed_propsim_params['radius'],
-                                            state_nom, cov_nom, ng_params_nom)
+                                            self.fixed_propsim_params['radius'], state_nom,
+                                            ng_params_nom)
         integ_body_nom.caTol = 0.0 # turn off close approach detection
         # add the nominal integ_body for the residuals
         if self.analytic_partials:
@@ -1244,21 +1242,21 @@ class FitSimulation:
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_plus[:3], state_plus[3:6],
-                                                        cov_nom, ng_params_plus)
+                                                        ng_params_plus)
                     integ_body_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_minus[:3], state_minus[3:6],
-                                                        cov_nom, ng_params_minus)
+                                                        ng_params_minus)
                 elif self.fit_cometary:
                     integ_body_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
-                                                        state_plus, cov_nom, ng_params_plus)
+                                                        state_plus, ng_params_plus)
                     integ_body_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
-                                                        state_minus, cov_nom, ng_params_minus)
+                                                        state_minus, ng_params_minus)
                 integ_body_plus.caTol = 0.0
                 integ_body_minus.caTol = 0.0
                 if self.past_obs_exist:
@@ -1647,7 +1645,6 @@ class FitSimulation:
         # atwb = partials.T @ weights @ residuals
         cov = np.linalg.inv(atwa)
         delta_x = cov @ atwb
-        # delta_x = np.linalg.solve(atwa, atwb)
         return delta_x.ravel(), cov
 
     def filter_lsq(self, verbose=True):
@@ -1734,6 +1731,7 @@ class FitSimulation:
             None
         """
         data = self.iters[iter_idx]
+        arc = self.obs_array[-1, 0] - self.obs_array[0, 0]
         print("Summary of the orbit fit calculations at iteration",
                     f"{data.iter_number} (of {self.n_iter}):")
         print("==============================================================")
@@ -1743,8 +1741,9 @@ class FitSimulation:
         print(f"reduced chi-squared: {data.reduced_chi_squared}")
         print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
         print("--------------------------------------------------------------")
-        print(f"Solution Time: MJD {self.t_sol:0.2f} TDB = ",
+        print(f"Solution Time: MJD {self.t_sol:0.3f} TDB =",
                 f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
+        print(f"Solution Observation Arc: {arc:0.2f} days")
         print("--------------------------------------------------------------")
         print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
                 "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")

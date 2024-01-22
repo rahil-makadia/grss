@@ -150,7 +150,6 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> cometaryState,
-                     std::vector<std::vector<real>> covariance,
                      NongravParamaters ngParams) {
     this->name = name;
     this->t0 = t0;
@@ -184,7 +183,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[0] = 0.0L;
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
-    this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
         this->ngParams.a1 = ngParams.a1;
@@ -203,7 +201,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> pos, std::vector<real> vel,
-                     std::vector<std::vector<real>> covariance,
                      NongravParamaters ngParams) {
     this->name = name;
     this->t0 = t0;
@@ -221,7 +218,6 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[0] = 0.0L;
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
-    this->covariance = covariance;
     this->isNongrav = false;
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
         this->ngParams.a1 = ngParams.a1;
@@ -262,8 +258,8 @@ void IntegBody::prepare_stm(){
     this->n2Derivs += (size_t) stmSize/2;
     this->propStm = true;
     if (this->isCometary){
-        std::vector<std::vector<real>> partialsEclip;
-        cartesian_cometary_partials(this->t0, this->initState, partialsEclip);
+        std::vector<std::vector<real>> partialsEclip(6, std::vector<real>(6, 0.0L));
+        get_cartesian_partials(this->t0, this->initState, "com2cart", partialsEclip);
         std::vector<std::vector<real>> bigRotMat(6, std::vector<real>(6, 0.0L));
         bigRotMat[0][0] = bigRotMat[3][3] = 1.0L;
         bigRotMat[1][1] = bigRotMat[4][4] = bigRotMat[2][2] = bigRotMat[5][5] = cos(EARTH_OBLIQUITY);
@@ -823,6 +819,13 @@ void propSimulation::add_integ_body(IntegBody body) {
                 "Integration body with name " + body.name +
                 " already exists in simulation " + this->name);
         }
+    }
+    if (body.t0 != this->integParams.t0) {
+        throw std::invalid_argument(
+            "Integration body " + body.name + " has initial time MJD " +
+            std::to_string(body.t0) +
+            " TDB which is different from the simulation initial time: MJD " +
+            std::to_string(this->integParams.t0) + " TDB.");
     }
     if (body.isCometary) {
         double sunState[9];

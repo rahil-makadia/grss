@@ -355,7 +355,7 @@ void gr15(propSimulation *propSim) {
             if (propSim->integParams.timestepCounter > 1) {
                 refine_b(b, e, dtReq / dt, dim);
             }
-            check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg, keepStepping);
+            check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg);
             if ((propSim->integParams.tf > propSim->integParams.t0 &&
                     t >= propSim->integParams.tf) ||
                 (propSim->integParams.tf < propSim->integParams.t0 &&

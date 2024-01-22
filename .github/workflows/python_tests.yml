@@ -7,12 +7,10 @@ on:
 
 jobs:
   prop-and-fit:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        with:
-          submodules: true
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -24,10 +22,7 @@ jobs:
           pip3 install .
       - name: Run tests
         run: |
-          python3 -m pip install jupyter ipykernel
-          python3 -m ipykernel install --user
+          python3 -m pip install jupyter
           cd tests/python
-          jupyter nbconvert --to script fit/*.ipynb
-          jupyter nbconvert --to script prop/*.ipynb
-          python fit/*.py
-          python prop/*.py
+          ./run_tests.sh prop
+          ./run_tests.sh fit

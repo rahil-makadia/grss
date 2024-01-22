@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 
 struct CacheItem {
     int spiceID = -99999;

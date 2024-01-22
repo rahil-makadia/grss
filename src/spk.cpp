@@ -40,7 +40,7 @@ spkInfo *spk_init(const std::string &path) {
                        // the file. Zero if this is the initial summary record.
             double nsum;    // Number of summaries in this record
             summary s[25];  // Summaries (25 is the maximum)
-        } summary;          // Summary record
+        } summaries;          // Summary record
         struct {
             char locidw[8];  // An identification word
             int nd;  // The number of double precision components in each array
@@ -97,9 +97,9 @@ spkInfo *spk_init(const std::string &path) {
     // okay, let's go
     spkInfo *pl = (spkInfo *)calloc(1, sizeof(spkInfo));
     while (1) {  // Loop over records
-        for (int b = 0; b < (int)record.summary.nsum;
+        for (int b = 0; b < (int)record.summaries.nsum;
              b++) {                               // Loop over summaries
-            summary *sum = &record.summary.s[b];  // get current summary
+            summary *sum = &record.summaries.s[b];  // get current summary
             // Index in our arrays for current target
             int m = pl->num - 1;
             // New target?
@@ -127,7 +127,7 @@ spkInfo *spk_init(const std::string &path) {
         }
 
         // Location of next record
-        long n = (long)record.summary.next - 1;
+        long n = (long)record.summaries.next - 1;
         if (n < 0) {
             // this is already the last record.
             break;
