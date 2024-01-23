@@ -20,7 +20,7 @@ jobs:
           python3 -m pip install --upgrade pip
           source initialize.sh
           brew install geos
-          pip3 install basemap joblib
+          pip3 install basemap
           pip3 install .
       - name: Build docs
         run: |
@@ -29,7 +29,6 @@ jobs:
           source build_cpp.sh
           cp build/prop_simulation* grss/prop
           cd docs
-          python3 -c "import grss"
           make clean html
           cd ..
       - name: Deploy
