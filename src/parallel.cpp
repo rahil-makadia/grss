@@ -11,7 +11,7 @@ std::vector<propSimulation> propSim_parallel_omp(
     // allBodies vector, then integrate each integBody using the reference
     // simulation
     omp_set_num_threads(omp_get_max_threads());
-    #pragma omp parallel shared(allBodies, isCometary, refSim)
+    #pragma omp parallel shared(allBodies, refSim)
     {
         #pragma omp for schedule(static)
         for (size_t i = 0; i < numBodies; i++) {
