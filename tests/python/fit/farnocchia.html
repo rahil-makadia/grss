@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 2.7.0 documentation</title>
+    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 2.8.0 documentation</title>
   
   
   
@@ -152,7 +152,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.7.0 documentation</p>
+    <p class="title logo__title">GRSS v2.8.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -518,7 +518,8 @@ verbose = True
 obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, de_kernel_path, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
 obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
 if add_gaia_obs:
-    obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=True)
+    gaia_dr = &#39;gaiafpr&#39;
+    obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb, t_max_tdb, gaia_dr, verbose)
     obs_array_optical = np.vstack((obs_array_optical, obs_array_gaia))
     observer_codes_optical = observer_codes_optical + observer_codes_gaia
 </pre></div>
@@ -536,8 +537,8 @@ Skipped 0 observations
 No debiasing needed for 505 observations. Debiased 438 observations. No biasing information for 0 observations.
 Applied default weight of 1 arcsec to 38 CCD observations
 Deweighted 208 observations as part of deweighting scheme.
-Found 111 observations from gaiadr3
-         Added 17 of those observations.
+Found 191 observations from gaiafpr
+         Added 191 of those observations.
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -563,13 +564,13 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.430                   0.550                   559.048                         0.292
-2                        0.430                   0.549                   559.468                         0.292
-3                        0.430                   0.549                   559.468                         0.292
+1                        0.402                   0.611                   617.518                         0.273
+2                        0.404                   0.598                   619.424                         0.274
+3                        0.404                   0.598                   619.424                         0.274
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.405                   0.516                   490.463                         0.257
-5                        0.405                   0.516                   490.495                         0.257
-Converged after rejecting outliers. Rejected 4 out of 960 optical observations.
+4                        0.374                   0.570                   541.165                         0.240
+5                        0.374                   0.570                   541.321                         0.240
+Converged after rejecting outliers. Rejected 5 out of 1134 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -587,21 +588,22 @@ Converged after rejecting outliers. Rejected 4 out of 960 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.40459307791220195
-RMS weighted: 0.5160333149074596
-chi-squared: 490.49548564273925
-reduced chi-squared: 0.2573428571053197
-square root of reduced chi-squared: 0.5072897171294917
+RMS unweighted: 0.3737289062138422
+RMS weighted: 0.5700844324146948
+chi-squared: 541.3210191378921
+reduced chi-squared: 0.2403734543241084
+square root of reduced chi-squared: 0.49027895562027585
 --------------------------------------------------------------
-Solution Time: MJD 58005.00 TDB =  2017-09-09 00:00:00.000 TDB
+Solution Time: MJD 58042.000 TDB = 2017-10-16 00:00:00.000 TDB
+Solution Observation Arc: 10342.85 days
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02873972465e-01               8.68599899075e-09               2.02873970684e-01               8.62276146017e-09               -1.78135212137e-09              -0.205
-q                       2.17589058084e+00               2.17699673927e-08               2.17589058532e+00               2.17046671313e-08               +4.47696324457e-09              +0.206
-tp                      5.74183073230e+04               2.22097535155e-05               5.74183073044e+04               2.18945376786e-05               -1.85277094715e-05              -0.834
-om                      1.52357220932e+02               5.24227539771e-06               1.52357222043e+02               5.23567180042e-06               +1.11076474241e-06              +0.212
-w                       2.08340003612e+02               8.22401779928e-06               2.08339997669e+02               8.15380871565e-06               -5.94306962398e-06              -0.723
-i                       5.81863313345e+00               9.87617099651e-07               5.81863349347e+00               9.82741198023e-07               +3.60017546441e-07              +0.365
+e                       2.02839420821e-01               1.41072497409e-09               2.02839418188e-01               1.41452945833e-09               -2.63307539661e-09              -1.866
+q                       2.17602309556e+00               5.02213641990e-09               2.17602308754e+00               5.00434425265e-09               -8.01885535751e-09              -1.597
+tp                      5.74182713236e+04               7.41859215578e-06               5.74182712893e+04               7.31070501446e-06               -3.43584688380e-05              -4.631
+om                      1.52357305306e+02               1.14596100392e-06               1.52357306613e+02               1.13528216146e-06               +1.30717384650e-06              +1.141
+w                       2.08338776381e+02               2.36706895048e-06               2.08338765899e+02               2.31666610684e-06               -1.04826961831e-05              -4.429
+i                       5.81853647038e+00               1.30273571989e-07               5.81853643246e+00               1.29988460340e-07               -3.79114721838e-08              -0.291
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -663,13 +665,13 @@ print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 1.53
-Mahalonobis distance between GRSS and JPL solution: 1.53
+Mahalonobis distance between JPL and GRSS solution: 5.92
+Mahalonobis distance between GRSS and JPL solution: 5.99
 Bhattacharya distance between JPL and GRSS solution: 0.0002
 Bhattacharya coefficient between JPL and GRSS solution: 0.9998
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
@@ -679,6 +681,21 @@ assert bhattacharya &lt; 0.10
 assert bhatt_coeff &gt; 0.90
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[11], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_f <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_0 <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> bhattacharya <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">0.10</span>
+
+<span class="ansi-red-fg">AssertionError</span>:
+</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:

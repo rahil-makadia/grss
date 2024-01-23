@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 2.7.0 documentation</title>
+    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 2.8.0 documentation</title>
   
   
   
@@ -152,7 +152,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.7.0 documentation</p>
+    <p class="title logo__title">GRSS v2.8.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -518,7 +518,8 @@ verbose = True
 obs_array_optical, observer_codes_optical = fit.get_mpc_optical_obs_array(body_id, de_kernel_path, optical_obs_file, t_min_tdb, t_max_tdb, debias_hires, debias_lowres, deweight, eliminate, max_obs_per_night, verbose)
 obs_array_radar, observer_codes_radar = fit.get_radar_obs_array(body_id, t_min_tdb, t_max_tdb, verbose)
 if add_gaia_obs:
-    obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None, t_max_tdb=None, verbose=True)
+    gaia_dr = &#39;gaiafpr&#39;
+    obs_array_gaia, observer_codes_gaia = fit.get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb, t_max_tdb, gaia_dr, verbose)
     obs_array_optical = np.vstack((obs_array_optical, obs_array_gaia))
     observer_codes_optical = observer_codes_optical + observer_codes_gaia
 </pre></div>
@@ -533,11 +534,11 @@ Skipped 0 observations
          0 of which were non-geocentric occultations,
          0 were either roving or radar observations (radar is handled separately),
          0 of which were outside the specified time range.
-No debiasing needed for 623 observations. Debiased 990 observations. No biasing information for 24 observations.
+No debiasing needed for 626 observations. Debiased 990 observations. No biasing information for 24 observations.
 Applied default weight of 1 arcsec to 102 CCD observations
 Deweighted 407 observations as part of deweighting scheme.
-Found 230 observations from gaiadr3
-         Added 30 of those observations.
+Found 308 observations from gaiafpr
+         Added 308 of those observations.
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -563,13 +564,13 @@ fit_sim = fit.FitSimulation(init_sol, init_cov, obs_array_optical, observer_code
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.463                   0.533                   930.063                         0.279
-2                        0.463                   0.532                   928.677                         0.279
-3                        0.463                   0.532                   928.678                         0.279
+1                        0.444                   0.614                   1200.653                        0.309
+2                        0.445                   0.605                   1205.346                        0.310
+3                        0.445                   0.605                   1205.345                        0.310
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.420                   0.502                   819.134                         0.247
-5                        0.420                   0.502                   819.278                         0.247
-Converged after rejecting outliers. Rejected 7 out of 1667 optical observations.
+4                        0.409                   0.584                   1104.563                        0.285
+5                        0.409                   0.584                   1105.164                        0.285
+Converged after rejecting outliers. Rejected 6 out of 1948 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -587,21 +588,22 @@ Converged after rejecting outliers. Rejected 7 out of 1667 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.41976342764107893
-RMS weighted: 0.5017086293783858
-chi-squared: 819.2782784202678
-reduced chi-squared: 0.24721734412198787
-square root of reduced chi-squared: 0.4972095575529375
+RMS unweighted: 0.4086730331302703
+RMS weighted: 0.5842916073253057
+chi-squared: 1105.1640497112812
+reduced chi-squared: 0.2849829937367925
+square root of reduced chi-squared: 0.5338379845391226
 --------------------------------------------------------------
-Solution Time: MJD 57500.00 TDB =  2016-04-22 00:00:00.000 TDB
+Solution Time: MJD 57554.000 TDB = 2016-06-15 00:00:00.000 TDB
+Solution Observation Arc: 15628.95 days
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.66697868063e-01               6.73767951889e-09               1.66697862433e-01               6.68519544825e-09               -5.62995272624e-09              -0.836
-q                       2.56503023084e+00               2.00660624764e-08               2.56503024804e+00               1.99033770589e-08               +1.72056484615e-08              +0.857
-tp                      5.75113652724e+04               3.28498193378e-05               5.75113652764e+04               3.22571773102e-05               +3.96950781578e-06              +0.121
-om                      2.06376077176e+02               2.70610101692e-05               2.06376092411e+02               2.69482657195e-05               +1.52345725724e-05              +0.563
-w                       1.54026406216e+02               2.84582407556e-05               1.54026391787e+02               2.82518267981e-05               -1.44297910651e-05              -0.507
-i                       7.88793990680e-01               5.14004162240e-07               7.88794212900e-01               5.04308914194e-07               +2.22219753598e-07              +0.432
+e                       1.66689208927e-01               2.27114730593e-09               1.66689208873e-01               2.27336266070e-09               -5.43749767434e-11              -0.024
+q                       2.56502647958e+00               2.93101837979e-09               2.56502649369e+00               2.90819217382e-09               +1.41080924720e-08              +4.813
+tp                      5.75113331212e+04               4.23910718449e-06               5.75113331294e+04               4.21117367101e-06               +8.23918526294e-06              +1.944
+om                      2.06375002750e+02               6.73552392878e-06               2.06375014798e+02               6.68167021420e-06               +1.20479355417e-05              +1.789
+w                       1.54019164292e+02               6.80776642853e-06               1.54019154030e+02               6.75614449332e-06               -1.02621406199e-05              -1.507
+i                       7.88829844392e-01               8.48469199123e-08               7.88830013074e-01               8.43230904748e-08               +1.68682169566e-07              +1.988
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -663,13 +665,13 @@ print(f&#39;Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 1.79
-Mahalonobis distance between GRSS and JPL solution: 1.81
-Bhattacharya distance between JPL and GRSS solution: 0.0005
-Bhattacharya coefficient between JPL and GRSS solution: 0.9995
+Mahalonobis distance between JPL and GRSS solution: 6.53
+Mahalonobis distance between GRSS and JPL solution: 6.59
+Bhattacharya distance between JPL and GRSS solution: 0.0003
+Bhattacharya coefficient between JPL and GRSS solution: 0.9997
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
@@ -679,6 +681,21 @@ assert bhattacharya &lt; 0.10
 assert bhatt_coeff &gt; 0.90
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[11], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_f <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_0 <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> bhattacharya <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">0.10</span>
+
+<span class="ansi-red-fg">AssertionError</span>:
+</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
