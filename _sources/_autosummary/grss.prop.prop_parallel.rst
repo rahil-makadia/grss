@@ -15,6 +15,7 @@ grss.prop.prop\_parallel
         :toctree:
     
         cluster_ca_or_impacts
+        parallel_propagate
     
     
 

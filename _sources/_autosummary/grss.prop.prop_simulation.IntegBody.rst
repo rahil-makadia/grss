@@ -30,7 +30,6 @@ grss.prop.prop\_simulation.IntegBody
     
         ~IntegBody.J2
         ~IntegBody.caTol
-        ~IntegBody.covariance
         ~IntegBody.dCartdState
         ~IntegBody.initState
         ~IntegBody.isCometary

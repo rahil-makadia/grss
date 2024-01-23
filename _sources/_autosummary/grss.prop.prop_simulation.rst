@@ -16,6 +16,7 @@ grss.prop.prop\_simulation
     
         cartesian_to_cometary
         cometary_to_cartesian
+        propSim_parallel_omp
     
     
 

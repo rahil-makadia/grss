@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_utils.get_codes_dict &#8212; GRSS 2.7.0 documentation</title>
+    <title>grss.prop.prop_simulation.propSim_parallel_omp &#8212; GRSS 2.7.0 documentation</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_utils.get_codes_dict';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop.prop_simulation.propSim_parallel_omp';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_utils.get_dec_from_dms" href="grss.fit.fit_utils.get_dec_from_dms.html" />
-    <link rel="prev" title="grss.fit.fit_utils.et2mjd" href="grss.fit.fit_utils.et2mjd.html" />
+    <link rel="next" title="grss.prop.prop_simulation.BPlaneParameters" href="grss.prop.prop_simulation.BPlaneParameters.html" />
+    <link rel="prev" title="grss.prop.prop_simulation.cometary_to_cartesian" href="grss.prop.prop_simulation.cometary_to_cartesian.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
     <meta name="docbuild:last-update" content="Jan 23, 2024"/>
@@ -170,7 +170,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
@@ -195,9 +195,9 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.IterationParams.html">grss.fit.fit_simulation.IterationParams</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_utils.html">grss.fit.fit_utils</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_utils.html">grss.fit.fit_utils</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.et2mjd.html">grss.fit.fit_utils.et2mjd</a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_utils.get_codes_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_codes_dict.html">grss.fit.fit_utils.get_codes_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_dec_from_dms.html">grss.fit.fit_utils.get_dec_from_dms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_mpc_observatory_info.html">grss.fit.fit_utils.get_mpc_observatory_info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_observer_info.html">grss.fit.fit_utils.get_observer_info</a></li>
@@ -217,16 +217,16 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_parallel.html">grss.prop.prop_parallel</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_parallel.cluster_ca_or_impacts.html">grss.prop.prop_parallel.cluster_ca_or_impacts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_parallel.parallel_propagate.html">grss.prop.prop_parallel.parallel_propagate</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_simulation.html">grss.prop.prop_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.prop.prop_simulation.html">grss.prop.prop_simulation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.cartesian_to_cometary.html">grss.prop.prop_simulation.cartesian_to_cometary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.cometary_to_cartesian.html">grss.prop.prop_simulation.cometary_to_cartesian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.propSim_parallel_omp.html">grss.prop.prop_simulation.propSim_parallel_omp</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.prop.prop_simulation.propSim_parallel_omp</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.BPlaneParameters.html">grss.prop.prop_simulation.BPlaneParameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.Body.html">grss.prop.prop_simulation.Body</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.CloseApproachParameters.html">grss.prop.prop_simulation.CloseApproachParameters</a></li>
@@ -338,7 +338,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_utils.get_codes_dict.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop.prop_simulation.propSim_parallel_omp.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -368,7 +368,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.fit.fit_utils.get_codes_dict.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.prop.prop_simulation.propSim_parallel_omp.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -452,7 +452,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.fit.fit_utils.get_codes_dict</h1>
+    <h1>grss.prop.prop_simulation.propSim_parallel_omp</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -462,7 +462,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_utils.get_codes_dict"><code class="docutils literal notranslate"><span class="pre">get_codes_dict()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSim_parallel_omp"><code class="docutils literal notranslate"><span class="pre">propSim_parallel_omp()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -474,20 +474,28 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="grss-fit-fit-utils-get-codes-dict">
-<h1>grss.fit.fit_utils.get_codes_dict<a class="headerlink" href="#grss-fit-fit-utils-get-codes-dict" title="Permalink to this heading">#</a></h1>
+  <section id="grss-prop-prop-simulation-propsim-parallel-omp">
+<h1>grss.prop.prop_simulation.propSim_parallel_omp<a class="headerlink" href="#grss-prop-prop-simulation-propsim-parallel-omp" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="grss.fit.fit_utils.get_codes_dict">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_utils.</span></span><span class="sig-name descname"><span class="pre">get_codes_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_utils.get_codes_dict" title="Permalink to this definition">#</a></dt>
-<dd><p>Creates a dictionary of MPC codes and their corresponding longitude,
-geocentric latitude, and distance from the geocenter</p>
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.propSim_parallel_omp">
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">propSim_parallel_omp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refSim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.prop.prop_simulation.propSimulation.html#grss.prop.prop_simulation.propSimulation" title="grss.prop.prop_simulation.propSimulation"><span class="pre">propSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">allBodies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isCometary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="grss.prop.prop_simulation.propSimulation.html#grss.prop.prop_simulation.propSimulation" title="grss.prop.prop_simulation.propSimulation"><span class="pre">propSimulation</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.prop.prop_simulation.propSim_parallel_omp" title="Permalink to this definition">#</a></dt>
+<dd><p>Propagates a simulation in parallel using OpenMP.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>codes_dict</strong> – dictionary of MPC codes and their corresponding longitude,
-geocentric latitude, and distance from the geocenter</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refSim</strong> (<a class="reference internal" href="grss.prop.prop_simulation.propSimulation.html#grss.prop.prop_simulation.propSimulation" title="grss.prop.prop_simulation.propSimulation"><em>propSimulation</em></a>) – Reference simulation to copy.</p></li>
+<li><p><strong>allBodies</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – List of all bodies to propagate. Each list contains the initial MJD TDB time,
+mass, radius, initial state, and list of non-gravitational parameters of the body.
+The initial state is either the initial Heliocentric Ecliptic Cometary state
+or the initial barycentric Cartesian state (position and velocity separated).</p></li>
+<li><p><strong>isCometary</strong> (<em>bool</em>) – Whether the bodies are cometary bodies.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>allSims</strong> – List of all simulations propagated in parallel.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="grss.prop.prop_simulation.propSimulation.html#grss.prop.prop_simulation.propSimulation" title="grss.prop.prop_simulation.propSimulation">propSimulation</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -506,20 +514,20 @@ geocentric latitude, and distance from the geocenter</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit.fit_utils.et2mjd.html"
+       href="grss.prop.prop_simulation.cometary_to_cartesian.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit.fit_utils.et2mjd</p>
+        <p class="prev-next-title">grss.prop.prop_simulation.cometary_to_cartesian</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_utils.get_dec_from_dms.html"
+       href="grss.prop.prop_simulation.BPlaneParameters.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_utils.get_dec_from_dms</p>
+        <p class="prev-next-title">grss.prop.prop_simulation.BPlaneParameters</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -538,7 +546,7 @@ geocentric latitude, and distance from the geocenter</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_utils.get_codes_dict"><code class="docutils literal notranslate"><span class="pre">get_codes_dict()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.propSim_parallel_omp"><code class="docutils literal notranslate"><span class="pre">propSim_parallel_omp()</span></code></a></li>
 </ul>
   </nav></div>
 

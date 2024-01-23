@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 2.5.0 documentation</title>
+    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 2.7.0 documentation</title>
   
   
   
@@ -65,7 +65,7 @@
     <link rel="prev" title="(28751) Eggl orbit determination test" href="eggl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Dec 24, 2023"/>
+    <meta name="docbuild:last-update" content="Jan 23, 2024"/>
   </head>
   
   
@@ -152,7 +152,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v2.5.0 documentation</p>
+    <p class="title logo__title">GRSS v2.7.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -223,11 +223,13 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../_autosummary/grss.prop.html">grss.prop</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_parallel.html">grss.prop.prop_parallel</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_parallel.cluster_ca_or_impacts.html">grss.prop.prop_parallel.cluster_ca_or_impacts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_parallel.parallel_propagate.html">grss.prop.prop_parallel.parallel_propagate</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.html">grss.prop.prop_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.cartesian_to_cometary.html">grss.prop.prop_simulation.cartesian_to_cometary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.cometary_to_cartesian.html">grss.prop.prop_simulation.cometary_to_cartesian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.propSim_parallel_omp.html">grss.prop.prop_simulation.propSim_parallel_omp</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.BPlaneParameters.html">grss.prop.prop_simulation.BPlaneParameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.Body.html">grss.prop.prop_simulation.Body</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_simulation.CloseApproachParameters.html">grss.prop.prop_simulation.CloseApproachParameters</a></li>
@@ -253,6 +255,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_utils.get_scale_factor.html">grss.prop.prop_utils.get_scale_factor</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_utils.plot_bplane.html">grss.prop.prop_utils.plot_bplane</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_utils.plot_ca_summary.html">grss.prop.prop_utils.plot_ca_summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_utils.plot_impact.html">grss.prop.prop_utils.plot_impact</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_utils.plot_single_bplane.html">grss.prop.prop_utils.plot_single_bplane</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../_autosummary/grss.prop.prop_utils.plot_solar_system.html">grss.prop.prop_utils.plot_solar_system</a></li>
 </ul>
@@ -527,7 +530,7 @@ if add_gaia_obs:
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Skipped 0 observations
-         0 of which were non-geocentric occultations or space-based observations,
+         0 of which were non-geocentric occultations,
          0 were either roving or radar observations (radar is handled separately),
          0 of which were outside the specified time range.
 No debiasing needed for 505 observations. Debiased 438 observations. No biasing information for 0 observations.
@@ -584,21 +587,21 @@ Converged after rejecting outliers. Rejected 4 out of 960 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.4045930768496239
-RMS weighted: 0.5160333117071398
-chi-squared: 490.4954870795384
-reduced chi-squared: 0.25734285785914923
-square root of reduced chi-squared: 0.5072897178724888
+RMS unweighted: 0.40459307791220195
+RMS weighted: 0.5160333149074596
+chi-squared: 490.49548564273925
+reduced chi-squared: 0.2573428571053197
+square root of reduced chi-squared: 0.5072897171294917
 --------------------------------------------------------------
 Solution Time: MJD 58005.00 TDB =  2017-09-09 00:00:00.000 TDB
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02873972465e-01               8.68599899075e-09               2.02873970684e-01               8.62276284006e-09               -1.78134940132e-09              -0.205
-q                       2.17589058084e+00               2.17699673927e-08               2.17589058532e+00               2.17046564636e-08               +4.47693304650e-09              +0.206
-tp                      5.74183073230e+04               2.22097535155e-05               5.74183073044e+04               2.18945109400e-05               -1.85278331628e-05              -0.834
-om                      1.52357220932e+02               5.24227539771e-06               1.52357222043e+02               5.23567986526e-06               +1.11076383291e-06              +0.212
-w                       2.08340003612e+02               8.22401779928e-06               2.08339997669e+02               8.15383363302e-06               -5.94310839119e-06              -0.723
-i                       5.81863313345e+00               9.87617099651e-07               5.81863349346e+00               9.82741543055e-07               +3.60013029166e-07              +0.365
+e                       2.02873972465e-01               8.68599899075e-09               2.02873970684e-01               8.62276146017e-09               -1.78135212137e-09              -0.205
+q                       2.17589058084e+00               2.17699673927e-08               2.17589058532e+00               2.17046671313e-08               +4.47696324457e-09              +0.206
+tp                      5.74183073230e+04               2.22097535155e-05               5.74183073044e+04               2.18945376786e-05               -1.85277094715e-05              -0.834
+om                      1.52357220932e+02               5.24227539771e-06               1.52357222043e+02               5.23567180042e-06               +1.11076474241e-06              +0.212
+w                       2.08340003612e+02               8.22401779928e-06               2.08339997669e+02               8.15380871565e-06               -5.94306962398e-06              -0.723
+i                       5.81863313345e+00               9.87617099651e-07               5.81863349347e+00               9.82741198023e-07               +3.60017546441e-07              +0.365
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -751,7 +754,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Dec 24, 2023.
+  Last updated on Jan 23, 2024.
   <br/>
 </p>
   </div>
