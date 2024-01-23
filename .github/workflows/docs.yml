@@ -25,6 +25,7 @@ jobs:
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
           source build_cpp.sh
           cp build/prop_simulation* grss/prop/
+          ls -alh grss/prop/
           cd docs
           make clean html
           cd ..
