@@ -25,10 +25,9 @@ jobs:
       - name: Build docs
         run: |
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
-          # brew install pandoc
+          brew install pandoc
           source build_cpp.sh
           cp build/prop_simulation* grss/prop
-          python -c "import grss"
           cd docs
           make clean html
           cd ..
