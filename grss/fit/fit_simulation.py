@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from astropy.time import Time
 
 from .. import prop
-from .fit_utils import get_observer_info, get_radec
+from .fit_utils import get_observer_info
 
 __all__ = [ 'FitSimulation',
             'create_simulated_obs_arrays',
