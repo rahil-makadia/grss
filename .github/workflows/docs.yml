@@ -7,7 +7,7 @@ on:
 
 jobs:
   sphinx:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -19,14 +19,12 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           source initialize.sh
-          pip3 install basemap --only-binary=basemap
           pip3 install .
       - name: Build docs
         run: |
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
-          brew install pandoc
-          # source build_cpp.sh
-          # cp build/prop_simulation* grss/prop/
+          source build_cpp.sh
+          cp build/prop_simulation* grss/prop/
           cd docs
           make clean html
           cd ..
