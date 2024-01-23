@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      # - dev
+      - dev
 
 jobs:
   sphinx:
@@ -19,13 +19,15 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           source initialize.sh
+          # brew install geos
+          pip3 install basemap
           pip3 install .
       - name: Build docs
         run: |
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
+          sudo apt-get install pandoc
           source build_cpp.sh
-          cp build/prop_simulation* grss/prop/
-          ls -alh grss/prop/
+          cp build/prop_simulation* grss/prop
           cd docs
           make clean html
           cd ..
