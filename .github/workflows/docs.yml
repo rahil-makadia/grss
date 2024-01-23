@@ -3,11 +3,11 @@ on:
   push:
     branches:
       - main
-      # - dev
+      - dev
 
 jobs:
   sphinx:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -23,9 +23,9 @@ jobs:
       - name: Build docs
         run: |
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
-          source build_cpp.sh
-          cp build/prop_simulation* grss/prop/
-          ls -alh grss/prop/
+          brew install pandoc
+          # source build_cpp.sh
+          # cp build/prop_simulation* grss/prop/
           cd docs
           make clean html
           cd ..
