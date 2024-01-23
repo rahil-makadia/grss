@@ -29,6 +29,7 @@ jobs:
           source build_cpp.sh
           cp build/prop_simulation* grss/prop
           cd docs
+          python3 -c "import grss"
           make clean html
           cd ..
       - name: Deploy
