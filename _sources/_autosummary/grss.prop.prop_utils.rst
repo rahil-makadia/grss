@@ -19,7 +19,7 @@ grss.prop.prop\_utils
         get_scale_factor
         plot_bplane
         plot_ca_summary
-        plot_impact
+        plot_earth_impact
         plot_single_bplane
         plot_solar_system
     
