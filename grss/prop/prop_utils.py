@@ -9,7 +9,7 @@ __all__ = [ 'equat2eclip',
             'plot_solar_system',
             'plot_ca_summary',
             'plot_bplane',
-            'plot_impact',
+            'plot_earth_impact',
 ]
 
 earth_obliq = 84381.448/3600.0*np.pi/180.0
@@ -300,8 +300,14 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
     sma = np.sqrt(eigvals[0]) * n_std
     smi = np.sqrt(eigvals[1]) * n_std
     if print_ellipse_params:
-        print(f'{bplane_type} ellipse sma: {sma/n_std} {units}')
-        print(f'{bplane_type} ellipse smi: {smi/n_std} {units}')
+        sma_print = sma/n_std
+        smi_print = smi/n_std
+        if bplane_type == 'Impact':
+            # convert lat/lon to km
+            sma_print *= np.pi/180*6378.1367
+            smi_print *= np.pi/180*6378.1367
+        print(f'{bplane_type} ellipse sma: {sma_print} {units}')
+        print(f'{bplane_type} ellipse smi: {smi_print} {units}')
         print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')
     theta_arr = np.linspace(0, 2*np.pi, 100)
     ellipse = np.array([sma*np.cos(theta_arr), smi*np.sin(theta_arr)])
@@ -599,14 +605,20 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
         axis.axis('equal')
     return axis
 
-def plot_impact(impact_list, print_ellipse_params=False, sigma_points=None):
+def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None, zoom_size=5.0e3):
     """
-    _summary_
+    Plot the impact locations of a list of impactParameters objects.
 
     Parameters
     ----------
-    impact_list : _type_
-        _description_
+    impact_list : list
+        List of impactParameters objects
+    print_ellipse_params : bool, optional
+        True to print the ellipse parameters, False to not print, by default False.
+    sigma_points : prop.SigmaPoints, optional
+        SigmaPoints object for reconstructing mean and cov, by default None.
+    zoom_size : float, optional
+        Size of the zoomed in plot, in km, by default 5.0e3.
     """
     if sigma_points is None and len(impact_list) < 2:
         raise ValueError("sigma_points must be supplied if len(impact_list) < 2")
@@ -631,7 +643,7 @@ def plot_impact(impact_list, print_ellipse_params=False, sigma_points=None):
 
     impact_ell = data_to_ellipse(lon, lat, n_std=3.0, plot_offset=False, bplane_type='Impact',
                                     print_ellipse_params=print_ellipse_params,
-                                    units='deg', sigma_points=sigma_points)
+                                    units='km', sigma_points=sigma_points)
 
     plt.figure(figsize=(12, 6), dpi=150)
     plt.subplot(1, 2, 1)
@@ -643,6 +655,8 @@ def plot_impact(impact_list, print_ellipse_params=False, sigma_points=None):
     m.drawmapboundary(fill_color=water)
     # convert to map projection coords.
     # Note that lon,lat can be scalars, lists or numpy arrays.
+    x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
+    m.plot(x_ell, y_ell, 'r-.')
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
 
@@ -652,25 +666,31 @@ def plot_impact(impact_list, print_ellipse_params=False, sigma_points=None):
     # rsphere=(6378137.00,6356752.3142) specifies WGS84 ellipsoid
     # area_thresh=1000 means don't plot coastline features less
     # than 1000 km^2 in area.
-    size = 5.0e6 # meters
+    size = zoom_size*1e3
     m = Basemap(width=size,height=size,
                 rsphere=(6378137.00,6356752.3142),
-                resolution='l',area_thresh=10000,projection='lcc',
+                resolution='l',area_thresh=size/100,projection='lcc',
                 lat_0=mean_lat,lon_0=mean_lon)
     m.shadedrelief()
+    lat_step = lon_step = 3 if zoom_size <= 1e3 else 10
+    if zoom_size <= 500:
+        lat_step = lon_step = 1
+    if zoom_size <= 100:
+        lat_step = lon_step = 0.5
     # draw parallels and meridians.
-    parallels = np.arange(-90.,91.,5.)
+    parallels = np.arange(-90, 91, lat_step)
     # labels = [left,right,top,bottom]
     m.drawparallels(parallels,labels=[True,False,False,False], color='gray')
-    meridians = np.arange(0.,361.,10.)
+    meridians = np.arange(0, 361, lon_step)
     m.drawmeridians(meridians,labels=[False,False,False,True], color='gray')
 
     x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
-    m.plot(x_ell, y_ell, 'k-')
+    m.plot(x_ell, y_ell, 'r-.')
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
     lat_half = 'N' if mean_lat > 0 else 'S'
-    plt.suptitle(f'Impact Location on Earth: {mean_lon:0.1f}$^o$E, {mean_lat:0.1f}$^o${lat_half}',
+    plt.suptitle('Impact Location at 100km altitude w.r.t Earth: '
+                    f'{mean_lon:0.2f}$^o$E, {mean_lat:0.2f}$^o${lat_half}',
                     y=0.93)
     plt.show()
     return None

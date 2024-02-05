@@ -310,9 +310,13 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
     au2km = 149597870.7
     obs_array = np.nan*np.ones((len(res), 6))
     observer_codes = []
+    curr_transit = int(-1e6)
     for i, data in enumerate(res):
-        if i > 0 and res[i]['transit_id'] == res[i-1]['transit_id']:
-            continue
+        if curr_transit != data['transit_id']:
+            curr_transit = data['transit_id']
+            transit_count = 1
+            while i+transit_count < len(res) and res[i+transit_count]['transit_id'] == curr_transit:
+                transit_count += 1
         obs_time = Time(data['epoch_utc'] + 55197.0, format='mjd', scale='utc')
         if obs_time.tdb.mjd < t_min_tdb or obs_time.tdb.mjd > t_max_tdb:
             continue
@@ -320,9 +324,9 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
         obs_array[i, 0] = obs_time.utc.mjd
         obs_array[i, 1] = data['ra']*3600
         obs_array[i, 2] = data['dec']*3600
-        ra_sig_sys = data['ra_error_systematic']/cosdec/1000
+        ra_sig_sys = data['ra_error_systematic']/cosdec/1000*transit_count
         ra_sig_rand = data['ra_error_random']/cosdec/1000
-        dec_sig_sys = data['dec_error_systematic']/1000
+        dec_sig_sys = data['dec_error_systematic']/1000*transit_count
         dec_sig_rand = data['dec_error_random']/1000
         corr_sys = data['ra_dec_correlation_systematic']
         corr_rand = data['ra_dec_correlation_random']
