@@ -655,6 +655,8 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     m.drawmapboundary(fill_color=water)
     # convert to map projection coords.
     # Note that lon,lat can be scalars, lists or numpy arrays.
+    x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
+    m.plot(x_ell, y_ell, 'r-.')
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
 
@@ -683,7 +685,7 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     m.drawmeridians(meridians,labels=[False,False,False,True], color='gray')
 
     x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
-    m.plot(x_ell, y_ell, 'k-')
+    m.plot(x_ell, y_ell, 'r-.')
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
     lat_half = 'N' if mean_lat > 0 else 'S'

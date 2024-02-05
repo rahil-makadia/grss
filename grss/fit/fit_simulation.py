@@ -609,6 +609,7 @@ class FitSimulation:
             self.fixed_propsim_params['events'] = []
             self.fit_events = False
         self.reject_outliers = True
+        self.reject_criteria = [3.0, 2.8]
         self.residual_chi_squared = [None]*len(self.obs_array)
         self.num_rejected = 0
         self.converged = False
@@ -1512,8 +1513,13 @@ class FitSimulation:
         ValueError
             If the observer information is not well-defined.
         """
-        chi_reject = 3.0
-        chi_recover = 2.8
+        chi_reject = self.reject_criteria[0]
+        chi_recover = self.reject_criteria[1]
+        if chi_recover > chi_reject:
+            raise ValueError("chi_recover must be less than chi_reject. "
+                                "Use default values if unsure. "
+                                "Default values are chi_reject=3.0 and chi_recover=2.8 "
+                                "(Implemented as FitSimulation.reject_criteria=[3.0, 2.8])")
         full_cov = np.linalg.inv(partials.T @ self.obs_weight @ partials)
         j = 0
         residual_chi_squared = np.zeros(len(self.obs_array))
