@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_simulation.Event" href="grss.prop.prop_simulation.Event.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 05, 2024"/>
+    <meta name="docbuild:last-update" content="Feb 17, 2024"/>
   </head>
   
   
@@ -469,7 +469,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.bVec"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.bVec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.centralBody"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBody</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.centralBodySpiceId"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBodySpiceId</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.dTLinMinusT"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dTLinMinusT</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.dist"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dist</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.dt"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.flybyBody"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.flybyBody</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.get_ca_parameters"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.get_ca_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.gravFocusFactor"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.gravFocusFactor</span></code></a></li>
@@ -548,8 +550,14 @@ the impact between two integrated or SPICE bodies.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.ImpactParameters.centralBodySpiceId" title="grss.prop.prop_simulation.ImpactParameters.centralBodySpiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">centralBodySpiceId</span></code></a></p></td>
 <td><p>SPICE ID of the central body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.ImpactParameters.dist" title="grss.prop.prop_simulation.ImpactParameters.dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.ImpactParameters.dTLinMinusT" title="grss.prop.prop_simulation.ImpactParameters.dTLinMinusT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dTLinMinusT</span></code></a></p></td>
+<td><p>Partials of difference between linearized time of periapsis and time of periapsis with respect to CA state.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.ImpactParameters.dist" title="grss.prop.prop_simulation.ImpactParameters.dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code></a></p></td>
 <td><p>Distance of the close approach.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.ImpactParameters.dt" title="grss.prop.prop_simulation.ImpactParameters.dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code></a></p></td>
+<td><p>Partials of time of periapsis with respect to CA state.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.prop.prop_simulation.ImpactParameters.flybyBody" title="grss.prop.prop_simulation.ImpactParameters.flybyBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flybyBody</span></code></a></p></td>
 <td><p>Name of the flyby body.</p></td>
@@ -638,9 +646,21 @@ the impact between two integrated or SPICE bodies.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.ImpactParameters.dTLinMinusT">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dTLinMinusT</span></span><a class="headerlink" href="#grss.prop.prop_simulation.ImpactParameters.dTLinMinusT" title="Permalink to this definition">#</a></dt>
+<dd><p>Partials of difference between linearized time of periapsis and time of periapsis with respect to CA state.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.prop.prop_simulation.ImpactParameters.dist">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dist</span></span><a class="headerlink" href="#grss.prop.prop_simulation.ImpactParameters.dist" title="Permalink to this definition">#</a></dt>
 <dd><p>Distance of the close approach.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.ImpactParameters.dt">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#grss.prop.prop_simulation.ImpactParameters.dt" title="Permalink to this definition">#</a></dt>
+<dd><p>Partials of time of periapsis with respect to CA state.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -843,7 +863,9 @@ the impact between two integrated or SPICE bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.bVec"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.bVec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.centralBody"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBody</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.centralBodySpiceId"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBodySpiceId</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.dTLinMinusT"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dTLinMinusT</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.dist"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dist</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.dt"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.flybyBody"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.flybyBody</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.get_ca_parameters"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.get_ca_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.ImpactParameters.gravFocusFactor"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.gravFocusFactor</span></code></a></li>
@@ -899,7 +921,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 05, 2024.
+  Last updated on Feb 17, 2024.
   <br/>
 </p>
   </div>

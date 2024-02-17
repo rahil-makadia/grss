@@ -26,6 +26,8 @@ grss.prop.prop\_simulation.BPlaneParameters
 
     .. autosummary::
     
+        ~BPlaneParameters.dx
+        ~BPlaneParameters.dy
         ~BPlaneParameters.x
         ~BPlaneParameters.y
         ~BPlaneParameters.z

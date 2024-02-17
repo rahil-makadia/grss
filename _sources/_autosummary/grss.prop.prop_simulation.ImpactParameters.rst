@@ -33,7 +33,9 @@ grss.prop.prop\_simulation.ImpactParameters
         ~ImpactParameters.bVec
         ~ImpactParameters.centralBody
         ~ImpactParameters.centralBodySpiceId
+        ~ImpactParameters.dTLinMinusT
         ~ImpactParameters.dist
+        ~ImpactParameters.dt
         ~ImpactParameters.flybyBody
         ~ImpactParameters.gravFocusFactor
         ~ImpactParameters.impact

@@ -32,7 +32,9 @@ grss.prop.prop\_simulation.CloseApproachParameters
         ~CloseApproachParameters.bVec
         ~CloseApproachParameters.centralBody
         ~CloseApproachParameters.centralBodySpiceId
+        ~CloseApproachParameters.dTLinMinusT
         ~CloseApproachParameters.dist
+        ~CloseApproachParameters.dt
         ~CloseApproachParameters.flybyBody
         ~CloseApproachParameters.gravFocusFactor
         ~CloseApproachParameters.impact
