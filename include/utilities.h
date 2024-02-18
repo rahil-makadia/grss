@@ -175,8 +175,6 @@ void deg_to_rad(const real &deg, real &rad);
 real deg_to_rad(const real deg);
 
 void sort_vector(std::vector<real> &v, const bool &ascending);
-void sort_vector_by_another(std::vector<real> &v, const std::vector<real> &vRef,
-                            const bool &ascending);
 void sort_vector_by_another(std::vector<std::vector<real>> &v,
                             const std::vector<real> &vRef,
                             const bool &ascending);

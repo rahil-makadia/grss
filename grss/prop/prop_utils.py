@@ -306,6 +306,7 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
             # convert lat/lon to km
             sma_print *= np.pi/180*6378.1367
             smi_print *= np.pi/180*6378.1367
+        print(f'{bplane_type} ellipse mean: ({x_mean}, {y_mean}) {units}')
         print(f'{bplane_type} ellipse sma: {sma_print} {units}')
         print(f'{bplane_type} ellipse smi: {smi_print} {units}')
         print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')

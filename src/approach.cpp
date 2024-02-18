@@ -547,6 +547,32 @@ void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const r
             this->scaled.dx[k] = (this->kizner.dx[k] - this->scaled.x*partial_lambda[k])/this->gravFocusFactor;
             this->scaled.dy[k] = (this->kizner.dy[k] - this->scaled.y*partial_lambda[k])/this->gravFocusFactor;
         }
+        // clean up
+        for (size_t k = 0; k < 6; k++) {
+            delete[] partial_r_vec[k];
+            delete[] partial_v_vec[k];
+            delete[] partial_hVec[k];
+            delete[] partial_eVec[k];
+            delete[] partial_pHat[k];
+            delete[] partial_qHat[k];
+            delete[] partial_rHat[k];
+            delete[] partial_sHat[k];
+            delete[] partial_tHat[k];
+        }
+        delete[] partial_alpha;
+        delete[] partial_vInf;
+        delete[] partial_a;
+        delete[] partial_n;
+        delete[] partial_hVec;
+        delete[] partial_h;
+        delete[] partial_e;
+        delete[] partial_F;
+        delete[] partial_pHat;
+        delete[] partial_qHat;
+        delete[] partial_rHat;
+        delete[] partial_sHat;
+        delete[] partial_tHat;
+        delete[] partial_lambda;
     }
 }
 

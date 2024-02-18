@@ -98,28 +98,6 @@ void sort_vector(std::vector<real> &v, const bool &ascending) {
     }
 }
 
-void sort_vector_by_another(std::vector<real> &v, const std::vector<real> &vRef,
-                            const bool &ascending) {
-    if (v.size() != vRef.size()) {
-        throw std::runtime_error(
-            "sort_vector_by_another: v and vRef must be the same size");
-    }
-    std::vector<size_t> sortedIdx(v.size());
-    std::iota(sortedIdx.begin(), sortedIdx.end(), 0);
-    if (ascending) {
-        std::sort(sortedIdx.begin(), sortedIdx.end(),
-                  [&vRef](size_t a, size_t b) { return vRef[a] < vRef[b]; });
-    } else {
-        std::sort(sortedIdx.begin(), sortedIdx.end(),
-                  [&vRef](size_t a, size_t b) { return vRef[a] > vRef[b]; });
-    }
-    std::vector<real> vCopy = v;
-    for (size_t i = 0; i < v.size(); i++) {
-        v[i] = vCopy[sortedIdx[i]];
-    }
-    vCopy.clear();
-}
-
 void sort_vector_by_another(std::vector<std::vector<real>> &v,
                             const std::vector<real> &vRef,
                             const bool &ascending) {

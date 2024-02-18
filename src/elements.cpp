@@ -241,11 +241,10 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
                            const real GM) {
     real elemTol = 1e-14;
     // only valid conversion is com2cart or kep2cart
-    real e, q, tp, om, w, i, a, nu, E, M;
+    real e, q, om, w, i, a, nu, E, M;
     if (conversion == "com2cart") {
         e = elems[0];
         q = elems[1];
-        tp = elems[2];
         om = elems[3];
         w = elems[4];
         i = elems[5];
@@ -261,7 +260,6 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
         nu = elems[5];
         E = 2 * atan(sqrt((1 - e) / (1 + e)) * tan(nu / 2));
         M = E - e * sin(E);
-        tp = epochMjd - M * sqrt(a * a * a) / GM;
     } else {
         throw std::invalid_argument("get_cartesian_partials: invalid conversion "
                                     "type, must be com2cart or kep2cart");
@@ -590,6 +588,38 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
             partials[5][i] = partial_nu[i];
         }
     }
+
+    // clean up
+    delete[] pos;
+    delete[] vel;
+    delete[] h_vec;
+    delete[] n_vec;
+    delete[] e_vec;
+    for (size_t i = 0; i < 6; i++) {
+        delete[] partial_r_vec[i];
+        delete[] partial_v_vec[i];
+        delete[] partial_h_vec[i];
+        delete[] partial_n_vec[i];
+        delete[] partial_e_vec[i];
+    }
+    delete[] partial_r_vec;
+    delete[] partial_v_vec;
+    delete[] partial_h_vec;
+    delete[] partial_n_vec;
+    delete[] partial_e_vec;
+    delete[] partial_r_mag;
+    delete[] partial_h_mag;
+    delete[] partial_n_mag;
+    delete[] partial_e_mag;
+    delete[] partial_a;
+    delete[] partial_q;
+    delete[] partial_nu;
+    delete[] partial_E;
+    delete[] partial_M;
+    delete[] partial_tp;
+    delete[] partial_Omega;
+    delete[] partial_w;
+    delete[] partial_i;
 }
 
 void get_cartesian_partials(const real &epochMjd,
