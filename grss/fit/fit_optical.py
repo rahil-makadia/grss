@@ -96,7 +96,7 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
     else:
         with open(optical_obs_file, 'r', encoding='utf-8') as file:
             obs_raw = file.readlines()
-            obs_raw = [x[:-1] for x in obs_raw] # remove \n at the end of each line
+            obs_raw = [line.rstrip() for line in obs_raw] # remove \n at the end of each line
     obs_array_optical = np.zeros((len(obs_raw), 6))
     star_catalog_codes = []
     observer_codes_optical = []

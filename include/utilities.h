@@ -109,6 +109,8 @@ struct BPlaneParameters {
     real x;
     real y;
     real z;
+    std::vector<real> dx = std::vector<real>(6, 0.0L);
+    std::vector<real> dy = std::vector<real>(6, 0.0L);
 };
 
 class CloseApproachParameters {
@@ -136,6 +138,8 @@ class CloseApproachParameters {
     BPlaneParameters opik;
     BPlaneParameters scaled;
     BPlaneParameters mtp;
+    std::vector<real> dTLinMinusT = std::vector<real>(6, 0.0L);
+    std::vector<real> dt = std::vector<real>(6, 0.0L);
     void get_ca_parameters(propSimulation *propSim, const real &tMap);
     void print_summary(int prec=8);
 };
@@ -171,8 +175,6 @@ void deg_to_rad(const real &deg, real &rad);
 real deg_to_rad(const real deg);
 
 void sort_vector(std::vector<real> &v, const bool &ascending);
-void sort_vector_by_another(std::vector<real> &v, const std::vector<real> &vRef,
-                            const bool &ascending);
 void sort_vector_by_another(std::vector<std::vector<real>> &v,
                             const std::vector<real> &vRef,
                             const bool &ascending);

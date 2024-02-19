@@ -155,6 +155,12 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter")
         .def_readwrite("z", &BPlaneParameters::z, R"mydelimiter(
             Z coordinate of the B-plane.
+            )mydelimiter")
+        .def_readwrite("dx", &BPlaneParameters::dx, R"mydelimiter(
+            Partial of X coordinate of the B-plane with respect to state.
+            )mydelimiter")
+        .def_readwrite("dy", &BPlaneParameters::dy, R"mydelimiter(
+            Partial of Y coordinate of the B-plane with respect to state.
             )mydelimiter");
 
     py::class_<CloseApproachParameters>(m, "CloseApproachParameters",
@@ -196,7 +202,8 @@ PYBIND11_MODULE(prop_simulation, m) {
             Name of the central body.
             )mydelimiter")
         .def_readwrite("centralBodySpiceId",
-                       &CloseApproachParameters::centralBodySpiceId, R"mydelimiter(
+                       &CloseApproachParameters::centralBodySpiceId,
+                       R"mydelimiter(
             SPICE ID of the central body.
             )mydelimiter")
         .def_readwrite("impact", &CloseApproachParameters::impact,
@@ -233,6 +240,13 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("mtp", &CloseApproachParameters::mtp, R"mydelimiter(
             Modified Target Plane (MTP) B-plane parameters of the close approach.
             )mydelimiter")
+        .def_readwrite("dTLinMinusT", &CloseApproachParameters::dTLinMinusT,
+                       R"mydelimiter(
+            Partials of difference between linearized time of periapsis and time of periapsis with respect to CA state.
+            )mydelimiter")
+        .def_readwrite("dt", &CloseApproachParameters::dt, R"mydelimiter(
+            Partials of time of periapsis with respect to CA state.
+            )mydelimiter")
         .def("get_ca_parameters", &CloseApproachParameters::get_ca_parameters,
              py::arg("propSim"), py::arg("tMap"), R"mydelimiter(
             Calculate the close approach parameters.
@@ -250,7 +264,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 None.
             )mydelimiter")
         .def("print_summary", &CloseApproachParameters::print_summary,
-            py::arg("prec") = 8, R"mydelimiter(
+             py::arg("prec") = 8, R"mydelimiter(
             Print a summary of the close approach parameters.
 
             Parameters
@@ -265,7 +279,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter");
 
     py::class_<ImpactParameters, CloseApproachParameters>(m, "ImpactParameters",
-                                        R"mydelimiter(
+                                                          R"mydelimiter(
         The ImpactParameters class contains parameters used for calculating
         the impact between two integrated or SPICE bodies.
         )mydelimiter")
@@ -284,7 +298,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             Altitude of the impact.
             )mydelimiter")
         .def("print_summary", &ImpactParameters::print_summary,
-            py::arg("prec") = 8, R"mydelimiter(
+             py::arg("prec") = 8, R"mydelimiter(
             Print a summary of the impact parameters.
 
             Parameters
@@ -412,9 +426,9 @@ PYBIND11_MODULE(prop_simulation, m) {
     py::class_<SpiceBody, Body>(m, "SpiceBody", R"mydelimiter(
         The SpiceBody class contains the properties of a SPICE body.
         )mydelimiter")
-        .def(py::init<std::string, int, real, real, real>(),
-             py::arg("name"), py::arg("spiceId"), py::arg("t0"),
-             py::arg("mass"), py::arg("radius"),
+        .def(py::init<std::string, int, real, real, real>(), py::arg("name"),
+             py::arg("spiceId"), py::arg("t0"), py::arg("mass"),
+             py::arg("radius"),
              R"mydelimiter(
             Constructor for the SpiceBody class.
 
@@ -546,7 +560,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             )mydelimiter");
 
     m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
-        py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
+          py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
         Propagates a simulation in parallel using OpenMP.
 
         Parameters
@@ -624,7 +638,8 @@ PYBIND11_MODULE(prop_simulation, m) {
         .def_readwrite("caParams", &propSimulation::caParams, R"mydelimiter(
             Close approach parameters of the simulation. List of propSimulation.CloseApproachParameters objects.
             )mydelimiter")
-        .def_readwrite("impactParams", &propSimulation::impactParams, R"mydelimiter(
+        .def_readwrite("impactParams", &propSimulation::impactParams,
+                       R"mydelimiter(
             Impact parameters of the simulation. List of propSimulation.ImpactParameters objects.
             )mydelimiter")
         .def_readwrite("t", &propSimulation::t, R"mydelimiter(
@@ -709,8 +724,8 @@ PYBIND11_MODULE(prop_simulation, m) {
             xIntegInterp : list of real
                 Interpolated states of the integration bodies.
             )mydelimiter")
-        .def("add_spice_body", &propSimulation::add_spice_body,
-             py::arg("body"), R"mydelimiter(
+        .def("add_spice_body", &propSimulation::add_spice_body, py::arg("body"),
+             R"mydelimiter(
             Adds a SPICE body to the simulation.
 
             Parameters
@@ -729,8 +744,8 @@ PYBIND11_MODULE(prop_simulation, m) {
             bodyName : str
                 Name of the SPICE body in the simulation.
             )mydelimiter")
-        .def("add_integ_body", &propSimulation::add_integ_body,
-             py::arg("body"), R"mydelimiter(
+        .def("add_integ_body", &propSimulation::add_integ_body, py::arg("body"),
+             R"mydelimiter(
             Adds an integration body to the simulation.
 
             Parameters

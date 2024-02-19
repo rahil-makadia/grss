@@ -661,6 +661,7 @@ void propSimulation::prepare_for_evaluation(
     }
     // sort tEval and corresponding observerInfo into ascending order or
     // descending order based on the integration direction
+    std::vector<real> tEvalOrig = tEval;
     sort_vector(tEval, forwardProp);
     if (observerInfo.size() != 0) {
         if (observerInfo.size() != tEval.size()) {
@@ -668,10 +669,7 @@ void propSimulation::prepare_for_evaluation(
                 "The number of tEval values and the number of observerInfo "
                 "vectors must be equal.");
         }
-        sort_vector_by_another(observerInfo, tEval, forwardProp);
-        if (backwardProp) {
-            std::reverse(observerInfo.begin(), observerInfo.end());
-        }
+        sort_vector_by_another(observerInfo, tEvalOrig, forwardProp);
     }
     if (forwardProp) {
         int removeCounter = 0;

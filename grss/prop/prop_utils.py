@@ -302,10 +302,12 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
     if print_ellipse_params:
         sma_print = sma/n_std
         smi_print = smi/n_std
+        print(f'{bplane_type} ellipse mean: ({x_mean}, {y_mean}) {units}')
         if bplane_type == 'Impact':
             # convert lat/lon to km
             sma_print *= np.pi/180*6378.1367
             smi_print *= np.pi/180*6378.1367
+            units = "km"
         print(f'{bplane_type} ellipse sma: {sma_print} {units}')
         print(f'{bplane_type} ellipse smi: {smi_print} {units}')
         print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')
@@ -643,7 +645,7 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
 
     impact_ell = data_to_ellipse(lon, lat, n_std=3.0, plot_offset=False, bplane_type='Impact',
                                     print_ellipse_params=print_ellipse_params,
-                                    units='km', sigma_points=sigma_points)
+                                    units='deg', sigma_points=sigma_points)
 
     plt.figure(figsize=(12, 6), dpi=150)
     plt.subplot(1, 2, 1)

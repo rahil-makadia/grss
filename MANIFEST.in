@@ -9,3 +9,4 @@ recursive-include tests *
 include CMakeLists.txt
 
 include grss/version.txt
+include build_cpp.sh
