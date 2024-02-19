@@ -61,7 +61,7 @@ package-data = {"grss" = [
 dependencies = {file = ["requirements.txt"]}
 
 [tool.cibuildwheel.macos]
-archs = ["x86_64", "arm64"]
+archs = ["arm64"]
 
 [tool.cibuildwheel.linux]
 archs = ["x86_64"]
