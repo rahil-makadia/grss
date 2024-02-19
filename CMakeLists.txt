@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 if(APPLE)
     set(CMAKE_C_COMPILER gcc-13)
     set(CMAKE_CXX_COMPILER g++-13)
+    add_compile_options(-largs -Wl, -ld_classic)
 endif()
 
 # set the project name and get version from version.txt

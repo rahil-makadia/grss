@@ -60,10 +60,8 @@ package-data = {"grss" = [
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[tool.cibuildwheel.macos]
-archs = ["arm64"]
+[tool.cibuildwheel]
 before-build = [
-    "brew reinstall -sv gcc",
     "pip install pybind11",
     "rm -rf build",
     "mkdir build",
@@ -71,12 +69,8 @@ before-build = [
     "cmake -Dpybind11_DIR=$pybind11_DIR -B./build -S.",
 ]
 
+[tool.cibuildwheel.macos]
+archs = ["arm64"]
+
 [tool.cibuildwheel.linux]
 archs = ["x86_64"]
-before-build = [
-    "pip install pybind11",
-    "rm -rf build",
-    "mkdir build",
-    "pybind11_DIR=$(pybind11-config --cmakedir)",
-    "cmake -Dpybind11_DIR=$pybind11_DIR -B./build -S.",
-]
