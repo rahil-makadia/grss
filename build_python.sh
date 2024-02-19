@@ -23,6 +23,7 @@ if [ $machine = "Mac" ]; then
 fi
 
 python3 -m build --sdist --outdir dist
+pybind11_DIR=$(pybind11-config --cmakedir)
 python3 -m cibuildwheel --output-dir dist
 
 twine check dist/*
