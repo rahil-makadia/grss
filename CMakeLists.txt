@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 if(APPLE)
     set(CMAKE_C_COMPILER gcc-13)
     set(CMAKE_CXX_COMPILER g++-13)
-    add_compile_options(-largs -Wl, -ld_classic)
+    add_compile_options(-Wl, -ld_classic, -ld64)
 endif()
 
 # set the project name and get version from version.txt
@@ -17,7 +17,7 @@ project(grss VERSION ${ver})
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp) # operational flags
-# add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
+# add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic) # debugging flags
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
