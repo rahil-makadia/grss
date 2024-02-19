@@ -3,7 +3,6 @@ include src/*.cpp
 include src/CMakeLists.txt
 
 include extern/get_cspice.py
-recursive-include extern/pybind11 *
 recursive-include tests *
 
 include CMakeLists.txt
