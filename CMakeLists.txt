@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 if(APPLE)
     set(CMAKE_C_COMPILER gcc-13)
     set(CMAKE_CXX_COMPILER g++-13)
+    set(CMAKE_OSX_ARCHITECTURES "arm64")
 endif()
 
 # set the project name and get version from version.txt

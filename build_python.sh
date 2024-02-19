@@ -21,7 +21,9 @@ if [ $machine = "Mac" ]; then
     cd ..
 fi
 
-python3 -m build --sdist --outdir dist
+if [ $machine = "Linux" ]; then
+    python3 -m build --sdist --outdir dist
+fi
 python3 -m cibuildwheel --output-dir dist
 
 twine check dist/*
