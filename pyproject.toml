@@ -61,7 +61,12 @@ package-data = {"grss" = [
 dependencies = {file = ["requirements.txt"]}
 
 [tool.cibuildwheel]
-before-build = "pip install pybind11 && pybind11_DIR=$(pybind11-config --cmakedir)"
+before-build = [
+    "pip install pybind11",
+    "pybind11_DIR=$(pybind11-config --cmakedir)",
+    "export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$pybind11_DIR",
+    "echo $pybind11_DIR"
+]
 
 [tool.cibuildwheel.macos]
 archs = ["arm64"]
