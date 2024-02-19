@@ -63,9 +63,10 @@ dependencies = {file = ["requirements.txt"]}
 [tool.cibuildwheel]
 before-build = [
     "pip install pybind11",
+    "mkdir build",
+    "cmake -B./build -S.",
     "pybind11_DIR=$(pybind11-config --cmakedir)",
     "cmake -Dpybind11_DIR=$pybind11_DIR",
-    "pwd",
     "ls -la",
 ]
 
