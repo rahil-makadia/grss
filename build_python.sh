@@ -3,27 +3,7 @@ rm -rf build dist grss.egg-info
 
 python3 -m pip install --upgrade pip build twine cibuildwheel
 
-unameOut="$(uname -s)"
-case "${unameOut}" in
-    Linux*)     machine=Linux;;
-    Darwin*)    machine=Mac;;
-    CYGWIN*)    machine=Cygwin;;
-    MINGW*)     machine=MinGw;;
-    MSYS_NT*)   machine=Git;;
-    *)          machine="UNKNOWN:${unameOut}"
-esac
-
-if [ $machine = "Mac" ]; then
-    # force download arm64 version of cspice
-    export ARCHFLAGS="-arch arm64"
-    cd ./extern
-    python3 get_cspice.py
-    cd ..
-fi
-
-if [ $machine = "Linux" ]; then
-    python3 -m build --sdist --outdir dist
-fi
+python3 -m build --sdist --outdir dist
 python3 -m cibuildwheel --output-dir dist
 
 twine check dist/*

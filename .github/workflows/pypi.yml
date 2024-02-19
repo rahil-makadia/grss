@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-14]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
       - name: Download MacOS distribution from previous job
         uses: actions/download-artifact@master
         with:
-          name: dist-macos-latest
+          name: dist-macos-14
           path: dist
       - name: Show files
         run: ls -l dist
