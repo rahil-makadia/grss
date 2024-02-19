@@ -4,6 +4,10 @@ on:
     branches:
       - main
       - dev
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - 'tests/cpp/**'
 
 jobs:
   prop-only:

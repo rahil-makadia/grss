@@ -5,8 +5,8 @@ on:
     branches:
       - main
       - dev
-    paths:
-      - "grss/version.txt"
+    # paths:
+    #   - "grss/version.txt"
 
 permissions:
   id-token: write

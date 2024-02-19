@@ -4,6 +4,11 @@ on:
     branches:
       - main
       - dev
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - 'grss/**'
+      - 'tests/python/**'
 
 jobs:
   prop-and-fit:
