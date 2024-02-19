@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.18.0)
 if(APPLE)
     set(CMAKE_C_COMPILER gcc-13)
     set(CMAKE_CXX_COMPILER g++-13)
-    set(CMAKE_OSX_ARCHITECTURES "arm64")
 endif()
 
 # set the project name and get version from version.txt
@@ -18,6 +17,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp) # operational flags
 # add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
+
+# if clang, add -Wl, -ld_classic flags
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wl -ld_classic)
+endif()
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
