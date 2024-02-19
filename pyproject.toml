@@ -68,6 +68,7 @@ before-build = [
     "pybind11_DIR=$(pybind11-config --cmakedir)",
     "cmake -Dpybind11_DIR=$pybind11_DIR -B./build -S.",
 ]
+skip = "cp38-macosx_arm64"
 
 [tool.cibuildwheel.macos]
 archs = ["arm64"]

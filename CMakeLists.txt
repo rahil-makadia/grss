@@ -18,11 +18,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp) # operational flags
 # add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
 
-# if clang, add -Wl, -ld_classic flags
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    add_compile_options(-Wl -ld_classic)
-endif()
-
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
