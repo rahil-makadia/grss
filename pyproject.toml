@@ -62,9 +62,11 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.cibuildwheel]
 before-build = [
-    "conda install pybind11 -c conda-forge",
+    "pip install pybind11",
     "pybind11_DIR=$(pybind11-config --cmakedir)",
-    "ls -l $pybind11_DIR"
+    "ls -l $pybind11_DIR",
+    "cp $pybind11_DIR/pybind11Config.cmake .",
+    "ls -l",
 ]
 
 [tool.cibuildwheel.macos]
