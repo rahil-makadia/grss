@@ -16,7 +16,7 @@ project(grss VERSION ${ver})
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp) # operational flags
-# add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic -Wno-unused-but-set-variable -Wno-unused-result) # debugging flags
+# add_compile_options(-std=c++11 -DLONGDOUBLE -g3 -fPIC -fopenmp -Werror -Wall -Wextra -pedantic) # debugging flags
 
 # Set header file directories
 include_directories(${CMAKE_SOURCE_DIR}/include)

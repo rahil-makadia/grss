@@ -35,6 +35,11 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext: CMakeExtension) -> None:
         subprocess.run(["./build_cpp.sh"], cwd=ext.sourcedir, check=True)
+        binary_created = [f for f in os.listdir(f"{ext.sourcedir}/build/")
+                            if f.startswith("prop_simulation")]
+        if not binary_created:
+            raise FileNotFoundError("prop_simulation binary for C++ source code not found "
+                                    "in cmake build directory")
         os.system(f"cp {ext.sourcedir}/build/prop_simulation* {self.build_lib}/grss/prop/")
         return
 
