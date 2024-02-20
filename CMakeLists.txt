@@ -31,10 +31,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 # create pybind11 module
-find_package(PythonInterp 3.8 REQUIRED)
-find_package(PythonLibs 3.8 REQUIRED)
-find_package(PythonInterp 3.10)
-find_package(PythonLibs 3.10)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 find_package(pybind11 REQUIRED)
 pybind11_add_module(prop_simulation src/${PROJECT_NAME}.cpp)
 target_link_libraries(prop_simulation PRIVATE ${PROJECT_NAME})
