@@ -8,6 +8,10 @@ Welcome to the GRSS docs!
 =============================================
 **GRSS** (pronounced "grass"), the *Gauss-Radau Small-body Simulator* is a Python package with a C++ binding for propagating and fitting the orbits of small bodies in the solar system, such as asteroids and comets. Continue reading on the following pages to learn more about the library:
 
+If you use GRSS in your research, please cite the following paper:
+
+Makadia et al. (2024), "Measurability of the Heliocentric Momentum Enhancement from a Kinetic Impact: The Double Asteroid Redirection Test (DART) Mission", `Planetary Science Journal, 5, 38. <https://doi.org/10.3847/PSJ/ad1bce>`_
+
 .. toctree::
    :maxdepth: 1
    
