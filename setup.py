@@ -7,9 +7,6 @@ from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
-# A CMakeExtension needs a sourcedir instead of a file list.
-# The name must be the _single_ output extension from the CMake build.
-# If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
     """
     CMake extension for setuptools.
@@ -50,9 +47,8 @@ with open("grss/version.txt", "r", encoding="utf-8") as f:
 if (not os.path.exists("./extern/cspice/lib/cspice.a") or
     not os.path.exists("./extern/cspice/include/SpiceUsr.h") ):
     subprocess.run(["python", "get_cspice.py"], cwd="./extern", check=True)
+
 setup(
-    version=ver,
-    packages=["grss", "grss.fit", "grss.prop"],
     ext_modules=[CMakeExtension("prop_simulation")],
-    cmdclass={"build_ext": CMakeBuild},
+    cmdclass={"build_ext": CMakeBuild}
 )

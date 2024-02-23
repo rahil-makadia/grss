@@ -118,7 +118,7 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
         obs_time_mjd = Time(date_main, format='iso', scale='utc').utc.mjd+date_float
         obs_code = data[77:80]
         disallow_code = obs_code in non_geocentric_occultation_codes
-        disallow_type = obs_type in ['R', 'r', 'V', 'v', 'O']
+        disallow_type = obs_type in ['R', 'r', 'V', 'v', 'O', 'X', 'x']
         disallow_line2 = obs_type in ['s']
         disallow_time = obs_time_mjd < t_min_utc or obs_time_mjd > t_max_utc
         if not disallow_code and not disallow_type and not disallow_time and not disallow_line2:
