@@ -402,29 +402,48 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     map_times = np.array([approach.tMap for approach in ca_list])
     kizner_x = np.array([approach.kizner.x*au2units for approach in ca_list])
     kizner_y = np.array([approach.kizner.y*au2units for approach in ca_list])
+    kizner_nan = np.any(np.isnan(kizner_x)) or np.any(np.isnan(kizner_y))
     opik_x = np.array([approach.opik.x*au2units for approach in ca_list])
     opik_y = np.array([approach.opik.y*au2units for approach in ca_list])
+    opik_nan = np.any(np.isnan(opik_x)) or np.any(np.isnan(opik_y))
     scaled_x = np.array([approach.scaled.x*au2units for approach in ca_list])
     scaled_y = np.array([approach.scaled.y*au2units for approach in ca_list])
+    scaled_nan = np.any(np.isnan(scaled_x)) or np.any(np.isnan(scaled_y))
     mtp_x = np.array([approach.mtp.x*au2units for approach in ca_list])
     mtp_y = np.array([approach.mtp.y*au2units for approach in ca_list])
-    focus_factor = np.max([approach.gravFocusFactor for approach in ca_list])
+    mtp_nan = np.any(np.isnan(mtp_x)) or np.any(np.isnan(mtp_y))
+    focus_factor = np.nanmean([approach.gravFocusFactor for approach in ca_list])
     impact_bool = np.array([approach.impact for approach in ca_list])
     impact_any = np.any(impact_bool)
     if len(ca_list) >= 100 or sigma_points is not None:
-        kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
-                                            'kizner', print_ellipse_params, units, sigma_points)
-        opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
-                                            'opik', print_ellipse_params, units, sigma_points)
-        scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
-                                            'scaled', print_ellipse_params, units, sigma_points)
-        mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
+        if not kizner_nan:
+            kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
+                                                'kizner', print_ellipse_params, units, sigma_points)
+        else:
+            kizner_ellipse = None
+        if not opik_nan:
+            opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
+                                                'opik', print_ellipse_params, units, sigma_points)
+        else:
+            opik_ellipse = None
+        if not scaled_nan:
+            scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
+                                                'scaled', print_ellipse_params, units, sigma_points)
+        else:
+            scaled_ellipse = None
+        if not mtp_nan:
+            mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
                                             'mtp', print_ellipse_params, units, sigma_points)
+        else:
+            mtp_ellipse = None
     else:
         kizner_ellipse = None
         opik_ellipse = None
         scaled_ellipse = None
         mtp_ellipse = None
+    if kizner_nan and opik_nan and scaled_nan and not mtp_nan:
+        print("WARNING: Close approaches have no valid B-planes but do have MTP. "
+                "Object might be captured.")
     fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=250)
     plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_ellipse, 'kizner',
                         focus_factor, show_central_body, plot_offset, scale_coords,
@@ -438,7 +457,7 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     plot_single_bplane(axes[1,1], mtp_x, mtp_y, mtp_ellipse, 'mtp',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
-    patches, labels = axes[0,0].get_legend_handles_labels()
+    patches, labels = axes[1,1].get_legend_handles_labels()
     fig.legend(patches, labels, loc='upper center', ncol=4,
                 bbox_to_anchor=(0.5, 1.023), fontsize=10)
     fig.tight_layout()
@@ -607,7 +626,8 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
         axis.axis('equal')
     return axis
 
-def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None, zoom_size=5.0e3):
+def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None,
+                        zoom_size=5.0e3, plot_ellipse=False, save_name=None):
     """
     Plot the impact locations of a list of impactParameters objects.
 
@@ -621,11 +641,15 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
         SigmaPoints object for reconstructing mean and cov, by default None.
     zoom_size : float, optional
         Size of the zoomed in plot, in km, by default 5.0e3.
+    plot_ellipse : bool, optional
+        True to plot the 3-sigma ellipse, False to not plot it, by default False.
+    save_name : str, optional
+        Name to save the plots as, by default None.
     """
     if sigma_points is None and len(impact_list) < 2:
         raise ValueError("sigma_points must be supplied if len(impact_list) < 2")
     if sigma_points is not None and len(impact_list) < 13:
-        raise ValueError("sigma_points are not valid form of analysis if len(impact_list) < 13")
+        print("WARNING: sigma_points are not a valid form of analysis if len(impact_list) < 13")
     if not np.all([impact.impact for impact in impact_list]):
         raise ValueError("Not all impactParameters objects supplied in list have impact=True")
     for impact in impact_list:
@@ -633,6 +657,9 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
             raise ValueError("Not all impactParameters objects supplied in list impact Earth")
 
     lon = np.array([impact.lon for impact in impact_list])*180.0/np.pi
+    # check if the longitude needs to be shifted to [-180, 180]
+    if np.any(lon > 180):
+        lon[lon > 180] -= 360
     lat = np.array([impact.lat for impact in impact_list])*180.0/np.pi
     if sigma_points is None:
         mean_lon = np.mean(lon)
@@ -657,42 +684,54 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     m.drawmapboundary(fill_color=water)
     # convert to map projection coords.
     # Note that lon,lat can be scalars, lists or numpy arrays.
-    x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
-    m.plot(x_ell, y_ell, 'r-.')
+    if plot_ellipse:
+        x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
+        m.plot(x_ell, y_ell, 'r-.')
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
 
     plt.subplot(1, 2, 2)
-    # setup Lambert Conformal basemap.
-    # lon_0,lat_0 is central point.
-    # rsphere=(6378137.00,6356752.3142) specifies WGS84 ellipsoid
-    # area_thresh=1000 means don't plot coastline features less
-    # than 1000 km^2 in area.
-    size = zoom_size*1e3
-    m = Basemap(width=size,height=size,
-                rsphere=(6378137.00,6356752.3142),
-                resolution='l',area_thresh=size/100,projection='lcc',
-                lat_0=mean_lat,lon_0=mean_lon)
-    m.shadedrelief()
-    lat_step = lon_step = 3 if zoom_size <= 1e3 else 10
-    if zoom_size <= 500:
-        lat_step = lon_step = 1
-    if zoom_size <= 100:
-        lat_step = lon_step = 0.5
-    # draw parallels and meridians.
-    parallels = np.arange(-90, 91, lat_step)
-    # labels = [left,right,top,bottom]
-    m.drawparallels(parallels,labels=[True,False,False,False], color='gray')
-    meridians = np.arange(0, 361, lon_step)
-    m.drawmeridians(meridians,labels=[False,False,False,True], color='gray')
-
-    x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
-    m.plot(x_ell, y_ell, 'r-.')
+    if zoom_size <= 5e3:
+        # setup Lambert Conformal basemap.
+        # lon_0,lat_0 is central point.
+        # rsphere=(6378137.00,6356752.3142) specifies WGS84 ellipsoid
+        # area_thresh=1000 means don't plot coastline features less
+        # than 1000 km^2 in area.
+        size = zoom_size*1e3
+        m = Basemap(width=size,height=size,
+                    rsphere=(6378137.00,6356752.3142),
+                    resolution='l',area_thresh=size/100,projection='lcc',
+                    lat_0=mean_lat,lon_0=mean_lon)
+        m.shadedrelief()
+        lat_step = lon_step = 3 if zoom_size <= 1e3 else 10
+        if zoom_size <= 500:
+            lat_step = lon_step = 1
+        if zoom_size <= 100:
+            lat_step = lon_step = 0.5
+        if zoom_size > 5e3:
+            lon_step = 60
+            lat_step = 30
+        # draw parallels and meridians.
+        parallels = np.arange(-90, 91, lat_step)
+        # labels = [left,right,top,bottom]
+        m.drawparallels(parallels,labels=[True,False,False,False], color='gray')
+        meridians = np.arange(0, 361, lon_step)
+        m.drawmeridians(meridians,labels=[False,False,False,True], color='gray')
+    else:
+        m = Basemap(projection='ortho',lon_0=mean_lon+180,lat_0=mean_lat,resolution='c')
+        m.drawcoastlines()
+        m.fillcontinents(color=land,lake_color=water)
+        m.drawmapboundary(fill_color=water)
+    if plot_ellipse:
+        x_ell, y_ell = m(impact_ell[0,:], impact_ell[1,:])
+        m.plot(x_ell, y_ell, 'r-.')
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
     lat_half = 'N' if mean_lat > 0 else 'S'
     plt.suptitle('Impact Location at 100km altitude w.r.t Earth: '
-                    f'{mean_lon:0.2f}$^o$E, {mean_lat:0.2f}$^o${lat_half}',
+                    f'{mean_lat:0.2f}$^o${lat_half}, {mean_lon:0.2f}$^o$E',
                     y=0.93)
+    if save_name is not None:
+        plt.savefig(save_name, dpi=500, bbox_inches='tight')
     plt.show()
     return None
