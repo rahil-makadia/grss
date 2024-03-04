@@ -174,10 +174,10 @@ real rad_to_deg(const real rad);
 void deg_to_rad(const real &deg, real &rad);
 real deg_to_rad(const real deg);
 
-void sort_vector(std::vector<real> &v, const bool &ascending);
-void sort_vector_by_another(std::vector<std::vector<real>> &v,
-                            const std::vector<real> &vRef,
-                            const bool &ascending);
+void sort_vector(std::vector<real> &v, const bool &ascending,
+                 std::vector<size_t> &sortedIdx);
+void sort_vector_by_idx(std::vector<std::vector<real>> &v,
+                            const std::vector<size_t> &sortedIdx);
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
 void vdot(const real *v1, const real *v2, const size_t &dim, real &dot);
 void vnorm(const std::vector<real> &v, real &norm);

@@ -659,17 +659,11 @@ void propSimulation::prepare_for_evaluation(
         throw std::invalid_argument(
             "The initial and final times must be different.");
     }
-    // sort tEval and corresponding observerInfo into ascending order or
-    // descending order based on the integration direction
-    std::vector<real> tEvalOrig = tEval;
-    sort_vector(tEval, forwardProp);
-    if (observerInfo.size() != 0) {
-        if (observerInfo.size() != tEval.size()) {
-            throw std::invalid_argument(
-                "The number of tEval values and the number of observerInfo "
-                "vectors must be equal.");
-        }
-        sort_vector_by_another(observerInfo, tEvalOrig, forwardProp);
+    // sort tEval into ascending order or descending order based on the
+    // integration direction (not during orbit fits)
+    if (observerInfo.size() == 0) {
+    std::vector<size_t> tEvalSortedIdx(tEval.size());
+        sort_vector(tEval, forwardProp, tEvalSortedIdx);
     }
     if (forwardProp) {
         int removeCounter = 0;

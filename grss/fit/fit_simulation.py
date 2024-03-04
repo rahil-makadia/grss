@@ -913,6 +913,9 @@ class FitSimulation:
         tf_past = np.min(t_eval_past)
         prop_sim_past = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
+        # flip t_eval_past and observer_info to go in reverse time order
+        t_eval_past = t_eval_past[::-1]
+        observer_info = tuple(observer_info[::-1])
         prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info)
@@ -972,7 +975,7 @@ class FitSimulation:
         eval_apparent_state = True
         converged_light_time = True
         observer_info = np.array(self.observer_info, dtype=tuple)
-        observer_info_past = tuple(observer_info[self.past_obs_idx])
+        observer_info_past = observer_info[self.past_obs_idx]
         observer_info_future = tuple(observer_info[self.future_obs_idx])
         prop_sim_past = None
         prop_sim_future = None
@@ -1649,7 +1652,7 @@ class FitSimulation:
             j += size
         # atwa = partials.T @ weights @ partials
         # atwb = partials.T @ weights @ residuals
-        cov = np.linalg.inv(atwa)
+        cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         delta_x = cov @ atwb
         return delta_x.ravel(), cov
 
