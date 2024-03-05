@@ -90,29 +90,27 @@ void deg_to_rad(const real &deg, real &rad) { rad = deg * PI / 180.0; }
 
 real deg_to_rad(const real deg) { return deg * PI / 180.0; }
 
-void sort_vector(std::vector<real> &v, const bool &ascending) {
-    if (ascending) {
-        std::stable_sort(v.begin(), v.end());
-    } else {
-        std::stable_sort(v.begin(), v.end(), std::greater<real>());
-    }
-}
-
-void sort_vector_by_another(std::vector<std::vector<real>> &v,
-                            const std::vector<real> &vRef,
-                            const bool &ascending) {
-    if (v.size() != vRef.size()) {
-        throw std::runtime_error(
-            "sort_vector_by_another: v and vRef must be the same size");
-    }
-    std::vector<size_t> sortedIdx(v.size());
+void sort_vector(std::vector<real> &v, const bool &ascending,
+                 std::vector<size_t> &sortedIdx) {
     std::iota(sortedIdx.begin(), sortedIdx.end(), 0);
     if (ascending) {
         std::sort(sortedIdx.begin(), sortedIdx.end(),
-                  [&vRef](size_t a, size_t b) { return vRef[a] < vRef[b]; });
+                  [v](size_t a, size_t b) { return v[a] < v[b]; });
     } else {
         std::sort(sortedIdx.begin(), sortedIdx.end(),
-                  [&vRef](size_t a, size_t b) { return vRef[a] > vRef[b]; });
+                  [v](size_t a, size_t b) { return v[a] > v[b]; });
+    }
+    std::vector<real> vCopy = v;
+    for (size_t i = 0; i < v.size(); i++) {
+        v[i] = vCopy[sortedIdx[i]];
+    }
+}
+
+void sort_vector_by_idx(std::vector<std::vector<real>> &v,
+                            const std::vector<size_t> &sortedIdx) {
+    if (v.size() != sortedIdx.size()) {
+        throw std::runtime_error(
+            "sort_vector_by_idx: v and sortedIdx must be the same size");
     }
     std::vector<std::vector<real>> vCopy = v;
     for (size_t i = 0; i < v.size(); i++) {

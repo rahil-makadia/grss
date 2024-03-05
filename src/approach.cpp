@@ -74,7 +74,7 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
                     impact.get_impact_parameters(propSim);
                     impact.impact = true;
                     propSim->impactParams.push_back(impact);
-                    std::cout << "Impact detected at MJD " << t << " TDB. "
+                    std::cout << "Impact detected at MJD " << tImp << " TDB. "
                               << propSim->integBodies[i].name
                               << " collided with " << bodyj->name << "!" << std::endl;
                 }

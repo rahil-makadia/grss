@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
+# pylint: disable=no-name-in-module
 from . import prop_simulation as prop
 
 __all__ = [ 'cluster_ca_or_impacts',

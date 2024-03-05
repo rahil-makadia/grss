@@ -74,10 +74,31 @@ void cometary_to_keplerian(const real &epochMjD,
     kepler_solve(epochMjD, cometaryState, GM, M, E, nu);
     keplerianState[0] = a;
     keplerianState[1] = cometaryState[0];
+    if (keplerianState[1] < 0) {
+        throw std::runtime_error(
+            "cometary_to_keplerian: e cannot be negative");
+    }
     keplerianState[2] = cometaryState[5];
     keplerianState[3] = cometaryState[3];
     keplerianState[4] = cometaryState[4];
     keplerianState[5] = nu;
+    // check that there are no NaNs
+    for (size_t i = 0; i < 6; i++) {
+        if (std::isnan(keplerianState[i])) {
+            std::cout << "cometary_to_keplerian: cometaryState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << cometaryState[j] << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "cometary_to_keplerian: keplerianState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << keplerianState[j] << " ";
+            }
+            std::cout << std::endl;
+            throw std::runtime_error(
+                "cometary_to_keplerian: NaN in keplerian state");
+        }
+    }
 }
 
 void keplerian_to_cometary(const real &epochMjD,
@@ -85,6 +106,10 @@ void keplerian_to_cometary(const real &epochMjD,
                            std::vector<real> &cometaryState, const real GM) {
     real a = keplerianState[0];
     real e = keplerianState[1];
+    if (e < 0) {
+        throw std::runtime_error(
+            "keplerian_to_cometary: e cannot be negative");
+    }
     real nu = keplerianState[5];
     real E = 2 * atan2(tan(nu / 2) * sqrt(1 - e), sqrt(1 + e));
     real M = E - e * sin(E);
@@ -97,12 +122,33 @@ void keplerian_to_cometary(const real &epochMjD,
     cometaryState[3] = keplerianState[3];
     cometaryState[4] = keplerianState[4];
     cometaryState[5] = keplerianState[2];
+    // check that there are no NaNs
+    for (size_t i = 0; i < 6; i++) {
+        if (std::isnan(cometaryState[i])) {
+            std::cout << "keplerian_to_cometary: keplerianState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << keplerianState[j] << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "keplerian_to_cometary: cometaryState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << cometaryState[j] << " ";
+            }
+            std::cout << std::endl;
+            throw std::runtime_error(
+                "keplerian_to_cometary: NaN in cometary state");
+        }
+    }
 }
 
 void keplerian_to_cartesian(const std::vector<real> &keplerianState,
                             std::vector<real> &cartesianState, const real GM) {
     real a = keplerianState[0];
     real e = keplerianState[1];
+    if (e < 0) {
+        throw std::runtime_error(
+            "keplerian_to_cartesian: e cannot be negative");
+    }
     real i = keplerianState[2];
     real Omega = keplerianState[3];
     real omega = keplerianState[4];
@@ -151,6 +197,23 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState,
     cartesianState[3] = v_final[0];
     cartesianState[4] = v_final[1];
     cartesianState[5] = v_final[2];
+    // check that there are no NaNs
+    for (size_t i = 0; i < 6; i++) {
+        if (std::isnan(cartesianState[i])) {
+            std::cout << "keplerian_to_cartesian: keplerianState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << keplerianState[j] << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "keplerian_to_cartesian: cartesianState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << cartesianState[j] << " ";
+            }
+            std::cout << std::endl;
+            throw std::runtime_error(
+                "keplerian_to_cartesian: NaN in cartesian state");
+        }
+    }
 }
 
 void cartesian_to_keplerian(const std::vector<real> &cartesianState,
@@ -217,12 +280,33 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState,
     keplerianState[3] = Omega;
     keplerianState[4] = omega;
     keplerianState[5] = nu;
+    // check that there are no NaNs
+    for (size_t i = 0; i < 6; i++) {
+        if (std::isnan(keplerianState[i])) {
+            std::cout << "cartesian_to_keplerian: cartesianState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << cartesianState[j] << " ";
+            }
+            std::cout << std::endl;
+            std::cout << "cartesian_to_keplerian: keplerianState: ";
+            for (size_t j = 0; j < 6; j++) {
+                std::cout << keplerianState[j] << " ";
+            }
+            std::cout << std::endl;
+            throw std::runtime_error(
+                "cartesian_to_keplerian: NaN in keplerian state");
+        }
+    }
 }
 
 void cometary_to_cartesian(const real &epochMjd,
                            const std::vector<real> &cometaryState,
                            std::vector<real> &cartesianState, const real GM) {
     std::vector<real> keplerianState(6);
+    if (cometaryState[0] < 0) {
+        throw std::runtime_error(
+            "cometary_to_cartesian: e cannot be negative");
+    }
     cometary_to_keplerian(epochMjd, cometaryState, keplerianState, GM);
     keplerian_to_cartesian(keplerianState, cartesianState, GM);
 }
