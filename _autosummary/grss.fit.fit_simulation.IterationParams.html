@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_simulation.IterationParams &#8212; GRSS 3.3.1 documentation</title>
+    <title>grss.fit.fit_simulation.IterationParams &#8212; GRSS 3.4.0 documentation</title>
   
   
   
@@ -149,7 +149,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.3.1 documentation</p>
+    <p class="title logo__title">GRSS v3.4.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -482,25 +482,25 @@ document.write(`
 <h1>grss.fit.fit_simulation.IterationParams<a class="headerlink" href="#grss-fit-fit-simulation-iterationparams" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">IterationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_weight_rej</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rejection_flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">IterationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rejection_flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for storing the iteration parameters for a single iteration of the
 orbit determination process. It is also used for plotting the residuals
 and chi-squared values for each iteration.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.IterationParams.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_weight_rej</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rejection_flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residuals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rejection_flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.IterationParams.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor for the IterationParams class</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>iter_number</strong> (<em>int</em>) – Iteration number</p></li>
+<li><p><strong>residuals</strong> (<em>array</em>) – Residuals at the current iteration</p></li>
+<li><p><strong>rms_u</strong> (<em>float</em>) – Unweighted RMS of the residuals.</p></li>
+<li><p><strong>rms_w</strong> (<em>float</em>) – Weighted RMS of the residuals.</p></li>
 <li><p><strong>x_nom</strong> (<em>dict</em>) – Dictionary of nominal state vector values at the current iteration</p></li>
 <li><p><strong>covariance</strong> (<em>array</em>) – Covariance matrix at the current iteration</p></li>
-<li><p><strong>residuals</strong> (<em>array</em>) – Residuals at the current iteration</p></li>
 <li><p><strong>obs_array</strong> (<em>array</em>) – Observation array for the orbit fit</p></li>
-<li><p><strong>obs_weight_rej</strong> (<em>array</em>) – Observation weight matrix after outlier rejection</p></li>
-<li><p><strong>observer_codes</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array</p></li>
 <li><p><strong>rejection_flags</strong> (<em>list</em>) – List of rejection flags for each observation in obs_array</p></li>
 </ul>
 </dd>
@@ -510,7 +510,7 @@ and chi-squared values for each iteration.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.__init__" title="grss.fit.fit_simulation.IterationParams.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(iter_number, x_nom, covariance, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.__init__" title="grss.fit.fit_simulation.IterationParams.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(iter_number, residuals, rms_u, ...)</p></td>
 <td><p>Constructor for the IterationParams class</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.IterationParams.plot_iteration_summary" title="grss.fit.fit_simulation.IterationParams.plot_iteration_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_iteration_summary</span></code></a>([show_logarithmic, ...])</p></td>
