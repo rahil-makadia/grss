@@ -1627,7 +1627,8 @@ class FitSimulation:
             atwb += (partials[j:j+size, :].T @ self.obs_weight[j:j+size, j:j+size]
                         @ residuals[j:j+size].reshape((size, 1)))
             j += size
-        cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+        # cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+        cov = np.array(prop.matrix_inverse(atwa))
         delta_x = cov @ atwb
         return delta_x.ravel(), cov
 
