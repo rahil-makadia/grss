@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_optical.get_space_based_observer_code &#8212; GRSS 3.4.1 documentation</title>
+    <title>grss.prop.prop_simulation.matrix_inverse &#8212; GRSS 3.4.1 documentation</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.get_space_based_observer_code';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop.prop_simulation.matrix_inverse';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_radar" href="grss.fit.fit_radar.html" />
-    <link rel="prev" title="grss.fit.fit_optical.get_optical_data" href="grss.fit.fit_optical.get_optical_data.html" />
+    <link rel="next" title="grss.prop.prop_simulation.propSim_parallel_omp" href="grss.prop.prop_simulation.propSim_parallel_omp.html" />
+    <link rel="prev" title="grss.prop.prop_simulation.cometary_to_cartesian" href="grss.prop.prop_simulation.cometary_to_cartesian.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
     <meta name="docbuild:last-update" content="Mar 11, 2024"/>
@@ -170,8 +170,8 @@
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
@@ -181,7 +181,7 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.get_space_based_observer_code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -217,16 +217,16 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_parallel.html">grss.prop.prop_parallel</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_parallel.cluster_ca_or_impacts.html">grss.prop.prop_parallel.cluster_ca_or_impacts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_parallel.parallel_propagate.html">grss.prop.prop_parallel.parallel_propagate</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_simulation.html">grss.prop.prop_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.prop.prop_simulation.html">grss.prop.prop_simulation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.cartesian_to_cometary.html">grss.prop.prop_simulation.cartesian_to_cometary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.cometary_to_cartesian.html">grss.prop.prop_simulation.cometary_to_cartesian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.matrix_inverse.html">grss.prop.prop_simulation.matrix_inverse</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.prop.prop_simulation.matrix_inverse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.propSim_parallel_omp.html">grss.prop.prop_simulation.propSim_parallel_omp</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.BPlaneParameters.html">grss.prop.prop_simulation.BPlaneParameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_simulation.Body.html">grss.prop.prop_simulation.Body</a></li>
@@ -339,7 +339,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_optical.get_space_based_observer_code.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop.prop_simulation.matrix_inverse.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -369,7 +369,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.fit.fit_optical.get_space_based_observer_code.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.prop.prop_simulation.matrix_inverse.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -453,7 +453,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.fit.fit_optical.get_space_based_observer_code</h1>
+    <h1>grss.prop.prop_simulation.matrix_inverse</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -463,7 +463,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_space_based_observer_code"><code class="docutils literal notranslate"><span class="pre">get_space_based_observer_code()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.matrix_inverse"><code class="docutils literal notranslate"><span class="pre">matrix_inverse()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -475,25 +475,24 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="grss-fit-fit-optical-get-space-based-observer-code">
-<h1>grss.fit.fit_optical.get_space_based_observer_code<a class="headerlink" href="#grss-fit-fit-optical-get-space-based-observer-code" title="Permalink to this heading">#</a></h1>
+  <section id="grss-prop-prop-simulation-matrix-inverse">
+<h1>grss.prop.prop_simulation.matrix_inverse<a class="headerlink" href="#grss-prop-prop-simulation-matrix-inverse" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="grss.fit.fit_optical.get_space_based_observer_code">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_space_based_observer_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_time_mjd_tdb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_80</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_space_based_observer_code" title="Permalink to this definition">#</a></dt>
-<dd><p>Get the full observer code for a space-based observation from the Minor Planet Center.</p>
+<dt class="sig sig-object py" id="grss.prop.prop_simulation.matrix_inverse">
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_simulation.</span></span><span class="sig-name descname"><span class="pre">matrix_inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-16</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.prop.prop_simulation.matrix_inverse" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the inverse of a matrix using LU decomposition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obs_time_mjd_tdb</strong> (<em>float</em>) – Observation time (MJD TDB)</p></li>
-<li><p><strong>first_80</strong> (<em>str</em>) – First 80 characters of the space-based observation</p></li>
-<li><p><strong>last_80</strong> (<em>str</em>) – Last 80 characters of the space-based observation</p></li>
+<li><p><strong>mat</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – Matrix to invert.</p></li>
+<li><p><strong>tol</strong> (<em>real</em><em>, </em><em>optional</em>) – Tolerance for the matrix inversion, by default 1.0e-16L.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>full_obs_code</strong> – Full observer code for the space-based observation</p>
+<dd class="field-even"><p><strong>invMat</strong> – Inverse of the matrix.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p>list of list of real</p>
 </dd>
 </dl>
 </dd></dl>
@@ -512,20 +511,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit.fit_optical.get_optical_data.html"
+       href="grss.prop.prop_simulation.cometary_to_cartesian.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit.fit_optical.get_optical_data</p>
+        <p class="prev-next-title">grss.prop.prop_simulation.cometary_to_cartesian</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_radar.html"
+       href="grss.prop.prop_simulation.propSim_parallel_omp.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_radar</p>
+        <p class="prev-next-title">grss.prop.prop_simulation.propSim_parallel_omp</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -544,7 +543,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_space_based_observer_code"><code class="docutils literal notranslate"><span class="pre">get_space_based_observer_code()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.prop_simulation.matrix_inverse"><code class="docutils literal notranslate"><span class="pre">matrix_inverse()</span></code></a></li>
 </ul>
   </nav></div>
 
