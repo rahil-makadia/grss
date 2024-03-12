@@ -337,6 +337,7 @@ PYBIND11_MODULE(prop_simulation, m) {
         cartesianState : list of real
             Cartesian state vector.
         )mydelimiter");
+
     m.def(
         "cartesian_to_cometary",
         [](real epochMjd, std::vector<real> cartesianState, real GM) {
@@ -361,6 +362,30 @@ PYBIND11_MODULE(prop_simulation, m) {
         -------
         cometaryState : list of real
             Cometary state vector.
+        )mydelimiter");
+
+    m.def(
+        "matrix_inverse",
+        [](std::vector<std::vector<real>> mat, const real &tol) {
+            std::vector<std::vector<real>> invMat(
+                mat.size(), std::vector<real>(mat[0].size()));
+            mat_inv(mat, invMat, tol);
+            return invMat;
+        },
+        py::arg("mat"), py::arg("tol") = 1.0e-16L, R"mydelimiter(
+        Calculate the inverse of a matrix using LU decomposition.
+
+        Parameters
+        ----------
+        mat : list of list of real
+            Matrix to invert.
+        tol : real, optional
+            Tolerance for the matrix inversion, by default 1.0e-16L.
+
+        Returns
+        -------
+        invMat : list of list of real
+            Inverse of the matrix.
         )mydelimiter");
 
     // from simulation.h
