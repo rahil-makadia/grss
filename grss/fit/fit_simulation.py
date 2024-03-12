@@ -17,7 +17,7 @@ class IterationParams:
     orbit determination process. It is also used for plotting the residuals
     and chi-squared values for each iteration.
     """
-    def __init__(self, iter_number, residuals, rms_u, rms_w,
+    def __init__(self, iter_number, residuals, rms_u, rms_w, residual_chi_squared,
                     x_nom, covariance, obs_array, rejection_flags):
         """
         Constructor for the IterationParams class
@@ -32,6 +32,8 @@ class IterationParams:
             Unweighted RMS of the residuals.
         rms_w : float
             Weighted RMS of the residuals.
+        residual_chi_squared : list
+            List of the residual chi-squared values for each observation.
         x_nom : dict
             Dictionary of nominal state vector values at the current iteration
         covariance : array
@@ -59,6 +61,7 @@ class IterationParams:
         self.sigmas = obs_array[:, 3:5]
         self.unweighted_rms = rms_u
         self.weighted_rms = rms_w
+        self.residual_chi_squared = residual_chi_squared
         self._calculate_chis()
         self._assemble_info()
         return None
@@ -1482,15 +1485,12 @@ class FitSimulation:
 
         Returns
         -------
-        partials : array
-            The partials of the observations with respect to the
-            initial nominal state after outlier rejection.
-        weights : array
-            The weights of the observations after outlier rejection.
-        residuals : array
-            The residuals of the observations after outlier rejection.
-        residual_chi_squared : array
-            The chi squared values of the residuals after outlier rejection.
+        rms_u : float
+            Unweighted RMS of the residuals.
+        rms_w : float
+            Weighted RMS of the residuals.
+        residual_chi_squared : list
+            List of the residual chi-squared values for each observation.
 
         Raises
         ------
@@ -1520,23 +1520,22 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
             resid = residuals[j:j+size].reshape((1, size))
             # calculate chi-squared for each residual
-            if start_rejecting:
-                obs_cov = self.obs_cov[j:j+size, j:j+size]
-                obs_partials = partials[j:j+size, :]
-                if self.rejection_flag[i]:
-                    resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
-                else:
-                    resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
-                residual_chi_squared[i] = (resid @ np.linalg.inv(resid_cov) @ resid.T)[0,0]
-                # outlier rejection, only reject RA/Dec measurements
-                # but not Gaia/radar measurements
-                if size == 2 and isinstance(self.observer_codes[i], str):
-                    if residual_chi_squared[i] > chi_reject**2:
-                        self.rejection_flag[i] = True
-                        self.num_rejected += 1
-                    elif self.rejection_flag[i] and residual_chi_squared[i] < chi_recover**2:
-                        self.rejection_flag[i] = False
-                        self.num_rejected -= 1
+            obs_cov = self.obs_cov[j:j+size, j:j+size]
+            obs_partials = partials[j:j+size, :]
+            if self.rejection_flag[i]:
+                resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
+            else:
+                resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
+            residual_chi_squared[i] = (resid @ np.linalg.inv(resid_cov) @ resid.T)[0,0]
+            # outlier rejection, only reject RA/Dec measurements
+            # but not Gaia/radar measurements
+            if start_rejecting and size == 2 and isinstance(self.observer_codes[i], str):
+                if residual_chi_squared[i] > chi_reject**2:
+                    self.rejection_flag[i] = True
+                    self.num_rejected += 1
+                elif self.rejection_flag[i] and residual_chi_squared[i] < chi_recover**2:
+                    self.rejection_flag[i] = False
+                    self.num_rejected -= 1
             if not self.rejection_flag[i]:
                 rms_u += (resid @ resid.T)[0,0]
                 rms_w += (resid @ self.obs_weight[j:j+size, j:j+size] @ resid.T)[0,0]
@@ -1547,9 +1546,9 @@ class FitSimulation:
                     "and chi_recover values, or turning off outlier rejection altogether.")
         rms_u = np.sqrt(rms_u/self.n_obs)
         rms_w = np.sqrt(rms_w/self.n_obs)
-        return rms_u, rms_w
+        return rms_u, rms_w, residual_chi_squared
 
-    def _add_iteration(self, iter_number, residuals, rms_u, rms_w):
+    def _add_iteration(self, iter_number, residuals, rms_u, rms_w, residual_chi_squared):
         """
         Adds an iteration to the list of iterations in the FitSimulation object.
 
@@ -1563,14 +1562,18 @@ class FitSimulation:
             Unweighted RMS of the residuals.
         rms_w : float
             Weighted RMS of the residuals.
+        residual_chi_squared : list
+            List of the residual chi-squared values for each observation.
 
         Returns
         -------
         None : NoneType
             None
         """
-        self.iters.append(IterationParams(iter_number, residuals, rms_u, rms_w, self.x_nom,
-                                            self.covariance, self.obs_array, self.rejection_flag))
+        self.iters.append(IterationParams(iter_number, residuals, rms_u, rms_w,
+                                            residual_chi_squared, self.x_nom,
+                                            self.covariance, self.obs_array,
+                                            self.rejection_flag))
         return None
 
     def _check_convergence(self):
@@ -1583,7 +1586,7 @@ class FitSimulation:
             None
         """
         if self.n_iter > 1:
-            del_rms_convergence = 1e-3
+            del_rms_convergence = 1e-4
             curr_rms = self.iters[-1].weighted_rms
             prev_rms = self.iters[-2].weighted_rms
             del_rms = abs(prev_rms - curr_rms)/prev_rms
@@ -1627,8 +1630,11 @@ class FitSimulation:
             atwb += (partials[j:j+size, :].T @ self.obs_weight[j:j+size, j:j+size]
                         @ residuals[j:j+size].reshape((size, 1)))
             j += size
-        # cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
-        cov = np.array(prop.matrix_inverse(atwa))
+        # use pseudo-inverse if the data arc is less than 7 days
+        if self.obs_array[-1,0]-self.obs_array[0,0] < 7.0:
+            cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+        else:
+            cov = np.array(prop.matrix_inverse(atwa))
         delta_x = cov @ atwb
         return delta_x.ravel(), cov
 
@@ -1656,11 +1662,11 @@ class FitSimulation:
             residuals, partials = self._get_residuals_and_partials()
             clean_residuals = self._flatten_and_clean(residuals)
             # calculate rms and reject outliers here if desired
-            rms_u, rms_w = self._get_rms_and_reject_outliers(partials, clean_residuals,
-                                                                start_rejecting)
+            rms_u, rms_w, res_chi_sq = self._get_rms_and_reject_outliers(partials, clean_residuals,
+                                                                            start_rejecting)
             if i == 0:
                 # add prefit iteration
-                self._add_iteration(0, residuals, rms_u, rms_w)
+                self._add_iteration(0, residuals, rms_u, rms_w, res_chi_sq)
             # get initial guess
             curr_state = np.array(list(self.x_nom.values()))
             # get state correction
@@ -1675,7 +1681,7 @@ class FitSimulation:
             # get new covariance
             self.covariance = cov
             # add iteration
-            self._add_iteration(i+1, residuals, rms_u, rms_w)
+            self._add_iteration(i+1, residuals, rms_u, rms_w, res_chi_sq)
             if verbose:
                 print(f"{self.iters[-1].iter_number}\t\t\t",
                         f"{self.iters[-1].unweighted_rms:.3f}\t\t\t",
