@@ -3,7 +3,7 @@
 
 #include "force.h"
 
-inline void comp_sum(real num, real *sum, real *compCoeff) {
+static inline void comp_sum(real num, real *sum, real *compCoeff) {
     const real y = num - *compCoeff;
     const real t = *sum + y;
     *compCoeff = (t - *sum) - y;
