@@ -217,6 +217,54 @@ static real root7(real num){
     return fac*root;
 }
 
+// static real get_adaptive_timestep_old(propSimulation *propSim, const real &dt,
+//                                       const real &accIntegArr7Max,
+//                                       const std::vector<std::vector<real>> &b) {
+//     real b6Max;
+//     vabs_max(b[6], b6Max);
+//     real relError = b6Max / accIntegArr7Max;
+//     real dtReq;
+//     if (std::isnormal(relError)) {
+//         dtReq = root7(propSim->integParams.tolInteg/relError)*dt;
+//     } else {
+//         dtReq = dt/propSim->integParams.dtChangeFactor;
+//     }
+//     return dtReq;
+// }
+
+static real get_adaptive_timestep(propSimulation *propSim, const real &dt,
+                                  const std::vector<real> &accInteg0,
+                                  const std::vector<std::vector<real>> &b) {
+    real minTimescale2 = 1e300L;
+    size_t startb = 0;
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++){
+        real y2 = 0.0L;
+        real y3 = 0.0L;
+        real y4 = 0.0L;
+        for (size_t j = 0; j < 3; j++){
+            const size_t k = startb+j;
+            real temp = accInteg0[k] + b[0][k] + b[1][k] + b[2][k] + b[3][k] + b[4][k] + b[5][k] + b[6][k];
+            y2 += temp*temp;
+            temp = b[0][k] + 2.0L*b[1][k] + 3.0L*b[2][k] + 4.0L*b[3][k] + 5.0L*b[4][k] + 6.0L*b[5][k] + 7.0L*b[6][k];
+            y3 += temp*temp;
+            temp = 2.0L*b[1][k] + 6.0L*b[2][k] + 12.0L*b[3][k] + 20.0L*b[4][k] + 30.0L*b[5][k] + 42.0L*b[6][k];
+            y4 += temp*temp;
+            real timescale2 = 2.0L*y2/(y3+sqrt(y4*y2));
+            if (std::isnormal(timescale2) && timescale2 < minTimescale2){
+                minTimescale2 = timescale2;
+            }
+        }
+    }
+    real dtReq;
+    if (std::isnormal(minTimescale2)){
+        // Numerical factor below is from REBOUND
+        dtReq = sqrt(minTimescale2) * root7(propSim->integParams.tolInteg*5040.0) * dt;
+    }else{
+        dtReq = dt/propSim->integParams.dtChangeFactor;
+    }
+    return dtReq;
+}
+
 void gr15(propSimulation *propSim) {
     if (!std::isfinite(propSim->t)) {
         throw std::runtime_error("t is not finite");
@@ -249,8 +297,7 @@ void gr15(propSimulation *propSim) {
     real *b6Tilde = new real[dim];
     memset(b6Tilde, 0.0, dim * sizeof(real));
     real b6TildeMax, accIntegArr7Max;
-    real b6Max, accIntegNextMax;
-    real relError, dtReq;
+    real dtReq;
     real tNextEvent = propSim->integParams.tf;
     static size_t nextEventIdx = 0;
     if (t == propSim->integParams.t0) {
@@ -309,15 +356,9 @@ void gr15(propSimulation *propSim) {
                 PCerr = b6TildeMax / accIntegArr7Max;
                 bOld = b;
             }
-            vabs_max(b[6], b6Max);
-            vabs_max(accIntegArr[7], accIntegNextMax);
-            relError = b6Max / accIntegNextMax;
             if (propSim->integParams.adaptiveTimestep) {
-                if (std::isnormal(relError)) {
-                    dtReq = root7(propSim->integParams.tolInteg/relError)*dt;
-                } else {
-                    dtReq = dt/propSim->integParams.dtChangeFactor;
-                }
+                // dtReq = get_adaptive_timestep_old(propSim, dt, accIntegArr7Max, b);
+                dtReq = get_adaptive_timestep(propSim, dt, accInteg0, b);
             } else {
                 dtReq = dt;
             }
@@ -325,11 +366,10 @@ void gr15(propSimulation *propSim) {
                 dtReq = copysign(propSim->integParams.dtMin, dtReq);
             }
             if (fabs(dtReq/dt) < propSim->integParams.dtChangeFactor) {
-                if (propSim->integParams.timestepCounter > 1) {
-                    refine_b(b, e, dtReq / dt, dim);
-                }
+                // std::cout << "Restarting next while loop at time t = " << t
+                //           << " with dt = " << dtReq << " instead of " << dt
+                //           << std::endl;
                 dt = dtReq;
-                std::cout << "Restarting next while loop at time t = " << t << std::endl;
                 continue;
             }
             // accept step
