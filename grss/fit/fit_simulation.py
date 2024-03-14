@@ -1,5 +1,5 @@
 """Simulation classes for the Python GRSS orbit determination code"""
-# pylint: disable=no-name-in-module, too-many-lines, useless-return
+# pylint: disable=no-name-in-module, no-member, too-many-lines, useless-return
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.time import Time
@@ -1528,8 +1528,7 @@ class FitSimulation:
                 resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
             residual_chi_squared[i] = (resid @ np.linalg.inv(resid_cov) @ resid.T)[0,0]
             # outlier rejection, only reject RA/Dec measurements
-            # but not Gaia/radar measurements
-            if start_rejecting and size == 2 and isinstance(self.observer_codes[i], str):
+            if start_rejecting and size == 2:
                 if residual_chi_squared[i] > chi_reject**2:
                     self.rejection_flag[i] = True
                     self.num_rejected += 1
