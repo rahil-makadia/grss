@@ -257,7 +257,8 @@ static real get_adaptive_timestep(propSimulation *propSim, const real &dt,
     }
     real dtReq;
     if (std::isnormal(minTimescale2)){
-        // Numerical factor below is from REBOUND
+        // Numerical factor below is for relating the epsilon in original IAS15 to the 
+        // eta in the new IAS15 stepping from https://arxiv.org/pdf/2401.02849.pdf
         dtReq = sqrt(minTimescale2) * root7(propSim->integParams.tolInteg*5040.0) * dt;
     }else{
         dtReq = dt/propSim->integParams.dtChangeFactor;

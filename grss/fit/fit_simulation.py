@@ -1,5 +1,5 @@
 """Simulation classes for the Python GRSS orbit determination code"""
-# pylint: disable=no-name-in-module, too-many-lines, useless-return
+# pylint: disable=no-name-in-module, no-member, too-many-lines, useless-return
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.time import Time
@@ -1345,15 +1345,17 @@ class FitSimulation:
             The propagated propSimulation object for the past.
         prop_sim_future : prop.propSimulation object
             The propagated propSimulation object for the future.
-
-        Raises
-        ------
-        NotImplementedError
-            Because analytic partials are not yet implemented.
         """
         partials = np.zeros((self.n_obs, self.n_fit))
         len_past_idx = len(self.past_obs_idx) if self.past_obs_exist else 0
         partials_idx = 0
+        past_optical_partials = np.array(prop_sim_past.opticalPartials)
+        past_radar_partials = np.array(prop_sim_past.radarPartials)
+        past_light_time = np.array(prop_sim_past.lightTimeEval)
+        future_optical_partials = np.array(prop_sim_future.opticalPartials)
+        future_radar_partials = np.array(prop_sim_future.radarPartials)
+        future_light_time = np.array(prop_sim_future.lightTimeEval)
+        t_eval_tdb = Time(self.obs_array[:, 0], format='mjd', scale='utc').tdb.mjd
         for i in range(self.obs_array.shape[0]):
             obs_info_len = len(self.observer_info[i])
             if obs_info_len in {4, 7}:
@@ -1368,17 +1370,23 @@ class FitSimulation:
             if self.past_obs_exist and i < len_past_idx:
                 prop_sim = prop_sim_past
                 sim_idx = i
+                light_time = past_light_time
+                optical_partials = past_optical_partials
+                radar_partials = past_radar_partials
             else:
                 prop_sim = prop_sim_future
                 sim_idx = i-len_past_idx
-            t_eval = Time(self.obs_array[i, 0], format='mjd', scale='utc').tdb.mjd
-            t_eval -= prop_sim.lightTimeEval[sim_idx][0]
+                light_time = future_light_time
+                optical_partials = future_optical_partials
+                radar_partials = future_radar_partials
+            t_eval = t_eval_tdb[i]
+            t_eval -= light_time[sim_idx, 0]
             stm = self._get_analytic_stm(t_eval, prop_sim)
             if is_optical:
-                part[0, :6] = prop_sim.opticalPartials[sim_idx][:6]
-                part[1, :6] = prop_sim.opticalPartials[sim_idx][6:12]
+                part[0, :6] = optical_partials[sim_idx, :6]
+                part[1, :6] = optical_partials[sim_idx, 6:12]
             else:
-                part[0, :6] = prop_sim.radarPartials[sim_idx][:6]
+                part[0, :6] = radar_partials[sim_idx, :6]
             partial = part @ stm
             partials[partials_idx:partials_idx+size, :] = partial
             partials_idx += size
@@ -1495,6 +1503,8 @@ class FitSimulation:
         Raises
         ------
         ValueError
+            If chi_recover is greater than chi_reject.
+        ValueError
             If the observer information is not well-defined.
         """
         chi_reject = self.reject_criteria[0]
@@ -1528,8 +1538,7 @@ class FitSimulation:
                 resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
             residual_chi_squared[i] = (resid @ np.linalg.inv(resid_cov) @ resid.T)[0,0]
             # outlier rejection, only reject RA/Dec measurements
-            # but not Gaia/radar measurements
-            if start_rejecting and size == 2 and isinstance(self.observer_codes[i], str):
+            if start_rejecting and size == 2:
                 if residual_chi_squared[i] > chi_reject**2:
                     self.rejection_flag[i] = True
                     self.num_rejected += 1

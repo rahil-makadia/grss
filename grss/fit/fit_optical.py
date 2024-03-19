@@ -324,9 +324,9 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
         obs_array[i, 0] = obs_time.utc.mjd
         obs_array[i, 1] = data['ra']*3600
         obs_array[i, 2] = data['dec']*3600
-        ra_sig_sys = data['ra_error_systematic']/cosdec/1000*transit_count
+        ra_sig_sys = data['ra_error_systematic']/cosdec/1000
         ra_sig_rand = data['ra_error_random']/cosdec/1000
-        dec_sig_sys = data['dec_error_systematic']/1000*transit_count
+        dec_sig_sys = data['dec_error_systematic']/1000
         dec_sig_rand = data['dec_error_random']/1000
         corr_sys = data['ra_dec_correlation_systematic']
         corr_rand = data['ra_dec_correlation_random']
@@ -334,7 +334,7 @@ def get_gaia_optical_obs_array(body_id, de_kernel_path, t_min_tdb=None,
                             [corr_sys*ra_sig_sys*dec_sig_sys, dec_sig_sys**2]])
         cov_rand = np.array([[ra_sig_rand**2, corr_rand*ra_sig_rand*dec_sig_rand],
                             [corr_rand*ra_sig_rand*dec_sig_rand, dec_sig_rand**2]])
-        cov = cov_sys + cov_rand
+        cov = transit_count*cov_sys + cov_rand
         ra_sig = cov[0,0]**0.5
         dec_sig = cov[1,1]**0.5
         corr = cov[0,1]/ra_sig/dec_sig

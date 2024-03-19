@@ -90,19 +90,16 @@ struct InterpolationParameters {
     std::vector<std::vector<real>> accIntegStack;
 };
 
-struct ForceParameters {
-    std::vector<real> masses;
-    std::vector<real> radii;
-    std::vector<int> spiceIdList;
-    std::vector<NongravParamaters> ngParamsList;
-    std::vector<bool> isPPNList;
-    std::vector<bool> isJ2List;
-    std::vector<real> J2List;
-    std::vector<real> poleRAList;
-    std::vector<real> poleDecList;
-    std::vector<bool> isNongravList;
-    std::vector<bool> isMajorList;
-    std::vector<bool> isThrustingList;
+struct STMParameters {
+    real *B = nullptr;
+    real *Bdot = nullptr;
+    real *C = nullptr;
+    real *Cdot = nullptr;
+    real *D = nullptr;
+    real *Ddot = nullptr;
+    real *dfdpos = nullptr;
+    real *dfdvel = nullptr;
+    real *dfdpar = nullptr;
 };
 
 struct BPlaneParameters {

@@ -55,134 +55,94 @@ void bcd_and_dot(const std::vector<real> &stm, real *B, real *Bdot, real *C,
     }
 }
 
-void bcd_2dot(const real *B, const real *Bdot, const real *C, const real *Cdot,
-              const real *D, const real *Ddot, const real *dfdpos,
-              const real *dfdvel, const real *dfdpar, size_t numParams,
+void bcd_2dot(STMParameters &stmParams, size_t numParams,
               size_t stmStarti, std::vector<real> &accInteg) {
     real *termB1 = new real[9];
     real *termB2 = new real[9];
     real *B2dot = new real[9];
 
-    mat3_mat3_mul(dfdpos, B, termB1);
-    mat3_mat3_mul(dfdvel, Bdot, termB2);
+    mat3_mat3_mul(stmParams.dfdpos, stmParams.B, termB1);
+    mat3_mat3_mul(stmParams.dfdvel, stmParams.Bdot, termB2);
     mat3_mat3_add(termB1, termB2, B2dot);
 
     real *termC1 = new real[9];
     real *termC2 = new real[9];
     real *C2dot = new real[9];
 
-    mat3_mat3_mul(dfdpos, C, termC1);
-    mat3_mat3_mul(dfdvel, Cdot, termC2);
+    mat3_mat3_mul(stmParams.dfdpos, stmParams.C, termC1);
+    mat3_mat3_mul(stmParams.dfdvel, stmParams.Cdot, termC2);
     mat3_mat3_add(termC1, termC2, C2dot);
 
-    accInteg[stmStarti + 0] += B2dot[0];
-    accInteg[stmStarti + 1] += B2dot[1];
-    accInteg[stmStarti + 2] += B2dot[2];
-    accInteg[stmStarti + 3] += C2dot[0];
-    accInteg[stmStarti + 4] += C2dot[1];
-    accInteg[stmStarti + 5] += C2dot[2];
-    accInteg[stmStarti + 6] += B2dot[3];
-    accInteg[stmStarti + 7] += B2dot[4];
-    accInteg[stmStarti + 8] += B2dot[5];
-    accInteg[stmStarti + 9] += C2dot[3];
-    accInteg[stmStarti + 10] += C2dot[4];
-    accInteg[stmStarti + 11] += C2dot[5];
-    accInteg[stmStarti + 12] += B2dot[6];
-    accInteg[stmStarti + 13] += B2dot[7];
-    accInteg[stmStarti + 14] += B2dot[8];
-    accInteg[stmStarti + 15] += C2dot[6];
-    accInteg[stmStarti + 16] += C2dot[7];
-    accInteg[stmStarti + 17] += C2dot[8];
+    accInteg[stmStarti + 0] = B2dot[0];
+    accInteg[stmStarti + 1] = B2dot[1];
+    accInteg[stmStarti + 2] = B2dot[2];
+    accInteg[stmStarti + 3] = C2dot[0];
+    accInteg[stmStarti + 4] = C2dot[1];
+    accInteg[stmStarti + 5] = C2dot[2];
+    accInteg[stmStarti + 6] = B2dot[3];
+    accInteg[stmStarti + 7] = B2dot[4];
+    accInteg[stmStarti + 8] = B2dot[5];
+    accInteg[stmStarti + 9] = C2dot[3];
+    accInteg[stmStarti + 10] = C2dot[4];
+    accInteg[stmStarti + 11] = C2dot[5];
+    accInteg[stmStarti + 12] = B2dot[6];
+    accInteg[stmStarti + 13] = B2dot[7];
+    accInteg[stmStarti + 14] = B2dot[8];
+    accInteg[stmStarti + 15] = C2dot[6];
+    accInteg[stmStarti + 16] = C2dot[7];
+    accInteg[stmStarti + 17] = C2dot[8];
 
     if (numParams > 0) {
         real *D2dot = new real[3 * numParams];
         for (size_t param = 0; param < numParams; param++) {
-            D2dot[3 * param + 0] = dfdpos[0] * D[3 * param + 0] +
-                dfdpos[1] * D[3 * param + 1] + dfdpos[2] * D[3 * param + 2] +
-                dfdvel[0] * Ddot[3 * param + 0] +
-                dfdvel[1] * Ddot[3 * param + 1] +
-                dfdvel[2] * Ddot[3 * param + 2] + dfdpar[3 * param + 0];
-            D2dot[3 * param + 1] = dfdpos[3] * D[3 * param + 0] +
-                dfdpos[4] * D[3 * param + 1] + dfdpos[5] * D[3 * param + 2] +
-                dfdvel[3] * Ddot[3 * param + 0] +
-                dfdvel[4] * Ddot[3 * param + 1] +
-                dfdvel[5] * Ddot[3 * param + 2] + dfdpar[3 * param + 1];
-            D2dot[3 * param + 2] = dfdpos[6] * D[3 * param + 0] +
-                dfdpos[7] * D[3 * param + 1] + dfdpos[8] * D[3 * param + 2] +
-                dfdvel[6] * Ddot[3 * param + 0] +
-                dfdvel[7] * Ddot[3 * param + 1] +
-                dfdvel[8] * Ddot[3 * param + 2] + dfdpar[3 * param + 2];
-            accInteg[stmStarti + 18 + 3 * param + 0] += D2dot[3 * param + 0];
-            accInteg[stmStarti + 18 + 3 * param + 1] += D2dot[3 * param + 1];
-            accInteg[stmStarti + 18 + 3 * param + 2] += D2dot[3 * param + 2];
+            D2dot[3 * param + 0] = stmParams.dfdpos[0] * stmParams.D[3 * param + 0] +
+                stmParams.dfdpos[1] * stmParams.D[3 * param + 1] + 
+                stmParams.dfdpos[2] * stmParams.D[3 * param + 2] +
+                stmParams.dfdvel[0] * stmParams.Ddot[3 * param + 0] +
+                stmParams.dfdvel[1] * stmParams.Ddot[3 * param + 1] +
+                stmParams.dfdvel[2] * stmParams.Ddot[3 * param + 2] + 
+                stmParams.dfdpar[3 * param + 0];
+            D2dot[3 * param + 1] = stmParams.dfdpos[3] * stmParams.D[3 * param + 0] +
+                stmParams.dfdpos[4] * stmParams.D[3 * param + 1] + 
+                stmParams.dfdpos[5] * stmParams.D[3 * param + 2] +
+                stmParams.dfdvel[3] * stmParams.Ddot[3 * param + 0] +
+                stmParams.dfdvel[4] * stmParams.Ddot[3 * param + 1] +
+                stmParams.dfdvel[5] * stmParams.Ddot[3 * param + 2] + 
+                stmParams.dfdpar[3 * param + 1];
+            D2dot[3 * param + 2] = stmParams.dfdpos[6] * stmParams.D[3 * param + 0] +
+                stmParams.dfdpos[7] * stmParams.D[3 * param + 1] + 
+                stmParams.dfdpos[8] * stmParams.D[3 * param + 2] +
+                stmParams.dfdvel[6] * stmParams.Ddot[3 * param + 0] +
+                stmParams.dfdvel[7] * stmParams.Ddot[3 * param + 1] +
+                stmParams.dfdvel[8] * stmParams.Ddot[3 * param + 2] + 
+                stmParams.dfdpar[3 * param + 2];
+            accInteg[stmStarti + 18 + 3 * param + 0] = D2dot[3 * param + 0];
+            accInteg[stmStarti + 18 + 3 * param + 1] = D2dot[3 * param + 1];
+            accInteg[stmStarti + 18 + 3 * param + 2] = D2dot[3 * param + 2];
         }
     }
 }
 
-void stm_newton(const IntegBody &bodyi, const real &gm, const real &dx,
-                const real &dy, const real &dz, const size_t &stmStarti,
-                std::vector<real> &accInteg) {
-    real *dfdpos = new real[9];
-    real *dfdvel = new real[9];
-    memset(dfdvel, 0, 9 * sizeof(real));
-    const size_t numParams = (bodyi.stm.size() - 36) / 6;
-    real *dfdpar = new real[3 * numParams];
-    memset(dfdpar, 0, 3 * numParams * sizeof(real));
-
-    real *B = new real[9];
-    real *Bdot = new real[9];
-    real *C = new real[9];
-    real *Cdot = new real[9];
-    real *D = new real[3 * numParams];
-    real *Ddot = new real[3 * numParams];
-    bcd_and_dot(bodyi.stm, B, Bdot, C, Cdot, D, Ddot);
-
+void stm_newton(STMParameters &stmParams, const real &gm, const real &dx,
+                const real &dy, const real &dz) {
     const real r = sqrt(dx * dx + dy * dy + dz * dz);
     const real r3 = r * r * r;
     const real r5 = r3 * r * r;
-    dfdpos[0] = gm * (3 * dx * dx / r5 - 1 / r3);
-    dfdpos[1] = gm * (3 * dx * dy / r5);
-    dfdpos[2] = gm * (3 * dx * dz / r5);
-    dfdpos[3] = gm * (3 * dx * dy / r5);
-    dfdpos[4] = gm * (3 * dy * dy / r5 - 1 / r3);
-    dfdpos[5] = gm * (3 * dy * dz / r5);
-    dfdpos[6] = gm * (3 * dx * dz / r5);
-    dfdpos[7] = gm * (3 * dy * dz / r5);
-    dfdpos[8] = gm * (3 * dz * dz / r5 - 1 / r3);
-
-    bcd_2dot(B, Bdot, C, Cdot, D, Ddot, dfdpos, dfdvel, dfdpar, numParams,
-             stmStarti, accInteg);
-
-    delete[] dfdpos;
-    delete[] dfdvel;
-    delete[] dfdpar;
-    delete[] B;
-    delete[] Bdot;
-    delete[] C;
-    delete[] Cdot;
-    delete[] D;
-    delete[] Ddot;
+    stmParams.dfdpos[0] += gm * (3 * dx * dx / r5 - 1 / r3);
+    stmParams.dfdpos[1] += gm * (3 * dx * dy / r5);
+    stmParams.dfdpos[2] += gm * (3 * dx * dz / r5);
+    stmParams.dfdpos[3] += gm * (3 * dx * dy / r5);
+    stmParams.dfdpos[4] += gm * (3 * dy * dy / r5 - 1 / r3);
+    stmParams.dfdpos[5] += gm * (3 * dy * dz / r5);
+    stmParams.dfdpos[6] += gm * (3 * dx * dz / r5);
+    stmParams.dfdpos[7] += gm * (3 * dy * dz / r5);
+    stmParams.dfdpos[8] += gm * (3 * dz * dz / r5 - 1 / r3);
 }
 
-void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &c,
+void stm_ppn_simple(STMParameters &stmParams, const real &gm, const real &c,
                     const real &beta, const real &gamma, const real &dx,
                     const real &dy, const real &dz, const real &dvx,
-                    const real &dvy, const real &dvz, const size_t &stmStarti,
-                    std::vector<real> &accInteg) {
-    real *dfdpos = new real[9];
-    real *dfdvel = new real[9];
-    const size_t numParams = (bodyi.stm.size() - 36) / 6;
-    real *dfdpar = new real[3 * numParams];
-    memset(dfdpar, 0, 3 * numParams * sizeof(real));
-
-    real *B = new real[9];
-    real *Bdot = new real[9];
-    real *C = new real[9];
-    real *Cdot = new real[9];
-    real *D = new real[3 * numParams];
-    real *Ddot = new real[3 * numParams];
-    bcd_and_dot(bodyi.stm, B, Bdot, C, Cdot, D, Ddot);
-
+                    const real &dvy, const real &dvz) {
     const real c2 = c * c;
     const real r = sqrt(dx * dx + dy * dy + dz * dz);
     const real r3 = r * r * r;
@@ -197,61 +157,32 @@ void stm_ppn_simple(const IntegBody &bodyi, const real &gm, const real &c,
     const real dfac2dr = -2 * (beta + gamma) * gm / (r * r);
     const real fac3 = 2 * (1 + gamma) * rDotV;
 
-    dfdpos[0] = dfac1dr*dx/r * (fac2*dx + fac3*dvx) + fac1*(fac2 + dfac2dr*dx*dx/r + 2*(1+gamma)*dvx*dvx);
-    dfdpos[1] = dfac1dr*dy/r * (fac2*dx + fac3*dvx) + fac1*(dfac2dr*dx*dy/r + 2*(1+gamma)*dvx*dvy);
-    dfdpos[2] = dfac1dr*dz/r * (fac2*dx + fac3*dvx) + fac1*(dfac2dr*dx*dz/r + 2*(1+gamma)*dvx*dvz);
-    dfdpos[3] = dfac1dr*dx/r * (fac2*dy + fac3*dvy) + fac1*(dfac2dr*dy*dx/r + 2*(1+gamma)*dvy*dvx);
-    dfdpos[4] = dfac1dr*dy/r * (fac2*dy + fac3*dvy) + fac1*(fac2 + dfac2dr*dy*dy/r + 2*(1+gamma)*dvy*dvy);
-    dfdpos[5] = dfac1dr*dz/r * (fac2*dy + fac3*dvy) + fac1*(dfac2dr*dy*dz/r + 2*(1+gamma)*dvy*dvz);
-    dfdpos[6] = dfac1dr*dx/r * (fac2*dz + fac3*dvz) + fac1*(dfac2dr*dz*dx/r + 2*(1+gamma)*dvz*dvx);
-    dfdpos[7] = dfac1dr*dy/r * (fac2*dz + fac3*dvz) + fac1*(dfac2dr*dz*dy/r + 2*(1+gamma)*dvz*dvy);
-    dfdpos[8] = dfac1dr*dz/r * (fac2*dz + fac3*dvz) + fac1*(fac2 + dfac2dr*dz*dz/r + 2*(1+gamma)*dvz*dvz);
+    stmParams.dfdpos[0] += dfac1dr*dx/r * (fac2*dx + fac3*dvx) + fac1*(fac2 + dfac2dr*dx*dx/r + 2*(1+gamma)*dvx*dvx);
+    stmParams.dfdpos[1] += dfac1dr*dy/r * (fac2*dx + fac3*dvx) + fac1*(dfac2dr*dx*dy/r + 2*(1+gamma)*dvx*dvy);
+    stmParams.dfdpos[2] += dfac1dr*dz/r * (fac2*dx + fac3*dvx) + fac1*(dfac2dr*dx*dz/r + 2*(1+gamma)*dvx*dvz);
+    stmParams.dfdpos[3] += dfac1dr*dx/r * (fac2*dy + fac3*dvy) + fac1*(dfac2dr*dy*dx/r + 2*(1+gamma)*dvy*dvx);
+    stmParams.dfdpos[4] += dfac1dr*dy/r * (fac2*dy + fac3*dvy) + fac1*(fac2 + dfac2dr*dy*dy/r + 2*(1+gamma)*dvy*dvy);
+    stmParams.dfdpos[5] += dfac1dr*dz/r * (fac2*dy + fac3*dvy) + fac1*(dfac2dr*dy*dz/r + 2*(1+gamma)*dvy*dvz);
+    stmParams.dfdpos[6] += dfac1dr*dx/r * (fac2*dz + fac3*dvz) + fac1*(dfac2dr*dz*dx/r + 2*(1+gamma)*dvz*dvx);
+    stmParams.dfdpos[7] += dfac1dr*dy/r * (fac2*dz + fac3*dvz) + fac1*(dfac2dr*dz*dy/r + 2*(1+gamma)*dvz*dvy);
+    stmParams.dfdpos[8] += dfac1dr*dz/r * (fac2*dz + fac3*dvz) + fac1*(fac2 + dfac2dr*dz*dz/r + 2*(1+gamma)*dvz*dvz);
 
-    dfdvel[0] = fac1*(-2*gamma*dvx*dx + fac3 + 2*(1+gamma)*dx*dvx);
-    dfdvel[1] = fac1*(-2*gamma*dvy*dx + 2*(1+gamma)*dy*dvx);
-    dfdvel[2] = fac1*(-2*gamma*dvz*dx + 2*(1+gamma)*dz*dvx);
-    dfdvel[3] = fac1*(-2*gamma*dvx*dy + 2*(1+gamma)*dx*dvy);
-    dfdvel[4] = fac1*(-2*gamma*dvy*dy + fac3 + 2*(1+gamma)*dy*dvy);
-    dfdvel[5] = fac1*(-2*gamma*dvz*dy + 2*(1+gamma)*dz*dvy);
-    dfdvel[6] = fac1*(-2*gamma*dvx*dz + 2*(1+gamma)*dx*dvz);
-    dfdvel[7] = fac1*(-2*gamma*dvy*dz + 2*(1+gamma)*dy*dvz);
-    dfdvel[8] = fac1*(-2*gamma*dvz*dz + fac3 + 2*(1+gamma)*dz*dvz);
-
-    bcd_2dot(B, Bdot, C, Cdot, D, Ddot, dfdpos, dfdvel, dfdpar, numParams,
-             stmStarti, accInteg);
-
-    delete[] dfdpos;
-    delete[] dfdvel;
-    delete[] dfdpar;
-    delete[] B;
-    delete[] Bdot;
-    delete[] C;
-    delete[] Cdot;
-    delete[] D;
-    delete[] Ddot;
+    stmParams.dfdvel[0] += fac1*(-2*gamma*dvx*dx + fac3 + 2*(1+gamma)*dx*dvx);
+    stmParams.dfdvel[1] += fac1*(-2*gamma*dvy*dx + 2*(1+gamma)*dy*dvx);
+    stmParams.dfdvel[2] += fac1*(-2*gamma*dvz*dx + 2*(1+gamma)*dz*dvx);
+    stmParams.dfdvel[3] += fac1*(-2*gamma*dvx*dy + 2*(1+gamma)*dx*dvy);
+    stmParams.dfdvel[4] += fac1*(-2*gamma*dvy*dy + fac3 + 2*(1+gamma)*dy*dvy);
+    stmParams.dfdvel[5] += fac1*(-2*gamma*dvz*dy + 2*(1+gamma)*dz*dvy);
+    stmParams.dfdvel[6] += fac1*(-2*gamma*dvx*dz + 2*(1+gamma)*dx*dvz);
+    stmParams.dfdvel[7] += fac1*(-2*gamma*dvy*dz + 2*(1+gamma)*dy*dvz);
+    stmParams.dfdvel[8] += fac1*(-2*gamma*dvz*dz + fac3 + 2*(1+gamma)*dz*dvz);
 }
 
-void stm_J2(const IntegBody &bodyi, const real &gm, const real &J2,
+void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
             const real &dxBody, const real &dyBody, const real &dzBody,
             const real &radius, const real &sinRA, const real &cosRA,
             const real &sinDec, const real &cosDec,
-            const real &smoothing_threshold, const size_t &stmStarti,
-            std::vector<real> &accInteg) {
-    real *dfdpos = new real[9];
-    real *dfdvel = new real[9];
-    memset(dfdvel, 0, 9 * sizeof(real));
-    const size_t numParams = (bodyi.stm.size() - 36) / 6;
-    real *dfdpar = new real[3 * numParams];
-    memset(dfdpar, 0, 3 * numParams * sizeof(real));
-
-    real *B = new real[9];
-    real *Bdot = new real[9];
-    real *C = new real[9];
-    real *Cdot = new real[9];
-    real *D = new real[3 * numParams];
-    real *Ddot = new real[3 * numParams];
-    bcd_and_dot(bodyi.stm, B, Bdot, C, Cdot, D, Ddot);
-
+            const real &smoothing_threshold) {
     const real r2 = dxBody * dxBody + dyBody * dyBody + dzBody * dzBody;
     const real r = sqrt(r2);
     const real r4 = r2 * r2;
@@ -340,48 +271,25 @@ void stm_J2(const IntegBody &bodyi, const real &gm, const real &J2,
     dfdfBody[8] = sinDec;
 
     real *dfBodydpos = new real[9];
+    real *dfdposJ2 = new real[9];
     mat3_mat3_mul(dfBodydposBody, dposBodydpos, dfBodydpos);
-    mat3_mat3_mul(dfdfBody, dfBodydpos, dfdpos);
+    mat3_mat3_mul(dfdfBody, dfBodydpos, dfdposJ2);
 
-    bcd_2dot(B, Bdot, C, Cdot, D, Ddot, dfdpos, dfdvel, dfdpar, numParams,
-             stmStarti, accInteg);
-
-    delete[] dfdpos;
-    delete[] dfdvel;
-    delete[] dfdpar;
-    delete[] B;
-    delete[] Bdot;
-    delete[] C;
-    delete[] Cdot;
-    delete[] D;
-    delete[] Ddot;
-    delete[] dfBodydposBody;
-    delete[] dposBodydpos;
-    delete[] dfdfBody;
-    delete[] dfBodydpos;
+    stmParams.dfdpos[0] += dfdposJ2[0];
+    stmParams.dfdpos[1] += dfdposJ2[1];
+    stmParams.dfdpos[2] += dfdposJ2[2];
+    stmParams.dfdpos[3] += dfdposJ2[3];
+    stmParams.dfdpos[4] += dfdposJ2[4];
+    stmParams.dfdpos[5] += dfdposJ2[5];
+    stmParams.dfdpos[6] += dfdposJ2[6];
+    stmParams.dfdpos[7] += dfdposJ2[7];
+    stmParams.dfdpos[8] += dfdposJ2[8];
 }
 
-void stm_nongrav(const IntegBody &bodyi, const real &g,
+void stm_nongrav(STMParameters &stmParams, const real &g,
                  const NongravParamaters &ngParams, const real &dx, const real &dy,
                  const real &dz, const real &dvx, const real &dvy, const real &dvz,
-                 real *rVec, real *nVec, const size_t &stmStarti,
-                 std::vector<real> &accInteg) {
-    // maybe pull this common stuff out into a function
-    // and return an STM struct in the force functions
-    // that gets passed into the STM functions
-    real *dfdpos = new real[9];
-    real *dfdvel = new real[9];
-    const size_t numParams = (bodyi.stm.size() - 36) / 6;
-    real *dfdpar = new real[3 * numParams];
-
-    real *B = new real[9];
-    real *Bdot = new real[9];
-    real *C = new real[9];
-    real *Cdot = new real[9];
-    real *D = new real[3 * numParams];
-    real *Ddot = new real[3 * numParams];
-    bcd_and_dot(bodyi.stm, B, Bdot, C, Cdot, D, Ddot);
-
+                 real *rVec, real *nVec) {
     const real a1 = ngParams.a1;
     const real a2 = ngParams.a2;
     const real a3 = ngParams.a3;
@@ -429,106 +337,92 @@ void stm_nongrav(const IntegBody &bodyi, const real &g,
     const real dgdy = dgdr * rHat[1];
     const real dgdz = dgdr * rHat[2];
 
-    dfdpos[0] = a1*(dgdx*rHat[0] - g*rxr3*dx + g/rNorm)
+    stmParams.dfdpos[0] += a1*(dgdx*rHat[0] - g*rxr3*dx + g/rNorm)
                 + a2*(dgdx*tHat[0] - g*txt3*(2*dx*vDotT - tVec[0]*rDotV) + g*(dx*dvx - rDotV)/tNorm)
                 + a3*(dgdx*nHat[0] - g*nxn3*(dx*vDotV - dvx*rDotV));
-    dfdpos[1] = a1*(dgdy*rHat[0] - g*rxr3*dy)
+    stmParams.dfdpos[1] += a1*(dgdy*rHat[0] - g*rxr3*dy)
                 + a2*(dgdy*tHat[0] - g*txt3*(2*dy*vDotT - tVec[1]*rDotV) + g*(2*dy*dvx - dx*dvy)/tNorm)
                 + a3*(dgdy*nHat[0] - g*nxn3*(dy*vDotV - dvy*rDotV) + g*dvz/nNorm);
-    dfdpos[2] = a1*(dgdz*rHat[0] - g*rxr3*dz)
+    stmParams.dfdpos[2] += a1*(dgdz*rHat[0] - g*rxr3*dz)
                 + a2*(dgdz*tHat[0] - g*txt3*(2*dz*vDotT - tVec[2]*rDotV) + g*(2*dz*dvx - dx*dvz)/tNorm)
                 + a3*(dgdz*nHat[0] - g*nxn3*(dz*vDotV - dvz*rDotV) - g*dvy/nNorm);
-    dfdpos[3] = a1*(dgdx*rHat[1] - g*ryr3*dx)
+    stmParams.dfdpos[3] += a1*(dgdx*rHat[1] - g*ryr3*dx)
                 + a2*(dgdx*tHat[1] - g*tyt3*(2*dx*vDotT - tVec[0]*rDotV) + g*(2*dx*dvy - dy*dvx)/tNorm)
                 + a3*(dgdx*nHat[1] - g*nyn3*(dx*vDotV - dvx*rDotV) - g*dvz/nNorm);
-    dfdpos[4] = a1*(dgdy*rHat[1] - g*ryr3*dy + g/rNorm)
+    stmParams.dfdpos[4] += a1*(dgdy*rHat[1] - g*ryr3*dy + g/rNorm)
                 + a2*(dgdy*tHat[1] - g*tyt3*(2*dy*vDotT - tVec[1]*rDotV) + g*(dy*dvy - rDotV)/tNorm)
                 + a3*(dgdy*nHat[1] - g*nyn3*(dy*vDotV - dvy*rDotV));
-    dfdpos[5] = a1*(dgdz*rHat[1] - g*ryr3*dz)
+    stmParams.dfdpos[5] += a1*(dgdz*rHat[1] - g*ryr3*dz)
                 + a2*(dgdz*tHat[1] - g*tyt3*(2*dz*vDotT - tVec[2]*rDotV) + g*(2*dz*dvy - dy*dvz)/tNorm)
                 + a3*(dgdz*nHat[1] - g*nyn3*(dz*vDotV - dvz*rDotV) + g*dvx/nNorm);
-    dfdpos[6] = a1*(dgdx*rHat[2] - g*rzr3*dx)
+    stmParams.dfdpos[6] += a1*(dgdx*rHat[2] - g*rzr3*dx)
                 + a2*(dgdx*tHat[2] - g*tzt3*(2*dx*vDotT - tVec[0]*rDotV) + g*(2*dx*dvz - dz*dvx)/tNorm)
                 + a3*(dgdx*nHat[2] - g*nzn3*(dx*vDotV - dvx*rDotV) + g*dvy/nNorm);
-    dfdpos[7] = a1*(dgdy*rHat[2] - g*rzr3*dy)
+    stmParams.dfdpos[7] += a1*(dgdy*rHat[2] - g*rzr3*dy)
                 + a2*(dgdy*tHat[2] - g*tzt3*(2*dy*vDotT - tVec[1]*rDotV) + g*(2*dy*dvz - dz*dvy)/tNorm)
                 + a3*(dgdy*nHat[2] - g*nzn3*(dy*vDotV - dvy*rDotV) - g*dvx/nNorm);
-    dfdpos[8] = a1*(dgdz*rHat[2] - g*rzr3*dz + g/rNorm)
+    stmParams.dfdpos[8] += a1*(dgdz*rHat[2] - g*rzr3*dz + g/rNorm)
                 + a2*(dgdz*tHat[2] - g*tzt3*(2*dz*vDotT - tVec[2]*rDotV) + g*(dz*dvz - rDotV)/tNorm)
                 + a3*(dgdz*nHat[2] - g*nzn3*(dz*vDotV - dvz*rDotV));
     
     const real r2 = rNorm * rNorm;
-    dfdvel[0] = g*(a2*((dy*dy + dz*dz)/tNorm - txt3*r2*tVec[0]) - a3*(nxn3*(r2*dvx - dx*rDotV)));
-    dfdvel[1] = g*(a2*(-dx*dy/tNorm - tyt3*r2*tVec[0]) - a3*(nxn3*(r2*dvy - dy*rDotV) + dz/nNorm));
-    dfdvel[2] = g*(a2*(-dx*dz/tNorm - tzt3*r2*tVec[0]) - a3*(nxn3*(r2*dvz - dz*rDotV) - dy/nNorm));
-    dfdvel[3] = g*(a2*(-dy*dx/tNorm - txt3*r2*tVec[1]) - a3*(nyn3*(r2*dvx - dx*rDotV) - dz/nNorm));
-    dfdvel[4] = g*(a2*((dx*dx + dz*dz)/tNorm - tyt3*r2*tVec[1]) - a3*(nyn3*(r2*dvy - dy*rDotV)));
-    dfdvel[5] = g*(a2*(-dy*dz/tNorm - tzt3*r2*tVec[1]) - a3*(nyn3*(r2*dvz - dz*rDotV) + dx/nNorm));
-    dfdvel[6] = g*(a2*(-dz*dx/tNorm - txt3*r2*tVec[2]) - a3*(nzn3*(r2*dvx - dx*rDotV) + dy/nNorm));
-    dfdvel[7] = g*(a2*(-dz*dy/tNorm - tyt3*r2*tVec[2]) - a3*(nzn3*(r2*dvy - dy*rDotV) - dx/nNorm));
-    dfdvel[8] = g*(a2*((dx*dx + dy*dy)/tNorm - tzt3*r2*tVec[2]) - a3*(nzn3*(r2*dvz - dz*rDotV)));
+    stmParams.dfdvel[0] += g*(a2*((dy*dy + dz*dz)/tNorm - txt3*r2*tVec[0]) - a3*(nxn3*(r2*dvx - dx*rDotV)));
+    stmParams.dfdvel[1] += g*(a2*(-dx*dy/tNorm - tyt3*r2*tVec[0]) - a3*(nxn3*(r2*dvy - dy*rDotV) + dz/nNorm));
+    stmParams.dfdvel[2] += g*(a2*(-dx*dz/tNorm - tzt3*r2*tVec[0]) - a3*(nxn3*(r2*dvz - dz*rDotV) - dy/nNorm));
+    stmParams.dfdvel[3] += g*(a2*(-dy*dx/tNorm - txt3*r2*tVec[1]) - a3*(nyn3*(r2*dvx - dx*rDotV) - dz/nNorm));
+    stmParams.dfdvel[4] += g*(a2*((dx*dx + dz*dz)/tNorm - tyt3*r2*tVec[1]) - a3*(nyn3*(r2*dvy - dy*rDotV)));
+    stmParams.dfdvel[5] += g*(a2*(-dy*dz/tNorm - tzt3*r2*tVec[1]) - a3*(nyn3*(r2*dvz - dz*rDotV) + dx/nNorm));
+    stmParams.dfdvel[6] += g*(a2*(-dz*dx/tNorm - txt3*r2*tVec[2]) - a3*(nzn3*(r2*dvx - dx*rDotV) + dy/nNorm));
+    stmParams.dfdvel[7] += g*(a2*(-dz*dy/tNorm - tyt3*r2*tVec[2]) - a3*(nzn3*(r2*dvy - dy*rDotV) - dx/nNorm));
+    stmParams.dfdvel[8] += g*(a2*((dx*dx + dy*dy)/tNorm - tzt3*r2*tVec[2]) - a3*(nzn3*(r2*dvz - dz*rDotV)));
 
     // Case 1, only one of a1, a2, or a3 is non-zero
     if (a1 != 0 && a2 == 0 && a3 == 0) {
-        dfdpar[0] = g*rHat[0];
-        dfdpar[1] = g*rHat[1];
-        dfdpar[2] = g*rHat[2];
+        stmParams.dfdpar[0] += g*rHat[0];
+        stmParams.dfdpar[1] += g*rHat[1];
+        stmParams.dfdpar[2] += g*rHat[2];
     } else if (a1 == 0 && a2 != 0 && a3 == 0) {
-        dfdpar[0] = g*tHat[0];
-        dfdpar[1] = g*tHat[1];
-        dfdpar[2] = g*tHat[2];
+        stmParams.dfdpar[0] += g*tHat[0];
+        stmParams.dfdpar[1] += g*tHat[1];
+        stmParams.dfdpar[2] += g*tHat[2];
     } else if (a1 == 0 && a2 == 0 && a3 != 0) {
-        dfdpar[0] = g*nHat[0];
-        dfdpar[1] = g*nHat[1];
-        dfdpar[2] = g*nHat[2];
+        stmParams.dfdpar[0] += g*nHat[0];
+        stmParams.dfdpar[1] += g*nHat[1];
+        stmParams.dfdpar[2] += g*nHat[2];
     }
     // Case 2, two of a1, a2, or a3 are non-zero
     if (a1 != 0 && a2 != 0 && a3 == 0) {
-        dfdpar[0] = g*rHat[0];
-        dfdpar[1] = g*rHat[1];
-        dfdpar[2] = g*rHat[2];
-        dfdpar[3] = g*tHat[0];
-        dfdpar[4] = g*tHat[1];
-        dfdpar[5] = g*tHat[2];
+        stmParams.dfdpar[0] += g*rHat[0];
+        stmParams.dfdpar[1] += g*rHat[1];
+        stmParams.dfdpar[2] += g*rHat[2];
+        stmParams.dfdpar[3] += g*tHat[0];
+        stmParams.dfdpar[4] += g*tHat[1];
+        stmParams.dfdpar[5] += g*tHat[2];
     } else if (a1 != 0 && a2 == 0 && a3 != 0) {
-        dfdpar[0] = g*rHat[0];
-        dfdpar[1] = g*rHat[1];
-        dfdpar[2] = g*rHat[2];
-        dfdpar[3] = g*nHat[0];
-        dfdpar[4] = g*nHat[1];
-        dfdpar[5] = g*nHat[2];
+        stmParams.dfdpar[0] += g*rHat[0];
+        stmParams.dfdpar[1] += g*rHat[1];
+        stmParams.dfdpar[2] += g*rHat[2];
+        stmParams.dfdpar[3] += g*nHat[0];
+        stmParams.dfdpar[4] += g*nHat[1];
+        stmParams.dfdpar[5] += g*nHat[2];
     } else if (a1 == 0 && a2 != 0 && a3 != 0) {
-        dfdpar[0] = g*tHat[0];
-        dfdpar[1] = g*tHat[1];
-        dfdpar[2] = g*tHat[2];
-        dfdpar[3] = g*nHat[0];
-        dfdpar[4] = g*nHat[1];
-        dfdpar[5] = g*nHat[2];
+        stmParams.dfdpar[0] += g*tHat[0];
+        stmParams.dfdpar[1] += g*tHat[1];
+        stmParams.dfdpar[2] += g*tHat[2];
+        stmParams.dfdpar[3] += g*nHat[0];
+        stmParams.dfdpar[4] += g*nHat[1];
+        stmParams.dfdpar[5] += g*nHat[2];
     }
     // Case 3, all of a1, a2, and a3 are non-zero
     if (a1 != 0 && a2 != 0 && a3 != 0) {
-        dfdpar[0] = g*rHat[0];
-        dfdpar[1] = g*rHat[1];
-        dfdpar[2] = g*rHat[2];
-        dfdpar[3] = g*tHat[0];
-        dfdpar[4] = g*tHat[1];
-        dfdpar[5] = g*tHat[2];
-        dfdpar[6] = g*nHat[0];
-        dfdpar[7] = g*nHat[1];
-        dfdpar[8] = g*nHat[2];
+        stmParams.dfdpar[0] += g*rHat[0];
+        stmParams.dfdpar[1] += g*rHat[1];
+        stmParams.dfdpar[2] += g*rHat[2];
+        stmParams.dfdpar[3] += g*tHat[0];
+        stmParams.dfdpar[4] += g*tHat[1];
+        stmParams.dfdpar[5] += g*tHat[2];
+        stmParams.dfdpar[6] += g*nHat[0];
+        stmParams.dfdpar[7] += g*nHat[1];
+        stmParams.dfdpar[8] += g*nHat[2];
     }
-
-    bcd_2dot(B, Bdot, C, Cdot, D, Ddot, dfdpos, dfdvel, dfdpar, numParams,
-             stmStarti, accInteg);
-
-    delete[] dfdpos;
-    delete[] dfdvel;
-    delete[] dfdpar;
-    delete[] B;
-    delete[] Bdot;
-    delete[] C;
-    delete[] Cdot;
-    delete[] D;
-    delete[] Ddot;
-    delete[] tVec;
 }
