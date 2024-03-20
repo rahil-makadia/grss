@@ -159,11 +159,6 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState,
     // real M = E-e*sin(E);
     // real n = sqrt(GM/pow(a, 3.0L));
     // real T0 = epochMjd-(M/n);
-    // ConstSpiceDouble elts[8] = {(double) (a*(1-e)), (double)e, (double)i,
-    // (double)Omega, (double)omega, (double)M, 0.0, (double)GM}; SpiceDouble
-    // state[6]; conics_c(elts, 0.0, state); std::cout << "spice state:" <<
-    // std::endl; std::cout << state[0] << " " << state[1] << " " << state[2] <<
-    // " " << state[3] << " " << state[4] << " " << state[5] << std::endl;
 
     std::vector<std::vector<real>> R1(3, std::vector<real>(3));
     std::vector<std::vector<real>> R2(3, std::vector<real>(3));

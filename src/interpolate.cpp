@@ -127,10 +127,8 @@ void interpolate_on_the_fly(propSimulation *propSim, const real &t, const real &
     while (interpIdx < propSim->tEval.size() && interpIdxInWindow) {
         real tInterpGeom;
         if (propSim->tEvalUTC) {
-            SpiceDouble etMinusUtc;
-            real secPastJ2000Utc;
-            mjd_to_et(propSim->tEval[interpIdx], secPastJ2000Utc);
-            deltet_c(secPastJ2000Utc, "UTC", &etMinusUtc);
+            const real secPastJ2000Utc = mjd_to_et(propSim->tEval[interpIdx]);
+            const real etMinusUtc = delta_et_utc(propSim->tEval[interpIdx]);
             tInterpGeom = et_to_mjd(secPastJ2000Utc + etMinusUtc);
         } else {
             tInterpGeom = propSim->tEval[interpIdx];
@@ -589,14 +587,8 @@ void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
     delayMeasurement = (delayDownleg + delayUpleg) * 86400.0L *
         1e6;  // days -> seconds -> microseconds
     if (propSim->tEvalUTC) {
-        SpiceDouble etMinusUtcReceiveTime;
-        SpiceDouble etMinusUtcTransmitTime;
-        real receiveTimeET;
-        real transmitTimeET;
-        mjd_to_et(receiveTimeTDB, receiveTimeET);
-        mjd_to_et(transmitTimeTDB, transmitTimeET);
-        deltet_c(receiveTimeET, "ET", &etMinusUtcReceiveTime);
-        deltet_c(transmitTimeET, "ET", &etMinusUtcTransmitTime);
+        const real etMinusUtcReceiveTime = delta_et_utc(receiveTimeTDB);
+        const real etMinusUtcTransmitTime = delta_et_utc(transmitTimeTDB);
         delayMeasurement +=
             (etMinusUtcTransmitTime - etMinusUtcReceiveTime) * 1e6;
     }

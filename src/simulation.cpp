@@ -15,18 +15,12 @@ void get_observer_state(const real &tObsMjd,
         observerState[5] = 0.0L;
         return;
     }
-    real tObsET;
+    real secPastJ2000 = mjd_to_et(tObsMjd);
     real tObsMjdTDB;
-    mjd_to_et(tObsMjd, tObsET);
     if (tObsInUTC) {
-        // std::cout << tObsMjd << " MJD UTC" << tObsET << " s UTC -> ";
-        SpiceDouble et_minus_utc;
-        real sec_past_j2000_utc = tObsET;
-        deltet_c(sec_past_j2000_utc, "UTC", &et_minus_utc);
-        tObsET += et_minus_utc;
-        et_to_mjd(tObsET, tObsMjdTDB);
-        // std::cout << tObsET << " s ET " << tObsMjdTDB << " MJD TDB" <<
-        // std::endl;
+        const real etMinusUtc = delta_et_utc(tObsMjd);
+        secPastJ2000 += etMinusUtc;
+        tObsMjdTDB = et_to_mjd(secPastJ2000);
     } else {
         tObsMjdTDB = tObsMjd;
     }
@@ -94,7 +88,7 @@ void get_observer_state(const real &tObsMjd,
                                           0.0,        0.0,        0.0};
     SpiceDouble observerStateInertial[6];
     SpiceDouble rotMat[6][6];
-    sxform_c(baseBodyFrame, "J2000", tObsET, rotMat);
+    sxform_c(baseBodyFrame, "J2000", secPastJ2000, rotMat);
     mxvg_c(rotMat, bodyFixedState, 6, 6, observerStateInertial);
     observerStateInertial[0] *= (real)1.0e3L / propSim->consts.du2m;
     observerStateInertial[1] *= (real)1.0e3L / propSim->consts.du2m;

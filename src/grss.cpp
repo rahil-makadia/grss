@@ -387,6 +387,34 @@ PYBIND11_MODULE(libgrss, m) {
             Inverse of the matrix.
         )mydelimiter");
 
+    m.def("delta_et_utc", &delta_et_utc, py::arg("mjdUtc"), R"mydelimiter(
+        Calculate the difference between TDB and UTC time with UTC as the input.
+
+        Parameters
+        ----------
+        mjdUtc : real
+            Modified Julian date in UTC.
+
+        Returns
+        -------
+        delta_et : real
+            Difference between TDB and UTC time.
+        )mydelimiter");
+
+    m.def("delta_et_tdb", &delta_et_tdb, py::arg("mjdTdb"), R"mydelimiter(
+        Calculate the difference between TDB and UTC time with TDB as the input.
+
+        Parameters
+        ----------
+        mjdTdb : real
+            Modified Julian date in TDB.
+
+        Returns
+        -------
+        delta_et : real
+            Difference between TDB and UTC time.
+        )mydelimiter");
+
     py::class_<Body>(m, "Body", R"mydelimiter(
         The Body class contains the properties of an integrated or SPICE body.
         )mydelimiter")
