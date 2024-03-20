@@ -27,7 +27,7 @@ jobs:
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
           sudo apt-get install pandoc
           source build_cpp.sh
-          cp build/prop_simulation* grss/prop
+          cp build/libgrss* grss/prop
           cd docs
           make clean html
           cd ..
