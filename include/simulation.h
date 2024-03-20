@@ -157,7 +157,7 @@ class propSimulation {
             std::vector<std::vector<real>>(),
         bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 21.0L,
         real dtMin = 5.0e-3L, real dtChangeFactor = 0.25L,
-        real tolInteg = 1.0e-9L, real tolPC = 1.0e-16L);
+        real tolInteg = 1.0e-11L, real tolPC = 1.0e-16L);
 
     // getters
     std::vector<real> get_sim_constants();
