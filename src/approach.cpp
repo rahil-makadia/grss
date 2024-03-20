@@ -631,32 +631,35 @@ void ImpactParameters::get_impact_parameters(propSimulation *propSim){
     }
     real tET;
     mjd_to_et(this->t, tET);
-    SpiceDouble rotMat[6][6];
-    sxform_c("J2000", baseBodyFrame, tET, rotMat);
-    SpiceDouble impactRelStateInertial[6];
+    SpiceDouble rotMatSpice[6][6];
+    sxform_c("J2000", baseBodyFrame, tET, rotMatSpice);
+    std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
+    for (size_t i = 0; i < 6; i++) {
+        for (size_t j = 0; j < 6; j++) {
+            rotMat[i][j] = (real)rotMatSpice[i][j];
+        }
+    }
+    std::vector<real> impactRelStateInertial(6);
     impactRelStateInertial[0] = this->xRel[0]*propSim->consts.du2m/1.0e3L;
     impactRelStateInertial[1] = this->xRel[1]*propSim->consts.du2m/1.0e3L;
     impactRelStateInertial[2] = this->xRel[2]*propSim->consts.du2m/1.0e3L;
     impactRelStateInertial[3] = this->xRel[3]*propSim->consts.duptu2mps/1.0e3L;
     impactRelStateInertial[4] = this->xRel[4]*propSim->consts.duptu2mps/1.0e3L;
     impactRelStateInertial[5] = this->xRel[5]*propSim->consts.duptu2mps/1.0e3L;
-    SpiceDouble impactRelStateBodyFixed[6];
-    mxvg_c(rotMat, impactRelStateInertial, 6, 6, impactRelStateBodyFixed);
-    impactRelStateBodyFixed[0] *= 1.0e3L/propSim->consts.du2m;
-    impactRelStateBodyFixed[1] *= 1.0e3L/propSim->consts.du2m;
-    impactRelStateBodyFixed[2] *= 1.0e3L/propSim->consts.du2m;
-    impactRelStateBodyFixed[3] *= 1.0e3L/propSim->consts.duptu2mps;
-    impactRelStateBodyFixed[4] *= 1.0e3L/propSim->consts.duptu2mps;
-    impactRelStateBodyFixed[5] *= 1.0e3L/propSim->consts.duptu2mps;
-    for (size_t i = 0; i < 6; i++) {
-        this->xRelBodyFixed[i] = (real)impactRelStateBodyFixed[i];
-    }
-    SpiceDouble bodyFixedPos[3];
-    for (size_t i = 0; i < 3; i++) {
-        bodyFixedPos[i] = impactRelStateBodyFixed[i];
-    }
-    SpiceDouble lon, lat, alt;
-    reclat_c(bodyFixedPos, &alt, &lon, &lat);
+    mat_vec_mul(rotMat, impactRelStateInertial, this->xRelBodyFixed);
+    this->xRelBodyFixed[0] *= 1.0e3L/propSim->consts.du2m;
+    this->xRelBodyFixed[1] *= 1.0e3L/propSim->consts.du2m;
+    this->xRelBodyFixed[2] *= 1.0e3L/propSim->consts.du2m;
+    this->xRelBodyFixed[3] *= 1.0e3L/propSim->consts.duptu2mps;
+    this->xRelBodyFixed[4] *= 1.0e3L/propSim->consts.duptu2mps;
+    this->xRelBodyFixed[5] *= 1.0e3L/propSim->consts.duptu2mps;
+    real x, y, z, lon, lat, dist;
+    x = this->xRelBodyFixed[0];
+    y = this->xRelBodyFixed[1];
+    z = this->xRelBodyFixed[2];
+    dist = sqrt(x*x + y*y + z*z);
+    lat = atan2(z, sqrt(x*x + y*y));
+    lon = atan2(y, x);
     if (lon < 0.0) {
         lon += 2 * PI;
     }
@@ -666,10 +669,9 @@ void ImpactParameters::get_impact_parameters(propSimulation *propSim){
     } else {
         radiusj = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
     }
-    alt -= radiusj;
     this->lon = lon;
     this->lat = lat;
-    this->alt = alt*propSim->consts.du2m/1.0e3L;
+    this->alt = (dist-radiusj)*propSim->consts.du2m/1.0e3L;
 }
 
 void ImpactParameters::print_summary(int prec){

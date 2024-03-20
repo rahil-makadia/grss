@@ -1349,12 +1349,14 @@ class FitSimulation:
         partials = np.zeros((self.n_obs, self.n_fit))
         len_past_idx = len(self.past_obs_idx) if self.past_obs_exist else 0
         partials_idx = 0
-        past_optical_partials = np.array(prop_sim_past.opticalPartials)
-        past_radar_partials = np.array(prop_sim_past.radarPartials)
-        past_light_time = np.array(prop_sim_past.lightTimeEval)
-        future_optical_partials = np.array(prop_sim_future.opticalPartials)
-        future_radar_partials = np.array(prop_sim_future.radarPartials)
-        future_light_time = np.array(prop_sim_future.lightTimeEval)
+        if self.past_obs_exist:
+            past_optical_partials = np.array(prop_sim_past.opticalPartials)
+            past_radar_partials = np.array(prop_sim_past.radarPartials)
+            past_light_time = np.array(prop_sim_past.lightTimeEval)
+        if self.future_obs_exist:
+            future_optical_partials = np.array(prop_sim_future.opticalPartials)
+            future_radar_partials = np.array(prop_sim_future.radarPartials)
+            future_light_time = np.array(prop_sim_future.lightTimeEval)
         t_eval_tdb = Time(self.obs_array[:, 0], format='mjd', scale='utc').tdb.mjd
         for i in range(self.obs_array.shape[0]):
             obs_info_len = len(self.observer_info[i])

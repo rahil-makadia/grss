@@ -78,24 +78,30 @@ void get_observer_state(const real &tObsMjd,
             throw std::invalid_argument("Given base body not supported");
             break;
     }
+    SpiceDouble rotMatSpice[6][6];
+    sxform_c(baseBodyFrame, "J2000", secPastJ2000, rotMatSpice);
+    std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
+    for (size_t i = 0; i < 6; i++) {
+        for (size_t j = 0; j < 6; j++) {
+            rotMat[i][j] = (real)rotMatSpice[i][j];
+        }
+    }
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
-    ConstSpiceDouble bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
-    ConstSpiceDouble bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
-    ConstSpiceDouble bodyFixedZ = rho * sin(lat) / 1.0e3L;
-    ConstSpiceDouble bodyFixedState[6] = {bodyFixedX, bodyFixedY, bodyFixedZ,
-                                          0.0,        0.0,        0.0};
-    SpiceDouble observerStateInertial[6];
-    SpiceDouble rotMat[6][6];
-    sxform_c(baseBodyFrame, "J2000", secPastJ2000, rotMat);
-    mxvg_c(rotMat, bodyFixedState, 6, 6, observerStateInertial);
-    observerStateInertial[0] *= (real)1.0e3L / propSim->consts.du2m;
-    observerStateInertial[1] *= (real)1.0e3L / propSim->consts.du2m;
-    observerStateInertial[2] *= (real)1.0e3L / propSim->consts.du2m;
-    observerStateInertial[3] *= (real)1.0e3L / propSim->consts.duptu2mps;
-    observerStateInertial[4] *= (real)1.0e3L / propSim->consts.duptu2mps;
-    observerStateInertial[5] *= (real)1.0e3L / propSim->consts.duptu2mps;
+    real bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
+    real bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
+    real bodyFixedZ = rho * sin(lat) / 1.0e3L;
+    std::vector<real> bodyFixedState = {bodyFixedX, bodyFixedY, bodyFixedZ,
+                                            0.0,        0.0,        0.0};
+    std::vector<real> observerStateInertial(6);
+    mat_vec_mul(rotMat, bodyFixedState, observerStateInertial);
+    observerStateInertial[0] *= 1.0e3L / propSim->consts.du2m;
+    observerStateInertial[1] *= 1.0e3L / propSim->consts.du2m;
+    observerStateInertial[2] *= 1.0e3L / propSim->consts.du2m;
+    observerStateInertial[3] *= 1.0e3L / propSim->consts.duptu2mps;
+    observerStateInertial[4] *= 1.0e3L / propSim->consts.duptu2mps;
+    observerStateInertial[5] *= 1.0e3L / propSim->consts.duptu2mps;
     observerState[0] = baseBodyState[0] + observerStateInertial[0];
     observerState[1] = baseBodyState[1] + observerStateInertial[1];
     observerState[2] = baseBodyState[2] + observerStateInertial[2];
