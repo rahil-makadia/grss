@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 # pylint: disable=no-name-in-module
-from . import prop_simulation as prop
+from . import libgrss as prop
 
 __all__ = [ 'cluster_ca_or_impacts',
 ]
@@ -18,12 +18,12 @@ def _handle_one_cloned_sim(sol, name):
         Dictionary of solution parameters.
     name : str
         Name of the cloned simulation.
-    ref_sim : grss.prop_sim.propSimulation
+    ref_sim : libgrss.propSimulation
         Reference simulation to use for making the cloned simulation.
 
     Returns
     -------
-    body : grss.prop_sim.IntegBody
+    body : libgrss.IntegBody
         IntegBody object with the solution parameters.
     """
     mass = sol.get('mass', 0.0)
@@ -70,7 +70,7 @@ def parallel_propagate(ref_sol, ref_sim, clones):
     ----------
     ref_sol : dict
         Reference solution to use for propagating the reference simulation.
-    ref_sim : grss.prop_sim.propSimulation
+    ref_sim : libgrss.propSimulation
         Reference simulation to use for propagating the orbits.
     clones : dict
         Dictionary of orbit solutions to propagate in parallel.
@@ -101,7 +101,7 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
 
     Parameters
     ----------
-    full_list : list of prop_simulation.CloseApproachParameters objects
+    full_list : list of libgrss.CloseApproachParameters objects
         List of close approaches to cluster.
     max_duration : float
         Maximum duration (in days) between close approaches in a cluster.
@@ -110,7 +110,7 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
 
     Returns
     -------
-    all_clusters : tuple of list of prop_simulation.CloseApproachParameters objects
+    all_clusters : tuple of list of libgrss.CloseApproachParameters objects
         A tuple of close approach clusters (each cluster is a list of
         close approaches).
     """

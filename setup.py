@@ -33,11 +33,11 @@ class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
         subprocess.run(["./build_cpp.sh"], cwd=ext.sourcedir, check=True)
         binary_created = [f for f in os.listdir(f"{ext.sourcedir}/build/")
-                            if f.startswith("prop_simulation")]
+                            if f.startswith("libgrss")]
         if not binary_created:
-            raise FileNotFoundError("prop_simulation binary for C++ source code not found "
+            raise FileNotFoundError("libgrss binary for C++ source code not found "
                                     "in cmake build directory")
-        os.system(f"cp {ext.sourcedir}/build/prop_simulation* {self.build_lib}/grss/prop/")
+        os.system(f"cp {ext.sourcedir}/build/libgrss* {self.build_lib}/grss/prop/")
         return
 
 # get version from version.txt
@@ -49,6 +49,6 @@ if (not os.path.exists("./extern/cspice/lib/cspice.a") or
     subprocess.run(["python", "get_cspice.py"], cwd="./extern", check=True)
 
 setup(
-    ext_modules=[CMakeExtension("prop_simulation")],
+    ext_modules=[CMakeExtension("libgrss")],
     cmdclass={"build_ext": CMakeBuild}
 )

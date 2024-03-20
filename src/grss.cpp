@@ -5,10 +5,9 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(prop_simulation, m) {
+PYBIND11_MODULE(libgrss, m) {
     m.doc() = "Simulation classes for the C++ GRSS orbit propagation code";
 
-    // from utilities.h
     py::class_<Constants>(m, "Constants", R"mydelimiter(
         The Constants class contains physical constants and conversion factors
         used in the GRSS orbit propagation code.
@@ -388,7 +387,6 @@ PYBIND11_MODULE(prop_simulation, m) {
             Inverse of the matrix.
         )mydelimiter");
 
-    // from simulation.h
     py::class_<Body>(m, "Body", R"mydelimiter(
         The Body class contains the properties of an integrated or SPICE body.
         )mydelimiter")

@@ -267,6 +267,9 @@ def _get_gaia_query_results(body_id, release, verbose):
     )
     job = Gaia.launch_job_async(query, dump_to_file=False,background=True)
     res = job.get_results()
+    # change the column names to be lowercase
+    for col_name in res.colnames:
+        res.rename_column(col_name, col_name.lower())
     res.sort('epoch_utc')
     if verbose:
         print(f"Found {len(res)} observations from {release}")

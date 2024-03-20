@@ -1,5 +1,6 @@
 #include "grss.h"
 #include <sys/time.h>
+#include <assert.h>
 #ifdef PROFILE_YES
 #include <gperftools/profiler.h>
 #endif
