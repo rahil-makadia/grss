@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_optical.get_gaia_optical_obs_array &#8212; GRSS 3.6.0 documentation</title>
+    <title>grss.prop.libgrss.delta_at_tai &#8212; GRSS 3.6.0 documentation</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.get_gaia_optical_obs_array';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.prop.libgrss.delta_at_tai';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_optical.get_mpc_optical_obs_array" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html" />
-    <link rel="prev" title="grss.fit.fit_optical.get_ades_optical_obs_array" href="grss.fit.fit_optical.get_ades_optical_obs_array.html" />
+    <link rel="next" title="grss.prop.libgrss.delta_at_utc" href="grss.prop.libgrss.delta_at_utc.html" />
+    <link rel="prev" title="grss.prop.libgrss.cometary_to_cartesian" href="grss.prop.libgrss.cometary_to_cartesian.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
     <meta name="docbuild:last-update" content="Mar 21, 2024"/>
@@ -170,15 +170,15 @@
 </ul>
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.deweight_obs.html">grss.fit.fit_optical.deweight_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.eliminate_obs.html">grss.fit.fit_optical.eliminate_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_ades_optical_obs_array.html">grss.fit.fit_optical.get_ades_optical_obs_array</a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
@@ -217,11 +217,11 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.libgrss.html">grss.prop.libgrss</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.prop.html">grss.prop</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.prop.libgrss.html">grss.prop.libgrss</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.cartesian_to_cometary.html">grss.prop.libgrss.cartesian_to_cometary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.cometary_to_cartesian.html">grss.prop.libgrss.cometary_to_cartesian</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_at_tai.html">grss.prop.libgrss.delta_at_tai</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.prop.libgrss.delta_at_tai</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_at_utc.html">grss.prop.libgrss.delta_at_utc</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_et_tdb.html">grss.prop.libgrss.delta_et_tdb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_et_utc.html">grss.prop.libgrss.delta_et_utc</a></li>
@@ -343,7 +343,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_optical.get_gaia_optical_obs_array.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.prop.libgrss.delta_at_tai.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -373,7 +373,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.fit.fit_optical.get_gaia_optical_obs_array.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.prop.libgrss.delta_at_tai.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -457,7 +457,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.fit.fit_optical.get_gaia_optical_obs_array</h1>
+    <h1>grss.prop.libgrss.delta_at_tai</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -467,7 +467,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_gaia_optical_obs_array"><code class="docutils literal notranslate"><span class="pre">get_gaia_optical_obs_array()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.libgrss.delta_at_tai"><code class="docutils literal notranslate"><span class="pre">delta_at_tai()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -479,30 +479,21 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="grss-fit-fit-optical-get-gaia-optical-obs-array">
-<h1>grss.fit.fit_optical.get_gaia_optical_obs_array<a class="headerlink" href="#grss-fit-fit-optical-get-gaia-optical-obs-array" title="Permalink to this heading">#</a></h1>
+  <section id="grss-prop-libgrss-delta-at-tai">
+<h1>grss.prop.libgrss.delta_at_tai<a class="headerlink" href="#grss-prop-libgrss-delta-at-tai" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="grss.fit.fit_optical.get_gaia_optical_obs_array">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_gaia_optical_obs_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaia_dr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaiadr3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_gaia_optical_obs_array" title="Permalink to this definition">#</a></dt>
-<dd><p>Assemble the optical observations for a given body from Gaia DR3.</p>
+<dt class="sig sig-object py" id="grss.prop.libgrss.delta_at_tai">
+<span class="sig-prename descclassname"><span class="pre">grss.prop.libgrss.</span></span><span class="sig-name descname"><span class="pre">delta_at_tai</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mjdTai</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#grss.prop.libgrss.delta_at_tai" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the difference between TAI and UTC time with TAI as the input.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>body_id</strong> (<em>str/int</em>) – Target id, numbers are interpreted as asteroids,
-append ‘P’ for comets, start with comet type and a ‘/’ for comet designations</p></li>
-<li><p><strong>de_kernel_path</strong> (<em>str</em>) – Path to the DE kernel file</p></li>
-<li><p><strong>t_min_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum time (MJD TDB) for observations to be included, by default None</p></li>
-<li><p><strong>t_max_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum time (MJD TDB) for observations to be included, by default None</p></li>
-<li><p><strong>gaia_dr</strong> (<em>str</em><em>, </em><em>optional</em>) – Gaia data release version database name, by default ‘gaiadr3’</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to print out information about the observations, by default False</p></li>
-</ul>
+<dd class="field-odd"><p><strong>mjdTai</strong> (<em>real</em>) – Modified Julian date in TAI.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>obs_array_optical</strong> (<em>array</em>) – Optical observation data for the given body</p></li>
-<li><p><strong>observer_codes_optical</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array_optical</p></li>
-</ul>
-</p>
+<dd class="field-even"><p><strong>deltaAt</strong> – Difference between TAI and UTC time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>real</p>
 </dd>
 </dl>
 </dd></dl>
@@ -521,20 +512,20 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit.fit_optical.get_ades_optical_obs_array.html"
+       href="grss.prop.libgrss.cometary_to_cartesian.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit.fit_optical.get_ades_optical_obs_array</p>
+        <p class="prev-next-title">grss.prop.libgrss.cometary_to_cartesian</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_optical.get_mpc_optical_obs_array.html"
+       href="grss.prop.libgrss.delta_at_utc.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_optical.get_mpc_optical_obs_array</p>
+        <p class="prev-next-title">grss.prop.libgrss.delta_at_utc</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -553,7 +544,7 @@ append ‘P’ for comets, start with comet type and a ‘/’ for comet designa
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_gaia_optical_obs_array"><code class="docutils literal notranslate"><span class="pre">get_gaia_optical_obs_array()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.prop.libgrss.delta_at_tai"><code class="docutils literal notranslate"><span class="pre">delta_at_tai()</span></code></a></li>
 </ul>
   </nav></div>
 

@@ -16,6 +16,8 @@ grss.prop.libgrss
     
         cartesian_to_cometary
         cometary_to_cartesian
+        delta_at_tai
+        delta_at_utc
         delta_et_tdb
         delta_et_utc
         matrix_inverse
@@ -42,8 +44,8 @@ grss.prop.libgrss
         IntegrationParameters
         InterpolationParameters
         NongravParamaters
+        PropSimulation
         SpiceBody
-        propSimulation
     
     
 

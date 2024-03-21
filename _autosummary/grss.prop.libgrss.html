@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop" href="grss.prop.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Mar 20, 2024"/>
+    <meta name="docbuild:last-update" content="Mar 21, 2024"/>
   </head>
   
   
@@ -221,6 +221,8 @@
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">grss.prop.libgrss</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.cartesian_to_cometary.html">grss.prop.libgrss.cartesian_to_cometary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.cometary_to_cartesian.html">grss.prop.libgrss.cometary_to_cartesian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_at_tai.html">grss.prop.libgrss.delta_at_tai</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_at_utc.html">grss.prop.libgrss.delta_at_utc</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_et_tdb.html">grss.prop.libgrss.delta_et_tdb</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.delta_et_utc.html">grss.prop.libgrss.delta_et_utc</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.matrix_inverse.html">grss.prop.libgrss.matrix_inverse</a></li>
@@ -236,8 +238,8 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.IntegrationParameters.html">grss.prop.libgrss.IntegrationParameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.InterpolationParameters.html">grss.prop.libgrss.InterpolationParameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.NongravParamaters.html">grss.prop.libgrss.NongravParamaters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.PropSimulation.html">grss.prop.libgrss.PropSimulation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.SpiceBody.html">grss.prop.libgrss.SpiceBody</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.prop.libgrss.propSimulation.html">grss.prop.libgrss.propSimulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.prop.prop_parallel.html">grss.prop.prop_parallel</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -479,6 +481,12 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="grss.prop.libgrss.cometary_to_cartesian.html#grss.prop.libgrss.cometary_to_cartesian" title="grss.prop.libgrss.cometary_to_cartesian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cometary_to_cartesian</span></code></a>(epochMjd, cometaryState)</p></td>
 <td><p>Convert cometary state to cartesian state.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.libgrss.delta_at_tai.html#grss.prop.libgrss.delta_at_tai" title="grss.prop.libgrss.delta_at_tai"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_at_tai</span></code></a>(mjdTai)</p></td>
+<td><p>Calculate the difference between TAI and UTC time with TAI as the input.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.prop.libgrss.delta_at_utc.html#grss.prop.libgrss.delta_at_utc" title="grss.prop.libgrss.delta_at_utc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_at_utc</span></code></a>(mjdUtc)</p></td>
+<td><p>Calculate the difference between TAI and UTC time with UTC as the input.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.libgrss.delta_et_tdb.html#grss.prop.libgrss.delta_et_tdb" title="grss.prop.libgrss.delta_et_tdb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_et_tdb</span></code></a>(mjdTdb)</p></td>
 <td><p>Calculate the difference between TDB and UTC time with TDB as the input.</p></td>
 </tr>
@@ -529,11 +537,11 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.libgrss.NongravParamaters.html#grss.prop.libgrss.NongravParamaters" title="grss.prop.libgrss.NongravParamaters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NongravParamaters</span></code></a></p></td>
 <td><p>The NongravParamaters class contains constants used for calculating the non-gravitational accelerations on integrated bodies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="grss.prop.libgrss.SpiceBody.html#grss.prop.libgrss.SpiceBody" title="grss.prop.libgrss.SpiceBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpiceBody</span></code></a></p></td>
-<td><p>The SpiceBody class contains the properties of a SPICE body.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.libgrss.propSimulation.html#grss.prop.libgrss.propSimulation" title="grss.prop.libgrss.propSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propSimulation</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.prop.libgrss.PropSimulation.html#grss.prop.libgrss.PropSimulation" title="grss.prop.libgrss.PropSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropSimulation</span></code></a></p></td>
 <td><p>Class to perform an orbit propagation simulation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.libgrss.SpiceBody.html#grss.prop.libgrss.SpiceBody" title="grss.prop.libgrss.SpiceBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpiceBody</span></code></a></p></td>
+<td><p>The SpiceBody class contains the properties of a SPICE body.</p></td>
 </tr>
 </tbody>
 </table>
@@ -603,7 +611,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Mar 20, 2024.
+  Last updated on Mar 21, 2024.
   <br/>
 </p>
   </div>
