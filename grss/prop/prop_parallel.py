@@ -18,7 +18,7 @@ def _handle_one_cloned_sim(sol, name):
         Dictionary of solution parameters.
     name : str
         Name of the cloned simulation.
-    ref_sim : libgrss.propSimulation
+    ref_sim : libgrss.PropSimulation
         Reference simulation to use for making the cloned simulation.
 
     Returns
@@ -70,7 +70,7 @@ def parallel_propagate(ref_sol, ref_sim, clones):
     ----------
     ref_sol : dict
         Reference solution to use for propagating the reference simulation.
-    ref_sim : libgrss.propSimulation
+    ref_sim : libgrss.PropSimulation
         Reference simulation to use for propagating the orbits.
     clones : dict
         Dictionary of orbit solutions to propagate in parallel.

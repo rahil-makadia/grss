@@ -3,7 +3,7 @@
 
 #include "parallel.h"
 
-void propSimulation::integrate() {
+void PropSimulation::integrate() {
     // check that xInteg has a valid size. If not, raise error
     if (this->integParams.nInteg < 1) {
         throw std::runtime_error(

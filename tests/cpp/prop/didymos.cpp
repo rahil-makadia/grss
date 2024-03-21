@@ -26,8 +26,8 @@ int main() {
     real t0SimMjd = 59956.5L;
     real numDays = 3000.0L;
     real tfSimMjd = t0SimMjd + numDays;
-    propSimulation simTestForward("simTestForward", t0SimMjd, DEkernel, DEkernelPath);
-    propSimulation simTestBackward("simTestBackward", tfSimMjd, DEkernel, DEkernelPath);
+    PropSimulation simTestForward("simTestForward", t0SimMjd, DEkernel, DEkernelPath);
+    PropSimulation simTestBackward("simTestBackward", tfSimMjd, DEkernel, DEkernelPath);
 
     std::vector<real> tEval = {};
     bool tEvalUTC = false;

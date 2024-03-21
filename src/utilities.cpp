@@ -212,29 +212,29 @@ void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][2] = 0;
     R[1][0] = 0;
     R[1][1] = cos(theta);
-    R[1][2] = -sin(theta);
+    R[1][2] = sin(theta);
     R[2][0] = 0;
-    R[2][1] = sin(theta);
+    R[2][1] = -sin(theta);
     R[2][2] = cos(theta);
 }
 
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][0] = cos(theta);
     R[0][1] = 0;
-    R[0][2] = sin(theta);
+    R[0][2] = -sin(theta);
     R[1][0] = 0;
     R[1][1] = 1;
     R[1][2] = 0;
-    R[2][0] = -sin(theta);
+    R[2][0] = sin(theta);
     R[2][1] = 0;
     R[2][2] = cos(theta);
 }
 
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][0] = cos(theta);
-    R[0][1] = -sin(theta);
+    R[0][1] = sin(theta);
     R[0][2] = 0;
-    R[1][0] = sin(theta);
+    R[1][0] = -sin(theta);
     R[1][1] = cos(theta);
     R[1][2] = 0;
     R[2][0] = 0;

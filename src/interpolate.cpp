@@ -69,7 +69,7 @@ void approx_xInteg(const std::vector<real> &xInteg0,
     }
 }
 
-std::vector<real> propSimulation::interpolate(const real t) {
+std::vector<real> PropSimulation::interpolate(const real t) {
     std::vector<real> xIntegInterp = std::vector<real>(this->xInteg.size(), 0.0);
     // find the index of the last element in this->interpParams.tStack that is
     // less than t if propagating forward, or the first element that is greater
@@ -116,7 +116,7 @@ std::vector<real> propSimulation::interpolate(const real t) {
     return xIntegInterp;
 }
 
-void interpolate_on_the_fly(propSimulation *propSim, const real &t, const real &dt) {
+void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &dt) {
     const real tNext = t + dt;
     size_t &interpIdx = propSim->interpIdx;
     const bool forwardProp = propSim->integParams.t0 < propSim->integParams.tf;
@@ -154,7 +154,7 @@ void interpolate_on_the_fly(propSimulation *propSim, const real &t, const real &
     }
 }
 
-void evaluate_one_interpolation(const propSimulation *propSim, const real &t,
+void evaluate_one_interpolation(const PropSimulation *propSim, const real &t,
                                 const real &dt, const real &tInterp,
                                 std::vector<real> &xInterp) {
     const real h = (tInterp - t) / dt;
@@ -166,7 +166,7 @@ void evaluate_one_interpolation(const propSimulation *propSim, const real &t,
                   xInterp, dummyCompCoeffs);
 }
 
-void get_interpIdxInWindow(const propSimulation *propSim,
+void get_interpIdxInWindow(const PropSimulation *propSim,
                            const real &tWindowStart, const real &tNext,
                            const bool &forwardProp,
                            const bool &backwardProp,
@@ -214,7 +214,7 @@ void get_interpIdxInWindow(const propSimulation *propSim,
         bwInWindowMarginEnd;
 }
 
-void get_lightTime_and_xRelative(propSimulation *propSim,
+void get_lightTime_and_xRelative(PropSimulation *propSim,
                                  const size_t interpIdx, const real &t,
                                  const real &dt, const real tInterpGeom,
                                  const std::vector<real> &xInterpGeom,
@@ -248,7 +248,7 @@ void get_lightTime_and_xRelative(propSimulation *propSim,
     }
 }
 
-void get_lightTimeOneBody(propSimulation *propSim, const size_t &i,
+void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           const real tInterpGeom, std::vector<real> xInterpGeom,
                           std::vector<real> xObserver,
                           const bool bouncePointAtLeadingEdge, const real &t,
@@ -312,7 +312,7 @@ void get_lightTimeOneBody(propSimulation *propSim, const size_t &i,
     }
 }
 
-void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
+void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     double sunState[9];
     double earthState[9];
@@ -389,7 +389,7 @@ void get_glb_correction(propSimulation *propSim, const real &tInterpGeom,
     xInterpApparentBary[2] = earthState[2] + earthTargetPos[2];
 }
 
-void get_measurement(propSimulation *propSim, const size_t &interpIdx,
+void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                      const real &t, const real &dt, const real tInterpGeom,
                      const std::vector<real> &xInterpGeom,
                      const std::vector<real> &xInterpApparent) {
@@ -421,7 +421,7 @@ void get_measurement(propSimulation *propSim, const size_t &interpIdx,
     propSim->radarPartials.push_back(radarPartials);
 }
 
-void get_optical_measurement(propSimulation *propSim,
+void get_optical_measurement(PropSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
                              std::vector<real> &opticalMeasurement,
                              std::vector<real> &opticalPartials) {
@@ -463,7 +463,7 @@ void get_optical_measurement(propSimulation *propSim,
     }
 }
 
-void get_radar_measurement(propSimulation *propSim, const size_t &interpIdx,
+void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
@@ -504,7 +504,7 @@ void get_radar_measurement(propSimulation *propSim, const size_t &interpIdx,
     } 
 }
 
-void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
+void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt, const size_t &i,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
@@ -612,7 +612,7 @@ void get_delay_measurement(propSimulation *propSim, const size_t &interpIdx,
     }
 }
 
-void get_delta_delay_relativistic(propSimulation *propSim,
+void get_delta_delay_relativistic(PropSimulation *propSim,
                                   const real &tForSpice,
                                   const std::vector<real> &targetState,
                                   real &deltaDelayRelativistic) {
@@ -658,7 +658,7 @@ void get_delta_delay_relativistic(propSimulation *propSim,
             (sunEarthDist + sunTargetDist - earthTargetDist));
 }
 
-void get_doppler_measurement(propSimulation *propSim, const size_t &i,
+void get_doppler_measurement(PropSimulation *propSim, const size_t &i,
                              const real receiveTimeTDB,
                              const real transmitTimeTDB,
                              const std::vector<real> xObsBaryRcv,

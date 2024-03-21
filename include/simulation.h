@@ -5,7 +5,7 @@
 
 void get_observer_state(const real &tObsMjd,
                         const std::vector<real> &observerInfo,
-                        propSimulation *propSim, const bool tObsInUTC,
+                        PropSimulation *propSim, const bool tObsInUTC,
                         std::vector<real> &observerState);
 
 struct Body {
@@ -75,7 +75,7 @@ class ImpulseEvent : public Event {
     void apply(const real &t, std::vector<real> &xInteg, const real &propDir);
 };
 
-class propSimulation {
+class PropSimulation {
    private:
     void prepare_for_evaluation(std::vector<real> &tEval,
                                 std::vector<std::vector<real>> &observerInfo);
@@ -88,9 +88,9 @@ class propSimulation {
     std::string name;
     std::string DEkernelPath;
     // constructor and copy constructor
-    propSimulation(std::string name, real t0, const int defaultSpiceBodies,
+    PropSimulation(std::string name, real t0, const int defaultSpiceBodies,
                    std::string DEkernelPath);
-    propSimulation(std::string name, const propSimulation &simRef);
+    PropSimulation(std::string name, const PropSimulation &simRef);
 
     // memory-mapped ephemeris
     Ephemeris ephem;

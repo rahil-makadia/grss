@@ -892,13 +892,13 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
+        prop_sim_past : prop.PropSimulation object
             propSim object for the past observations.
         """
         # pylint: disable=no-member
         t_eval_past = self.obs_array[self.past_obs_idx, 0]
         tf_past = np.min(t_eval_past)
-        prop_sim_past = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_past = prop.PropSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
         # flip t_eval_past and observer_info to go in reverse time order
         t_eval_past = t_eval_past[::-1]
@@ -929,13 +929,13 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_future : prop.propSimulation object
+        prop_sim_future : prop.PropSimulation object
             propSim object for the future observations.
         """
         # pylint: disable=no-member
         t_eval_future = self.obs_array[self.future_obs_idx, 0]
         tf_future = np.max(t_eval_future)
-        prop_sim_future = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_future = prop.PropSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
         prop_sim_future.tEvalMargin = 1.0
         prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
@@ -954,9 +954,9 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
+        prop_sim_past : prop.PropSimulation object
             propSim object for the past observations.
-        prop_sim_future : prop.propSimulation object
+        prop_sim_future : prop.PropSimulation object
             propSim object for the future observations.
         """
         t_eval_utc = True
@@ -1078,10 +1078,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            PropSimulation object for the future.
         integ_body : prop.IntegBody object
             IntegBody object for the body being fitted.
         events : list
@@ -1089,10 +1089,10 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
-            propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            PropSimulation object for the future.
         """
         for event in events:
             t_event = event[0]
@@ -1192,10 +1192,10 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
-            propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            propagated propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            propagated PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            propagated PropSimulation object for the future.
         """
         # sourcery skip: low-code-quality
         # pylint: disable=no-member
@@ -1279,10 +1279,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            The propagated PropSimulation object for the future.
         integ_body_idx : int
             The index of the integ_body to use for calculating the observations.
 
@@ -1341,10 +1341,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            The propagated PropSimulation object for the future.
         """
         partials = np.zeros((self.n_obs, self.n_fit))
         len_past_idx = len(self.past_obs_idx) if self.past_obs_exist else 0
@@ -1401,10 +1401,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            The propagated PropSimulation object for the future.
         perturbation_info : list
             A list of tuples containing the perturbation information
             for each nominal state parameter.
@@ -1437,10 +1437,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : prop.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : prop.PropSimulation object
+            The propagated PropSimulation object for the future.
         perturbation_info : list
             A list of tuples containing the perturbation information
             for each nominal state parameter.
@@ -1961,10 +1961,10 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     t_eval_utc = True
     eval_apparent_state = True
     converged_light_time = True
-    prop_sim_past = prop.propSimulation("simulated_obs_past", ref_sol['t'],
+    prop_sim_past = prop.PropSimulation("simulated_obs_past", ref_sol['t'],
                                         de_kernel, de_kernel_path)
     prop_sim_past.tEvalMargin = 1.0
-    prop_sim_future = prop.propSimulation("simulated_obs_future", ref_sol['t'],
+    prop_sim_future = prop.PropSimulation("simulated_obs_future", ref_sol['t'],
                                         de_kernel, de_kernel_path)
     prop_sim_future.tEvalMargin = 1.0
     if past_obs_exist:

@@ -16,7 +16,8 @@ real mjd_to_jd(const real mjd);
 void mjd_to_et(const real mjd, real &et);
 real mjd_to_et(const real mjd);
 
-void delta_at(const real mjdUtc, real &deltaAt);
+real delta_at_utc(const real mjdUtc);
+real delta_at_tai(const real mjdTai);
 real delta_et_utc(const real mjdUtc);
 real delta_et_tdb(const real mjdTdb);
 #endif

@@ -41,7 +41,7 @@ class SpiceBody;
 class IntegBody;
 class Event;
 class ImpulseEvent;
-class propSimulation;
+class PropSimulation;
 
 struct Constants {
     real du2m = 149597870700.0L;  // default au to m
@@ -137,7 +137,7 @@ class CloseApproachParameters {
     BPlaneParameters mtp;
     std::vector<real> dTLinMinusT = std::vector<real>(6, 0.0L);
     std::vector<real> dt = std::vector<real>(6, 0.0L);
-    void get_ca_parameters(propSimulation *propSim, const real &tMap);
+    void get_ca_parameters(PropSimulation *propSim, const real &tMap);
     void print_summary(int prec=8);
 };
 
@@ -148,7 +148,7 @@ class ImpactParameters : public CloseApproachParameters {
     real lon;
     real lat;
     real alt;
-    void get_impact_parameters(propSimulation *propSim);
+    void get_impact_parameters(PropSimulation *propSim);
     void print_summary(int prec=8);
 };
 

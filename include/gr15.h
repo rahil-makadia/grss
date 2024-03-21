@@ -59,16 +59,16 @@ const real dVec[21] = {
     0.0000000317188154017613665, 0.0002762930909826476593130, 0.0360285539837364596003871, 0.5767330002770787313544596, 2.2485887607691597933926895, 2.7558127197720458314421588
 };
 
-real get_initial_timestep(propSimulation *propSim);
+real get_initial_timestep(PropSimulation *propSim);
 void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim, real *g);
 void compute_g_and_b(const std::vector<std::vector<real> > &AccIntegArr,
                      const size_t &hIdx, real *g, real *bCompCoeffs,
                      std::vector<std::vector<real> > &b, const size_t &dim);
 void refine_b(std::vector<std::vector<real> > &b, real *e, const real &dtRatio,
               const size_t &dim);
-void check_and_apply_events(propSimulation *propSim, const real &t,
+void check_and_apply_events(PropSimulation *propSim, const real &t,
                             real &tNextEvent, size_t &nextEventIdx,
                             std::vector<real> &xInteg);
-void gr15(propSimulation *propSim);
+void gr15(PropSimulation *propSim);
 
 #endif

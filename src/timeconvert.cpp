@@ -74,7 +74,7 @@ real mjd_to_et(const real mjd) {
     return et;
 }
 
-void delta_at(const real mjdUtc, real &deltaAt) {
+real delta_at_utc(const real mjdUtc) {
     const real leapDatesMjdUtc[] = {
         36934.0, 37300.0, 37512.0, 37665.0, 38334.0, 38395.0, 38486.0,
         38639.0, 38761.0, 38820.0, 38942.0, 39004.0, 39126.0, 39887.0,
@@ -97,9 +97,9 @@ void delta_at(const real mjdUtc, real &deltaAt) {
         0.0012960, 0.0012960, 0.0012960, 0.0011232, 0.0011232,
         0.0012960, 0.0012960, 0.0012960, 0.0012960, 0.0012960,
         0.0012960, 0.0012960, 0.0025920, 0.0025920};
-    deltaAt = 0;
+    real deltaAt = 0;
     if (mjdUtc < leapDatesMjdUtc[0]) {
-        return;
+        return deltaAt;
     }
     size_t len = sizeof(leapDatesMjdUtc) / sizeof(leapDatesMjdUtc[0]);
     size_t i;
@@ -113,6 +113,15 @@ void delta_at(const real mjdUtc, real &deltaAt) {
         deltaAt +=
             leapSecDrift[i] * (mjdUtc - leapSecDriftMjdUtc[i]);
     }
+    return deltaAt;
+}
+
+real delta_at_tai(const real mjdTai){
+    real utcApprox = mjdTai;
+    real taiMinusUtc = delta_at_utc(utcApprox);
+    utcApprox = mjdTai - taiMinusUtc / 86400;
+    taiMinusUtc = delta_at_utc(utcApprox);
+    return taiMinusUtc;
 }
 
 real delta_et_utc(const real mjdUtc) {
@@ -124,8 +133,7 @@ real delta_et_utc(const real mjdUtc) {
     const real mDot = 1.99096871e-7;
     // end of SPICE leapseconds kernel information
 
-    real taiMinusUtc;
-    delta_at(mjdUtc, taiMinusUtc);
+    real taiMinusUtc = delta_at_utc(mjdUtc);
     real tdbSecPastJ2000Approx =
         (mjdUtc - 51544.5) * 86400 + ttMinusTai + taiMinusUtc;
     // equivalent of spice d_nint routine
@@ -161,11 +169,7 @@ real delta_et_tdb(const real mjdTdb) {
     const real M = m0 + mDot * tdbSecPastJ2000;
     const real E = M + eb * sin(M);
     const real tdbMinusTtApprox = k * sin(E);
-    const real tai_approx = mjdTdb - (tdbMinusTtApprox + ttMinusTai) / 86400;
-    real utcApprox = tai_approx;
-    real taiMinusUtc;
-    delta_at(utcApprox, taiMinusUtc);
-    utcApprox = mjdTdb - (tdbMinusTtApprox + ttMinusTai + taiMinusUtc) / 86400;
-    delta_at(utcApprox, taiMinusUtc);
+    const real taiApprox = mjdTdb - (tdbMinusTtApprox + ttMinusTai) / 86400;
+    real taiMinusUtc = delta_at_tai(taiApprox);
     return tdbMinusTtApprox + ttMinusTai + taiMinusUtc;
 }

@@ -1,6 +1,6 @@
 #include "approach.h"
 
-void check_ca_or_impact(propSimulation *propSim, const real &tOld,
+void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                         const std::vector<real> xIntegOld, const real &t,
                         const std::vector<real> xInteg) {
     // Check for close approach or impact
@@ -115,7 +115,7 @@ void check_ca_or_impact(propSimulation *propSim, const real &tOld,
     }
 }
 
-void ca_rdot_calc(propSimulation *propSim, const size_t &i, const size_t &j,
+void ca_rdot_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &rDot) {
     // Calculate the radial velocity between two bodies at a given time
     // This is used in get_ca_or_impact_time to find the time of closest approach
@@ -127,7 +127,7 @@ void ca_rdot_calc(propSimulation *propSim, const size_t &i, const size_t &j,
         (xRel[0] * xRel[3] + xRel[1] * xRel[4] + xRel[2] * xRel[5]) / relDist;
 }
 
-void impact_r_calc(propSimulation *propSim, const size_t &i, const size_t &j,
+void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &r) {
     // Calculate the distance between two bodies at a given time, accounting for
     // the radius of the bodies
@@ -147,7 +147,7 @@ void impact_r_calc(propSimulation *propSim, const size_t &i, const size_t &j,
     r = relDist - radius - radiusj;
 }
 
-void get_rel_state(propSimulation *propSim, const size_t &i, const size_t &j,
+void get_rel_state(PropSimulation *propSim, const size_t &i, const size_t &j,
                    const real &t, real xRel[6]) {
     std::vector<real> xInterp = propSim->interpolate(t);
     size_t starti = 0;
@@ -173,10 +173,10 @@ void get_rel_state(propSimulation *propSim, const size_t &i, const size_t &j,
     }
 }
 
-void get_ca_or_impact_time(propSimulation *propSim, const size_t &i,
+void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
                            const size_t &j, const real &x1, const real &x2,
                            real &tCA,
-                           void (*zero_func)(propSimulation *, const size_t &,
+                           void (*zero_func)(PropSimulation *, const size_t &,
                                              const size_t &, const real &,
                                              real &)) {
     // Brent's method for root finding, from Numerical Recipes in C/C++, 3rd
@@ -259,7 +259,7 @@ void get_ca_or_impact_time(propSimulation *propSim, const size_t &i,
                  "get_ca_or_impact_time!!! Impact/CA time may not be accurate.";
 }
 
-void CloseApproachParameters::get_ca_parameters(propSimulation *propSim, const real &tMap) {
+void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const real &tMap) {
     // Calculate the parameters of a close approach
     this->tMap = tMap;
     real xRelMap[6];
@@ -584,7 +584,7 @@ void CloseApproachParameters::print_summary(int prec){
     std::cout << "    Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
 }
 
-void ImpactParameters::get_impact_parameters(propSimulation *propSim){
+void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     ConstSpiceChar *baseBodyFrame;
     switch (this->centralBodySpiceId) {
         case 10:

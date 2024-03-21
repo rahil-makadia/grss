@@ -170,9 +170,9 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState,
     std::vector<real> r_final(3);
     std::vector<real> v_final(3);
 
-    rot_mat_z(Omega, R1);
-    rot_mat_x(i, R2);
-    rot_mat_z(omega, R3);
+    rot_mat_z(-Omega, R1);
+    rot_mat_x(-i, R2);
+    rot_mat_z(-omega, R3);
     mat_mat_mul(R1, R2, RTemp);
     mat_mat_mul(RTemp, R3, R);
 
