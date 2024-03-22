@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.time import Time
 
-from .. import prop
+from .. import libgrss
 from .fit_utils import get_observer_info
 
 __all__ = [ 'FitSimulation',
@@ -892,13 +892,13 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
+        prop_sim_past : libgrss.PropSimulation object
             propSim object for the past observations.
         """
         # pylint: disable=no-member
         t_eval_past = self.obs_array[self.past_obs_idx, 0]
         tf_past = np.min(t_eval_past)
-        prop_sim_past = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_past = libgrss.PropSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
         # flip t_eval_past and observer_info to go in reverse time order
         t_eval_past = t_eval_past[::-1]
@@ -929,13 +929,13 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_future : prop.propSimulation object
+        prop_sim_future : libgrss.PropSimulation object
             propSim object for the future observations.
         """
         # pylint: disable=no-member
         t_eval_future = self.obs_array[self.future_obs_idx, 0]
         tf_future = np.max(t_eval_future)
-        prop_sim_future = prop.propSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_future = libgrss.PropSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
         prop_sim_future.tEvalMargin = 1.0
         prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
@@ -954,9 +954,9 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
+        prop_sim_past : libgrss.PropSimulation object
             propSim object for the past observations.
-        prop_sim_future : prop.propSimulation object
+        prop_sim_future : libgrss.PropSimulation object
             propSim object for the future observations.
         """
         t_eval_utc = True
@@ -1030,11 +1030,11 @@ class FitSimulation:
 
         Returns
         -------
-        nongrav_params : prop.NongravParamaters object
+        nongrav_params : libgrss.NongravParamaters object
             Non-gravitational parameters for the fitted body.
         """
         # pylint: disable=no-member
-        nongrav_params = prop.NongravParamaters()
+        nongrav_params = libgrss.NongravParamaters()
         a1_val = x_dict['a1'] if 'a1' in x_dict.keys() else self.fixed_propsim_params['a1']
         a2_val = x_dict['a2'] if 'a2' in x_dict.keys() else self.fixed_propsim_params['a2']
         a3_val = x_dict['a3'] if 'a3' in x_dict.keys() else self.fixed_propsim_params['a3']
@@ -1078,21 +1078,21 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            propSimulation object for the future.
-        integ_body : prop.IntegBody object
+        prop_sim_past : libgrss.PropSimulation object
+            PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            PropSimulation object for the future.
+        integ_body : libgrss.IntegBody object
             IntegBody object for the body being fitted.
         events : list
             List of events for the fitted body.
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
-            propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            propSimulation object for the future.
+        prop_sim_past : libgrss.PropSimulation object
+            PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            PropSimulation object for the future.
         """
         for event in events:
             t_event = event[0]
@@ -1119,13 +1119,13 @@ class FitSimulation:
         -------
         state_plus : list
             Perturbed state in the positive direction.
-        ng_params_plus : prop.NongravParamaters object
+        ng_params_plus : libgrss.NongravParamaters object
             Perturbed non-gravitational parameters in the positive direction.
         events_plus : list
             Perturbed events in the positive direction.
         state_minus : list
             Perturbed state in the negative direction.
-        ng_params_minus : prop.NongravParamaters object
+        ng_params_minus : libgrss.NongravParamaters object
             Perturbed non-gravitational parameters in the negative direction.
         events_minus : list
             Perturbed events in the negative direction.
@@ -1192,10 +1192,10 @@ class FitSimulation:
 
         Returns
         -------
-        prop_sim_past : prop.propSimulation object
-            propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            propagated propSimulation object for the future.
+        prop_sim_past : libgrss.PropSimulation object
+            propagated PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            propagated PropSimulation object for the future.
         """
         # sourcery skip: low-code-quality
         # pylint: disable=no-member
@@ -1206,12 +1206,12 @@ class FitSimulation:
         ng_params_nom = self._x_dict_to_nongrav_params(self.x_nom)
         events_nom = self._x_dict_to_events(self.x_nom)
         if self.fit_cartesian:
-            integ_body_nom = prop.IntegBody("integ_body_nom", self.t_sol,
+            integ_body_nom = libgrss.IntegBody("integ_body_nom", self.t_sol,
                                             self.fixed_propsim_params['mass'],
                                             self.fixed_propsim_params['radius'],
                                             state_nom[:3], state_nom[3:6], ng_params_nom)
         elif self.fit_cometary:
-            integ_body_nom = prop.IntegBody("integ_body_nom",
+            integ_body_nom = libgrss.IntegBody("integ_body_nom",
                                             self.t_sol, self.fixed_propsim_params['mass'],
                                             self.fixed_propsim_params['radius'], state_nom,
                                             ng_params_nom)
@@ -1232,22 +1232,22 @@ class FitSimulation:
                 (state_plus, ng_params_plus, events_plus, state_minus,
                         ng_params_minus, events_minus, _) = perturbation_info[i]
                 if self.fit_cartesian:
-                    integ_body_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t_sol,
+                    integ_body_plus = libgrss.IntegBody(f"integBody_pert_{key}_plus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_plus[:3], state_plus[3:6],
                                                         ng_params_plus)
-                    integ_body_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
+                    integ_body_minus = libgrss.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_minus[:3], state_minus[3:6],
                                                         ng_params_minus)
                 elif self.fit_cometary:
-                    integ_body_plus = prop.IntegBody(f"integBody_pert_{key}_plus", self.t_sol,
+                    integ_body_plus = libgrss.IntegBody(f"integBody_pert_{key}_plus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_plus, ng_params_plus)
-                    integ_body_minus = prop.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
+                    integ_body_minus = libgrss.IntegBody(f"integBody_pert_{key}_minus", self.t_sol,
                                                         self.fixed_propsim_params['mass'],
                                                         self.fixed_propsim_params['radius'],
                                                         state_minus, ng_params_minus)
@@ -1279,10 +1279,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : libgrss.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            The propagated PropSimulation object for the future.
         integ_body_idx : int
             The index of the integ_body to use for calculating the observations.
 
@@ -1341,20 +1341,22 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : libgrss.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            The propagated PropSimulation object for the future.
         """
         partials = np.zeros((self.n_obs, self.n_fit))
         len_past_idx = len(self.past_obs_idx) if self.past_obs_exist else 0
         partials_idx = 0
-        past_optical_partials = np.array(prop_sim_past.opticalPartials)
-        past_radar_partials = np.array(prop_sim_past.radarPartials)
-        past_light_time = np.array(prop_sim_past.lightTimeEval)
-        future_optical_partials = np.array(prop_sim_future.opticalPartials)
-        future_radar_partials = np.array(prop_sim_future.radarPartials)
-        future_light_time = np.array(prop_sim_future.lightTimeEval)
+        if self.past_obs_exist:
+            past_optical_partials = np.array(prop_sim_past.opticalPartials)
+            past_radar_partials = np.array(prop_sim_past.radarPartials)
+            past_light_time = np.array(prop_sim_past.lightTimeEval)
+        if self.future_obs_exist:
+            future_optical_partials = np.array(prop_sim_future.opticalPartials)
+            future_radar_partials = np.array(prop_sim_future.radarPartials)
+            future_light_time = np.array(prop_sim_future.lightTimeEval)
         t_eval_tdb = Time(self.obs_array[:, 0], format='mjd', scale='utc').tdb.mjd
         for i in range(self.obs_array.shape[0]):
             obs_info_len = len(self.observer_info[i])
@@ -1399,10 +1401,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : libgrss.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            The propagated PropSimulation object for the future.
         perturbation_info : list
             A list of tuples containing the perturbation information
             for each nominal state parameter.
@@ -1435,10 +1437,10 @@ class FitSimulation:
 
         Parameters
         ----------
-        prop_sim_past : prop.propSimulation object
-            The propagated propSimulation object for the past.
-        prop_sim_future : prop.propSimulation object
-            The propagated propSimulation object for the future.
+        prop_sim_past : libgrss.PropSimulation object
+            The propagated PropSimulation object for the past.
+        prop_sim_future : libgrss.PropSimulation object
+            The propagated PropSimulation object for the future.
         perturbation_info : list
             A list of tuples containing the perturbation information
             for each nominal state parameter.
@@ -1643,7 +1645,7 @@ class FitSimulation:
         if self.obs_array[-1,0]-self.obs_array[0,0] < 7.0:
             cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         else:
-            cov = np.array(prop.matrix_inverse(atwa))
+            cov = np.array(libgrss.matrix_inverse(atwa))
         delta_x = cov @ atwb
         return delta_x.ravel(), cov
 
@@ -1904,7 +1906,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     # check that the reference solution has the requisite information and create integration body
     if 't' not in ref_sol:
         raise ValueError("Must provide a time for the initial solution.")
-    nongrav_params = prop.NongravParamaters()
+    nongrav_params = libgrss.NongravParamaters()
     nongrav_params.a1 = ref_ng_info['a1']
     nongrav_params.a2 = ref_ng_info['a2']
     nongrav_params.a3 = ref_ng_info['a3']
@@ -1916,7 +1918,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     if all(key in ref_sol for key in ("x", "y", "z", "vx", "vy", "vz")):
         pos = [ref_sol['x'], ref_sol['y'], ref_sol['z']]
         vel = [ref_sol['vx'], ref_sol['vy'], ref_sol['vz']]
-        target_body = prop.IntegBody("body_simulated_obs", ref_sol['t'], ref_sol['mass'],
+        target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'], ref_sol['mass'],
                                         ref_sol['radius'], pos, vel,
                                         ref_cov, nongrav_params)
     elif all(key in ref_sol for key in ("e", "q", "tp", "om", "w", "i")):
@@ -1928,7 +1930,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         inc = ref_sol['i']
         cometary_elements = [ecc, peri_dist, time_peri,
                                 omega*np.pi/180.0, arg_peri*np.pi/180.0, inc*np.pi/180.0]
-        target_body = prop.IntegBody("body_simulated_obs", ref_sol['t'],
+        target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'],
                                         ref_sol['mass'], ref_sol['radius'], cometary_elements,
                                         ref_cov, nongrav_params)
     else:
@@ -1959,10 +1961,10 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     t_eval_utc = True
     eval_apparent_state = True
     converged_light_time = True
-    prop_sim_past = prop.propSimulation("simulated_obs_past", ref_sol['t'],
+    prop_sim_past = libgrss.PropSimulation("simulated_obs_past", ref_sol['t'],
                                         de_kernel, de_kernel_path)
     prop_sim_past.tEvalMargin = 1.0
-    prop_sim_future = prop.propSimulation("simulated_obs_future", ref_sol['t'],
+    prop_sim_future = libgrss.PropSimulation("simulated_obs_future", ref_sol['t'],
                                         de_kernel, de_kernel_path)
     prop_sim_future.tEvalMargin = 1.0
     if past_obs_exist:

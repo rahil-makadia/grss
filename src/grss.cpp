@@ -5,10 +5,9 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(prop_simulation, m) {
-    m.doc() = "Simulation classes for the C++ GRSS orbit propagation code";
+PYBIND11_MODULE(libgrss, m) {
+    m.doc() = "GRSS C++ library bindings for Python";
 
-    // from utilities.h
     py::class_<Constants>(m, "Constants", R"mydelimiter(
         The Constants class contains physical constants and conversion factors
         used in the GRSS orbit propagation code.
@@ -253,7 +252,7 @@ PYBIND11_MODULE(prop_simulation, m) {
 
             Parameters
             ----------
-            propSim : propSimulation
+            propSim : PropSimulation
                 Simulation containing the close approach.
             tMap : real
                 Time of the mapping point.
@@ -388,7 +387,62 @@ PYBIND11_MODULE(prop_simulation, m) {
             Inverse of the matrix.
         )mydelimiter");
 
-    // from simulation.h
+    m.def("delta_at_utc", &delta_at_utc, py::arg("mjdUtc"), R"mydelimiter(
+        Calculate the difference between TAI and UTC time with UTC as the input.
+
+        Parameters
+        ----------
+        mjdUtc : real
+            Modified Julian date in UTC.
+
+        Returns
+        -------
+        deltaAt : real
+            Difference between TAI and UTC time.
+        )mydelimiter");
+
+    m.def("delta_at_tai", &delta_at_tai, py::arg("mjdTai"), R"mydelimiter(
+        Calculate the difference between TAI and UTC time with TAI as the input.
+
+        Parameters
+        ----------
+        mjdTai : real
+            Modified Julian date in TAI.
+
+        Returns
+        -------
+        deltaAt : real
+            Difference between TAI and UTC time.
+        )mydelimiter");
+
+    m.def("delta_et_utc", &delta_et_utc, py::arg("mjdUtc"), R"mydelimiter(
+        Calculate the difference between TDB and UTC time with UTC as the input.
+
+        Parameters
+        ----------
+        mjdUtc : real
+            Modified Julian date in UTC.
+
+        Returns
+        -------
+        delta_et : real
+            Difference between TDB and UTC time.
+        )mydelimiter");
+
+    m.def("delta_et_tdb", &delta_et_tdb, py::arg("mjdTdb"), R"mydelimiter(
+        Calculate the difference between TDB and UTC time with TDB as the input.
+
+        Parameters
+        ----------
+        mjdTdb : real
+            Modified Julian date in TDB.
+
+        Returns
+        -------
+        delta_et : real
+            Difference between TDB and UTC time.
+        )mydelimiter");
+
     py::class_<Body>(m, "Body", R"mydelimiter(
         The Body class contains the properties of an integrated or SPICE body.
         )mydelimiter")
@@ -495,7 +549,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Radius of the body.
             cometaryState : list of real
                 Initial Heliocentric Ecliptic Cometary state of the body.
-            ngParams : propSimulation.NongravParamaters
+            ngParams : PropSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
             )mydelimiter")
 
@@ -517,7 +571,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Initial barycentric Cartesian position of the body.
             vel : list of real
                 Initial barycentric Cartesian velocity of the body.
-            ngParams : propSimulation.NongravParamaters
+            ngParams : PropSimulation.NongravParamaters
                 Non-gravitational parameters of the body.
             )mydelimiter")
         .def_readwrite("spiceId", &IntegBody::spiceId, R"mydelimiter(
@@ -586,11 +640,11 @@ PYBIND11_MODULE(prop_simulation, m) {
 
     m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
           py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
-        Propagates a simulation in parallel using OpenMP.
+        Propagate a simulation in parallel using OpenMP.
 
         Parameters
         ----------
-        refSim : propSimulation
+        refSim : PropSimulation
             Reference simulation to copy.
         allBodies : list of list of real
             List of all bodies to propagate. Each list contains the initial MJD TDB time,
@@ -602,17 +656,17 @@ PYBIND11_MODULE(prop_simulation, m) {
 
         Returns
         -------
-        allSims : list of propSimulation
+        allSims : list of PropSimulation
             List of all simulations propagated in parallel.
         )mydelimiter");
 
-    py::class_<propSimulation>(m, "propSimulation", R"mydelimiter(
-        Class to perform an orbit propagation simulation.
+    py::class_<PropSimulation>(m, "PropSimulation", R"mydelimiter(
+        The PropSimulation class contains the orbit propagation simulation for intgrating solar system small bodies.
         )mydelimiter")
         .def(py::init<std::string, real, const int, std::string>(),
              py::arg("name"), py::arg("t0"), py::arg("defaultSpiceBodies"),
              py::arg("DEkernelPath"), R"mydelimiter(
-            Constructor for the propSimulation class.
+            Constructor for the PropSimulation class.
 
             name : str
                 Name of the simulation.
@@ -623,119 +677,123 @@ PYBIND11_MODULE(prop_simulation, m) {
             DEkernelPath : str
                 Path to the SPICE DE kernel.
             )mydelimiter")
-        .def(py::init<std::string, const propSimulation &>(), py::arg("name"),
+        .def(py::init<std::string, const PropSimulation &>(), py::arg("name"),
              py::arg("simRef"), R"mydelimiter(
-            Constructor for the propSimulation class.
+            Constructor for the PropSimulation class.
 
             name : str
                 Name of the simulation.
-            simRef : propSimulation
+            simRef : PropSimulation
                 Simulation to copy.
             )mydelimiter")
-        .def_readwrite("name", &propSimulation::name, R"mydelimiter(
+        .def_readwrite("name", &PropSimulation::name, R"mydelimiter(
             Name of the simulation.
             )mydelimiter")
-        .def_readwrite("DEkernelPath", &propSimulation::DEkernelPath,
+        .def_readwrite("DEkernelPath", &PropSimulation::DEkernelPath,
                        R"mydelimiter(
             Path to the SPICE DE kernel.
             )mydelimiter")
-        .def_readwrite("ephem", &propSimulation::ephem, R"mydelimiter(
-            Memory mapped SPK ephemeris of the simulation. propSimulation.Ephemeris object.
+        .def_readwrite("ephem", &PropSimulation::ephem, R"mydelimiter(
+            Memory mapped SPK ephemeris of the simulation. PropSimulation.Ephemeris object.
             )mydelimiter")
-        .def_readwrite("consts", &propSimulation::consts, R"mydelimiter(
-            Constants of the simulation. propSimulation.Constants object.
+        .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
+            Constants of the simulation. PropSimulation.Constants object.
             )mydelimiter")
-        .def_readwrite("integParams", &propSimulation::integParams,
+        .def_readwrite("integParams", &PropSimulation::integParams,
                        R"mydelimiter(
-            Integration parameters of the simulation. propSimulation.IntegParams object.
+            Integration parameters of the simulation. PropSimulation.IntegParams object.
             )mydelimiter")
-        .def_readwrite("spiceBodies", &propSimulation::spiceBodies,
+        .def_readwrite("parallelMode", &PropSimulation::parallelMode,
                        R"mydelimiter(
-            SPICE bodies of the simulation. List of propSimulation.SpiceBodies objects.
+            Whether to use parallel mode for the simulation (helps decide whether to use SPICE binary PCKs for Earth).
             )mydelimiter")
-        .def_readwrite("integBodies", &propSimulation::integBodies,
+        .def_readwrite("spiceBodies", &PropSimulation::spiceBodies,
                        R"mydelimiter(
-            Integration bodies of the simulation. List of propSimulation.IntegBody objects.
+            SPICE bodies of the simulation. List of PropSimulation.SpiceBodies objects.
             )mydelimiter")
-        .def_readwrite("events", &propSimulation::events, R"mydelimiter(
-            Events of the simulation. List of propSimulation.Event objects.
-            )mydelimiter")
-        .def_readwrite("caParams", &propSimulation::caParams, R"mydelimiter(
-            Close approach parameters of the simulation. List of propSimulation.CloseApproachParameters objects.
-            )mydelimiter")
-        .def_readwrite("impactParams", &propSimulation::impactParams,
+        .def_readwrite("integBodies", &PropSimulation::integBodies,
                        R"mydelimiter(
-            Impact parameters of the simulation. List of propSimulation.ImpactParameters objects.
+            Integration bodies of the simulation. List of PropSimulation.IntegBody objects.
             )mydelimiter")
-        .def_readwrite("t", &propSimulation::t, R"mydelimiter(
+        .def_readwrite("events", &PropSimulation::events, R"mydelimiter(
+            Events of the simulation. List of PropSimulation.Event objects.
+            )mydelimiter")
+        .def_readwrite("caParams", &PropSimulation::caParams, R"mydelimiter(
+            Close approach parameters of the simulation. List of PropSimulation.CloseApproachParameters objects.
+            )mydelimiter")
+        .def_readwrite("impactParams", &PropSimulation::impactParams,
+                       R"mydelimiter(
+            Impact parameters of the simulation. List of PropSimulation.ImpactParameters objects.
+            )mydelimiter")
+        .def_readwrite("t", &PropSimulation::t, R"mydelimiter(
             Current time of the simulation.
             )mydelimiter")
-        .def_readwrite("xInteg", &propSimulation::xInteg, R"mydelimiter(
+        .def_readwrite("xInteg", &PropSimulation::xInteg, R"mydelimiter(
             Current states of each integration body in the simulation.
             )mydelimiter")
-        .def_readwrite("interpParams", &propSimulation::interpParams,
+        .def_readwrite("interpParams", &PropSimulation::interpParams,
                        R"mydelimiter(
-            Interpolation parameters of the simulation. propSimulation.InterpolationParameters object.
+            Interpolation parameters of the simulation. PropSimulation.InterpolationParameters object.
             )mydelimiter")
-        .def_readwrite("tEvalUTC", &propSimulation::tEvalUTC, R"mydelimiter(
-            Whether the MJD evaluation time is in UTC for each value in propSimulation.tEval,
+        .def_readwrite("tEvalUTC", &PropSimulation::tEvalUTC, R"mydelimiter(
+            Whether the MJD evaluation time is in UTC for each value in PropSimulation.tEval,
             as opposed to TDB.
             )mydelimiter")
-        .def_readwrite("evalApparentState", &propSimulation::evalApparentState,
+        .def_readwrite("evalApparentState", &PropSimulation::evalApparentState,
                        R"mydelimiter(
             Whether to evaluate the apparent state of the integration bodies.
             )mydelimiter")
-        .def_readwrite("evalMeasurements", &propSimulation::evalMeasurements,
+        .def_readwrite("evalMeasurements", &PropSimulation::evalMeasurements,
                        R"mydelimiter(
             Whether to evaluate the measurements of the integration bodies.
             )mydelimiter")
         .def_readwrite("convergedLightTime",
-                       &propSimulation::convergedLightTime, R"mydelimiter(
+                       &PropSimulation::convergedLightTime, R"mydelimiter(
             Whether to use converged Newtonian light time correction.
             )mydelimiter")
-        .def_readwrite("xObserver", &propSimulation::xObserver, R"mydelimiter(
-            State of the observer for each value in propSimulation.tEval.
+        .def_readwrite("xObserver", &PropSimulation::xObserver, R"mydelimiter(
+            State of the observer for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("observerInfo", &propSimulation::observerInfo,
+        .def_readwrite("observerInfo", &PropSimulation::observerInfo,
                        R"mydelimiter(
-            Observer information for each value in propSimulation.tEval.
+            Observer information for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("tEvalMargin", &propSimulation::tEvalMargin,
+        .def_readwrite("tEvalMargin", &PropSimulation::tEvalMargin,
                        R"mydelimiter(
             Margin for allowing evaluation past the propagation start and end times.
             )mydelimiter")
-        .def_readwrite("tEval", &propSimulation::tEval, R"mydelimiter(
+        .def_readwrite("tEval", &PropSimulation::tEval, R"mydelimiter(
             MJD Times to evaluate the states of the integrated bodies at.
-            Can be TDB or UTC based on propSimulation.tEvalUTC.
+            Can be TDB or UTC based on PropSimulation.tEvalUTC.
             )mydelimiter")
-        .def_readwrite("radarObserver", &propSimulation::radarObserver,
+        .def_readwrite("radarObserver", &PropSimulation::radarObserver,
                        R"mydelimiter(
-            Whether the observer for each value in propSimulation.tEval is for radar.
+            Whether the observer for each value in PropSimulation.tEval is for radar.
             )mydelimiter")
-        .def_readwrite("lightTimeEval", &propSimulation::lightTimeEval,
+        .def_readwrite("lightTimeEval", &PropSimulation::lightTimeEval,
                        R"mydelimiter(
-            Light time from the observer to each integration body for each value in propSimulation.tEval.
+            Light time from the observer to each integration body for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("xIntegEval", &propSimulation::xIntegEval, R"mydelimiter(
-            States of each integration body in the simulation for each value in propSimulation.tEval.
+        .def_readwrite("xIntegEval", &PropSimulation::xIntegEval, R"mydelimiter(
+            States of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("opticalObs", &propSimulation::opticalObs,
+        .def_readwrite("opticalObs", &PropSimulation::opticalObs,
                        R"mydelimiter(
-            Optical observation of each integration body in the simulation for each value in propSimulation.tEval.
+            Optical observation of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("opticalPartials", &propSimulation::opticalPartials,
+        .def_readwrite("opticalPartials", &PropSimulation::opticalPartials,
                        R"mydelimiter(
-            Optical observation partials of each integration body in the simulation for each value in propSimulation.tEval.
+            Optical observation partials of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("radarObs", &propSimulation::radarObs,
+        .def_readwrite("radarObs", &PropSimulation::radarObs,
                        R"mydelimiter(
-            Radar observation of each integration body in the simulation for each value in propSimulation.tEval.
+            Radar observation of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def_readwrite("radarPartials", &propSimulation::radarPartials,
+        .def_readwrite("radarPartials", &PropSimulation::radarPartials,
                        R"mydelimiter(
-            Radar observation partials of each integration body in the simulation for each value in propSimulation.tEval.
+            Radar observation partials of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
-        .def("interpolate", &propSimulation::interpolate, py::arg("t"),
+        .def("interpolate", &PropSimulation::interpolate, py::arg("t"),
              R"mydelimiter(
             Interpolates the states of the integrated bodies to a given time.
 
@@ -749,16 +807,16 @@ PYBIND11_MODULE(prop_simulation, m) {
             xIntegInterp : list of real
                 Interpolated states of the integration bodies.
             )mydelimiter")
-        .def("add_spice_body", &propSimulation::add_spice_body, py::arg("body"),
+        .def("add_spice_body", &PropSimulation::add_spice_body, py::arg("body"),
              R"mydelimiter(
             Adds a SPICE body to the simulation.
 
             Parameters
             ----------
-            body : propSimulation.SpiceBody
+            body : PropSimulation.SpiceBody
                 SPICE body to add to the simulation.
             )mydelimiter")
-        .def("get_spiceBody_state", &propSimulation::get_spiceBody_state,
+        .def("get_spiceBody_state", &PropSimulation::get_spiceBody_state,
              py::arg("t"), py::arg("bodyName"), R"mydelimiter(
             Gets the state of a SPICE body at a given time.
 
@@ -769,16 +827,16 @@ PYBIND11_MODULE(prop_simulation, m) {
             bodyName : str
                 Name of the SPICE body in the simulation.
             )mydelimiter")
-        .def("add_integ_body", &propSimulation::add_integ_body, py::arg("body"),
+        .def("add_integ_body", &PropSimulation::add_integ_body, py::arg("body"),
              R"mydelimiter(
             Adds an integration body to the simulation.
 
             Parameters
             ----------
-            body : propSimulation.IntegBody
+            body : PropSimulation.IntegBody
                 Integration body to add to the simulation.
             )mydelimiter")
-        .def("remove_body", &propSimulation::remove_body, py::arg("name"),
+        .def("remove_body", &PropSimulation::remove_body, py::arg("name"),
              R"mydelimiter(
             Removes a body from the simulation.
 
@@ -787,7 +845,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             name : str
                 Name of the body to remove.
             )mydelimiter")
-        .def("add_event", &propSimulation::add_event, py::arg("body"),
+        .def("add_event", &PropSimulation::add_event, py::arg("body"),
              py::arg("tEvent"), py::arg("deltaV"), py::arg("multiplier") = 1.0L,
              R"mydelimiter(
             Adds an impulsive delta-V event to the simulation.
@@ -803,7 +861,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             multiplier : real
                 Multiplier to apply to the delta-V.
             )mydelimiter")
-        .def("set_sim_constants", &propSimulation::set_sim_constants,
+        .def("set_sim_constants", &PropSimulation::set_sim_constants,
              py::arg("du2m") = 149597870700.0L, py::arg("tu2s") = 86400.0L,
              py::arg("G") = 6.6743e-11L /
                  (149597870700.0L * 149597870700.0L * 149597870700.0L) *
@@ -824,14 +882,14 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Speed of light in a vacuum.
             )mydelimiter")
         .def("set_integration_parameters",
-             &propSimulation::set_integration_parameters, py::arg("tf"),
+             &PropSimulation::set_integration_parameters, py::arg("tf"),
              py::arg("tEval") = std::vector<real>(),
              py::arg("tEvalUTC") = false, py::arg("evalApparentState") = false,
              py::arg("convergedLightTims") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
              py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
              py::arg("dtMax") = 21.0L, py::arg("dtMin") = 5.0e-3L,
-             py::arg("dtChangeFactor") = 0.25L, py::arg("tolInteg") = 1.0e-9L,
+             py::arg("dtChangeFactor") = 0.25L, py::arg("tolInteg") = 1.0e-11L,
              py::arg("tolPC") = 1.0e-16L, R"mydelimiter(
             Sets the integration parameters.
 
@@ -844,7 +902,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                 Can be TDB or UTC based on tEvalUTC.
             tEvalUTC : bool
                 Whether the MJD evaluation time is in UTC for each value in
-                propSimulation.tEval, as opposed to TDB.
+                PropSimulation.tEval, as opposed to TDB.
             evalApparentState : bool
                 Whether to evaluate the apparent state of the integration bodies.
             convergedLightTimes : bool
@@ -868,7 +926,7 @@ PYBIND11_MODULE(prop_simulation, m) {
             tolPC : real
                 Tolerance for predictor-corrector within IAS15.
             )mydelimiter")
-        .def("get_sim_constants", &propSimulation::get_sim_constants,
+        .def("get_sim_constants", &PropSimulation::get_sim_constants,
              R"mydelimiter(
                 Gets the constants of the simulation.
 
@@ -888,7 +946,7 @@ PYBIND11_MODULE(prop_simulation, m) {
                     Difference between Julian date and modified Julian date.
                 )mydelimiter")
         .def("get_integration_parameters",
-             &propSimulation::get_integration_parameters, R"mydelimiter(
+             &PropSimulation::get_integration_parameters, R"mydelimiter(
             Gets the integration parameters.
 
             Returns
@@ -918,10 +976,10 @@ PYBIND11_MODULE(prop_simulation, m) {
             tolPC : real
                 Tolerance for predictor-corrector within IAS15.
             )mydelimiter")
-        .def("integrate", &propSimulation::integrate, R"mydelimiter(
+        .def("integrate", &PropSimulation::integrate, R"mydelimiter(
             Propagates the simulation using the Gauss-Radau integrator.
             )mydelimiter")
-        .def("extend", &propSimulation::extend, py::arg("tf"),
+        .def("extend", &PropSimulation::extend, py::arg("tf"),
              py::arg("tEvalNew") = std::vector<real>(),
              py::arg("xObserverNew") = std::vector<std::vector<real>>(),
              R"mydelimiter(

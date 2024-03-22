@@ -1,5 +1,6 @@
 #include "grss.h"
 #include <sys/time.h>
+#include <assert.h>
 #ifdef PROFILE_YES
 #include <gperftools/profiler.h>
 #endif
@@ -24,7 +25,7 @@ int main() {
     }
     real t0SimMjd = 2.4621385359989386E+06L - 2400000.5L;
     real tfSimMjd = 2.4625030372426095E+06L - 2400000.5L;
-    propSimulation simTest("simTest", t0SimMjd, DEkernel, DEkernelPath);
+    PropSimulation simTest("simTest", t0SimMjd, DEkernel, DEkernelPath);
 
     std::vector<real> tEval = {};
     bool tEvalUTC = false;

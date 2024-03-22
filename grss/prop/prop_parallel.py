@@ -1,14 +1,13 @@
 """Parallel computing utilities for the GRSS orbit propagation code"""
 import numpy as np
 import pandas as pd
-from joblib import Parallel, delayed
 # pylint: disable=no-name-in-module
-from . import prop_simulation as prop
+from .. import libgrss
 
 __all__ = [ 'cluster_ca_or_impacts',
 ]
 
-def _handle_one_cloned_sim(sol, name):
+def _handle_one_cloned_sim(sol):
     """
     Parse a solution dictionary into an IntegBody object.
 
@@ -16,14 +15,10 @@ def _handle_one_cloned_sim(sol, name):
     ----------
     sol : dict
         Dictionary of solution parameters.
-    name : str
-        Name of the cloned simulation.
-    ref_sim : grss.prop_sim.propSimulation
-        Reference simulation to use for making the cloned simulation.
 
     Returns
     -------
-    body : grss.prop_sim.IntegBody
+    body : libgrss.IntegBody
         IntegBody object with the solution parameters.
     """
     mass = sol.get('mass', 0.0)
@@ -53,13 +48,12 @@ def _handle_one_cloned_sim(sol, name):
         vel = [sol['vx'], sol['vy'], sol['vz']]
         cart = True
     else:
-        raise ValueError(f'Invalid solution dictionary for {name}')
+        # rause error and print dictionary
+        raise ValueError(f'Invalid solution dictionary:\n{sol}')
     if cometary:
         full_list = [sol['t'], mass, radius] + com + ng_list
     elif cart:
         full_list = [sol['t'], mass, radius] + pos + vel + ng_list
-    else:
-        raise ValueError(f'Invalid solution dictionary for {name}')
     return full_list
 
 def parallel_propagate(ref_sol, ref_sim, clones):
@@ -70,14 +64,11 @@ def parallel_propagate(ref_sol, ref_sim, clones):
     ----------
     ref_sol : dict
         Reference solution to use for propagating the reference simulation.
-    ref_sim : grss.prop_sim.propSimulation
+    ref_sim : libgrss.PropSimulation
         Reference simulation to use for propagating the orbits.
     clones : dict
         Dictionary of orbit solutions to propagate in parallel.
     """
-    name_prefix = ref_sim.name
-    ref_body_info = _handle_one_cloned_sim(ref_sol, f'{name_prefix} Sim 0')
-
     if ('e' in ref_sol and 'q' in ref_sol and 'tp' in ref_sol
         and 'om' in ref_sol and 'w' in ref_sol and 'i' in ref_sol):
         is_cometary = True
@@ -85,15 +76,13 @@ def parallel_propagate(ref_sol, ref_sim, clones):
             and 'vx' in ref_sol and 'vy' in ref_sol and 'vz' in ref_sol):
         is_cometary = False
     else:
-        raise ValueError(f'Invalid solution dictionary for {name_prefix} Sim 0')
+        raise ValueError('Invalid reference solution dictionary')
 
-    clone_info = Parallel(n_jobs=-1)(
-                    delayed(_handle_one_cloned_sim)
-                    (sol, f'{name_prefix} Sim {i+1}') for i, sol in enumerate(clones)
-    )
-    all_info = [ref_body_info]+clone_info
+    # this does not need parallelism, only takes ~2.5s to do 1e6 clones!
+    all_info = [_handle_one_cloned_sim(sol) for sol in clones]
+    ref_sim.parallelMode = True
 
-    return prop.propSim_parallel_omp(ref_sim, is_cometary, all_info)
+    return libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info)
 
 def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
     """
@@ -101,7 +90,7 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
 
     Parameters
     ----------
-    full_list : list of prop_simulation.CloseApproachParameters objects
+    full_list : list of libgrss.CloseApproachParameters objects
         List of close approaches to cluster.
     max_duration : float
         Maximum duration (in days) between close approaches in a cluster.
@@ -110,7 +99,7 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
 
     Returns
     -------
-    all_clusters : tuple of list of prop_simulation.CloseApproachParameters objects
+    all_clusters : tuple of list of libgrss.CloseApproachParameters objects
         A tuple of close approach clusters (each cluster is a list of
         close approaches).
     """

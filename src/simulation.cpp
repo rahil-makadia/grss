@@ -2,7 +2,7 @@
 
 void get_observer_state(const real &tObsMjd,
                         const std::vector<real> &observerInfo,
-                        propSimulation *propSim, const bool tObsInUTC,
+                        PropSimulation *propSim, const bool tObsInUTC,
                         std::vector<real> &observerState) {
     SpiceInt baseBody = observerInfo[0];
     if (observerInfo[0] == 500) baseBody = 399;
@@ -15,18 +15,12 @@ void get_observer_state(const real &tObsMjd,
         observerState[5] = 0.0L;
         return;
     }
-    real tObsET;
+    real secPastJ2000 = mjd_to_et(tObsMjd);
     real tObsMjdTDB;
-    mjd_to_et(tObsMjd, tObsET);
     if (tObsInUTC) {
-        // std::cout << tObsMjd << " MJD UTC" << tObsET << " s UTC -> ";
-        SpiceDouble et_minus_utc;
-        real sec_past_j2000_utc = tObsET;
-        deltet_c(sec_past_j2000_utc, "UTC", &et_minus_utc);
-        tObsET += et_minus_utc;
-        et_to_mjd(tObsET, tObsMjdTDB);
-        // std::cout << tObsET << " s ET " << tObsMjdTDB << " MJD TDB" <<
-        // std::endl;
+        const real etMinusUtc = delta_et_utc(tObsMjd);
+        secPastJ2000 += etMinusUtc;
+        tObsMjdTDB = et_to_mjd(secPastJ2000);
     } else {
         tObsMjdTDB = tObsMjd;
     }
@@ -84,24 +78,30 @@ void get_observer_state(const real &tObsMjd,
             throw std::invalid_argument("Given base body not supported");
             break;
     }
+    SpiceDouble rotMatSpice[6][6];
+    sxform_c(baseBodyFrame, "J2000", secPastJ2000, rotMatSpice);
+    std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
+    for (size_t i = 0; i < 6; i++) {
+        for (size_t j = 0; j < 6; j++) {
+            rotMat[i][j] = (real)rotMatSpice[i][j];
+        }
+    }
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
-    ConstSpiceDouble bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
-    ConstSpiceDouble bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
-    ConstSpiceDouble bodyFixedZ = rho * sin(lat) / 1.0e3L;
-    ConstSpiceDouble bodyFixedState[6] = {bodyFixedX, bodyFixedY, bodyFixedZ,
-                                          0.0,        0.0,        0.0};
-    SpiceDouble observerStateInertial[6];
-    SpiceDouble rotMat[6][6];
-    sxform_c(baseBodyFrame, "J2000", tObsET, rotMat);
-    mxvg_c(rotMat, bodyFixedState, 6, 6, observerStateInertial);
-    observerStateInertial[0] *= (real)1.0e3L / propSim->consts.du2m;
-    observerStateInertial[1] *= (real)1.0e3L / propSim->consts.du2m;
-    observerStateInertial[2] *= (real)1.0e3L / propSim->consts.du2m;
-    observerStateInertial[3] *= (real)1.0e3L / propSim->consts.duptu2mps;
-    observerStateInertial[4] *= (real)1.0e3L / propSim->consts.duptu2mps;
-    observerStateInertial[5] *= (real)1.0e3L / propSim->consts.duptu2mps;
+    real bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
+    real bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
+    real bodyFixedZ = rho * sin(lat) / 1.0e3L;
+    std::vector<real> bodyFixedState = {bodyFixedX, bodyFixedY, bodyFixedZ,
+                                            0.0,        0.0,        0.0};
+    std::vector<real> observerStateInertial(6);
+    mat_vec_mul(rotMat, bodyFixedState, observerStateInertial);
+    observerStateInertial[0] *= 1.0e3L / propSim->consts.du2m;
+    observerStateInertial[1] *= 1.0e3L / propSim->consts.du2m;
+    observerStateInertial[2] *= 1.0e3L / propSim->consts.du2m;
+    observerStateInertial[3] *= 1.0e3L / propSim->consts.duptu2mps;
+    observerStateInertial[4] *= 1.0e3L / propSim->consts.duptu2mps;
+    observerStateInertial[5] *= 1.0e3L / propSim->consts.duptu2mps;
     observerState[0] = baseBodyState[0] + observerStateInertial[0];
     observerState[1] = baseBodyState[1] + observerStateInertial[1];
     observerState[2] = baseBodyState[2] + observerStateInertial[2];
@@ -165,7 +165,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
     std::vector<std::vector<real>> eclipToEquatorial(3, std::vector<real>(3));
-    rot_mat_x(EARTH_OBLIQUITY, eclipToEquatorial);
+    rot_mat_x(-EARTH_OBLIQUITY, eclipToEquatorial);
     mat_vec_mul(eclipToEquatorial,
                 {cartesianStateEclip[0], cartesianStateEclip[1],
                  cartesianStateEclip[2]},
@@ -303,7 +303,7 @@ void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,
     }
 }
 
-propSimulation::propSimulation(std::string name, real t0,
+PropSimulation::PropSimulation(std::string name, real t0,
                                const int defaultSpiceBodies,
                                std::string DEkernelPath) {
     this->name = name;
@@ -631,12 +631,13 @@ propSimulation::propSimulation(std::string name, real t0,
     }
 }
 
-propSimulation::propSimulation(std::string name, const propSimulation& simRef) {
+PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
     this->ephem = simRef.ephem;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
+    this->parallelMode = simRef.parallelMode;
     this->spiceBodies = simRef.spiceBodies;
     // this->integBodies = simRef.integBodies;
     // this->events = simRef.events;
@@ -651,7 +652,7 @@ propSimulation::propSimulation(std::string name, const propSimulation& simRef) {
     this->radarObserver = simRef.radarObserver;
 }
 
-void propSimulation::prepare_for_evaluation(
+void PropSimulation::prepare_for_evaluation(
     std::vector<real>& tEval, std::vector<std::vector<real>>& observerInfo) {
     const bool forwardProp = this->integParams.t0 <= this->integParams.tf;
     const bool backwardProp = this->integParams.t0 >= this->integParams.tf;
@@ -728,30 +729,28 @@ void propSimulation::prepare_for_evaluation(
     std::vector<std::vector<real>> xObserver = std::vector<std::vector<real>>(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
-    if (this->tEvalUTC) {
+    if (!this->parallelMode) {
         furnsh_c(this->DEkernelPath.c_str());
-    }
-    if (tEval.size() != 0) {
-        for (size_t i = 0; i < tEval.size(); i++) {
-            if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
-                radarObserver[i] = 0;
-            } else if (observerInfo[i].size() == 9) {
-                radarObserver[i] = 1;
-            } else if (observerInfo[i].size() == 10) {
-                radarObserver[i] = 2;
-            } else {
-                throw std::invalid_argument(
-                    "The observerInfo vector must have 4/7 (optical), 9 (radar "
-                    "delay), or 10 elements (radar doppler).");
+        if (tEval.size() != 0) {
+            for (size_t i = 0; i < tEval.size(); i++) {
+                if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
+                    radarObserver[i] = 0;
+                } else if (observerInfo[i].size() == 9) {
+                    radarObserver[i] = 1;
+                } else if (observerInfo[i].size() == 10) {
+                    radarObserver[i] = 2;
+                } else {
+                    throw std::invalid_argument(
+                        "The observerInfo vector must have 4/7 (optical), 9 (radar "
+                        "delay), or 10 elements (radar doppler).");
+                }
+                get_observer_state(tEval[i], observerInfo[i], this,
+                                this->tEvalUTC, xObserver[i]);
+                // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " <<
+                // xObserver[i][2] << " " << xObserver[i][3] << " " <<
+                // xObserver[i][4] << " " << xObserver[i][5] << std::endl;
             }
-            get_observer_state(tEval[i], observerInfo[i], this,
-                               this->tEvalUTC, xObserver[i]);
-            // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " <<
-            // xObserver[i][2] << " " << xObserver[i][3] << " " <<
-            // xObserver[i][4] << " " << xObserver[i][5] << std::endl;
         }
-    }
-    if (this->tEvalUTC) {
         unload_c(this->DEkernelPath.c_str());
     }
 
@@ -768,7 +767,7 @@ void propSimulation::prepare_for_evaluation(
     }
 }
 
-void propSimulation::add_spice_body(SpiceBody body) {
+void PropSimulation::add_spice_body(SpiceBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->spiceBodies.size(); i++) {
         if (this->spiceBodies[i].name == body.name) {
@@ -783,7 +782,7 @@ void propSimulation::add_spice_body(SpiceBody body) {
     this->integParams.nTotal++;
 }
 
-std::vector<real> propSimulation::get_spiceBody_state(const real t, const std::string &bodyName) {
+std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::string &bodyName) {
     int spiceID = -1;
     for (size_t i = 0; i < this->spiceBodies.size(); i++){
         if (this->spiceBodies[i].name == bodyName){
@@ -803,7 +802,7 @@ std::vector<real> propSimulation::get_spiceBody_state(const real t, const std::s
     return state;
 }
 
-void propSimulation::add_integ_body(IntegBody body) {
+void PropSimulation::add_integ_body(IntegBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->integBodies.size(); i++) {
         if (this->integBodies[i].name == body.name) {
@@ -838,7 +837,7 @@ void propSimulation::add_integ_body(IntegBody body) {
     this->integParams.n2Derivs += body.n2Derivs;
 }
 
-void propSimulation::remove_body(std::string name) {
+void PropSimulation::remove_body(std::string name) {
     for (size_t i = 0; i < this->spiceBodies.size(); i++) {
         if (this->spiceBodies[i].name == name) {
             this->spiceBodies.erase(this->spiceBodies.begin() + i);
@@ -858,7 +857,7 @@ void propSimulation::remove_body(std::string name) {
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
-void propSimulation::add_event(IntegBody body, real tEvent,
+void PropSimulation::add_event(IntegBody body, real tEvent,
                                std::vector<real> deltaV, real multiplier) {
     // check if tEvent is valid
     const bool forwardProp = this->integParams.tf > this->integParams.t0;
@@ -907,7 +906,7 @@ void propSimulation::add_event(IntegBody body, real tEvent,
     }
 }
 
-void propSimulation::set_sim_constants(real du2m, real tu2s, real G,
+void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
                                        real clight) {
     this->consts.du2m = du2m;
     this->consts.tu2s = tu2s;
@@ -918,7 +917,7 @@ void propSimulation::set_sim_constants(real du2m, real tu2s, real G,
     this->consts.JdMinusMjd = 2400000.5;
 }
 
-void propSimulation::set_integration_parameters(
+void PropSimulation::set_integration_parameters(
     real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState,
     bool convergedLightTime, std::vector<std::vector<real>> observerInfo,
     bool adaptiveTimestep, real dt0, real dtMax, real dtMin,
@@ -939,7 +938,7 @@ void propSimulation::set_integration_parameters(
     this->integParams.tolInteg = tolInteg;
 }
 
-std::vector<real> propSimulation::get_sim_constants() {
+std::vector<real> PropSimulation::get_sim_constants() {
     std::vector<real> constants = {
         this->consts.du2m,      this->consts.tu2s,   this->consts.duptu2mps,
         this->consts.G,         this->consts.clight, this->consts.j2000Jd,
@@ -947,7 +946,7 @@ std::vector<real> propSimulation::get_sim_constants() {
     return constants;
 }
 
-std::vector<real> propSimulation::get_integration_parameters() {
+std::vector<real> PropSimulation::get_integration_parameters() {
     std::vector<real> integration_parameters = {
         (real)this->integParams.nInteg,
         (real)this->integParams.nSpice,
@@ -964,7 +963,7 @@ std::vector<real> propSimulation::get_integration_parameters() {
     return integration_parameters;
 }
 
-void propSimulation::preprocess() {
+void PropSimulation::preprocess() {
     if (!this->isPreprocessed) {
         this->t = this->integParams.t0;
         for (size_t i = 0; i < this->integParams.nInteg; i++) {
@@ -990,7 +989,7 @@ void propSimulation::preprocess() {
     }
 }
 
-void propSimulation::extend(real tf, std::vector<real> tEvalNew,
+void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
                             std::vector<std::vector<real>> xObserverNew) {
     std::cout << "WARNING: The extend() method is under development and may "
                  "not work properly with the interpolation routines."

@@ -1,6 +1,6 @@
 #include "gr15.h"
 
-real get_initial_timestep(propSimulation *propSim){
+real get_initial_timestep(PropSimulation *propSim){
     real dt0 = propSim->integParams.dtMin;
     if (propSim->integParams.dt0 != 0.0) {
         dt0 = fabs(propSim->integParams.dt0);
@@ -178,7 +178,7 @@ void refine_b(std::vector<std::vector<real>> &b,
     }
 }
 
-void check_and_apply_events(propSimulation *propSim, const real &t,
+void check_and_apply_events(PropSimulation *propSim, const real &t,
                             real &tNextEvent, size_t &nextEventIdx,
                             std::vector<real> &xInteg) {
     while (nextEventIdx < propSim->events.size() && t == tNextEvent) {
@@ -217,7 +217,7 @@ static real root7(real num){
     return fac*root;
 }
 
-// static real get_adaptive_timestep_old(propSimulation *propSim, const real &dt,
+// static real get_adaptive_timestep_old(PropSimulation *propSim, const real &dt,
 //                                       const real &accIntegArr7Max,
 //                                       const std::vector<std::vector<real>> &b) {
 //     real b6Max;
@@ -232,7 +232,7 @@ static real root7(real num){
 //     return dtReq;
 // }
 
-static real get_adaptive_timestep(propSimulation *propSim, const real &dt,
+static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
                                   const std::vector<real> &accInteg0,
                                   const std::vector<std::vector<real>> &b) {
     real minTimescale2 = 1e300L;
@@ -266,7 +266,7 @@ static real get_adaptive_timestep(propSimulation *propSim, const real &dt,
     return dtReq;
 }
 
-void gr15(propSimulation *propSim) {
+void gr15(PropSimulation *propSim) {
     if (!std::isfinite(propSim->t)) {
         throw std::runtime_error("t is not finite");
     }

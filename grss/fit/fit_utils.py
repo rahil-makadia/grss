@@ -294,7 +294,7 @@ def get_codes_dict():
 def get_observer_info(observer_codes):
     """
     Creates a list of observer information for each observer code for
-    passing into a grss propSimulation object
+    passing into a libgrss PropSimulation object
 
     Parameters
     ----------

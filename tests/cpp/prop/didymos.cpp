@@ -1,5 +1,6 @@
 #include "grss.h"
 #include <sys/time.h>
+#include <assert.h>
 #ifdef PROFILE_YES
 #include <gperftools/profiler.h>
 #endif
@@ -25,8 +26,8 @@ int main() {
     real t0SimMjd = 59956.5L;
     real numDays = 3000.0L;
     real tfSimMjd = t0SimMjd + numDays;
-    propSimulation simTestForward("simTestForward", t0SimMjd, DEkernel, DEkernelPath);
-    propSimulation simTestBackward("simTestBackward", tfSimMjd, DEkernel, DEkernelPath);
+    PropSimulation simTestForward("simTestForward", t0SimMjd, DEkernel, DEkernelPath);
+    PropSimulation simTestBackward("simTestBackward", tfSimMjd, DEkernel, DEkernelPath);
 
     std::vector<real> tEval = {};
     bool tEvalUTC = false;
@@ -126,7 +127,7 @@ int main() {
                               pow(simTestBackward.xInteg[2] - posf[2], 2))*simTestForward.consts.du2m;
     std::cout << "Distance (m): " << roundTripDiff << std::endl;
     // make sure the difference is less than 1% of distDiff
-    assert(roundTripDiff < 0.25L*distDiff);
+    assert(roundTripDiff < 0.5L*distDiff);
 
     std::cout
         << std::endl

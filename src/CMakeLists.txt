@@ -8,6 +8,7 @@ parallel.cpp
 simulation.cpp
 spk.cpp
 stm.cpp
+timeconvert.cpp
 utilities.cpp
 )
 

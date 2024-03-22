@@ -3,7 +3,7 @@
 
 #include "parallel.h"
 
-void propSimulation::integrate() {
+void PropSimulation::integrate() {
     // check that xInteg has a valid size. If not, raise error
     if (this->integParams.nInteg < 1) {
         throw std::runtime_error(
@@ -13,9 +13,9 @@ void propSimulation::integrate() {
     }
 
     this->preprocess();
-    furnsh_c(this->DEkernelPath.c_str());
+    if (!this->parallelMode) furnsh_c(this->DEkernelPath.c_str());
     gr15(this);
-    unload_c(this->DEkernelPath.c_str());
+    if (!this->parallelMode) unload_c(this->DEkernelPath.c_str());
 
     // if backwards integration
     if (this->integParams.t0 > this->integParams.tf) {

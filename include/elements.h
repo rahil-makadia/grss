@@ -1,8 +1,7 @@
 #ifndef ELEMENTS_H
 #define ELEMENTS_H
 
-#include "utilities.h"
-#include <assert.h>
+#include "timeconvert.h"
 
 void kepler_solve_elliptic(const real &M, const real &e, real &E,
                            const real &tol, const int &max_iter);

@@ -1,79 +1,5 @@
 #include "utilities.h"
 
-void jd_to_et(const real jd, real &et) {
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    et = (jd - j2000) * day2sec;
-}
-
-real jd_to_et(const real jd) {
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    return (jd - j2000) * day2sec;
-}
-
-void jd_to_mjd(const real jd, real &mjd) {
-    real offset = 2400000.5;
-    mjd = jd - offset;
-}
-
-real jd_to_mjd(const real jd) {
-    real offset = 2400000.5;
-    return jd - offset;
-}
-
-void et_to_jd(const real et, real &jd) {
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    jd = (et / day2sec) + j2000;
-}
-
-real et_to_jd(const real et) {
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    return (et / day2sec) + j2000;
-}
-
-void et_to_mjd(const real et, real &mjd) {
-    real offset = 2400000.5;
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    mjd = (et / day2sec) - offset + j2000;
-}
-
-real et_to_mjd(const real et) {
-    real offset = 2400000.5;
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    return (et / day2sec) - offset + j2000;
-}
-
-void mjd_to_jd(const real mjd, real &jd) {
-    real offset = 2400000.5;
-    jd = mjd + offset;
-}
-
-real mjd_to_jd(const real mjd) {
-    real offset = 2400000.5;
-    real jd = mjd + offset;
-    return jd;
-}
-
-void mjd_to_et(const real mjd, real &et) {
-    real offset = 2400000.5;
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    et = (mjd + offset - j2000) * day2sec;
-}
-
-real mjd_to_et(const real mjd) {
-    real offset = 2400000.5;
-    real j2000 = 2451545.0;
-    real day2sec = 86400.0;
-    real et = (mjd + offset - j2000) * day2sec;
-    return et;
-}
-
 void wrap_to_2pi(real &angle) {
     if (angle < 0) {
         angle += 2 * PI;
@@ -286,29 +212,29 @@ void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][2] = 0;
     R[1][0] = 0;
     R[1][1] = cos(theta);
-    R[1][2] = -sin(theta);
+    R[1][2] = sin(theta);
     R[2][0] = 0;
-    R[2][1] = sin(theta);
+    R[2][1] = -sin(theta);
     R[2][2] = cos(theta);
 }
 
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][0] = cos(theta);
     R[0][1] = 0;
-    R[0][2] = sin(theta);
+    R[0][2] = -sin(theta);
     R[1][0] = 0;
     R[1][1] = 1;
     R[1][2] = 0;
-    R[2][0] = -sin(theta);
+    R[2][0] = sin(theta);
     R[2][1] = 0;
     R[2][2] = cos(theta);
 }
 
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R) {
     R[0][0] = cos(theta);
-    R[0][1] = -sin(theta);
+    R[0][1] = sin(theta);
     R[0][2] = 0;
-    R[1][0] = sin(theta);
+    R[1][0] = -sin(theta);
     R[1][1] = cos(theta);
     R[1][2] = 0;
     R[2][0] = 0;

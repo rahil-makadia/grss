@@ -5,7 +5,7 @@
 
 void get_observer_state(const real &tObsMjd,
                         const std::vector<real> &observerInfo,
-                        propSimulation *propSim, const bool tObsInUTC,
+                        PropSimulation *propSim, const bool tObsInUTC,
                         std::vector<real> &observerState);
 
 struct Body {
@@ -75,7 +75,7 @@ class ImpulseEvent : public Event {
     void apply(const real &t, std::vector<real> &xInteg, const real &propDir);
 };
 
-class propSimulation {
+class PropSimulation {
    private:
     void prepare_for_evaluation(std::vector<real> &tEval,
                                 std::vector<std::vector<real>> &observerInfo);
@@ -88,9 +88,9 @@ class propSimulation {
     std::string name;
     std::string DEkernelPath;
     // constructor and copy constructor
-    propSimulation(std::string name, real t0, const int defaultSpiceBodies,
+    PropSimulation(std::string name, real t0, const int defaultSpiceBodies,
                    std::string DEkernelPath);
-    propSimulation(std::string name, const propSimulation &simRef);
+    PropSimulation(std::string name, const PropSimulation &simRef);
 
     // memory-mapped ephemeris
     Ephemeris ephem;
@@ -101,6 +101,7 @@ class propSimulation {
 
     // integration parameters
     IntegrationParameters integParams;
+    bool parallelMode = false;
 
     // bodies and events
     std::vector<SpiceBody> spiceBodies;
@@ -157,7 +158,7 @@ class propSimulation {
             std::vector<std::vector<real>>(),
         bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 21.0L,
         real dtMin = 5.0e-3L, real dtChangeFactor = 0.25L,
-        real tolInteg = 1.0e-9L, real tolPC = 1.0e-16L);
+        real tolInteg = 1.0e-11L, real tolPC = 1.0e-16L);
 
     // getters
     std::vector<real> get_sim_constants();

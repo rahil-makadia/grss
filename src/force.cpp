@@ -6,7 +6,7 @@
 #endif
 
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
-                                propSimulation *propSim) {
+                                PropSimulation *propSim) {
     std::vector<real> accInteg(propSim->integParams.n2Derivs, 0.0);
     std::vector<STMParameters> allSTMs;
     size_t starti = 0;
@@ -104,7 +104,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     return accInteg;
 }
 
-void force_newton(const propSimulation *propSim, std::vector<real> &accInteg,
+void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
                   std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -156,7 +156,7 @@ void force_newton(const propSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
-void force_ppn_simple(const propSimulation *propSim,
+void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
                       std::vector<STMParameters> &allSTMs) {
 #ifdef PRINT_FORCES
@@ -227,7 +227,7 @@ void force_ppn_simple(const propSimulation *propSim,
     #endif
 }
 
-void force_ppn_eih(const propSimulation *propSim, std::vector<real> &accInteg,
+void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
                    std::vector<STMParameters> &allSTMs) {
 // calculate accelerations using the Einstein-Infeld-Hoffmann (EIH) PPN
 // formalism see eqn 27 in
@@ -386,7 +386,7 @@ void force_ppn_eih(const propSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
-void force_J2(const propSimulation *propSim, std::vector<real> &accInteg,
+void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
               std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -474,7 +474,7 @@ void force_J2(const propSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
-void force_nongrav(const propSimulation *propSim, std::vector<real> &accInteg,
+void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
                    std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -571,7 +571,7 @@ void force_nongrav(const propSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
-void force_thruster(const propSimulation *propSim,
+void force_thruster(const PropSimulation *propSim,
                     std::vector<real> &accInteg) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
