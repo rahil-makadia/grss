@@ -25,11 +25,6 @@ include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
 # Set source code directories
 add_subdirectory(src)
 
-# Configure CPack for cross-platform packaging
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
-
 # create pybind11 module
 find_package(pybind11 REQUIRED)
 pybind11_add_module(libgrss src/${PROJECT_NAME}.cpp)
