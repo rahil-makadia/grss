@@ -6,5 +6,6 @@ API
    :recursive:
 
    grss.fit
+   grss.libgrss
    grss.prop
    grss.utils
