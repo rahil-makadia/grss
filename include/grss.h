@@ -13,9 +13,9 @@ void PropSimulation::integrate() {
     }
 
     this->preprocess();
-    furnsh_c(this->DEkernelPath.c_str());
+    if (!this->parallelMode) furnsh_c(this->DEkernelPath.c_str());
     gr15(this);
-    unload_c(this->DEkernelPath.c_str());
+    if (!this->parallelMode) unload_c(this->DEkernelPath.c_str());
 
     // if backwards integration
     if (this->integParams.t0 > this->integParams.tf) {

@@ -37,7 +37,7 @@ class CMakeBuild(build_ext):
         if not binary_created:
             raise FileNotFoundError("libgrss binary for C++ source code not found "
                                     "in cmake build directory")
-        os.system(f"cp {ext.sourcedir}/build/libgrss* {self.build_lib}/grss/prop/")
+        os.system(f"cp {ext.sourcedir}/build/libgrss* {self.build_lib}/grss/")
         return
 
 # get version from version.txt

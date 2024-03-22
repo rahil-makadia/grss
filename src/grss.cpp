@@ -6,7 +6,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(libgrss, m) {
-    m.doc() = "Simulation classes for the C++ GRSS orbit propagation code";
+    m.doc() = "GRSS C++ library bindings for Python";
 
     py::class_<Constants>(m, "Constants", R"mydelimiter(
         The Constants class contains physical constants and conversion factors
@@ -640,7 +640,7 @@ PYBIND11_MODULE(libgrss, m) {
 
     m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
           py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
-        Propagates a simulation in parallel using OpenMP.
+        Propagate a simulation in parallel using OpenMP.
 
         Parameters
         ----------
@@ -661,7 +661,7 @@ PYBIND11_MODULE(libgrss, m) {
         )mydelimiter");
 
     py::class_<PropSimulation>(m, "PropSimulation", R"mydelimiter(
-        Class to perform an orbit propagation simulation.
+        The PropSimulation class contains the orbit propagation simulation for intgrating solar system small bodies.
         )mydelimiter")
         .def(py::init<std::string, real, const int, std::string>(),
              py::arg("name"), py::arg("t0"), py::arg("defaultSpiceBodies"),
@@ -702,6 +702,10 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("integParams", &PropSimulation::integParams,
                        R"mydelimiter(
             Integration parameters of the simulation. PropSimulation.IntegParams object.
+            )mydelimiter")
+        .def_readwrite("parallelMode", &PropSimulation::parallelMode,
+                       R"mydelimiter(
+            Whether to use parallel mode for the simulation (helps decide whether to use SPICE binary PCKs for Earth).
             )mydelimiter")
         .def_readwrite("spiceBodies", &PropSimulation::spiceBodies,
                        R"mydelimiter(

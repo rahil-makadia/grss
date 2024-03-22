@@ -637,6 +637,7 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->ephem = simRef.ephem;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
+    this->parallelMode = simRef.parallelMode;
     this->spiceBodies = simRef.spiceBodies;
     // this->integBodies = simRef.integBodies;
     // this->events = simRef.events;
@@ -728,30 +729,28 @@ void PropSimulation::prepare_for_evaluation(
     std::vector<std::vector<real>> xObserver = std::vector<std::vector<real>>(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
-    if (this->tEvalUTC) {
+    if (!this->parallelMode) {
         furnsh_c(this->DEkernelPath.c_str());
-    }
-    if (tEval.size() != 0) {
-        for (size_t i = 0; i < tEval.size(); i++) {
-            if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
-                radarObserver[i] = 0;
-            } else if (observerInfo[i].size() == 9) {
-                radarObserver[i] = 1;
-            } else if (observerInfo[i].size() == 10) {
-                radarObserver[i] = 2;
-            } else {
-                throw std::invalid_argument(
-                    "The observerInfo vector must have 4/7 (optical), 9 (radar "
-                    "delay), or 10 elements (radar doppler).");
+        if (tEval.size() != 0) {
+            for (size_t i = 0; i < tEval.size(); i++) {
+                if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
+                    radarObserver[i] = 0;
+                } else if (observerInfo[i].size() == 9) {
+                    radarObserver[i] = 1;
+                } else if (observerInfo[i].size() == 10) {
+                    radarObserver[i] = 2;
+                } else {
+                    throw std::invalid_argument(
+                        "The observerInfo vector must have 4/7 (optical), 9 (radar "
+                        "delay), or 10 elements (radar doppler).");
+                }
+                get_observer_state(tEval[i], observerInfo[i], this,
+                                this->tEvalUTC, xObserver[i]);
+                // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " <<
+                // xObserver[i][2] << " " << xObserver[i][3] << " " <<
+                // xObserver[i][4] << " " << xObserver[i][5] << std::endl;
             }
-            get_observer_state(tEval[i], observerInfo[i], this,
-                               this->tEvalUTC, xObserver[i]);
-            // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " <<
-            // xObserver[i][2] << " " << xObserver[i][3] << " " <<
-            // xObserver[i][4] << " " << xObserver[i][5] << std::endl;
         }
-    }
-    if (this->tEvalUTC) {
         unload_c(this->DEkernelPath.c_str());
     }
 

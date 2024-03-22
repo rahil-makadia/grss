@@ -71,7 +71,7 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     impact.flybyBodyIdx = i;
                     impact.centralBodyIdx = j;
                     impact.get_ca_parameters(propSim, tImp);
-                    impact.get_impact_parameters(propSim);
+                    if (!propSim->parallelMode) impact.get_impact_parameters(propSim);
                     impact.impact = true;
                     propSim->impactParams.push_back(impact);
                     std::cout << "Impact detected at MJD " << tImp << " TDB. "

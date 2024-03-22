@@ -144,7 +144,7 @@ class CloseApproachParameters {
 class ImpactParameters : public CloseApproachParameters {
    private:
    public:
-    std::vector<real> xRelBodyFixed = std::vector<real>(6, 0.0L);
+    std::vector<real> xRelBodyFixed = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
     real lon;
     real lat;
     real alt;

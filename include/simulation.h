@@ -101,6 +101,7 @@ class PropSimulation {
 
     // integration parameters
     IntegrationParameters integParams;
+    bool parallelMode = false;
 
     // bodies and events
     std::vector<SpiceBody> spiceBodies;

@@ -407,8 +407,10 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                                 opticalPartials);
         break;
     case 1: case 2:
-        get_radar_measurement(propSim, interpIdx, t, dt, tInterpGeom,
-                              xInterpGeom, radarMeasurement, radarPartials);
+        if (!propSim->parallelMode) {
+            get_radar_measurement(propSim, interpIdx, t, dt, tInterpGeom,
+                                  xInterpGeom, radarMeasurement, radarPartials);
+        }
         break;
     default:
         throw std::runtime_error(
