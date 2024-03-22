@@ -26,7 +26,6 @@ include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
 add_subdirectory(src)
 
 # create pybind11 module
-set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 REQUIRED)
 pybind11_add_module(libgrss src/${PROJECT_NAME}.cpp)
 target_link_libraries(libgrss PRIVATE ${PROJECT_NAME})
