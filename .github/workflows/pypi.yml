@@ -32,8 +32,8 @@ jobs:
           xcode-version: '15.1.0'
       - name: Initialize repository
         run: |
-          source initialize.sh --no-tm-overwrite
           sudo apt-get install doxygen
+          source initialize.sh --no-tm-overwrite
       - name: Build python distributions
         run: source build_python.sh
       - name: Upload distribution for next job

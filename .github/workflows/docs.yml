@@ -15,16 +15,20 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1.6.0
+        with:
+          xcode-version: '15.1.0'
       - name: Install GRSS (including dependencies)
         run: |
           python3 -m pip install --upgrade pip
+          sudo brew install doxygen
           source initialize.sh
           pip3 install .
       - name: Build docs
         run: |
           python3 -m pip install sphinx-book-theme==1.0.1 pydata-sphinx-theme==0.15.2
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-favicon breathe
-          sudo brew install doxygen
           source build_cpp.sh
           cp build/libgrss* grss/
           cd docs
