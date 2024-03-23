@@ -22,7 +22,7 @@ jobs:
       - name: Install GRSS (including dependencies)
         run: |
           python3 -m pip install --upgrade pip
-          brew install doxygen
+          brew install pandoc doxygen
           source initialize.sh
           pip3 install .
       - name: Build docs
