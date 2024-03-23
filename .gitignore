@@ -125,10 +125,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-docs/source/_autosummary/
-
 # PyBuilder
 .pybuilder/
 target/
@@ -187,6 +183,14 @@ cython_debug/
 *.app
 
 ################################### Individual user exceptions
+# Sphinx documentation
+docs/_build/
+docs/source/_autosummary/
+
+# Doxygen documentation
+docs/doxygen/*
+!docs/doxygen/doxygen.config
+
 # gperftools profiler output
 *.prof
 

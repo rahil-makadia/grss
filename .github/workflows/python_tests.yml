@@ -24,6 +24,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           source initialize.sh
+          sudo apt-get install doxygen
           pip3 install .
       - name: Run tests
         run: |

@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "GRSS"
-project_copyright = "2023, Rahil Makadia"
+project_copyright = "2024, GRSS Development Team"
 author = "Rahil Makadia"
 # get release and version from version.txt
 with open("../../grss/version.txt", "r", encoding="utf-8") as f:
@@ -24,6 +24,7 @@ extensions = [
     "nbsphinx",  # for parsing jupyter notebooks
     "sphinx_favicon",  # for adding full favicon support
     "sphinx_gallery.load_style",  # for displaying jupyter notebook thumbnails
+    "breathe",  # for linking to C++ documentation
 ]
 autosummary_generate = True
 
@@ -36,6 +37,13 @@ exclude_patterns = []
 html_theme = "sphinx_book_theme"
 html_context = {
     "default_mode": "light",
+}
+html_sidebars = {
+    "*": [
+        "navbar-logo.html",
+        "search-field.html",
+        "sbt-sidebar-nav.html",
+    ]
 }
 html_theme_options = {
     "repository_url": "https://github.com/rahil-makadia/grss",

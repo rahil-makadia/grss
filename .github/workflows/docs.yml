@@ -19,15 +19,14 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           source initialize.sh
-          # brew install geos
-          pip3 install basemap
           pip3 install .
       - name: Build docs
         run: |
-          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-book-theme sphinx-favicon
-          sudo apt-get install pandoc
+          python3 -m pip install sphinx-book-theme==1.0.1 pydata-sphinx-theme==0.15.2
+          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-favicon breathe
+          sudo apt-get install pandoc doxygen
           source build_cpp.sh
-          cp build/libgrss* grss/prop
+          cp build/libgrss* grss/
           cd docs
           make clean html
           cd ..

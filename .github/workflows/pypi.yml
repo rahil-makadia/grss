@@ -33,6 +33,7 @@ jobs:
       - name: Initialize repository
         run: |
           source initialize.sh --no-tm-overwrite
+          sudo apt-get install doxygen
       - name: Build python distributions
         run: source build_python.sh
       - name: Upload distribution for next job
