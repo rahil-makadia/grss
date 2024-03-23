@@ -28,7 +28,7 @@ jobs:
       - name: Build docs
         run: |
           python3 -m pip install sphinx-book-theme==1.0.1 pydata-sphinx-theme==0.15.2
-          python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-favicon breathe
+          python3 -m pip install ipython sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-favicon breathe
           source build_cpp.sh
           cp build/libgrss* grss/
           cd docs
