@@ -7,7 +7,7 @@ on:
 
 jobs:
   sphinx:
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
         run: |
           python3 -m pip install sphinx-book-theme==1.0.1 pydata-sphinx-theme==0.15.2
           python3 -m pip install sphinx sphinx-copybutton sphinx-gallery nbsphinx sphinx-favicon breathe
-          sudo apt-get install pandoc doxygen
+          sudo brew install doxygen
           source build_cpp.sh
           cp build/libgrss* grss/
           cd docs
