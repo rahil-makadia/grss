@@ -23,6 +23,7 @@ extensions = [
     "sphinx.ext.napoleon",  # for parsing numpy style docstrings
     "nbsphinx",  # for parsing jupyter notebooks
     "sphinx_favicon",  # for adding full favicon support
+    "IPython.sphinxext.ipython_console_highlighting",  # for syntax highlighting
     "sphinx_gallery.load_style",  # for displaying jupyter notebook thumbnails
     "breathe",  # for linking to C++ documentation
 ]
@@ -107,3 +108,9 @@ favicons = [
     {"name": "msapplication-TileImage", "content": "mstile-310x310.png"},
 ]
 exclude_patterns = ["**.ipynb_checkpoints"]
+
+breathe_projects = {
+	"GRSS": "../doxygen/xml"
+}
+breathe_default_project = "GRSS"
+breathe_default_members = ('members', 'undoc-members')
