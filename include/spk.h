@@ -31,40 +31,37 @@ struct EphemerisCache {
     double t;
     struct CacheItem items[SPK_CACHE_ITEM_SIZE];
 };
-
 #define SPK_CACHE_SIZE 16
+#define RECORD_LEN 1024
 struct Ephemeris {
-    struct spkInfo *mb;
-    struct spkInfo *sb;
-    size_t cacheSize = SPK_CACHE_SIZE;
+    struct SpkInfo *mb;
+    struct SpkInfo *sb;
     size_t nextIdxToWrite = -1;
     EphemerisCache cache[SPK_CACHE_SIZE];
 };
 
-struct spkTarget {
-    int code;    // Target code
-    int cen;     // Centre target
-    double beg;  // Begin epoch
-    double end;  // End epoch
-    double res;  // Epoch step
-    int *one;    // Record index
-    int *two;    // ... ditto
-    int ind;     // Length of index
+struct SpkTarget {
+    int code;
+    int cen;
+    double beg;
+    double end;
+    double res;
+    int *one;
+    int *two;
+    int ind;
 };
-
-struct spkInfo {
-    struct spkTarget *targets;
-    int num;           // number of targets
-    int allocatedNum;  // space allocated for this many targets
-    void *map;         // memory map
-    size_t len;        // map length
+struct SpkInfo {
+    struct SpkTarget *targets;
+    int num;
+    int allocatedNum;
+    void *map;
+    size_t len;
 };
-
-spkInfo *spk_init(const std::string &path);
-int spk_free(struct spkInfo *pl);
-int spk_calc(struct spkInfo *pl, double epoch, int m, double *x, double *y,
-             double *z, double *out_vx, double *out_vy, double *out_vz,
-             double *out_ax, double *out_ay, double *out_az);
+SpkInfo *spk_init(const std::string &path);
+void spk_calc(SpkInfo *pl, double epoch, int spiceId, double *out_x,
+             double *out_y, double *out_z, double *out_vx, double *out_vy,
+             double *out_vz, double *out_ax, double *out_ay, double *out_az);
 void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
                    double state[9]);
+
 #endif

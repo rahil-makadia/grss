@@ -16,7 +16,7 @@ std::vector<PropSimulation> propSim_parallel_omp(
         for (size_t i = 0; i < numBodies; i++) {
             std::vector<real> data = allBodies[i];
             std::string name = refSim.name+" clone "+std::to_string(i);
-            NongravParamaters ngParams;
+            NongravParameters ngParams;
             ngParams.a1 = data[9];
             ngParams.a2 = data[10];
             ngParams.a3 = data[11];

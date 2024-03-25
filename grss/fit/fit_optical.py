@@ -1,6 +1,6 @@
 """Optical observation handling for the GRSS orbit determination code"""
 from astropy.time import Time
-from astroquery.mpc import MPC
+import requests
 from astroquery.gaia import Gaia
 import healpy as hp
 import numpy as np
@@ -14,6 +14,29 @@ __all__ = [ 'get_ades_optical_obs_array',
             'get_gaia_optical_obs_array',
             'get_mpc_optical_obs_array',
 ]
+
+def get_mpc_raw_data(tdes):
+    """
+    Get observation data from MPC observations API for desired small body
+
+    Parameters
+    ----------
+    tdes : str/int
+        IMPORTANT: must be the designation of the small body, not the name.
+
+    Returns
+    -------
+    raw_data : dict
+        JSON output of small body information query from JPL small-body radar API
+    """
+    response = requests.get("https://data.minorplanetcenter.net/api/get-obs",
+                            json={"desigs": [f"{tdes}"], "output_format": ["OBS80"]},
+                            timeout=60)
+    if response.ok:
+        obs80_string = response.json()[0]['OBS80']
+    else:
+        print("Error: ", response.status_code, response.content)
+    return [line for line in obs80_string.split("\n") if line]
 
 def get_space_based_observer_code(obs_time_mjd_tdb, first_80, last_80):
     """
@@ -91,8 +114,7 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
     else:
         t_max_utc = Time(t_max_tdb, format='mjd', scale='tdb').utc.mjd
     if optical_obs_file is None:
-        # pylint: disable=no-member
-        obs_raw = MPC.get_observations(body_id, get_mpcformat=True, cache=False)['obs']
+        obs_raw = get_mpc_raw_data(body_id)
     else:
         with open(optical_obs_file, 'r', encoding='utf-8') as file:
             obs_raw = file.readlines()
@@ -105,7 +127,6 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
     space_observatory_codes = [ '245', '249', '250', '258', '274', 'C49', 'C50', 'C51',
                                 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59',]
     non_geocentric_occultation_codes = ['275']
-    unsupported_code_counter = 0
     unsupported_type_counter = 0
     out_of_range_counter = 0
     skip_counter = 0
@@ -116,12 +137,10 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
         date_main = date[:-7].replace(' ','-')
         date_float = float(date[-7:])
         obs_time_mjd = Time(date_main, format='iso', scale='utc').utc.mjd+date_float
-        obs_code = data[77:80]
-        disallow_code = obs_code in non_geocentric_occultation_codes
         disallow_type = obs_type in ['R', 'r', 'V', 'v', 'O', 'X', 'x']
         disallow_line2 = obs_type in ['s']
         disallow_time = obs_time_mjd < t_min_utc or obs_time_mjd > t_max_utc
-        if not disallow_code and not disallow_type and not disallow_time and not disallow_line2:
+        if not disallow_type and not disallow_time and not disallow_line2:
             observer_program = data[13]
             r_asc = get_ra_from_hms(data[32:44])
             dec = get_dec_from_dms(data[44:56])
@@ -130,10 +149,11 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
             obs_array_optical[i, 2] = dec
             star_catalog = data[71]
             star_catalog_codes.append(star_catalog)
-            if obs_code in space_observatory_codes:
+            obs_code = data[77:80]
+            if obs_code in space_observatory_codes + non_geocentric_occultation_codes:
                 obs_time_mjd_tdb = Time(obs_time_mjd, format='mjd', scale='utc').tdb.mjd
                 first_80 = data
-                last_80 = data[80:] if optical_obs_file is None else obs_raw[i+1][:80]
+                last_80 = obs_raw[i+1][:80]
                 full_obs_code = get_space_based_observer_code(obs_time_mjd_tdb, first_80, last_80)
                 observer_codes_optical.append(full_obs_code)
             else:
@@ -141,10 +161,7 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
             observation_type_codes.append(obs_type)
             observer_program_codes.append(observer_program)
         else:
-            if disallow_code:
-                increment = 1
-                unsupported_code_counter += increment
-            elif disallow_type:
+            if disallow_type:
                 increment = 0.5
                 unsupported_type_counter += increment
             elif disallow_time:
@@ -160,8 +177,7 @@ def get_optical_data(body_id, de_kernel_path, optical_obs_file=None, t_min_tdb=N
             observer_program_codes.append(np.nan)
     spice.kclear()
     if verbose:
-        print(f"Skipped {int(skip_counter)} observations \n\t {unsupported_code_counter} of",
-                f"which were non-geocentric occultations, \n\t {int(unsupported_type_counter)}",
+        print(f"Skipped {int(skip_counter)} observations \n\t {int(unsupported_type_counter)}",
                 "were either roving or radar observations (radar is handled separately),",
                 f"\n\t {out_of_range_counter} of which were outside the specified time range.")
     non_nan_idx = ~np.isnan(obs_array_optical[:, 0])
@@ -536,12 +552,11 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
         obs_type = observation_type_codes[i]
         obs_program = observer_program_codes[i]
         if obs_type in ['P', 'A', 'N', ' ']:
-            if obs_date_mjd <= Time('1890-01-01', format='iso', scale='utc').utc.mjd:
+            if obs_date_mjd <= 11368.0: # until 1890-01-01
                 obs_array_optical[i, 3:5] = 10.0
-            elif (  obs_date_mjd > Time('1890-01-01', format='iso', scale='utc').utc.mjd and
-                    obs_date_mjd <= Time('1950-01-01', format='iso', scale='utc').utc.mjd):
+            elif obs_date_mjd <= 33282.0: # until 1950-01-01
                 obs_array_optical[i, 3:5] = 5.0
-            elif obs_date_mjd > Time('1950-01-01', format='iso', scale='utc').utc.mjd:
+            else: # 1950-01-01 to present
                 obs_array_optical[i, 3:5] = 2.5
         elif obs_type in ['E', 'H']: # occultation or hipparcos
             obs_array_optical[i, 3:5] = 0.2
@@ -553,7 +568,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
             obs_array_optical[i, 3:5] = 2.0
         elif obs_type in ['S']: # satellite
             if obs_code in ['275']: # non-geocentric occultation
-                obs_array_optical[i, 3:5] = 0.2
+                obs_array_optical[i, 3:5] = 3e-3
             elif obs_code in ['250']: # HST
                 obs_array_optical[i, 3:5] = 1.3
             elif obs_code in ['249', 'C49', 'C50']: # SOHO, STEREO-A, STEREO-B
@@ -580,7 +595,7 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                     if obs_program == 'Z':
                         obs_array_optical[i, 3:5] = 1.0
                 elif obs_code in ['703']:
-                    if obs_date_mjd < Time('2014-01-01', format='iso', scale='utc').utc.mjd:
+                    if obs_date_mjd < 56658.0: # until 2014-01-01
                         obs_array_optical[i, 3:5] = 1.0
                     else:
                         obs_array_optical[i, 3:5] = 0.8
@@ -591,12 +606,12 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                 elif obs_code in ['704']:
                     obs_array_optical[i, 3:5] = 1.0
                 elif obs_code in ['691', '291']:
-                    if obs_date_mjd < Time('2003-01-01', format='iso', scale='utc').utc.mjd:
+                    if obs_date_mjd < 56240.0: # until 2003-01-01
                         obs_array_optical[i, 3:5] = 0.6
                     else:
                         obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['644']:
-                    if obs_date_mjd < Time('2003-09-01', format='iso', scale='utc').utc.mjd:
+                    if obs_date_mjd < 52883.0: # until 2003-09-01
                         obs_array_optical[i, 3:5] = 0.6
                     else:
                         obs_array_optical[i, 3:5] = 0.4
@@ -630,11 +645,9 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                         obs_array_optical[i, 3:5] = 0.1
                     elif obs_program == '1':
                         obs_array_optical[i, 3:5] = 1.0
-                    elif obs_program == '2':
+                    elif obs_program in {'2', '3'}:
                         obs_array_optical[i, 3:5] = 0.5
-                    elif obs_program == '3':
-                        obs_array_optical[i, 3:5] = 0.5
-                    if obs_date_mjd < Time('2023-10-06', format='iso', scale='utc').utc.mjd:
+                    if obs_date_mjd < 60223.0: # until 2023-10-06
                         obs_array_optical[i, 3:5] = 0.1
                 elif obs_code in ['T10', 'T11', 'T13', 'T16', 'T17']:
                     obs_array_optical[i, 3:5] = 0.5
@@ -644,31 +657,21 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                         obs_array_optical[i, 3:5] = 0.1
                     elif obs_program == '1':
                         obs_array_optical[i, 3:5] = 0.2
-                    elif obs_program == '2':
+                    elif obs_program in {'2', '3'}:
                         obs_array_optical[i, 3:5] = 0.5
-                    elif obs_program == '3':
-                        obs_array_optical[i, 3:5] = 0.5
-                    if obs_date_mjd < Time('2022-10-06', format='iso', scale='utc').utc.mjd:
+                    if obs_date_mjd < 59858.0: # until 2022-10-06
                         obs_array_optical[i, 3:5] = 0.1
                 elif obs_code in ['T14']:
                     obs_array_optical[i, 3:5] = 0.5
-                    if obs_program == '0':
+                    if obs_program in {'0', '7'}:
                         obs_array_optical[i, 3:5] = 0.1
-                    elif obs_program == '1':
-                        obs_array_optical[i, 3:5] = 0.5
-                    elif obs_program == '2':
+                    elif obs_program in {'1', '2', '4', '6'}:
                         obs_array_optical[i, 3:5] = 0.5
                     elif obs_program == '3':
                         obs_array_optical[i, 3:5] = 0.2
-                    elif obs_program == '4':
-                        obs_array_optical[i, 3:5] = 0.5
                     elif obs_program == '5':
                         obs_array_optical[i, 3:5] = 1.0
-                    elif obs_program == '6':
-                        obs_array_optical[i, 3:5] = 0.5
-                    elif obs_program == '7':
-                        obs_array_optical[i, 3:5] = 0.1
-                    if obs_date_mjd < Time('2022-10-06', format='iso', scale='utc').utc.mjd:
+                    if obs_date_mjd < 59858.0: # until 2022-10-06
                         obs_array_optical[i, 3:5] = 0.1
                 elif obs_code in ['T15']:
                     obs_array_optical[i, 3:5] = 0.5
@@ -748,19 +751,13 @@ def apply_weights(obs_array_optical, star_catalog_codes, observer_codes_optical,
                         obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['Z18']:
                     if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
-                        obs_array_optical[i, 3:5] = 0.2
-                elif obs_code in ['181']:
+                        obs_array_optical[i, 3:5] = 0.1
+                elif obs_code in ['181', 'D20']:
                     if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.5
                 elif obs_code in ['G37']:
                     if obs_program == '5' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.2
-                elif obs_code in ['D20']:
-                    if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
-                        obs_array_optical[i, 3:5] = 0.5
-                elif obs_code in ['Z18']:
-                    if obs_program == '1' and star_catalog in ['U', 'V', 'W', 'X']:
-                        obs_array_optical[i, 3:5] = 0.1
                 elif obs_code in ['N50']:
                     if obs_program == '2' and star_catalog in ['U', 'V', 'W', 'X']:
                         obs_array_optical[i, 3:5] = 0.3

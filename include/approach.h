@@ -18,4 +18,5 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
                            void (*zero_func)(PropSimulation *, const size_t &,
                                              const size_t &, const real &,
                                              real &));
+
 #endif

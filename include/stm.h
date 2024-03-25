@@ -3,6 +3,18 @@
 
 #include "simulation.h"
 
+struct STMParameters {
+    real *B = nullptr;
+    real *Bdot = nullptr;
+    real *C = nullptr;
+    real *Cdot = nullptr;
+    real *D = nullptr;
+    real *Ddot = nullptr;
+    real *dfdpos = nullptr;
+    real *dfdvel = nullptr;
+    real *dfdpar = nullptr;
+};
+
 void bcd_and_dot(const std::vector<real> &stm, real *B, real *Bdot, real *C,
                  real *Cdot, real *D, real *Ddot);
 void bcd_2dot(STMParameters &stmParams, size_t numParams,
@@ -19,7 +31,7 @@ void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
             const real &sinDec, const real &cosDec,
             const real &smoothing_threshold);
 void stm_nongrav(STMParameters &stmParams, const real &g,
-                 const NongravParamaters &ngParams, const real &dx,
+                 const NongravParameters &ngParams, const real &dx,
                  const real &dy, const real &dz, const real &dvx,
                  const real &dvy, const real &dvz, real *rVec, real *nVec);
 

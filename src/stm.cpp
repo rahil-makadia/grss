@@ -287,7 +287,7 @@ void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
 }
 
 void stm_nongrav(STMParameters &stmParams, const real &g,
-                 const NongravParamaters &ngParams, const real &dx, const real &dy,
+                 const NongravParameters &ngParams, const real &dx, const real &dy,
                  const real &dz, const real &dvx, const real &dvy, const real &dvz,
                  real *rVec, real *nVec) {
     const real a1 = ngParams.a1;

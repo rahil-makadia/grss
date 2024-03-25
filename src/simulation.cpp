@@ -150,7 +150,7 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> cometaryState,
-                     NongravParamaters ngParams) {
+                     NongravParameters ngParams) {
     this->name = name;
     this->t0 = t0;
     this->mass = mass;
@@ -201,7 +201,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
 
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> pos, std::vector<real> vel,
-                     NongravParamaters ngParams) {
+                     NongravParameters ngParams) {
     this->name = name;
     this->t0 = t0;
     this->mass = mass;
@@ -322,8 +322,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 0: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de440.bsp";
-            spkInfo* mbInfo = spk_init(kernel_mb);
-            spkInfo* sbInfo = spk_init(kernel_sb);
+            SpkInfo* mbInfo = spk_init(kernel_mb);
+            SpkInfo* sbInfo = spk_init(kernel_sb);
             this->ephem.mb = mbInfo;
             this->ephem.sb = sbInfo;
             break;
@@ -333,8 +333,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 431: {
             std::string kernel_sb = mapKernelPath + "sb431-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de430.bsp";
-            spkInfo* mbInfo = spk_init(kernel_mb);
-            spkInfo* sbInfo = spk_init(kernel_sb);
+            SpkInfo* mbInfo = spk_init(kernel_mb);
+            SpkInfo* sbInfo = spk_init(kernel_sb);
             this->ephem.mb = mbInfo;
             this->ephem.sb = sbInfo;
             real G = 6.6743e-11L /
@@ -480,8 +480,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 441: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de440.bsp";
-            spkInfo* mbInfo = spk_init(kernel_mb);
-            spkInfo* sbInfo = spk_init(kernel_sb);
+            SpkInfo* mbInfo = spk_init(kernel_mb);
+            SpkInfo* sbInfo = spk_init(kernel_sb);
             this->ephem.mb = mbInfo;
             this->ephem.sb = sbInfo;
             real G = 6.6743e-11L /
