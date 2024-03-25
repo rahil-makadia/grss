@@ -43,7 +43,7 @@
         IntegBody
         IntegrationParameters
         InterpolationParameters
-        NongravParamaters
+        NongravParameters
         PropSimulation
         SpiceBody
     

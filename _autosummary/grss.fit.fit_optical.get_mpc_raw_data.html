@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_simulation.FitSimulation &#8212; GRSS 3.7.1 documentation</title>
+    <title>grss.fit.fit_optical.get_mpc_raw_data &#8212; GRSS 3.7.1 documentation</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_simulation.FitSimulation';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.get_mpc_raw_data';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_simulation.IterationParams" href="grss.fit.fit_simulation.IterationParams.html" />
-    <link rel="prev" title="grss.fit.fit_simulation.create_simulated_obs_arrays" href="grss.fit.fit_simulation.create_simulated_obs_arrays.html" />
+    <link rel="next" title="grss.fit.fit_optical.get_optical_data" href="grss.fit.fit_optical.get_optical_data.html" />
+    <link rel="prev" title="grss.fit.fit_optical.get_mpc_optical_obs_array" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
     <meta name="docbuild:last-update" content="Mar 25, 2024"/>
@@ -173,7 +173,7 @@
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api_py.html">Python API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
@@ -182,7 +182,7 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_ades_optical_obs_array.html">grss.fit.fit_optical.get_ades_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_raw_data.html">grss.fit.fit_optical.get_mpc_raw_data</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.get_mpc_raw_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
 </ul>
@@ -192,9 +192,9 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_raw_data.html">grss.fit.fit_radar.get_radar_raw_data</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_simulation.html">grss.fit.fit_simulation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_simulation.html">grss.fit.fit_simulation</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.create_simulated_obs_arrays.html">grss.fit.fit_simulation.create_simulated_obs_arrays</a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_simulation.FitSimulation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.FitSimulation.html">grss.fit.fit_simulation.FitSimulation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.IterationParams.html">grss.fit.fit_simulation.IterationParams</a></li>
 </ul>
 </li>
@@ -347,7 +347,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_simulation.FitSimulation.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_optical.get_mpc_raw_data.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -377,7 +377,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.fit.fit_simulation.FitSimulation.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.fit.fit_optical.get_mpc_raw_data.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -461,7 +461,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.fit.fit_simulation.FitSimulation</h1>
+    <h1>grss.fit.fit_optical.get_mpc_raw_data</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -471,13 +471,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation"><code class="docutils literal notranslate"><span class="pre">FitSimulation</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.__init__"><code class="docutils literal notranslate"><span class="pre">FitSimulation.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.plot_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.plot_summary()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.print_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.print_summary()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_mpc_raw_data"><code class="docutils literal notranslate"><span class="pre">get_mpc_raw_data()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -489,111 +483,23 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="grss-fit-fit-simulation-fitsimulation">
-<h1>grss.fit.fit_simulation.FitSimulation<a class="headerlink" href="#grss-fit-fit-simulation-fitsimulation" title="Permalink to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class to perform an orbit fit simulation.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Constructor of the FitSimulation class.</p>
+  <section id="grss-fit-fit-optical-get-mpc-raw-data">
+<h1>grss.fit.fit_optical.get_mpc_raw_data<a class="headerlink" href="#grss-fit-fit-optical-get-mpc-raw-data" title="Permalink to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="grss.fit.fit_optical.get_mpc_raw_data">
+<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_mpc_raw_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tdes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_mpc_raw_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Get observation data from MPC observations API for desired small body</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x_init</strong> (<em>dict</em>) – Initial guess of the state vector.</p></li>
-<li><p><strong>cov_init</strong> (<em>array</em><em>, </em><em>optional</em>) – Initial covariance matrix, by default None</p></li>
-<li><p><strong>obs_array_optical</strong> (<em>array</em><em>, </em><em>optional</em>) – Optical observation data for the orbit fit, by default None</p></li>
-<li><p><strong>observer_codes_optical</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Observer locations for each observation in obs_array_optical, by default None</p></li>
-<li><p><strong>obs_array_radar</strong> (<em>array</em><em>, </em><em>optional</em>) – Radar observation data for the orbit fit, by default None</p></li>
-<li><p><strong>observer_codes_radar</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Observer locations for each observation in obs_array_radar, by default None</p></li>
-<li><p><strong>n_iter_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of maximum iterations to correct the orbit estimate, by default 10</p></li>
-<li><p><strong>de_kernel</strong> (<em>int</em><em>, </em><em>optional</em>) – SPICE kernel version, by default 441</p></li>
-<li><p><strong>de_kernel_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the SPICE kernel, by default ‘’</p></li>
-<li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the body, by default 0.0</p></li>
-<li><p><strong>nongrav_info</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing the non-gravitational parameters, by default None</p></li>
-<li><p><strong>events</strong> (<em>list</em><em>, </em><em>optional</em>) – List of lists containing impulsive maneuvers, by default None</p></li>
-</ul>
+<dd class="field-odd"><p><strong>tdes</strong> (<em>str/int</em>) – IMPORTANT: must be the designation of the small body, not the name.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
+<dd class="field-even"><p><strong>raw_data</strong> – JSON output of small body information query from JPL small-body radar API</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
-</dd></dl>
-
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="grss.fit.fit_simulation.FitSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_init[, cov_init, ...])</p></td>
-<td><p>Constructor of the FitSimulation class.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq" title="grss.fit.fit_simulation.FitSimulation.filter_lsq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_lsq</span></code></a>([verbose])</p></td>
-<td><p>Performs a least-squares fit on the observations.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.plot_summary" title="grss.fit.fit_simulation.FitSimulation.plot_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_summary</span></code></a>([auto_close])</p></td>
-<td><p>Plots a summary of the orbit fit calculations.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.print_summary" title="grss.fit.fit_simulation.FitSimulation.print_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_summary</span></code></a>([iter_idx])</p></td>
-<td><p>Prints a summary of the orbit fit calculations at a given iteration.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.filter_lsq">
-<span class="sig-name descname"><span class="pre">filter_lsq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq" title="Permalink to this definition">#</a></dt>
-<dd><p>Performs a least-squares fit on the observations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – FLag for printing the iteration information while fitting, by default True.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.plot_summary">
-<span class="sig-name descname"><span class="pre">plot_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auto_close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.plot_summary" title="Permalink to this definition">#</a></dt>
-<dd><p>Plots a summary of the orbit fit calculations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>auto_close</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to automatically close the figure, by default False</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.print_summary">
-<span class="sig-name descname"><span class="pre">print_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.print_summary" title="Permalink to this definition">#</a></dt>
-<dd><p>Prints a summary of the orbit fit calculations at a given iteration.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>iter_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – The iteration number to print the summary for, by default -1.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>None</strong> – None</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>NoneType</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -610,20 +516,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit.fit_simulation.create_simulated_obs_arrays.html"
+       href="grss.fit.fit_optical.get_mpc_optical_obs_array.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit.fit_simulation.create_simulated_obs_arrays</p>
+        <p class="prev-next-title">grss.fit.fit_optical.get_mpc_optical_obs_array</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_simulation.IterationParams.html"
+       href="grss.fit.fit_optical.get_optical_data.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_simulation.IterationParams</p>
+        <p class="prev-next-title">grss.fit.fit_optical.get_optical_data</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -643,13 +549,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation"><code class="docutils literal notranslate"><span class="pre">FitSimulation</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.__init__"><code class="docutils literal notranslate"><span class="pre">FitSimulation.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.plot_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.plot_summary()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.print_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.print_summary()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_mpc_raw_data"><code class="docutils literal notranslate"><span class="pre">get_mpc_raw_data()</span></code></a></li>
 </ul>
   </nav></div>
 
