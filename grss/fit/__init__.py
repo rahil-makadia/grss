@@ -1,4 +1,4 @@
-"""GRSS orbit determination subpackage"""
+"""GRSS Python orbit determination subpackage"""
 import warnings
 from .fit_optical import *
 from .fit_radar import *

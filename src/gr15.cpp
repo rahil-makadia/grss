@@ -1,5 +1,9 @@
 #include "gr15.h"
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @return real Initial timestep.
+ */
 real get_initial_timestep(PropSimulation *propSim){
     real dt0 = propSim->integParams.dtMin;
     if (propSim->integParams.dt0 != 0.0) {
@@ -15,6 +19,11 @@ real get_initial_timestep(PropSimulation *propSim){
     return dt0;
 }
 
+/**
+ * @param[in] b Matrix of interpolation coefficients.
+ * @param[in] dim Dimension of the system (number of 2nd derivatives).
+ * @param[out] g Matrix of interpolation coefficients.
+ */
 void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim, real *g) {
     for (size_t i = 0; i < dim; i++) {
         g[0*dim+i] = b[6][i]*dVec[15] + b[5][i]*dVec[10] + b[4][i]*dVec[6] + b[3][i]*dVec[3] + b[2][i]*dVec[1] + b[1][i]*dVec[0] + b[0][i];
@@ -27,6 +36,14 @@ void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim,
     }
 }
 
+/**
+ * @param[in] AccIntegArr Array of acceleration values at the nodes.
+ * @param[in] hIdx Gauss-Radau node index.
+ * @param[out] g Matrix of interpolation coefficients.
+ * @param[out] bCompCoeffs Vector of compensated summation coefficients for computing the b-matrix.
+ * @param[out] b Matrix of interpolation coefficients.
+ * @param[in] dim Dimension of the system (number of 2nd derivatives).
+ */
 void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                      const size_t &hIdx, real *g, real *bCompCoeffs,
                      std::vector<std::vector<real>> &b, const size_t &dim) {
@@ -135,6 +152,12 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
     }
 }
 
+/**
+ * @param[inout] b Matrix of interpolation coefficients.
+ * @param[inout] e Refinement matrix.
+ * @param[in] dtRatio Ratio of the required timestep to the previous timestep.
+ * @param[in] dim Dimension of the system (number of 2nd derivatives).
+ */
 void refine_b(std::vector<std::vector<real>> &b,
               real *e, const real &dtRatio,
               const size_t &dim) {
@@ -178,6 +201,13 @@ void refine_b(std::vector<std::vector<real>> &b,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] t Current time.
+ * @param[out] tNextEvent Time of the next event.
+ * @param[out] nextEventIdx Index of the next event.
+ * @param[in] xInteg Vector of integrated states after the current timestep.
+ */
 void check_and_apply_events(PropSimulation *propSim, const real &t,
                             real &tNextEvent, size_t &nextEventIdx,
                             std::vector<real> &xInteg) {
@@ -200,6 +230,12 @@ void check_and_apply_events(PropSimulation *propSim, const real &t,
     }
 }
 
+/**
+ * @brief Compute the 7th root of a number.
+ * 
+ * @param[in] num Number to compute the 7th root of.
+ * @return real 7th root of the number.
+ */
 static real root7(real num){
     real fac = 1.0;
     if (num<1e-7){
@@ -217,6 +253,15 @@ static real root7(real num){
     return fac*root;
 }
 
+// /**
+//  * @brief Get the next timestep based on the old IAS15 adaptive timestep criterion.
+//  * 
+//  * @param[in] propSim PropSimulation object for the integration.
+//  * @param[in] dt Current timestep.
+//  * @param[in] accIntegArr7Max Maximum acceleration value at the last node.
+//  * @param[in] b Matrix of interpolation coefficients.
+//  * @return real Next timestep.
+//  */
 // static real get_adaptive_timestep_old(PropSimulation *propSim, const real &dt,
 //                                       const real &accIntegArr7Max,
 //                                       const std::vector<std::vector<real>> &b) {
@@ -232,6 +277,15 @@ static real root7(real num){
 //     return dtReq;
 // }
 
+/**
+ * @brief Get the next timestep based on the new IAS15 adaptive timestep criterion.
+ * 
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] dt Current timestep.
+ * @param[in] accInteg0 Vector of acceleration values at the current timestep.
+ * @param[in] b Matrix of interpolation coefficients.
+ * @return real Next timestep.
+ */
 static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
                                   const std::vector<real> &accInteg0,
                                   const std::vector<std::vector<real>> &b) {
@@ -266,6 +320,9 @@ static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
     return dtReq;
 }
 
+/**
+ * @param[inout] propSim PropSimulation object for the integration.
+ */
 void gr15(PropSimulation *propSim) {
     if (!std::isfinite(propSim->t)) {
         throw std::runtime_error("t is not finite");

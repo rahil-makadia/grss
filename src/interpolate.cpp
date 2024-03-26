@@ -1,5 +1,17 @@
 #include "interpolate.h"
 
+/**
+ * @param[in] xInteg0 Initial state vector.
+ * @param[in] accInteg0 Initial acceleration vector.
+ * @param[in] dt Integration time step.
+ * @param[in] h Fraction of the time step to use for the approximation.
+ * @param[in] b Interpolation coefficients for the Gauss-Radau polynomial.
+ * @param[in] starti Starting index of the state vector to approximate.
+ * @param[in] startb Starting index of the interpolation coefficients.
+ * @param[in] iterStep Number of derivatives to evaluate.
+ * @param[out] xIntegNext Approximated state vector.
+ * @param[out] xIntegCompCoeffs Compensation coefficients.
+ */
 void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const std::vector<real> &accInteg0, const real &dt,
                         const real &h, const std::vector<std::vector<real>> &b,
@@ -38,6 +50,16 @@ void approx_xInteg_math(const std::vector<real> &xInteg0,
     }
 }
 
+/**
+ * @param[in] xInteg0 Initial state vector.
+ * @param[in] accInteg0 Initial acceleration vector.
+ * @param[in] dt Integration time step.
+ * @param[in] h Fraction of the time step to use for the approximation.
+ * @param[in] b Interpolation coefficients for the Gauss-Radau polynomial.
+ * @param[in] integBodies List of integrated bodies in the PropSimulation.
+ * @param[out] xIntegNext Approximated state vector.
+ * @param[out] xIntegCompCoeffs Compensation coefficients.
+ */
 void approx_xInteg(const std::vector<real> &xInteg0,
                    const std::vector<real> &accInteg0, const real &dt,
                    const real &h, const std::vector<std::vector<real>> &b,
@@ -69,6 +91,10 @@ void approx_xInteg(const std::vector<real> &xInteg0,
     }
 }
 
+/**
+ * @param[in] t Time to interpolate the integrated state from the PropSimulation at.
+ * @return std::vector<real> The interpolated geometric barycentric state at time t.
+ */
 std::vector<real> PropSimulation::interpolate(const real t) {
     std::vector<real> xIntegInterp = std::vector<real>(this->xInteg.size(), 0.0);
     // find the index of the last element in this->interpParams.tStack that is
@@ -116,6 +142,11 @@ std::vector<real> PropSimulation::interpolate(const real t) {
     return xIntegInterp;
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ */
 void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &dt) {
     const real tNext = t + dt;
     size_t &interpIdx = propSim->interpIdx;
@@ -154,6 +185,13 @@ void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ * @param[in] tInterp Time to interpolate to.
+ * @param[out] xInterp Interpolated state vector.
+ */
 void evaluate_one_interpolation(const PropSimulation *propSim, const real &t,
                                 const real &dt, const real &tInterp,
                                 std::vector<real> &xInterp) {
@@ -166,6 +204,15 @@ void evaluate_one_interpolation(const PropSimulation *propSim, const real &t,
                   xInterp, dummyCompCoeffs);
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] tWindowStart Start time of the interpolation window.
+ * @param[in] tNext Time of the next interpolation.
+ * @param[in] forwardProp Flag to indicate forward integration.
+ * @param[in] backwardProp Flag to indicate backward integration.
+ * @param[out] interpIdxInWindow Flag to indicate whether the next interpolation
+ * index is within the window.
+ */
 void get_interpIdxInWindow(const PropSimulation *propSim,
                            const real &tWindowStart, const real &tNext,
                            const bool &forwardProp,
@@ -214,6 +261,16 @@ void get_interpIdxInWindow(const PropSimulation *propSim,
         bwInWindowMarginEnd;
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[in] xInterpGeom Geometric state vector of the target body.
+ * @param[out] lightTime Light time to the target body.
+ * @param[out] xInterpApparent Apparent state vector of the target body.
+ */
 void get_lightTime_and_xRelative(PropSimulation *propSim,
                                  const size_t interpIdx, const real &t,
                                  const real &dt, const real tInterpGeom,
@@ -248,6 +305,18 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] i Index of the target body.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[in] xInterpGeom Geometric state vector of the target body.
+ * @param[in] xObserver State vector of the observer.
+ * @param[in] bouncePointAtLeadingEdge Flag to indicate whether the bounce point
+ * is at the leading edge (as opposed to center of mass)
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ * @param[out] lightTimeOneBody Light time to the target body.
+ */
 void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           const real tInterpGeom, std::vector<real> xInterpGeom,
                           std::vector<real> xObserver,
@@ -312,6 +381,11 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[out] xInterpApparentBary Apparent state vector of the target body.
+ */
 void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     double sunState[9];
@@ -389,6 +463,15 @@ void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
     xInterpApparentBary[2] = earthState[2] + earthTargetPos[2];
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[in] xInterpGeom Geometric state vector of the target body at the interpolation time.
+ * @param[in] xInterpApparent Apparent state vector of the target body at the interpolation time.
+ */
 void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                      const real &t, const real &dt, const real tInterpGeom,
                      const std::vector<real> &xInterpGeom,
@@ -423,6 +506,12 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
     propSim->radarPartials.push_back(radarPartials);
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] xInterpApparent Apparent state vector of the target body.
+ * @param[out] opticalMeasurement Optical measurement (RA and Dec).
+ * @param[out] opticalPartials Partials of the optical measurement.
+ */
 void get_optical_measurement(PropSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
                              std::vector<real> &opticalMeasurement,
@@ -465,6 +554,16 @@ void get_optical_measurement(PropSimulation *propSim,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[in] xInterpGeom Geometric state vector of the target body at the interpolation time.
+ * @param[out] radarMeasurement Radar measurement (range/Doppler).
+ * @param[out] radarPartials Partials of the radar measurement.
+ */
 void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt,
                            const real tInterpGeom,
@@ -506,6 +605,22 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
     } 
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
+ * @param[in] t Time at the beginning of the time step.
+ * @param[in] dt Completed time step size.
+ * @param[in] i Index of the target body.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[in] xInterpGeom Geometric state vector of the target body at the interpolation time.
+ * @param[in] receiveTimeTDB Time of reception of the radar signal (TDB).
+ * @param[out] transmitTimeTDB Time of transmission of the radar signal (TDB).
+ * @param[out] xObsBaryRcv Barycentric state vector of the observer at the reception time.
+ * @param[out] xTrgtBaryBounce Barycentric state vector of the target body at the bounce time.
+ * @param[out] xObsBaryTx Barycentric state vector of the observer at the transmission time.
+ * @param[out] delayMeasurement Radar delay measurement.
+ * @param[out] delayPartials Partials of the radar delay measurement.
+ */
 void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
                            const real &t, const real &dt, const size_t &i,
                            const real tInterpGeom,
@@ -614,6 +729,12 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] tForSpice Time for querying SPICE Ephemeris for the Sun and Earth positions.
+ * @param[in] targetState State vector of the target body.
+ * @param[out] deltaDelayRelativistic Relativistic delay correction (Shapiro delay).
+ */
 void get_delta_delay_relativistic(PropSimulation *propSim,
                                   const real &tForSpice,
                                   const std::vector<real> &targetState,
@@ -660,6 +781,18 @@ void get_delta_delay_relativistic(PropSimulation *propSim,
             (sunEarthDist + sunTargetDist - earthTargetDist));
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] i Index of the target body.
+ * @param[in] receiveTimeTDB Time of reception of the radar signal (TDB).
+ * @param[in] transmitTimeTDB Time of transmission of the radar signal (TDB).
+ * @param[in] xObsBaryRcv Barycentric state vector of the observer at the reception time.
+ * @param[in] xTrgtBaryBounce Barycentric state vector of the target body at the bounce time.
+ * @param[in] xObsBaryTx Barycentric state vector of the observer at the transmission time.
+ * @param[in] transmitFreq Frequency of the transmitted radar signal.
+ * @param[out] dopplerMeasurement Doppler measurement.
+ * @param[out] dopplerPartials Partials of the Doppler measurement.
+ */
 void get_doppler_measurement(PropSimulation *propSim, const size_t &i,
                              const real receiveTimeTDB,
                              const real transmitTimeTDB,

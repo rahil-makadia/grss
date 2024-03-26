@@ -1,39 +1,67 @@
 #include "timeconvert.h"
 
+/** 
+ * @param[in] jd Julian Date.
+ * @param[out] et TDB ephemeris time.
+ */
 void jd_to_et(const real jd, real &et) {
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     et = (jd - j2000) * day2sec;
 }
 
+/**
+ * @param[in] jd Julian Date.
+ * @return real TDB ephemeris time.
+ */
 real jd_to_et(const real jd) {
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     return (jd - j2000) * day2sec;
 }
 
+/** 
+ * @param[in] jd Julian Date.
+ * @param[out] mjd Modified Julian Date.
+ */
 void jd_to_mjd(const real jd, real &mjd) {
     real offset = 2400000.5;
     mjd = jd - offset;
 }
 
+/**
+ * @param[in] jd Julian Date.
+ * @return real Modified Julian Date.
+ */
 real jd_to_mjd(const real jd) {
     real offset = 2400000.5;
     return jd - offset;
 }
 
+/**
+ * @param[in] et TDB ephemeris time.
+ * @param[out] jd Julian Date.
+ */
 void et_to_jd(const real et, real &jd) {
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     jd = (et / day2sec) + j2000;
 }
 
+/**
+ * @param[in] et TDB ephemeris time.
+ * @return real Julian Date.
+ */
 real et_to_jd(const real et) {
     real j2000 = 2451545.0;
     real day2sec = 86400.0;
     return (et / day2sec) + j2000;
 }
 
+/**
+ * @param[in] et TDB ephemeris time.
+ * @param[out] mjd Modified Julian Date.
+ */
 void et_to_mjd(const real et, real &mjd) {
     real offset = 2400000.5;
     real j2000 = 2451545.0;
@@ -41,6 +69,10 @@ void et_to_mjd(const real et, real &mjd) {
     mjd = (et / day2sec) - offset + j2000;
 }
 
+/**
+ * @param[in] et TDB ephemeris time.
+ * @return real Modified Julian Date.
+ */
 real et_to_mjd(const real et) {
     real offset = 2400000.5;
     real j2000 = 2451545.0;
@@ -48,17 +80,29 @@ real et_to_mjd(const real et) {
     return (et / day2sec) - offset + j2000;
 }
 
+/**
+ * @param[in] mjd Modified Julian Date.
+ * @param[out] jd Julian Date.
+ */
 void mjd_to_jd(const real mjd, real &jd) {
     real offset = 2400000.5;
     jd = mjd + offset;
 }
 
+/**
+ * @param[in] mjd Modified Julian Date.
+ * @return real Julian Date.
+ */
 real mjd_to_jd(const real mjd) {
     real offset = 2400000.5;
     real jd = mjd + offset;
     return jd;
 }
 
+/**
+ * @param[in] mjd Modified Julian Date.
+ * @param[out] et TDB ephemeris time.
+ */
 void mjd_to_et(const real mjd, real &et) {
     real offset = 2400000.5;
     real j2000 = 2451545.0;
@@ -66,6 +110,10 @@ void mjd_to_et(const real mjd, real &et) {
     et = (mjd + offset - j2000) * day2sec;
 }
 
+/**
+ * @param[in] mjd Modified Julian Date.
+ * @return real TDB ephemeris time.
+ */
 real mjd_to_et(const real mjd) {
     real offset = 2400000.5;
     real j2000 = 2451545.0;
@@ -74,6 +122,10 @@ real mjd_to_et(const real mjd) {
     return et;
 }
 
+/**
+ * @param[in] mjdUtc UTC Modified Julian Date.
+ * @return real TAI-UTC.
+ */
 real delta_at_utc(const real mjdUtc) {
     const real leapDatesMjdUtc[] = {
         36934.0, 37300.0, 37512.0, 37665.0, 38334.0, 38395.0, 38486.0,
@@ -97,9 +149,9 @@ real delta_at_utc(const real mjdUtc) {
         0.0012960, 0.0012960, 0.0012960, 0.0011232, 0.0011232,
         0.0012960, 0.0012960, 0.0012960, 0.0012960, 0.0012960,
         0.0012960, 0.0012960, 0.0025920, 0.0025920};
-    real deltaAt = 0;
+    real taiMinusUtc = 0;
     if (mjdUtc < leapDatesMjdUtc[0]) {
-        return deltaAt;
+        return taiMinusUtc;
     }
     size_t len = sizeof(leapDatesMjdUtc) / sizeof(leapDatesMjdUtc[0]);
     size_t i;
@@ -108,14 +160,18 @@ real delta_at_utc(const real mjdUtc) {
             break;
         }
     }
-    deltaAt = leapSecs[i];
+    taiMinusUtc = leapSecs[i];
     if (mjdUtc >= leapDatesMjdUtc[0] && mjdUtc < 41317.0) {
-        deltaAt +=
+        taiMinusUtc +=
             leapSecDrift[i] * (mjdUtc - leapSecDriftMjdUtc[i]);
     }
-    return deltaAt;
+    return taiMinusUtc;
 }
 
+/**
+ * @param[in] mjdTai TAI Modified Julian Date.
+ * @return real TAI-UTC.
+ */
 real delta_at_tai(const real mjdTai){
     real utcApprox = mjdTai;
     real taiMinusUtc = delta_at_utc(utcApprox);
@@ -124,6 +180,10 @@ real delta_at_tai(const real mjdTai){
     return taiMinusUtc;
 }
 
+/**
+ * @param[in] mjdUtc UTC Modified Julian Date.
+ * @return real TDB-UTC.
+ */
 real delta_et_utc(const real mjdUtc) {
     // start of SPICE leapseconds kernels information (currently naif0012.tls)
     const real ttMinusTai = 32.184;
@@ -149,6 +209,10 @@ real delta_et_utc(const real mjdUtc) {
     return tdbMinusTtApprox + ttMinusTai + taiMinusUtc;
 }
 
+/**
+ * @param[in] mjdTdb TDB Modified Julian Date.
+ * @return real TDB-UTC.
+ */
 real delta_et_tdb(const real mjdTdb) {
     // start of SPICE leapseconds kernels information (currently naif0012.tls)
     const real ttMinusTai = 32.184;

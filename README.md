@@ -79,4 +79,4 @@ GRSS Development Team:
 * Siegfried Eggl
 * Davide Farnocchia
 
-The GRSS library was developed by Rahil Makadia as part of his PhD dissertation at the University of Illinois at Urbana-Champaign. This work was supported by a NASA Space Technologies Graduate Research Opportunities (NSTGRO) Fellowship, Grant #80NSSC22K1173. The author would like to thank his advisor, Dr. Siegfried Eggl as well as his collaborators, Dr. Steven R. Chesley, and Dr. Davide Farnocchia for their guidance and support.
+The GRSS library was developed by Rahil Makadia as part of his PhD dissertation at the University of Illinois at Urbana-Champaign. This work was supported by a NASA Space Technologies Graduate Research Opportunities (NSTGRO) Fellowship, Grant #80NSSC22K1173. Rahil would like to thank his advisor, Dr. Siegfried Eggl as well as his collaborators, Dr. Steven R. Chesley, and Dr. Davide Farnocchia for their guidance and support.

@@ -270,8 +270,10 @@ class IterationParams:
         plt.suptitle(iter_string, y=0.95)
         grid_spec = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
         ax1 = fig.add_subplot(grid_spec[0, 0])
-        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize)
-        ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize)
+        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize,
+                    color='C1', alpha=0.5)
+        ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize,
+                    color='C0', alpha=0.5)
         ax1.plot(t_arr[is_rejected], ra_residuals[is_rejected], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
         ax1.plot(t_arr[is_rejected], dec_residuals[is_rejected], 'ro',
@@ -398,10 +400,10 @@ class IterationParams:
         if plot_chi_squared:
             plt.subplot(1,2,1)
         if not np.all(np.isnan(ra_chi)) and not np.all(np.isnan(dec_chi)):
-            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
-            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA', color='C1', alpha=0.5)
+            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
-                        markersize=2*markersize, markerfacecolor='none')#, label='Rejected Obs.')
+                        markersize=2*markersize, markerfacecolor='none', label='Rejected')
             plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
         if not np.all(np.isnan(doppler_chi)):
@@ -425,8 +427,10 @@ class IterationParams:
         plt.gcf().autofmt_xdate()
         if plot_chi_squared:
             plt.subplot(1,2,2)
-            plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')
-            plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize,
+                        label='RA', color='C1', alpha=0.5)
+            plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize,
+                        label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[is_rejected], ra_chi_squared[is_rejected], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
             plt.plot(t_arr[is_rejected], dec_chi_squared[is_rejected], 'ro',

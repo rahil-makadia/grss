@@ -1,4 +1,4 @@
-"""GRSS utilities subpackage"""
+"""GRSS Python utilities subpackage"""
 import os
 import sys
 import datetime

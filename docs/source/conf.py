@@ -66,24 +66,7 @@ html_theme_options = {
         "alt_text": "GRSS - Home",
         "text": f"{project} v{version} documentation",
     },
-    # "icon_links": [
-    #     {
-    #         "name": "GitHub",
-    #         "url": "https://github.com/rahil-makadia/grss",
-    #         "icon": "fa-brands fa-github",
-    #     },
-    #     {
-    #         "name": "PyPI Downloads",
-    #         "url": "https://pypi.org/project/grss/",
-    #         "icon": "https://img.shields.io/pypi/dw/grss",
-    #         "type": "url",
-    #     },
-    #     {
-    #         "name": "PyPI",
-    #         "url": "https://pypi.org/project/grss/",
-    #         "icon": "fa-brands fa-python",
-    #     },
-    # ],
+    "navigation_with_keys": True,
     "extra_footer": ("Created using "
                         "<a href=https://sphinx-book-theme.readthedocs.io/>"
                         "The Sphinx Book Theme</a>."),

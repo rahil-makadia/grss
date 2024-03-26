@@ -1,7 +1,19 @@
 #include "spk.h"
 
+/**
+ * @brief Calculate the Modified Julian Date from the Ephemeris Time.
+ * 
+ * @param[in] et Ephemeris Time (TDB seconds since J2000).
+ * @return double Modified Julian Date (TDB).
+ */
 static double inline _mjd(double et) { return 51544.5 + et / 86400.0; }
 
+/**
+ * @brief Check if the record is non-ascii.
+ * 
+ * @param[in] record Record to check.
+ * @return int 1 if the record is non-ascii, 0 otherwise.
+ */
 static int _com(const char *record) {
     for (int n = 0; n < RECORD_LEN; n++) {
         if (record[n] < 0) return 0;
@@ -9,7 +21,11 @@ static int _com(const char *record) {
     return 1;
 }
 
-SpkInfo *spk_init(const std::string &path) {
+/**
+ * @param[in] path Path to the SPK file.
+ * @return SpkInfo* Pointer to the SpkInfo structure.
+ */
+SpkInfo* spk_init(const std::string &path) {
     // For file format information, see
     // https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/daf.html
 
@@ -158,6 +174,20 @@ SpkInfo *spk_init(const std::string &path) {
     return pl;
 }
 
+/**
+ * @param[in] pl SpkInfo structure.
+ * @param[in] epoch Epoch to compute the state at (MJD ET).
+ * @param[in] spiceId SPICE ID of the body.
+ * @param[out] out_x X position of the body [AU].
+ * @param[out] out_y Y position of the body [AU].
+ * @param[out] out_z Z position of the body [AU].
+ * @param[out] out_vx X velocity of the body [AU/day].
+ * @param[out] out_vy Y velocity of the body [AU/day].
+ * @param[out] out_vz Z velocity of the body [AU/day].
+ * @param[out] out_ax X acceleration of the body [AU/day^2].
+ * @param[out] out_ay Y acceleration of the body [AU/day^2].
+ * @param[out] out_az Z acceleration of the body [AU/day^2].
+ */
 void spk_calc(SpkInfo *pl, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
              double *out_vz, double *out_ax, double *out_ay, double *out_az) {
@@ -310,9 +340,15 @@ void spk_calc(SpkInfo *pl, double epoch, int spiceId, double *out_x,
     *out_az += acc[2];
 }
 
-void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
+/**
+ * @param[in] spiceId SPICE ID of the body.
+ * @param[in] t0_mjd Epoch to compute the state at (MJD ET).
+ * @param[in] ephem Ephemeris data from the PropSimulation.
+ * @param[out] state State+acceleration of the body at the requested epoch [AU, AU/day, AU/day^2].
+ */
+void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
                    double state[9]) {
-    bool smallBody = spiceID > 1000000;
+    bool smallBody = spiceId > 1000000;
     SpkInfo *infoToUse;
     if (smallBody) {
         infoToUse = ephem.sb;
@@ -321,9 +357,9 @@ void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
     }
     // find what cache index corresponds to the requested SPICE ID
     int m;
-    m = spiceID;
+    m = spiceId;
     for (m = 0; m < infoToUse->num; m++) {
-        if (infoToUse->targets[m].code == spiceID) {
+        if (infoToUse->targets[m].code == spiceId) {
             break;
         }
         if (m == infoToUse->num - 1) {
@@ -343,8 +379,8 @@ void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
         if (ephem.cache[i].t == t0_mjd) {
             t0SomewhereInCache = true;
             if (ephem.cache[i].items[cacheIdx].t == t0_mjd &&
-                ephem.cache[i].items[cacheIdx].spiceID == spiceID) {
-                // std::cout << "Using cached state for " << spiceID << " at "
+                ephem.cache[i].items[cacheIdx].spiceId == spiceId) {
+                // std::cout << "Using cached state for " << spiceId << " at "
                 // << t0_mjd << " from slot" << i << std::endl;
                 state[0] = ephem.cache[i].items[cacheIdx].x;
                 state[1] = ephem.cache[i].items[cacheIdx].y;
@@ -361,7 +397,7 @@ void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
     }
     // if not, calculate it from the SPK memory map,
     double x, y, z, vx, vy, vz, ax, ay, az;
-    spk_calc(infoToUse, t0_mjd, spiceID, &x, &y, &z, &vx, &vy, &vz, &ax, &ay,
+    spk_calc(infoToUse, t0_mjd, spiceId, &x, &y, &z, &vx, &vy, &vz, &ax, &ay,
              &az);
     state[0] = x;
     state[1] = y;
@@ -393,11 +429,11 @@ void get_spk_state(const int &spiceID, const double &t0_mjd, Ephemeris &ephem,
             ephem.nextIdxToWrite = 0;
         }
     }
-    // std::cout << "Adding state for " << spiceID << " at " << t0_mjd << " to
+    // std::cout << "Adding state for " << spiceId << " at " << t0_mjd << " to
     // cache at slot" << ephem.nextIdxToWrite << std::endl;
     ephem.cache[ephem.nextIdxToWrite].t = t0_mjd;
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].t = t0_mjd;
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].spiceID = spiceID;
+    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].spiceId = spiceId;
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].x = state[0];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].y = state[1];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].z = state[2];

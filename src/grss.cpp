@@ -6,7 +6,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(libgrss, m) {
-    m.doc() = "GRSS C++ library bindings for Python";
+    m.doc() = "GRSS Python bindings for C++ library";
 
     py::class_<Constants>(m, "Constants", R"mydelimiter(
         The Constants class contains physical constants and conversion factors
