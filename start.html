@@ -175,6 +175,7 @@
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Getting Started</a></li>
+
 <li class="toctree-l1"><a class="reference internal" href="prop.html">GRSS Propagator Module (grss.prop)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -502,10 +503,15 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Getting Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-pypi">Install via PyPI</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code">Install via source code</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-python">Install via source code (Python)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-c-reduced-functionality">Install via source code (C++, reduced functionality)</a></li>
 </ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
+</ul>
+
             </nav>
         </div>
     </div>
@@ -535,8 +541,8 @@ document.write(`
 </div>
 <p>NOTE: The GRSS library is currently not pip-installable on Intel-based Macs. To use the library on an Intel-based Mac, please install the library using the source code from the GitHub repository (see below for instructions).</p>
 </section>
-<section id="install-via-source-code">
-<h2>Install via source code<a class="headerlink" href="#install-via-source-code" title="Permalink to this heading">#</a></h2>
+<section id="install-via-source-code-python">
+<h2>Install via source code (Python)<a class="headerlink" href="#install-via-source-code-python" title="Permalink to this heading">#</a></h2>
 <p>The source code for the GRSS library is available on GitHub and can be downloaded using the following command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://www.github.com/rahil-makadia/grss</span>
 </pre></div>
@@ -548,8 +554,24 @@ document.write(`
 </pre></div>
 </div>
 </section>
+<section id="install-via-source-code-c-reduced-functionality">
+<h2>Install via source code (C++, reduced functionality)<a class="headerlink" href="#install-via-source-code-c-reduced-functionality" title="Permalink to this heading">#</a></h2>
+<p>The source code for the GRSS library is available on GitHub and can be downloaded using the following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://www.github.com/rahil-makadia/grss</span>
+</pre></div>
+</div>
+<p>Once the source code has been downloaded, the library can be installed using the following commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd grss</span>
+<span class="go">source initialize.sh</span>
+<span class="go">source build_cpp.sh</span>
+</pre></div>
+</div>
+<p>You will need to have CMake installed on your system to build the C++ library. Once the build script has completed, you can use the resulting static/shared library from the <cite>build</cite> directory in your C++ projects.</p>
+<p>Keep in mind the C++ library only contains support for propagating orbits and calculating observables. If you want to use the orbit fitting functionality, you will need to install the full Python library.</p>
+</section>
+</section>
 <section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h1>
 <p>Once the GRSS library has been installed, it can be imported into a Python script using the following command:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grss</span>
 </pre></div>
@@ -559,7 +581,6 @@ document.write(`
 </pre></div>
 </div>
 <p>Once these files are available to the library, you are ready to use GRSS to its full potential!</p>
-</section>
 </section>
 
 
@@ -607,10 +628,15 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Getting Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-pypi">Install via PyPI</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code">Install via source code</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-python">Install via source code (Python)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-c-reduced-functionality">Install via source code (C++, reduced functionality)</a></li>
 </ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
+</ul>
+
   </nav></div>
 
 </div></div>
