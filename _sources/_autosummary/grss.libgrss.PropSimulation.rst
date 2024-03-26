@@ -26,9 +26,11 @@ grss.libgrss.PropSimulation
         ~PropSimulation.get_spiceBody_state
         ~PropSimulation.integrate
         ~PropSimulation.interpolate
+        ~PropSimulation.map_ephemeris
         ~PropSimulation.remove_body
         ~PropSimulation.set_integration_parameters
         ~PropSimulation.set_sim_constants
+        ~PropSimulation.unmap_ephemeris
     
     
 
@@ -42,7 +44,6 @@ grss.libgrss.PropSimulation
         ~PropSimulation.caParams
         ~PropSimulation.consts
         ~PropSimulation.convergedLightTime
-        ~PropSimulation.ephem
         ~PropSimulation.evalApparentState
         ~PropSimulation.evalMeasurements
         ~PropSimulation.events
