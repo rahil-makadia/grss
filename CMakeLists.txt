@@ -53,5 +53,5 @@ if (DOXYGEN_FOUND)
         VERBATIM
     )
 else (DOXYGEN_FOUND)
-    message(FATAL_ERROR "Doxygen needs to be installed to generate the doxygen documentation")
+    message(WARNING "Doxygen needs to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
