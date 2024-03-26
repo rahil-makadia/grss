@@ -9,23 +9,29 @@
 static double inline _mjd(double et) { return 51544.5 + et / 86400.0; }
 
 /**
- * @brief Check if the record is non-ascii.
- * 
- * @param[in] record Record to check.
- * @return int 1 if the record is non-ascii, 0 otherwise.
+ * @param[in] pl DafInfo structure.
  */
-static int _com(const char *record) {
-    for (int n = 0; n < RECORD_LEN; n++) {
-        if (record[n] < 0) return 0;
+void daf_free(DafInfo* pl) {
+	if (pl == nullptr)
+		return;
+
+    if (pl->targets){
+        for (int m = 0; m < pl->num; m++) {
+            free(pl->targets[m].one);
+            free(pl->targets[m].two);
+        }
+        free(pl->targets);
     }
-    return 1;
+	munmap(pl->map, pl->len);
+	memset(pl, 0, sizeof(DafInfo));
+	free(pl);
 }
 
 /**
- * @param[in] path Path to the SPK file.
- * @return SpkInfo* Pointer to the SpkInfo structure.
+ * @param[in] path Path to the DAF file.
+ * @return DafInfo* Pointer to the DafInfo structure.
  */
-SpkInfo* spk_init(const std::string &path) {
+DafInfo* daf_init(const std::string &path, const std::string &type) {
     // For file format information, see
     // https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/daf.html
 
@@ -45,20 +51,20 @@ SpkInfo* spk_init(const std::string &path) {
     union {
         char buf[RECORD_LEN];
         struct {
-            double next;  // The record number of the next summary record in the
-                          // file. Zero if this is the final summary record.
-            double
-                prev;  // The record number of the previous summary record in
-                       // the file. Zero if this is the initial summary record.
+            double next;    // The record number of the next summary record in the file. Zero if this is the final summary record.
+            double prev;    // The record number of the previous summary record in the file. Zero if this is the initial summary record.
             double nsum;    // Number of summaries in this record
             summary s[25];  // Summaries (25 is the maximum)
-        } summaries;          // Summary record
+        } summaries;        // Summary record
+        // See: https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/daf.html#The%20File%20Record
         struct {
-            char locidw[8];  // An identification word
-            int nd;  // The number of double precision components in each array
-                     // summary.
-            int ni;  // The number of integer components in each array summary.
-        } file;      // File record
+            char locidw[8]; // An identification word
+            int nd;         // The number of double precision components in each array summary.
+            int ni;         // The number of integer components in each array summary.
+            char locifn[60];// The internal name or description of the array file.
+            int fward;      // The record number of the initial summary record in the file.
+            int bward;      // The record number of the final summary record in the file.
+        } file;             // File record
     } record;
 
     // Try opening file.
@@ -70,9 +76,10 @@ SpkInfo* spk_init(const std::string &path) {
     // Read the file record.
     read(fd, &record, RECORD_LEN);
     // Check if the file is a valid double Precision Array File
-    if (strncmp(record.file.locidw, "DAF/SPK", 7) != 0) {
+    std::string full_file_type = "DAF/" + type;
+    if (strncmp(record.file.locidw, full_file_type.c_str(), 7) != 0) {
         throw std::runtime_error(
-            "Error parsing DAF/SPK file. Incorrect "
+            "Error parsing "+full_file_type+". Incorrect "
             "header.");
         close(fd);
         return NULL;
@@ -83,21 +90,21 @@ SpkInfo* spk_init(const std::string &path) {
     int nc = 8 * (record.file.nd + (record.file.ni + 1) / 2);
     if (nc != sizeof(summary)) {
         throw std::runtime_error(
-            "Error parsing DAF/SPK file. Wrong size of "
+            "Error parsing "+full_file_type+". Wrong size of "
             "summary record.");
         close(fd);
         return NULL;
     }
 
-    // Continue reading file until we find a non-ascii record.
-    do {
-        read(fd, record.buf, RECORD_LEN);
-    } while (_com(record.buf) > 0);
+    // Seek until the first summary record using the file record's fward pointer.
+    // Record numbers start from 1 not 0 so we subtract 1 to get to the correct record.
+    lseek(fd, (record.file.fward - 1) * RECORD_LEN, SEEK_SET);
+    read(fd, record.buf, RECORD_LEN);
 
     // We are at the first summary block, validate
     if ((int64_t)record.buf[8] != 0) {
         throw std::runtime_error(
-            "Error parsing DAF/SPL file. Cannot find "
+            "Error parsing "+full_file_type+". Cannot find "
             "summary block.");
         close(fd);
         return NULL;
@@ -107,11 +114,13 @@ SpkInfo* spk_init(const std::string &path) {
     // std::cout << "record.file.ni: " << record.file.ni << std::endl;
     // std::cout << "nc: " << nc << std::endl;
     // okay, let's go
-    SpkInfo *pl = (SpkInfo *)calloc(1, sizeof(SpkInfo));
-    while (1) {  // Loop over records
-        for (int b = 0; b < (int)record.summaries.nsum;
-             b++) {                               // Loop over summaries
-            summary *sum = &record.summaries.s[b];  // get current summary
+    DafInfo *pl = (DafInfo *)calloc(1, sizeof(DafInfo));
+    // Loop over records
+    while (true) {
+        // Loop over summaries
+        for (int b = 0; b < (int)record.summaries.nsum; b++) {
+            // get current summary
+            summary *sum = &record.summaries.s[b];
             // Index in our arrays for current target
             int m = pl->num - 1;
             // New target?
@@ -153,7 +162,7 @@ SpkInfo* spk_init(const std::string &path) {
     // Get file size
     struct stat sb;
     if (fstat(fd, &sb) < 0) {
-        throw std::runtime_error("Error calculating size for DAF/SPL file.");
+        throw std::runtime_error("Error calculating size for "+full_file_type+".");
         return NULL;
     }
     pl->len = sb.st_size;
@@ -164,18 +173,26 @@ SpkInfo* spk_init(const std::string &path) {
         throw std::runtime_error("Error creating memory map.");
         return NULL;  // Will leak memory
     }
-#if defined(MADV_RANDOM)
-    if (madvise(pl->map, pl->len, MADV_RANDOM) < 0) {
-        throw std::runtime_error("Error while calling madvise().");
-        return NULL;  // Will leak memory
-    }
-#endif
+    #if defined(MADV_RANDOM)
+        if (madvise(pl->map, pl->len, MADV_RANDOM) < 0) {
+            throw std::runtime_error("Error while calling madvise().");
+            return NULL;  // Will leak memory
+        }
+    #endif
     close(fd);
     return pl;
 }
 
 /**
- * @param[in] pl SpkInfo structure.
+ * @param[in] path Path to the SPK file.
+ * @return DafInfo* Pointer to the DafInfo structure for the SPK file.
+ */
+DafInfo* spk_init(const std::string &path) {
+    return daf_init(path, "SPK");
+}
+
+/**
+ * @param[in] pl DafInfo structure.
  * @param[in] epoch Epoch to compute the state at (MJD ET).
  * @param[in] spiceId SPICE ID of the body.
  * @param[out] out_x X position of the body [AU].
@@ -188,7 +205,7 @@ SpkInfo* spk_init(const std::string &path) {
  * @param[out] out_ay Y acceleration of the body [AU/day^2].
  * @param[out] out_az Z acceleration of the body [AU/day^2].
  */
-void spk_calc(SpkInfo *pl, double epoch, int spiceId, double *out_x,
+void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
              double *out_vz, double *out_ax, double *out_ay, double *out_az) {
     if (pl == NULL) {
@@ -349,7 +366,7 @@ void spk_calc(SpkInfo *pl, double epoch, int spiceId, double *out_x,
 void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
                    double state[9]) {
     bool smallBody = spiceId > 1000000;
-    SpkInfo *infoToUse;
+    DafInfo *infoToUse;
     if (smallBody) {
         infoToUse = ephem.sb;
     } else {

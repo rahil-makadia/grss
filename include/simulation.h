@@ -406,6 +406,7 @@ class PropSimulation {
    public:
     std::string name;
     std::string DEkernelPath;
+    Ephemeris ephem;
     /**
      * @brief Construct a new PropSimulation object.
      */
@@ -415,7 +416,14 @@ class PropSimulation {
      * @brief Construct a new PropSimulation object from a reference simulation.
      */
     PropSimulation(std::string name, const PropSimulation &simRef);
-    Ephemeris ephem;
+    /**
+     * @brief Memory map the ephemeris files.
+     */
+    void map_ephemeris();
+    /**
+     * @brief Unmap the ephemeris files.
+     */
+    void unmap_ephemeris();
     /**
      * @brief Get the state of a SpiceBody in the PropSimulation at a given time.
      */

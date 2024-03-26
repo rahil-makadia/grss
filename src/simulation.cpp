@@ -368,25 +368,18 @@ PropSimulation::PropSimulation(std::string name, real t0,
 
     std::string mapKernelPath =
         DEkernelPath.substr(0, DEkernelPath.find_last_of("/\\")) + "/";
+    std::string kernel_sb, kernel_mb;
     switch (defaultSpiceBodies) {
         case 0: {
-            std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
-            std::string kernel_mb = mapKernelPath + "de440.bsp";
-            SpkInfo* mbInfo = spk_init(kernel_mb);
-            SpkInfo* sbInfo = spk_init(kernel_sb);
-            this->ephem.mb = mbInfo;
-            this->ephem.sb = sbInfo;
+            kernel_sb = mapKernelPath + "sb441-n16s.bsp";
+            kernel_mb = mapKernelPath + "de440.bsp";
             break;
         }
         // DE430 or DE431
         case 430:
         case 431: {
-            std::string kernel_sb = mapKernelPath + "sb431-n16s.bsp";
-            std::string kernel_mb = mapKernelPath + "de430.bsp";
-            SpkInfo* mbInfo = spk_init(kernel_mb);
-            SpkInfo* sbInfo = spk_init(kernel_sb);
-            this->ephem.mb = mbInfo;
-            this->ephem.sb = sbInfo;
+            kernel_sb = mapKernelPath + "sb431-n16s.bsp";
+            kernel_mb = mapKernelPath + "de430.bsp";
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
@@ -507,6 +500,9 @@ PropSimulation::PropSimulation(std::string name, real t0,
                                 2.295559390637462e-15L / G, 0.0L);
             SpiceBody Sylvia("Sylvia", 2000087, this->integParams.t0,
                              2.199295173574073e-15L / G, 0.0L);
+            Ceres.caTol = 0.05;
+            Vesta.caTol = 0.05;
+            Pallas.caTol = 0.05;
             add_spice_body(Ceres);
             add_spice_body(Vesta);
             add_spice_body(Pallas);
@@ -528,12 +524,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         // DE440 or DE441
         case 440:
         case 441: {
-            std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
-            std::string kernel_mb = mapKernelPath + "de440.bsp";
-            SpkInfo* mbInfo = spk_init(kernel_mb);
-            SpkInfo* sbInfo = spk_init(kernel_sb);
-            this->ephem.mb = mbInfo;
-            this->ephem.sb = sbInfo;
+            kernel_sb = mapKernelPath + "sb441-n16s.bsp";
+            kernel_mb = mapKernelPath + "de440.bsp";
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
@@ -653,6 +645,9 @@ PropSimulation::PropSimulation(std::string name, real t0,
                                  2.4067012218937576e-15L / G, 0.0L);
             SpiceBody Cybele("Cybele", 2000065, this->integParams.t0,
                              2.0917175955133682e-15L / G, 0.0L);
+            Ceres.caTol = 0.05;
+            Vesta.caTol = 0.05;
+            Pallas.caTol = 0.05;
             add_spice_body(Ceres);
             add_spice_body(Vesta);
             add_spice_body(Pallas);
@@ -679,6 +674,9 @@ PropSimulation::PropSimulation(std::string name, real t0,
                 "441).");
             break;
     }
+    this->ephem.mbPath = kernel_mb;
+    this->ephem.sbPath = kernel_sb;
+    this->map_ephemeris();
 }
 
 /**
@@ -825,6 +823,18 @@ void PropSimulation::prepare_for_evaluation(
     }
 }
 
+void PropSimulation::map_ephemeris(){
+    this->ephem.mb = spk_init(this->ephem.mbPath);
+    this->ephem.sb = spk_init(this->ephem.sbPath);
+}
+
+void PropSimulation::unmap_ephemeris(){
+    daf_free(this->ephem.mb);
+    daf_free(this->ephem.sb);
+    this->ephem.mb = nullptr;
+    this->ephem.sb = nullptr;
+}
+
 /**
  * @param[in] t Time at which to get the state.
  * @param[in] bodyName Name of the body.
@@ -842,6 +852,11 @@ std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::s
         throw std::invalid_argument("SPICE Body with name " + bodyName +
                                         " does not exist in simulation " +
                                         this->name);
+    }
+    if (this->ephem.mb == nullptr || this->ephem.sb == nullptr){
+        throw std::invalid_argument(
+            "Ephemeris kernels are not loaded. Memory map the ephemeris using "
+            "PropSimulation.map_ephemeris() method first.");
     }
     double spiceState[9];
     get_spk_state(spiceId, t, this->ephem, spiceState);
@@ -1124,6 +1139,10 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->radarObs.clear();
     this->radarPartials.clear();
 
+    // map the ephemeris again
+    this->map_ephemeris();
+
+    // first prepare for integration and then integrate
     this->integParams.t0 = this->t;
     this->interpParams.tStack.push_back(this->t);
     this->interpParams.xIntegStack.push_back(this->xInteg);

@@ -56,7 +56,7 @@ struct CacheItem {
  */
 struct EphemerisCache {
     double t;
-    struct CacheItem items[SPK_CACHE_ITEM_SIZE];
+    CacheItem items[SPK_CACHE_ITEM_SIZE];
 };
 
 /**
@@ -69,21 +69,6 @@ struct EphemerisCache {
  * @brief Length of a record in an SPK file.
  */
 #define RECORD_LEN 1024
-
-/**
- * @brief Structure to hold all the data for the SPK files in a PropSimulation.
- *
- * @param mb Main body ephemeris data.
- * @param sb Small body ephemeris data.
- * @param nextIdxToWrite Next index to write to in the cache.
- * @param cache Cache of recently queried SPK data.
- */
-struct Ephemeris {
-    struct SpkInfo *mb;
-    struct SpkInfo *sb;
-    size_t nextIdxToWrite = -1;
-    EphemerisCache cache[SPK_CACHE_SIZE];
-};
 
 /**
  * @brief Structure to hold the data for a single body in an SPK file.
@@ -117,8 +102,8 @@ struct SpkTarget {
  * @param map Memory map of the SPK file.
  * @param len Length of the memory map.
  */
-struct SpkInfo {
-    struct SpkTarget *targets;
+struct DafInfo {
+    SpkTarget* targets;
     int num;
     int allocatedNum;
     void *map;
@@ -126,15 +111,42 @@ struct SpkInfo {
 };
 
 /**
+ * @brief Structure to hold all the data for the SPK files in a PropSimulation.
+ *
+ * @param mb Main body ephemeris data.
+ * @param sb Small body ephemeris data.
+ * @param nextIdxToWrite Next index to write to in the cache.
+ * @param cache Cache of recently queried SPK data.
+ */
+struct Ephemeris {
+    std::string mbPath;
+    std::string sbPath;
+    DafInfo* mb = nullptr;
+    DafInfo* sb = nullptr;
+    size_t nextIdxToWrite = -1;
+    EphemerisCache cache[SPK_CACHE_SIZE];
+};
+
+/**
+ * @brief Free the memory allocated for an DafInfo structure.
+ */
+void daf_free(DafInfo *pl);
+
+/**
+ * @brief Initialise a DAF file.
+ */
+DafInfo* daf_init(const std::string &path, const std::string &type);
+
+/**
  * @brief Initialise an SPK file.
  */
-SpkInfo* spk_init(const std::string &path);
+DafInfo* spk_init(const std::string &path);
 
 /**
  * @brief Compute pos, vel, and acc for a given body
- * at a given time using an SpkInfo structure.
+ * at a given time using an DafInfo structure.
  */
-void spk_calc(SpkInfo *pl, double epoch, int spiceId, double *out_x,
+void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
              double *out_vz, double *out_ax, double *out_ay, double *out_az);
 

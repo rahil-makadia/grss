@@ -181,6 +181,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
         if body.name == flyby_body:
             break
         j += 2*body.n2Derivs
+    prop_sim.map_ephemeris()
     for idx, time in enumerate(t_stack):
         central_body_state = prop_sim.get_spiceBody_state(time, central_body)
         ca_body_state = x_stack[idx]
@@ -190,6 +191,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
         rel_state[idx,3] = ca_body_state[j+3] - central_body_state[3]
         rel_state[idx,4] = ca_body_state[j+4] - central_body_state[4]
         rel_state[idx,5] = ca_body_state[j+5] - central_body_state[5]
+    prop_sim.unmap_ephemeris()
     rel_dist = np.linalg.norm(rel_state[:,:3], axis=1)
     rel_radial_vel = np.sum(rel_state[:,:3]*rel_state[:,3:6], axis=1) / rel_dist
     scale_factor, units = get_scale_factor(central_body)
