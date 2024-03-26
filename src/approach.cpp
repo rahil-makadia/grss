@@ -1,5 +1,12 @@
 #include "approach.h"
 
+/**
+ * @param[inout] propSim PropSimulation object for the integration.
+ * @param[in] tOld Time at the previous integrator epoch.
+ * @param[in] xIntegOld State at the previous integrator epoch.
+ * @param[in] t Time at the current integrator epoch.
+ * @param[in] xInteg State at the current integrator epoch.
+ */
 void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                         const std::vector<real> xIntegOld, const real &t,
                         const std::vector<real> xInteg) {
@@ -115,6 +122,13 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] i Index of the first body.
+ * @param[in] j Index of the second body.
+ * @param[in] t Time at the current integrator epoch.
+ * @param[out] rDot Relative radial velocity.
+ */
 void ca_rdot_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &rDot) {
     // Calculate the radial velocity between two bodies at a given time
@@ -127,6 +141,13 @@ void ca_rdot_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
         (xRel[0] * xRel[3] + xRel[1] * xRel[4] + xRel[2] * xRel[5]) / relDist;
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] i Index of the first body.
+ * @param[in] j Index of the second body.
+ * @param[in] t Time at the current integrator epoch.
+ * @param[out] r Relative distance.
+ */
 void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &r) {
     // Calculate the distance between two bodies at a given time, accounting for
@@ -147,6 +168,13 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
     r = relDist - radius - radiusj;
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] i Index of the first body.
+ * @param[in] j Index of the second body.
+ * @param[in] t Time to compute the relative state.
+ * @param[out] xRel Relative state of the body.
+ */
 void get_rel_state(PropSimulation *propSim, const size_t &i, const size_t &j,
                    const real &t, real xRel[6]) {
     std::vector<real> xInterp = propSim->interpolate(t);
@@ -173,6 +201,15 @@ void get_rel_state(PropSimulation *propSim, const size_t &i, const size_t &j,
     }
 }
 
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] i Index of the first body.
+ * @param[in] j Index of the second body.
+ * @param[in] x1 Initial time of the bracketed interval.
+ * @param[in] x2 Final time of the bracketed interval.
+ * @param[out] tCA Time of close approach or impact.
+ * @param[in] zero_func Function to compute the zero of (rDot for CA or r for impacts).
+ */
 void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
                            const size_t &j, const real &x1, const real &x2,
                            real &tCA,
@@ -259,6 +296,10 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
                  "get_ca_or_impact_time!!! Impact/CA time may not be accurate.";
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[in] tMap Time of the B-plane map.
+ */
 void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const real &tMap) {
     // Calculate the parameters of a close approach
     this->tMap = tMap;
@@ -576,6 +617,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     }
 }
 
+/**
+ * @param[in] prec Precision of the output.
+ */
 void CloseApproachParameters::print_summary(int prec){
     std::cout.precision(prec);
     std::cout << "MJD " << this->t << " TDB:" << std::endl;
@@ -584,6 +628,9 @@ void CloseApproachParameters::print_summary(int prec){
     std::cout << "    Gravitational focusing factor: " << this->gravFocusFactor << ". Impact: " << std::boolalpha << this->impact << std::endl;
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ */
 void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     ConstSpiceChar *baseBodyFrame;
     switch (this->centralBodySpiceId) {
@@ -674,6 +721,9 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     this->alt = (dist-radiusj)*propSim->consts.du2m/1.0e3L;
 }
 
+/**
+ * @param[in] prec Precision of the output.
+ */
 void ImpactParameters::print_summary(int prec){
     std::cout.precision(prec);
     std::cout << "MJD " << this->t << " TDB:" << std::endl;

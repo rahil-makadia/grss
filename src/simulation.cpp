@@ -1,5 +1,12 @@
 #include "simulation.h"
 
+/** 
+ * @param[in] tObsMjd Observation time in Modified Julian Date.
+ * @param[in] observerInfo Observer information (base body SPICE ID, lon [rad], lat [rad], alt [m])
+ * @param[in] propSim PropSimulation object for querying Ephemeris of base body.
+ * @param[in] tObsInUTC Flag to indicate if the observation time is in UTC (true) or TDB (false).
+ * @param[out] observerState Output observer state (position [DU], velocity [DU/TU]).
+ */
 void get_observer_state(const real &tObsMjd,
                         const std::vector<real> &observerInfo,
                         PropSimulation *propSim, const bool tObsInUTC,
@@ -110,6 +117,11 @@ void get_observer_state(const real &tObsMjd,
     observerState[5] = baseBodyState[5] + observerStateInertial[5];
 }
 
+/** 
+ * @param[in] J2 Oblateness coefficient.
+ * @param[in] poleRA Right ascension of the pole.
+ * @param[in] poleDec Declination of the pole.
+*/
 void Body::set_J2(real J2, real poleRA, real poleDec) {
     this->J2 = J2;
     if (this->J2 != 0.0L) {
@@ -121,6 +133,13 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
     this->poleDec = poleDec * DEG2RAD;
 }
 
+/** 
+ * @param[in] name Name of the body.
+ * @param[in] spiceId SPICE ID of the body.
+ * @param[in] t0 Initial time [MJD TDB].
+ * @param[in] mass Mass of the body [kg].
+ * @param[in] radius Radius of the body [m].
+ */
 SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
                      real radius) {
     this->name = name;
@@ -148,9 +167,17 @@ SpiceBody::SpiceBody(std::string name, int spiceId, real t0, real mass,
     this->acc[2] = 0.0L;
 }
 
+/**
+ * @param[in] name Name of the body.
+ * @param[in] t0 Initial time.
+ * @param[in] mass Mass of the body [kg].
+ * @param[in] radius Radius of the body [m].
+ * @param[in] cometaryState Initial heliocentric ecliptic cometary state of the body.
+ * @param[in] ngParams Nongravitational parameters for the body.
+ */
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> cometaryState,
-                     NongravParamaters ngParams) {
+                     NongravParameters ngParams) {
     this->name = name;
     this->t0 = t0;
     this->mass = mass;
@@ -199,9 +226,18 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->isMajor = false;
 }
 
+/**
+ * @param[in] name Name of the body.
+ * @param[in] t0 Initial time.
+ * @param[in] mass Mass of the body [kg].
+ * @param[in] radius Radius of the body [m].
+ * @param[in] pos Initial barycentric position of the body [AU].
+ * @param[in] vel Initial barycentric velocity of the body [AU/day].
+ * @param[in] ngParams Nongravitational parameters for the body.
+ */
 IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
                      std::vector<real> pos, std::vector<real> vel,
-                     NongravParamaters ngParams) {
+                     NongravParameters ngParams) {
     this->name = name;
     this->t0 = t0;
     this->mass = mass;
@@ -290,6 +326,11 @@ void IntegBody::prepare_stm(){
     }
 }
 
+/**
+ * @param[in] t Time of the event.
+ * @param[inout] xInteg State of the body.
+ * @param[in] propDir Direction of propagation.
+ */
 void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,
                          const real& propDir) {
     if (t != this->t) {
@@ -303,6 +344,15 @@ void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,
     }
 }
 
+/**
+ * @param[in] name Name of the simulation.
+ * @param[in] t0 Initial time.
+ * @param[in] defaultSpiceBodies Default SPICE bodies to load.
+ *              (0=empty sim with DE440 ephemeris,
+ *               430/421=DE430 Sun+planets+Moon+Pluto+big16 asteroids,
+ *               440/441=DE440 Sun+planets+Moon+Pluto+big16 asteroids)
+ * @param[in] DEkernelPath Path to SPICE metakernel
+ */
 PropSimulation::PropSimulation(std::string name, real t0,
                                const int defaultSpiceBodies,
                                std::string DEkernelPath) {
@@ -322,8 +372,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 0: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de440.bsp";
-            spkInfo* mbInfo = spk_init(kernel_mb);
-            spkInfo* sbInfo = spk_init(kernel_sb);
+            SpkInfo* mbInfo = spk_init(kernel_mb);
+            SpkInfo* sbInfo = spk_init(kernel_sb);
             this->ephem.mb = mbInfo;
             this->ephem.sb = sbInfo;
             break;
@@ -333,8 +383,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 431: {
             std::string kernel_sb = mapKernelPath + "sb431-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de430.bsp";
-            spkInfo* mbInfo = spk_init(kernel_mb);
-            spkInfo* sbInfo = spk_init(kernel_sb);
+            SpkInfo* mbInfo = spk_init(kernel_mb);
+            SpkInfo* sbInfo = spk_init(kernel_sb);
             this->ephem.mb = mbInfo;
             this->ephem.sb = sbInfo;
             real G = 6.6743e-11L /
@@ -480,8 +530,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 441: {
             std::string kernel_sb = mapKernelPath + "sb441-n16s.bsp";
             std::string kernel_mb = mapKernelPath + "de440.bsp";
-            spkInfo* mbInfo = spk_init(kernel_mb);
-            spkInfo* sbInfo = spk_init(kernel_sb);
+            SpkInfo* mbInfo = spk_init(kernel_mb);
+            SpkInfo* sbInfo = spk_init(kernel_sb);
             this->ephem.mb = mbInfo;
             this->ephem.sb = sbInfo;
             real G = 6.6743e-11L /
@@ -631,6 +681,10 @@ PropSimulation::PropSimulation(std::string name, real t0,
     }
 }
 
+/**
+ * @param[in] name Name of the simulation.
+ * @param[in] simRef Reference simulation to copy.
+ */
 PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
@@ -652,6 +706,10 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->radarObserver = simRef.radarObserver;
 }
 
+/**
+ * @param[in] tEval Vector of times at which to evaluate the integrated state.
+ * @param[in] observerInfo Observer information array.
+ */
 void PropSimulation::prepare_for_evaluation(
     std::vector<real>& tEval, std::vector<std::vector<real>>& observerInfo) {
     const bool forwardProp = this->integParams.t0 <= this->integParams.tf;
@@ -767,6 +825,34 @@ void PropSimulation::prepare_for_evaluation(
     }
 }
 
+/**
+ * @param[in] t Time at which to get the state.
+ * @param[in] bodyName Name of the body.
+ * @return std::vector<real> State of the body at time t.
+ */
+std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::string &bodyName) {
+    int spiceId = -1;
+    for (size_t i = 0; i < this->spiceBodies.size(); i++){
+        if (this->spiceBodies[i].name == bodyName){
+            spiceId = this->spiceBodies[i].spiceId;
+            break;
+        }
+    }
+    if (spiceId == -1){
+        throw std::invalid_argument("SPICE Body with name " + bodyName +
+                                        " does not exist in simulation " +
+                                        this->name);
+    }
+    double spiceState[9];
+    get_spk_state(spiceId, t, this->ephem, spiceState);
+    std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
+                               spiceState[3], spiceState[4], spiceState[5]};
+    return state;
+}
+
+/**
+ * @param[in] body SpiceBody object to add to the simulation.
+ */
 void PropSimulation::add_spice_body(SpiceBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->spiceBodies.size(); i++) {
@@ -782,26 +868,9 @@ void PropSimulation::add_spice_body(SpiceBody body) {
     this->integParams.nTotal++;
 }
 
-std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::string &bodyName) {
-    int spiceID = -1;
-    for (size_t i = 0; i < this->spiceBodies.size(); i++){
-        if (this->spiceBodies[i].name == bodyName){
-            spiceID = this->spiceBodies[i].spiceId;
-            break;
-        }
-    }
-    if (spiceID == -1){
-        throw std::invalid_argument("SPICE Body with name " + bodyName +
-                                        " does not exist in simulation " +
-                                        this->name);
-    }
-    double spiceState[9];
-    get_spk_state(spiceID, t, this->ephem, spiceState);
-    std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
-                               spiceState[3], spiceState[4], spiceState[5]};
-    return state;
-}
-
+/**
+ * @param[in] body IntegBody object to add to the simulation.
+ */
 void PropSimulation::add_integ_body(IntegBody body) {
     // check if body already exists. if so, throw error
     for (size_t i = 0; i < this->integBodies.size(); i++) {
@@ -837,6 +906,9 @@ void PropSimulation::add_integ_body(IntegBody body) {
     this->integParams.n2Derivs += body.n2Derivs;
 }
 
+/**
+ * @param[in] name Name of the body to remove.
+ */
 void PropSimulation::remove_body(std::string name) {
     for (size_t i = 0; i < this->spiceBodies.size(); i++) {
         if (this->spiceBodies[i].name == name) {
@@ -857,6 +929,12 @@ void PropSimulation::remove_body(std::string name) {
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
+/**
+ * @param[in] body IntegBody object to apply the ImpulseEvent to.
+ * @param[in] tEvent Time at which to apply the ImpulseEvent.
+ * @param[in] deltaV Delta-V for the impulse.
+ * @param[in] multiplier Multiplier for the Delta-V.
+ */
 void PropSimulation::add_event(IntegBody body, real tEvent,
                                std::vector<real> deltaV, real multiplier) {
     // check if tEvent is valid
@@ -906,6 +984,12 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     }
 }
 
+/**
+ * @param[in] du2m Distance unit conversion factor (default: AU to meters).
+ * @param[in] tu2s Time unit conversion factor (default: days to seconds).
+ * @param[in] G Gravitational constant (default: kg AU^3/day^2).
+ * @param[in] clight Speed of light (default: AU/day).
+  */
 void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
                                        real clight) {
     this->consts.du2m = du2m;
@@ -917,6 +1001,21 @@ void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
     this->consts.JdMinusMjd = 2400000.5;
 }
 
+/**
+ * @param[in] tf Final time.
+ * @param[in] tEval Vector of times at which to evaluate the integrated state (default: empty).
+ * @param[in] tEvalUTC Flag to indicate if the evaluation times are in UTC (default: false).
+ * @param[in] evalApparentState Flag to indicate if the apparent state is evaluated (default: false).
+ * @param[in] convergedLightTime Flag to indicate if converged light time needs to be computed (default: false).
+ * @param[in] observerInfo Observer information array (default: empty).
+ * @param[in] adaptiveTimestep Flag to use adaptive timestep (default: true).
+ * @param[in] dt0 Initial timestep (default: 0.0).
+ * @param[in] dtMax Maximum timestep (default: 21.0).
+ * @param[in] dtMin Minimum timestep (default: 0.005).
+ * @param[in] dtChangeFactor Maximum factor by which to change timestep (default: 0.25).
+ * @param[in] tolInteg Tolerance for integrator (default: 1e-11).
+ * @param[in] tolPC Tolerance for Gauss-Radau predictor-corrector loop (default: 1e-16).
+ */
 void PropSimulation::set_integration_parameters(
     real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState,
     bool convergedLightTime, std::vector<std::vector<real>> observerInfo,
@@ -938,6 +1037,9 @@ void PropSimulation::set_integration_parameters(
     this->integParams.tolInteg = tolInteg;
 }
 
+/**
+ * @return std::vector<real> Vector of simulation constants.
+ */
 std::vector<real> PropSimulation::get_sim_constants() {
     std::vector<real> constants = {
         this->consts.du2m,      this->consts.tu2s,   this->consts.duptu2mps,
@@ -946,6 +1048,9 @@ std::vector<real> PropSimulation::get_sim_constants() {
     return constants;
 }
 
+/**
+ * @return std::vector<real> Vector of simulation integration parameters.
+ */
 std::vector<real> PropSimulation::get_integration_parameters() {
     std::vector<real> integration_parameters = {
         (real)this->integParams.nInteg,
@@ -988,7 +1093,13 @@ void PropSimulation::preprocess() {
         this->isPreprocessed = true;
     }
 }
-
+/**
+ * @brief Extend the simulation to a new final time.
+ * 
+ * @param[in] tf New final time.
+ * @param[in] tEvalNew New vector of times at which to evaluate the integrated state.
+ * @param[in] xObserverNew New vector of observer states.
+ */
 void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
                             std::vector<std::vector<real>> xObserverNew) {
     std::cout << "WARNING: The extend() method is under development and may "

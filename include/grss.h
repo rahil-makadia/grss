@@ -4,7 +4,7 @@
 #include "parallel.h"
 
 void PropSimulation::integrate() {
-    // check that xInteg has a valid size. If not, raise error
+    // raise error if xInteg is empty (no integration bodies in simulation)
     if (this->integParams.nInteg < 1) {
         throw std::runtime_error(
             "ERROR: There are no integration bodies in the "
@@ -12,12 +12,13 @@ void PropSimulation::integrate() {
             "integrate.");
     }
 
+    // integrate the system
     this->preprocess();
     if (!this->parallelMode) furnsh_c(this->DEkernelPath.c_str());
     gr15(this);
     if (!this->parallelMode) unload_c(this->DEkernelPath.c_str());
 
-    // if backwards integration
+    // flip vectors if integration is backwards in time
     if (this->integParams.t0 > this->integParams.tf) {
         std::reverse(this->events.begin(), this->events.end());
         std::reverse(this->xObserver.begin(), this->xObserver.end());

@@ -23,8 +23,8 @@ int main(){
                 2000704, 2000048, 2000003, 2000002, 2000016, 2000087, 2000088, 2000004};
     furnsh_c(kernel_sb.c_str());
     furnsh_c(kernel_mb.c_str());
-    spkInfo* mbInfo431 = spk_init(kernel_mb);
-    spkInfo* sbInfo431 = spk_init(kernel_sb);
+    SpkInfo* mbInfo431 = spk_init(kernel_mb);
+    SpkInfo* sbInfo431 = spk_init(kernel_sb);
     Ephemeris eph431;
     eph431.mb = mbInfo431;
     eph431.sb = sbInfo431;
@@ -69,8 +69,8 @@ int main(){
                 2000704, 2000007, 2000003, 2000002, 2000016, 2000087, 2000088, 2000004};
     furnsh_c(kernel_sb.c_str());
     furnsh_c(kernel_mb.c_str());
-    spkInfo* mbInfo441 = spk_init(kernel_mb);
-    spkInfo* sbInfo441 = spk_init(kernel_sb);
+    SpkInfo* mbInfo441 = spk_init(kernel_mb);
+    SpkInfo* sbInfo441 = spk_init(kernel_sb);
     Ephemeris eph441;
     eph441.mb = mbInfo441;
     eph441.sb = sbInfo441;

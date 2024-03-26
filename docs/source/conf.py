@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "GRSS"
-project_copyright = "2023, Rahil Makadia"
+project_copyright = "2024, GRSS Development Team"
 author = "Rahil Makadia"
 # get release and version from version.txt
 with open("../../grss/version.txt", "r", encoding="utf-8") as f:
@@ -23,7 +23,9 @@ extensions = [
     "sphinx.ext.napoleon",  # for parsing numpy style docstrings
     "nbsphinx",  # for parsing jupyter notebooks
     "sphinx_favicon",  # for adding full favicon support
+    "IPython.sphinxext.ipython_console_highlighting",  # for syntax highlighting
     "sphinx_gallery.load_style",  # for displaying jupyter notebook thumbnails
+    "breathe",  # for linking to C++ documentation
 ]
 autosummary_generate = True
 
@@ -36,6 +38,13 @@ exclude_patterns = []
 html_theme = "sphinx_book_theme"
 html_context = {
     "default_mode": "light",
+}
+html_sidebars = {
+    "*": [
+        "navbar-logo.html",
+        "search-field.html",
+        "sbt-sidebar-nav.html",
+    ]
 }
 html_theme_options = {
     "repository_url": "https://github.com/rahil-makadia/grss",
@@ -57,24 +66,7 @@ html_theme_options = {
         "alt_text": "GRSS - Home",
         "text": f"{project} v{version} documentation",
     },
-    # "icon_links": [
-    #     {
-    #         "name": "GitHub",
-    #         "url": "https://github.com/rahil-makadia/grss",
-    #         "icon": "fa-brands fa-github",
-    #     },
-    #     {
-    #         "name": "PyPI Downloads",
-    #         "url": "https://pypi.org/project/grss/",
-    #         "icon": "https://img.shields.io/pypi/dw/grss",
-    #         "type": "url",
-    #     },
-    #     {
-    #         "name": "PyPI",
-    #         "url": "https://pypi.org/project/grss/",
-    #         "icon": "fa-brands fa-python",
-    #     },
-    # ],
+    "navigation_with_keys": True,
     "extra_footer": ("Created using "
                         "<a href=https://sphinx-book-theme.readthedocs.io/>"
                         "The Sphinx Book Theme</a>."),
@@ -99,3 +91,9 @@ favicons = [
     {"name": "msapplication-TileImage", "content": "mstile-310x310.png"},
 ]
 exclude_patterns = ["**.ipynb_checkpoints"]
+
+breathe_projects = {
+	"GRSS": "../doxygen/xml"
+}
+breathe_default_project = "GRSS"
+breathe_default_members = ('members', 'undoc-members')

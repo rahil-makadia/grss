@@ -40,7 +40,7 @@ int main() {
     std::vector<real> vel = {-1.38187429130724199339e-02,
                              -6.00401017433447106719e-03,
                              -2.57842571752728202256e-03};
-    NongravParamaters ngPrms;
+    NongravParameters ngPrms;
     ngPrms.a1 = 4.999999873689E-13L;
     ngPrms.a2 = -2.901085508711E-14;
     ngPrms.a3 = 0.0L;

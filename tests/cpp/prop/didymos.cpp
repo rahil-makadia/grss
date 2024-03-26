@@ -44,7 +44,7 @@ int main() {
                              5.270678006987460E-01};
     std::vector<real> velf = {-1.653652752454120E-02, -8.564528317342794E-04,
                              6.471815241318629E-04};
-    NongravParamaters ngPrms;
+    NongravParameters ngPrms;
     ngPrms.a1 = 0.0L;
     ngPrms.a2 = -1.042309691002E-14;
     ngPrms.a3 = 0.0L;

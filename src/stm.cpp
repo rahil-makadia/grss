@@ -1,5 +1,14 @@
 #include "stm.h"
 
+/**
+ * @param[in] stm The full STM.
+ * @param[out] B The B submatrix (dpos_dpos).
+ * @param[out] Bdot The Bdot submatrix (dpos_dvel).
+ * @param[out] C The C submatrix (dvel_dpos).
+ * @param[out] Cdot The Cdot submatrix (dvel_dvel).
+ * @param[out] D The D submatrix (dpos_dpar).
+ * @param[out] Ddot The Ddot submatrix (dvel_dpar).
+ */
 void bcd_and_dot(const std::vector<real> &stm, real *B, real *Bdot, real *C,
                  real *Cdot, real *D, real *Ddot) {
     B[0] = stm[0];
@@ -55,6 +64,12 @@ void bcd_and_dot(const std::vector<real> &stm, real *B, real *Bdot, real *C,
     }
 }
 
+/**
+ * @param[in] stmParams Structure containing the STM submatrices and their derivatives.
+ * @param[in] numParams Number of parameters.
+ * @param[in] stmStarti Index of the first element of the STM in the second derivative vector.
+ * @param[out] accInteg Second derivative vector.
+ */
 void bcd_2dot(STMParameters &stmParams, size_t numParams,
               size_t stmStarti, std::vector<real> &accInteg) {
     real *termB1 = new real[9];
@@ -123,6 +138,13 @@ void bcd_2dot(STMParameters &stmParams, size_t numParams,
     }
 }
 
+/**
+ * @param[inout] stmParams Structure containing the STM submatrices and their derivatives.
+ * @param[in] gm Gravitational parameter.
+ * @param[in] dx Position difference in the x direction [AU].
+ * @param[in] dy Position difference in the y direction [AU].
+ * @param[in] dz Position difference in the z direction [AU].
+ */
 void stm_newton(STMParameters &stmParams, const real &gm, const real &dx,
                 const real &dy, const real &dz) {
     const real r = sqrt(dx * dx + dy * dy + dz * dz);
@@ -139,6 +161,19 @@ void stm_newton(STMParameters &stmParams, const real &gm, const real &dx,
     stmParams.dfdpos[8] += gm * (3 * dz * dz / r5 - 1 / r3);
 }
 
+/**
+ * @param[inout] stmParams Structure containing the STM submatrices and their derivatives.
+ * @param[in] gm Gravitational parameter.
+ * @param[in] c Speed of light [AU/day].
+ * @param[in] beta PPN parameter.
+ * @param[in] gamma PPN parameter.
+ * @param[in] dx Position difference in the x direction [AU].
+ * @param[in] dy Position difference in the y direction [AU].
+ * @param[in] dz Position difference in the z direction [AU].
+ * @param[in] dvx Velocity difference in the x direction [AU/day].
+ * @param[in] dvy Velocity difference in the y direction [AU/day].
+ * @param[in] dvz Velocity difference in the z direction [AU/day].
+ */
 void stm_ppn_simple(STMParameters &stmParams, const real &gm, const real &c,
                     const real &beta, const real &gamma, const real &dx,
                     const real &dy, const real &dz, const real &dvx,
@@ -178,6 +213,20 @@ void stm_ppn_simple(STMParameters &stmParams, const real &gm, const real &c,
     stmParams.dfdvel[8] += fac1*(-2*gamma*dvz*dz + fac3 + 2*(1+gamma)*dz*dvz);
 }
 
+/**
+ * @param[inout] stmParams Structure containing the STM submatrices and their derivatives.
+ * @param[in] gm Gravitational parameter.
+ * @param[in] J2 Oblateness coefficient.
+ * @param[in] dxBody Body fixed position difference in the x direction [AU].
+ * @param[in] dyBody Body fixed position difference in the y direction [AU].
+ * @param[in] dzBody Body fixed position difference in the z direction [AU].
+ * @param[in] radius Radius of the body [AU].
+ * @param[in] sinRA Sine of the right ascension of the body pole.
+ * @param[in] cosRA Cosine of the right ascension of the body pole.
+ * @param[in] sinDec Sine of the declination of the body pole.
+ * @param[in] cosDec Cosine of the declination of the body pole.
+ * @param[in] smoothing_threshold Threshold for the J2 smoothing function inside the body.
+ */
 void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
             const real &dxBody, const real &dyBody, const real &dzBody,
             const real &radius, const real &sinRA, const real &cosRA,
@@ -286,8 +335,21 @@ void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
     stmParams.dfdpos[8] += dfdposJ2[8];
 }
 
+/**
+ * @param[inout] stmParams Structure containing the STM submatrices and their derivatives.
+ * @param[in] g Non-gravitational acceleration scaling function.
+ * @param[in] ngParams Structure containing the non-gravitational acceleration parameters.
+ * @param[in] dx Heliocentric position difference in the x direction [AU].
+ * @param[in] dy Heliocentric position difference in the y direction [AU].
+ * @param[in] dz Heliocentric position difference in the z direction [AU].
+ * @param[in] dvx Heliocentric velocity difference in the x direction [AU/day].
+ * @param[in] dvy Heliocentric velocity difference in the y direction [AU/day].
+ * @param[in] dvz Heliocentric velocity difference in the z direction [AU/day].
+ * @param[in] rVec Relative position vector.
+ * @param[in] nVec Relative angular momentum vector.
+ */
 void stm_nongrav(STMParameters &stmParams, const real &g,
-                 const NongravParamaters &ngParams, const real &dx, const real &dy,
+                 const NongravParameters &ngParams, const real &dx, const real &dy,
                  const real &dz, const real &dvx, const real &dvy, const real &dvz,
                  real *rVec, real *nVec) {
     const real a1 = ngParams.a1;

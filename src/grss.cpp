@@ -6,7 +6,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(libgrss, m) {
-    m.doc() = "GRSS C++ library bindings for Python";
+    m.doc() = "GRSS Python bindings for C++ library";
 
     py::class_<Constants>(m, "Constants", R"mydelimiter(
         The Constants class contains physical constants and conversion factors
@@ -88,33 +88,33 @@ PYBIND11_MODULE(libgrss, m) {
                         Tolerance for integration.
                         )mydelimiter");
 
-    py::class_<NongravParamaters>(m, "NongravParamaters", R"mydelimiter(
-        The NongravParamaters class contains constants used for calculating the
+    py::class_<NongravParameters>(m, "NongravParameters", R"mydelimiter(
+        The NongravParameters class contains constants used for calculating the
         non-gravitational accelerations on integrated bodies.
         )mydelimiter")
         .def(py::init<>())
-        .def_readwrite("a1", &NongravParamaters::a1, R"mydelimiter(
+        .def_readwrite("a1", &NongravParameters::a1, R"mydelimiter(
             Radial non-gravitational parameter a1.
             )mydelimiter")
-        .def_readwrite("a2", &NongravParamaters::a2, R"mydelimiter(
+        .def_readwrite("a2", &NongravParameters::a2, R"mydelimiter(
             Transverse non-gravitational parameter a2.
             )mydelimiter")
-        .def_readwrite("a3", &NongravParamaters::a3, R"mydelimiter(
+        .def_readwrite("a3", &NongravParameters::a3, R"mydelimiter(
             Normal non-gravitational parameter a3.
             )mydelimiter")
-        .def_readwrite("alpha", &NongravParamaters::alpha, R"mydelimiter(
+        .def_readwrite("alpha", &NongravParameters::alpha, R"mydelimiter(
             Non-gravitational parameter alpha from Marsden et al. (1973).
             )mydelimiter")
-        .def_readwrite("k", &NongravParamaters::k, R"mydelimiter(
+        .def_readwrite("k", &NongravParameters::k, R"mydelimiter(
             Non-gravitational parameter k from Marsden et al. (1973).
             )mydelimiter")
-        .def_readwrite("m", &NongravParamaters::m, R"mydelimiter(
+        .def_readwrite("m", &NongravParameters::m, R"mydelimiter(
             Non-gravitational parameter m from Marsden et al. (1973).
             )mydelimiter")
-        .def_readwrite("n", &NongravParamaters::n, R"mydelimiter(
+        .def_readwrite("n", &NongravParameters::n, R"mydelimiter(
             Non-gravitational parameter n from Marsden et al. (1973).
             )mydelimiter")
-        .def_readwrite("r0_au", &NongravParamaters::r0_au, R"mydelimiter(
+        .def_readwrite("r0_au", &NongravParameters::r0_au, R"mydelimiter(
             Non-gravitational parameter r0 in AU from Marsden et al. (1973).
             )mydelimiter");
 
@@ -533,7 +533,7 @@ PYBIND11_MODULE(libgrss, m) {
         The IntegBody class contains the properties of an integrated body.
         )mydelimiter")
         .def(py::init<std::string, real, real, real, std::vector<real>,
-                      NongravParamaters>(),
+                      NongravParameters>(),
              py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
              py::arg("cometaryState"), py::arg("ngParams"),
              R"mydelimiter(
@@ -549,12 +549,12 @@ PYBIND11_MODULE(libgrss, m) {
                 Radius of the body.
             cometaryState : list of real
                 Initial Heliocentric Ecliptic Cometary state of the body.
-            ngParams : PropSimulation.NongravParamaters
+            ngParams : PropSimulation.NongravParameters
                 Non-gravitational parameters of the body.
             )mydelimiter")
 
         .def(py::init<std::string, real, real, real, std::vector<real>,
-                      std::vector<real>, NongravParamaters>(),
+                      std::vector<real>, NongravParameters>(),
              py::arg("name"), py::arg("t0"), py::arg("mass"), py::arg("radius"),
              py::arg("pos"), py::arg("vel"), py::arg("ngParams"), R"mydelimiter(
             Constructor for the IntegBody class.
@@ -571,7 +571,7 @@ PYBIND11_MODULE(libgrss, m) {
                 Initial barycentric Cartesian position of the body.
             vel : list of real
                 Initial barycentric Cartesian velocity of the body.
-            ngParams : PropSimulation.NongravParamaters
+            ngParams : PropSimulation.NongravParameters
                 Non-gravitational parameters of the body.
             )mydelimiter")
         .def_readwrite("spiceId", &IntegBody::spiceId, R"mydelimiter(

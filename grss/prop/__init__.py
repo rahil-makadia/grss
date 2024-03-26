@@ -1,4 +1,4 @@
-"""GRSS orbit propagation subpackage"""
+"""GRSS Python orbit propagation subpackage"""
 from ..libgrss import *
 from .prop_parallel import *
 from .prop_unscented import *

@@ -33,3 +33,25 @@ target_compile_definitions(libgrss PRIVATE VERSION_INFO=${${PROJECT_NAME}_VERSIO
 
 # compile tests
 add_subdirectory(tests/cpp/prop)
+
+# build the documentation
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    # set input and output files
+    set(DOXYGEN_IN ${CMAKE_SOURCE_DIR}/docs/doxygen/doxygen.config)
+    set(DOXYGEN_OUT ${CMAKE_SOURCE_DIR}/docs/doxygen/doxyfile.out)
+
+    # configure the file and fill out CMake variables
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+
+    # note: the option ALL allows building the docs with the binaries
+    add_custom_target(
+        doxygen_docs ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/doxygen
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+else (DOXYGEN_FOUND)
+    message(WARNING "Doxygen needs to be installed to generate the doxygen documentation")
+endif (DOXYGEN_FOUND)

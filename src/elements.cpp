@@ -1,5 +1,12 @@
 #include "elements.h"
 
+/** 
+ * @param[in] M Mean anomaly.
+ * @param[in] e Eccentricity.
+ * @param[out] E Eccentric anomaly.
+ * @param[in] tol Tolerance.
+ * @param[in] max_iter Maximum number of iterations.
+ */
 void kepler_solve_elliptic(const real &M, const real &e, real &E, const real &tol,
                   const int &max_iter) {
     if (e < 0.8) {
@@ -23,6 +30,13 @@ void kepler_solve_elliptic(const real &M, const real &e, real &E, const real &to
     }
 }
 
+/** 
+ * @param[in] M Mean anomaly.
+ * @param[in] e Eccentricity.
+ * @param[out] EHyp Hyperbolic anomaly.
+ * @param[in] tol Tolerance.
+ * @param[in] max_iter Maximum number of iterations.
+ */
 void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
                              const real &tol, const int &max_iter) {
     EHyp = M;
@@ -43,6 +57,16 @@ void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
     }
 }
 
+/** 
+ * @param[in] epochMjD Epoch in TDB Modified Julian Date.
+ * @param[in] cometaryState Cometary elements.
+ * @param[in] GM Gravitational parameter.
+ * @param[out] M Mean anomaly.
+ * @param[out] E Eccentric anomaly (elliptic orbits) or hyperbolic anomaly (hyperbolic orbits)
+ * @param[out] nu True anomaly.
+ * @param[in] tol Tolerance.
+ * @param[in] max_iter Maximum number of iterations.
+ */
 void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
                   const real &GM, real &M, real &E, real &nu,
                   const real &tol, const int &max_iter) {
@@ -66,12 +90,18 @@ void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
     }
 }
 
-void cometary_to_keplerian(const real &epochMjD,
+/** 
+ * @param[in] epochMjd Epoch in TDB Modified Julian Date.
+ * @param[in] cometaryState Cometary elements.
+ * @param[out] keplerianState Keplerian elements.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
+void cometary_to_keplerian(const real &epochMjd,
                            const std::vector<real> &cometaryState,
                            std::vector<real> &keplerianState, const real GM) {
     real a = cometaryState[1] / (1 - cometaryState[0]);
     real M, E, nu;
-    kepler_solve(epochMjD, cometaryState, GM, M, E, nu);
+    kepler_solve(epochMjd, cometaryState, GM, M, E, nu);
     keplerianState[0] = a;
     keplerianState[1] = cometaryState[0];
     if (keplerianState[1] < 0) {
@@ -101,7 +131,13 @@ void cometary_to_keplerian(const real &epochMjD,
     }
 }
 
-void keplerian_to_cometary(const real &epochMjD,
+/** 
+ * @param[in] epochMjd Epoch in TDB Modified Julian Date.
+ * @param[in] keplerianState Keplerian elements.
+ * @param[out] cometaryState Cometary elements.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
+void keplerian_to_cometary(const real &epochMjd,
                            const std::vector<real> &keplerianState,
                            std::vector<real> &cometaryState, const real GM) {
     real a = keplerianState[0];
@@ -114,7 +150,7 @@ void keplerian_to_cometary(const real &epochMjD,
     real E = 2 * atan2(tan(nu / 2) * sqrt(1 - e), sqrt(1 + e));
     real M = E - e * sin(E);
     real n = sqrt(GM / pow(a, 3.0L));
-    real T0 = epochMjD - (M / n);
+    real T0 = epochMjd - (M / n);
 
     cometaryState[0] = e;
     cometaryState[1] = a * (1 - e);
@@ -141,6 +177,11 @@ void keplerian_to_cometary(const real &epochMjD,
     }
 }
 
+/** 
+ * @param[in] keplerianState Keplerian elements.
+ * @param[out] cartesianState Cartesian state.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
 void keplerian_to_cartesian(const std::vector<real> &keplerianState,
                             std::vector<real> &cartesianState, const real GM) {
     real a = keplerianState[0];
@@ -211,6 +252,11 @@ void keplerian_to_cartesian(const std::vector<real> &keplerianState,
     }
 }
 
+/** 
+ * @param[in] cartesianState Cartesian state.
+ * @param[out] keplerianState Keplerian elements.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
 void cartesian_to_keplerian(const std::vector<real> &cartesianState,
                             std::vector<real> &keplerianState, const real GM) {
     std::vector<real> rVec(3);
@@ -294,6 +340,12 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState,
     }
 }
 
+/** 
+ * @param[in] epochMjd Epoch in TDB Modified Julian Date.
+ * @param[in] cometaryState Cometary elements.
+ * @param[out] cartesianState Cartesian state.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
 void cometary_to_cartesian(const real &epochMjd,
                            const std::vector<real> &cometaryState,
                            std::vector<real> &cartesianState, const real GM) {
@@ -306,6 +358,12 @@ void cometary_to_cartesian(const real &epochMjd,
     keplerian_to_cartesian(keplerianState, cartesianState, GM);
 }
 
+/** 
+ * @param[in] epochMjd Epoch in TDB Modified Julian Date.
+ * @param[in] cartesianState Cartesian state.
+ * @param[out] cometaryState Cometary elements.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
 void cartesian_to_cometary(const real &epochMjd,
                            const std::vector<real> &cartesianState,
                            std::vector<real> &cometaryState, const real GM) {
@@ -314,6 +372,13 @@ void cartesian_to_cometary(const real &epochMjd,
     keplerian_to_cometary(epochMjd, keplerianState, cometaryState, GM);
 }
 
+/** 
+ * @param[in] epochMjd Epoch in TDB Modified Julian Date.
+ * @param[in] elems Elements.
+ * @param[in] conversion Conversion type.
+ * @param[out] partials Partials of the elements w.r.t. the Cartesian state.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
 void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
                            const std::string conversion,
                            std::vector<std::vector<real>> &partials,
@@ -701,6 +766,13 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     delete[] partial_i;
 }
 
+/** 
+ * @param[in] epochMjd Epoch in TDB Modified Julian Date.
+ * @param[in] elems Elements.
+ * @param[in] conversion Conversion type.
+ * @param[out] partials Partials of the Cartesian state w.r.t. the elements.
+ * @param[in] GM Gravitational parameter (default Sun).
+ */
 void get_cartesian_partials(const real &epochMjd,
                             const std::vector<real> &elems,
                             const std::string &conversion,

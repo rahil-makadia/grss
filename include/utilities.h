@@ -25,192 +25,209 @@ using std::tanh;
 #include "SpiceUsr.h"
 #include "spk.h"
 
+/**
+ * @brief Real type to be used for floating point calculations.
+ * Choose between double and long double.
+ * 
+ */
 #ifdef LONGDOUBLE
 #define real long double
 #else
 #define real double
 #endif
+/**
+ * @brief Value of PI.
+ * 
+ */
 #define PI 3.141592653589793238462643383279502884197169399375105820974944
+/**
+* @brief Conversion factor from radians to degrees.
+* 
+*/
 #define RAD2DEG 180.0 / PI
+/**
+ * @brief Conversion factor from degrees to radians.
+ * 
+ */
 #define DEG2RAD PI / 180.0
+/**
+ * @brief Value of Earth's obliquity in radians.
+ * 
+ */
 #define EARTH_OBLIQUITY 84381.448 / 3600.0 * DEG2RAD
 
-// forward declarations for simulation.h
-struct Body;
-class SpiceBody;
-class IntegBody;
-class Event;
-class ImpulseEvent;
-class PropSimulation;
-
-struct Constants {
-    real du2m = 149597870700.0L;  // default au to m
-    real tu2s = 86400.0;          // default day to sec
-    real duptu2mps = du2m/tu2s;   // default au/day to m/s
-    real G = 6.6743e-11L / (du2m * du2m * du2m) * tu2s *
-        tu2s;                                  // default kg au^3 / day^2
-    real clight = 299792458.0L / du2m * tu2s;  // default au/day
-    real j2000Jd = 2451545.0;
-    real JdMinusMjd = 2400000.5;
-};
-
-struct IntegrationParameters {
-    size_t nInteg;
-    size_t nSpice;
-    size_t nTotal;
-    size_t n2Derivs;
-    real t0;
-    real tf;
-    real dt0;
-    real dtMax;
-    real dtMin;
-    real dtChangeFactor;
-    bool adaptiveTimestep;
-    size_t timestepCounter;
-    real tolPC;
-    real tolInteg;
-};
-
-struct NongravParamaters {
-    // from https://ssd.jpl.nasa.gov/horizons/manual.html
-    real a1 = 0.0L;
-    real a2 = 0.0L;
-    real a3 = 0.0L;
-    real alpha = 0.1112620426L;
-    real k = 4.6142L;
-    real m = 2.15L;
-    real n = 5.093L;
-    real r0_au = 2.808L;
-};
-
-struct InterpolationParameters {
-    std::vector<real> tStack;
-    std::vector<std::vector<real>> xIntegStack;
-    std::vector<std::vector<std::vector<real>>> bStack;
-    std::vector<std::vector<real>> accIntegStack;
-};
-
-struct STMParameters {
-    real *B = nullptr;
-    real *Bdot = nullptr;
-    real *C = nullptr;
-    real *Cdot = nullptr;
-    real *D = nullptr;
-    real *Ddot = nullptr;
-    real *dfdpos = nullptr;
-    real *dfdvel = nullptr;
-    real *dfdpar = nullptr;
-};
-
-struct BPlaneParameters {
-    real x;
-    real y;
-    real z;
-    std::vector<real> dx = std::vector<real>(6, 0.0L);
-    std::vector<real> dy = std::vector<real>(6, 0.0L);
-};
-
-class CloseApproachParameters {
-   private:
-   public:
-    real t;
-    std::vector<real> xRel = std::vector<real>(6, 0.0L);
-    real tMap;
-    std::vector<real> xRelMap = std::vector<real>(6, 0.0L);
-    real dist;
-    real vel;
-    real vInf;
-    std::string flybyBody;
-    int flybyBodyIdx;
-    std::string centralBody;
-    int centralBodyIdx;
-    int centralBodySpiceId;
-    bool impact;
-    real tPeri;
-    real tLin;
-    std::vector<real> bVec = std::vector<real>(3, 0.0L);
-    real bMag;
-    real gravFocusFactor;
-    BPlaneParameters kizner;
-    BPlaneParameters opik;
-    BPlaneParameters scaled;
-    BPlaneParameters mtp;
-    std::vector<real> dTLinMinusT = std::vector<real>(6, 0.0L);
-    std::vector<real> dt = std::vector<real>(6, 0.0L);
-    void get_ca_parameters(PropSimulation *propSim, const real &tMap);
-    void print_summary(int prec=8);
-};
-
-class ImpactParameters : public CloseApproachParameters {
-   private:
-   public:
-    std::vector<real> xRelBodyFixed = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
-    real lon;
-    real lat;
-    real alt;
-    void get_impact_parameters(PropSimulation *propSim);
-    void print_summary(int prec=8);
-};
-
-void jd_to_mjd(const real jd, real &mjd);
-real jd_to_mjd(const real jd);
-void mjd_to_jd(const real mjd, real &jd);
-real mjd_to_jd(const real mjd);
-void jd_to_et(const real jd, real &et);
-real jd_to_et(const real jd);
-void et_to_jd(const real et, real &jd);
-real et_to_jd(const real et);
-void mjd_to_et(const real mjd, real &et);
-real mjd_to_et(const real mjd);
-void et_to_mjd(const real et, real &mjd);
-real et_to_mjd(const real et);
-
+/**
+ * @brief Wrap an angle to the range [0, 2*pi).
+ */
 void wrap_to_2pi(real &angle);
+
+/**
+ * @brief Convert an angle from radians to degrees.
+ */
 void rad_to_deg(const real &rad, real &deg);
+
+/**
+ * @brief Convert an angle from radians to degrees.
+ */
 real rad_to_deg(const real rad);
+
+/**
+ * @brief Convert an angle from degrees to radians.
+ */
 void deg_to_rad(const real &deg, real &rad);
+
+/**
+ * @brief Convert an angle from degrees to radians.
+ */
 real deg_to_rad(const real deg);
 
+/**
+ * @brief Sort a vector in ascending or descending order.
+ */
 void sort_vector(std::vector<real> &v, const bool &ascending,
                  std::vector<size_t> &sortedIdx);
+
+/**
+ * @brief Sort a vector of vectors based on the indices of another vector.
+ */
 void sort_vector_by_idx(std::vector<std::vector<real>> &v,
                             const std::vector<size_t> &sortedIdx);
+
+/**
+ * @brief Dot product of two vectors.
+ */
 void vdot(const std::vector<real> &v1, const std::vector<real> &v2, real &dot);
+
+/**
+ * @brief Dot product of two vectors.
+ */
 void vdot(const real *v1, const real *v2, const size_t &dim, real &dot);
+
+/**
+ * @brief Norm of a vector.
+ */
 void vnorm(const std::vector<real> &v, real &norm);
+
+/**
+ * @brief Norm of a vector.
+ */
 void vnorm(const real *v, const size_t &dim, real &norm);
+
+/**
+ * @brief Unit vector of a vector.
+ */
 void vunit(const std::vector<real> &v, std::vector<real> &unit);
+
+/**
+ * @brief Unit vector of a vector.
+ */
 void vunit(const real *v, const size_t &dim, real *unit);
+
+/**
+ * @brief Cross product of two vectors.
+ */
 void vcross(const std::vector<real> &v1, const std::vector<real> &v2,
             std::vector<real> &cross);
+
+/**
+ * @brief Cross product of two vectors.
+ */
 void vcross(const real *v1, const real *v2, real *cross);
+
+/**
+ * @brief Add two vectors.
+ */
 void vadd(const std::vector<real> &v1, const std::vector<real> &v2,
           std::vector<real> &sum);
+
+/**
+ * @brief Subtract two vectors.
+ */
 void vsub(const std::vector<real> &v1, const std::vector<real> &v2,
           std::vector<real> &diff);
+
+/**
+ * @brief Multiply a vector by a constant.
+ */
 void vcmul(const std::vector<real> &v, const real &c, std::vector<real> &vc);
+
+/**
+ * @brief Multiply two vectors element-wise.
+ */
 void vvmul(const std::vector<real> &v1, const std::vector<real> &v2,
            std::vector<real> &v3);
+
+/**
+ * @brief Find the maximum absolute value in a vector.
+ */
 void vabs_max(const std::vector<real> &v, real &max);
+
+/**
+ * @brief Find the maximum absolute value in a vector.
+ */
 void vabs_max(const real *v, const size_t &dim, real &max);
 
+/**
+ * @brief Multiply a matrix by a vector.
+ */
 void mat_vec_mul(const std::vector<std::vector<real>> &A,
                  const std::vector<real> &v, std::vector<real> &Av);
+
+/**
+ * @brief Multiply two matrices.
+ */
 void mat_mat_mul(const std::vector<std::vector<real>> &A,
                  const std::vector<std::vector<real>> &B,
                  std::vector<std::vector<real>> &AB);
+
+/**
+ * @brief Invert a 3x3 matrix.
+ */
 void mat3_inv(const std::vector<std::vector<real>> &A,
               std::vector<std::vector<real>> &Ainv);
+
+/**
+ * @brief Multiply two 3x3 matrices.
+ */
 void mat3_mat3_mul(const real *A, const real *B, real *prod);
+
+/**
+ * @brief Add two 3x3 matrices.
+ */
 void mat3_mat3_add(const real *A, const real *B, real *sum);
+
+/**
+ * @brief Rotation matrix about the x-axis.
+ */
 void rot_mat_x(const real &theta, std::vector<std::vector<real>> &R);
+
+/**
+ * @brief Rotation matrix about the y-axis.
+ */
 void rot_mat_y(const real &theta, std::vector<std::vector<real>> &R);
+
+/**
+ * @brief Rotation matrix about the z-axis.
+ */
 void rot_mat_z(const real &theta, std::vector<std::vector<real>> &R);
+
+/**
+ * @brief Decompose a matrix into its LU form.
+ */
 void LU_decompose(std::vector<std::vector<real>> &A, const size_t &N,
                   const real &tol, size_t *P);
+
+/**
+ * @brief Invert a matrix using its LU decomposition.
+ */
 void LU_inverse(std::vector<std::vector<real>> &A, const size_t *P,
                 const size_t &N, std::vector<std::vector<real>> &AInv);
+
+/**
+ * @brief Invert a matrix.
+ */
 void mat_inv(std::vector<std::vector<real>> mat,
              std::vector<std::vector<real>> &matInv,
              const real &tol = 1.0e-16L);
+
 #endif

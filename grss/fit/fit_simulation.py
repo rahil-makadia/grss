@@ -270,8 +270,10 @@ class IterationParams:
         plt.suptitle(iter_string, y=0.95)
         grid_spec = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
         ax1 = fig.add_subplot(grid_spec[0, 0])
-        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize)
-        ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize)
+        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize,
+                    color='C1', alpha=0.5)
+        ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize,
+                    color='C0', alpha=0.5)
         ax1.plot(t_arr[is_rejected], ra_residuals[is_rejected], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
         ax1.plot(t_arr[is_rejected], dec_residuals[is_rejected], 'ro',
@@ -298,9 +300,9 @@ class IterationParams:
             ax2main.set_yscale('log')
             ax2main.set_xscale('log')
         ax3 = fig.add_subplot(grid_spec[0, 2])
-        ax3.plot(t_arr, delay_residuals, '.', mfc='C2', mec='C2', label='Delay',
-                    markersize=radar_scale*markersize)
         ax3.plot(t_arr, doppler_residuals, '.', mfc='C3', mec='C3', label='Doppler',
+                    markersize=radar_scale*markersize)
+        ax3.plot(t_arr, delay_residuals, '.', mfc='C2', mec='C2', label='Delay',
                     markersize=radar_scale*markersize)
         ax3.legend()
         ax3.set_xlabel('Time [UTC]')
@@ -398,18 +400,18 @@ class IterationParams:
         if plot_chi_squared:
             plt.subplot(1,2,1)
         if not np.all(np.isnan(ra_chi)) and not np.all(np.isnan(dec_chi)):
-            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA')
-            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA', color='C1', alpha=0.5)
+            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
-                        markersize=2*markersize, markerfacecolor='none')#, label='Rejected Obs.')
+                        markersize=2*markersize, markerfacecolor='none', label='Rejected')
             plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
-        if not np.all(np.isnan(delay_chi)):
-            plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2',
-                        markersize=radar_scale*markersize, label='Delay')
         if not np.all(np.isnan(doppler_chi)):
             plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
+        if not np.all(np.isnan(delay_chi)):
+            plt.plot(t_arr, delay_chi, '.', mfc='C2', mec='C2',
+                        markersize=radar_scale*markersize, label='Delay')
         plt.axhline(-sigma_limit, c='red', linestyle='--', alpha=0.5,
                         label=fr'$\pm{sigma_limit:.0f}\sigma$')
         plt.axhline(sigma_limit, c='red', linestyle='--', alpha=0.5)
@@ -425,16 +427,18 @@ class IterationParams:
         plt.gcf().autofmt_xdate()
         if plot_chi_squared:
             plt.subplot(1,2,2)
-            plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize, label='RA')
-            plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize, label='Dec')
+            plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize,
+                        label='RA', color='C1', alpha=0.5)
+            plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize,
+                        label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[is_rejected], ra_chi_squared[is_rejected], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
             plt.plot(t_arr[is_rejected], dec_chi_squared[is_rejected], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
-            plt.plot(t_arr, delay_chi_squared, '.', mfc='C2', mec='C2',
-                        markersize=radar_scale*markersize, label='Delay')
             plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
+            plt.plot(t_arr, delay_chi_squared, '.', mfc='C2', mec='C2',
+                        markersize=radar_scale*markersize, label='Delay')
             plt.legend(ncol=2)
             plt.xlabel('Time [UTC]')
             plt.ylabel(r'$\chi^2$')
@@ -898,7 +902,8 @@ class FitSimulation:
         # pylint: disable=no-member
         t_eval_past = self.obs_array[self.past_obs_idx, 0]
         tf_past = np.min(t_eval_past)
-        prop_sim_past = libgrss.PropSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_past = libgrss.PropSimulation(name, self.t_sol,
+                                                self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
         # flip t_eval_past and observer_info to go in reverse time order
         t_eval_past = t_eval_past[::-1]
@@ -935,7 +940,8 @@ class FitSimulation:
         # pylint: disable=no-member
         t_eval_future = self.obs_array[self.future_obs_idx, 0]
         tf_future = np.max(t_eval_future)
-        prop_sim_future = libgrss.PropSimulation(name, self.t_sol, self.de_kernel, self.de_kernel_path)
+        prop_sim_future = libgrss.PropSimulation(name, self.t_sol,
+                                                    self.de_kernel, self.de_kernel_path)
         prop_sim_future.tEvalMargin = 1.0
         prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
@@ -1030,11 +1036,11 @@ class FitSimulation:
 
         Returns
         -------
-        nongrav_params : libgrss.NongravParamaters object
+        nongrav_params : libgrss.NongravParameters object
             Non-gravitational parameters for the fitted body.
         """
         # pylint: disable=no-member
-        nongrav_params = libgrss.NongravParamaters()
+        nongrav_params = libgrss.NongravParameters()
         a1_val = x_dict['a1'] if 'a1' in x_dict.keys() else self.fixed_propsim_params['a1']
         a2_val = x_dict['a2'] if 'a2' in x_dict.keys() else self.fixed_propsim_params['a2']
         a3_val = x_dict['a3'] if 'a3' in x_dict.keys() else self.fixed_propsim_params['a3']
@@ -1119,13 +1125,13 @@ class FitSimulation:
         -------
         state_plus : list
             Perturbed state in the positive direction.
-        ng_params_plus : libgrss.NongravParamaters object
+        ng_params_plus : libgrss.NongravParameters object
             Perturbed non-gravitational parameters in the positive direction.
         events_plus : list
             Perturbed events in the positive direction.
         state_minus : list
             Perturbed state in the negative direction.
-        ng_params_minus : libgrss.NongravParamaters object
+        ng_params_minus : libgrss.NongravParameters object
             Perturbed non-gravitational parameters in the negative direction.
         events_minus : list
             Perturbed events in the negative direction.
@@ -1906,7 +1912,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     # check that the reference solution has the requisite information and create integration body
     if 't' not in ref_sol:
         raise ValueError("Must provide a time for the initial solution.")
-    nongrav_params = libgrss.NongravParamaters()
+    nongrav_params = libgrss.NongravParameters()
     nongrav_params.a1 = ref_ng_info['a1']
     nongrav_params.a2 = ref_ng_info['a2']
     nongrav_params.a3 = ref_ng_info['a3']
@@ -2182,10 +2188,8 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     simulated_obs_event = events if events is not None else None
     modified_obs_arrays = (obs_array_optical, observer_codes_optical,
                             obs_array_radar, observer_codes_radar)
-    simulated_obs_info = _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov,
-                                                    nongrav_info, simulated_obs_event,
-                                                    modified_obs_arrays,
-                                                    simulated_optical_obs_idx, optical_obs_types,
-                                                    simulated_radar_obs_idx, radar_obs_types,
-                                                    de_kernel, de_kernel_path, noise)
-    return simulated_obs_info
+    return _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongrav_info,
+                                    simulated_obs_event, modified_obs_arrays,
+                                    simulated_optical_obs_idx, optical_obs_types,
+                                    simulated_radar_obs_idx, radar_obs_types,
+                                    de_kernel, de_kernel_path, noise)

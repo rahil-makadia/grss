@@ -1,5 +1,11 @@
 #include "parallel.h"
 
+/**
+ * @param[in] refSim Reference simulation to use as a template for the parallel propagation.
+ * @param[in] isCometary Flag to indicate whether the bodies are cometary states or Cartesian states.
+ * @param[in] allBodies Array of information for bodies to propagate in parallel.
+ * @return std::vector<PropSimulation> Array of propagated simulations.
+ */
 std::vector<PropSimulation> propSim_parallel_omp(
     const PropSimulation refSim, const bool isCometary,
     const std::vector<std::vector<real> > &allBodies) {
@@ -16,7 +22,7 @@ std::vector<PropSimulation> propSim_parallel_omp(
         for (size_t i = 0; i < numBodies; i++) {
             std::vector<real> data = allBodies[i];
             std::string name = refSim.name+" clone "+std::to_string(i);
-            NongravParamaters ngParams;
+            NongravParameters ngParams;
             ngParams.a1 = data[9];
             ngParams.a2 = data[10];
             ngParams.a3 = data[11];

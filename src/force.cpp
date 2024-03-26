@@ -5,6 +5,12 @@
 #include <fstream>
 #endif
 
+/**
+ * @param[in] t Time [TDB MJD]
+ * @param[in] xInteg State vector
+ * @param[in] propSim PropSimulation object
+ * @return std::vector<real> State derivative
+ */
 std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
                                 PropSimulation *propSim) {
     std::vector<real> accInteg(propSim->integParams.n2Derivs, 0.0);
@@ -104,6 +110,11 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     return accInteg;
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
+ */
 void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
                   std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
@@ -156,6 +167,11 @@ void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
+ */
 void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
                       std::vector<STMParameters> &allSTMs) {
@@ -227,6 +243,11 @@ void force_ppn_simple(const PropSimulation *propSim,
     #endif
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
+ */
 void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
                    std::vector<STMParameters> &allSTMs) {
 // calculate accelerations using the Einstein-Infeld-Hoffmann (EIH) PPN
@@ -386,6 +407,11 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
+ */
 void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
               std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
@@ -474,6 +500,11 @@ void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
+ */
 void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
                    std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
@@ -571,6 +602,10 @@ void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
     #endif
 }
 
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ */
 void force_thruster(const PropSimulation *propSim,
                     std::vector<real> &accInteg) {
     #ifdef PRINT_FORCES

@@ -1,4 +1,4 @@
-# grss
+# GRSS
 
 [![PyPi Version](https://img.shields.io/pypi/v/grss?color=green)](https://pypi.python.org/pypi/grss/)
 [![Build Sphinx docs)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml)
@@ -36,7 +36,7 @@ If this installation fails (i.e., you get an error when importing GRSS), you can
 
 NOTE: The GRSS library is currently not pip-installable on Intel-based Macs. To use the library on an Intel-based Mac, please install the library using the source code from the GitHub repository (see below for instructions).
 
-### Install via source code
+### Install via source code (Python)
 
 The source code for the GRSS library is available on GitHub and can be downloaded using the following command:
 
@@ -51,6 +51,26 @@ Once the source code has been downloaded, the library can be installed using the
     source initialize.sh
     python3 -m pip install .
 ```
+
+### Install via source code (C++, reduced functionality)
+
+The source code for the GRSS library is available on GitHub and can be downloaded using the following command:
+
+```console
+    git clone https://www.github.com/rahil-makadia/grss
+```
+
+Once the source code has been downloaded, the library can be installed using the following command:
+
+```console
+    cd grss
+    source initialize.sh
+    source build_cpp.sh
+```
+
+You will need to have CMake installed on your system to build the C++ library. Once the build script has completed, you can use the resulting static/shared library from the `build` directory in your C++ projects.
+
+Keep in mind the C++ library only contains support for propagating orbits and calculating observables. If you want to use the orbit fitting functionality, you will need to install the full Python library.
 
 ## Usage
 
@@ -79,4 +99,4 @@ GRSS Development Team:
 * Siegfried Eggl
 * Davide Farnocchia
 
-The GRSS library was developed by Rahil Makadia as part of his PhD dissertation at the University of Illinois at Urbana-Champaign. This work was supported by a NASA Space Technologies Graduate Research Opportunities (NSTGRO) Fellowship, Grant #80NSSC22K1173. The author would like to thank his advisor, Dr. Siegfried Eggl as well as his collaborators, Dr. Steven R. Chesley, and Dr. Davide Farnocchia for their guidance and support.
+The GRSS library was developed by Rahil Makadia as part of his PhD dissertation at the University of Illinois at Urbana-Champaign. This work was supported by a NASA Space Technologies Graduate Research Opportunities (NSTGRO) Fellowship, Grant #80NSSC22K1173. Rahil would like to thank his advisor, Dr. Siegfried Eggl as well as his collaborators, Dr. Steven R. Chesley, and Dr. Davide Farnocchia for their guidance and support.
