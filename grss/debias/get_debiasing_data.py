@@ -8,12 +8,12 @@ FTP_SITE = 'ftp://ssd.jpl.nasa.gov/pub/ssd/debias'
 # if lowres_data.tgz or lowres_data/ already exist, do not download
 if not os.path.exists(f'{cwd}/lowres_data.tgz') and not os.path.exists(f'{cwd}/lowres_data/'):
     FTP_FILE = 'debias_2018.tgz'
-    cmd = f'curl -# --show-error -o {cwd}/lowres_data.tgz {FTP_SITE}/{FTP_FILE}'
+    cmd = f'curl --silent --show-error -o {cwd}/lowres_data.tgz {FTP_SITE}/{FTP_FILE}'
     print(f'Downloading {FTP_FILE}')
     os.system(cmd)
 if not os.path.exists(f'{cwd}/hires_data.tgz') and not os.path.exists(f'{cwd}/hires_data/'):
     FTP_FILE = 'debias_hires2018.tgz'
-    cmd = f'curl -# --show-error -o {cwd}/hires_data.tgz {FTP_SITE}/{FTP_FILE}'
+    cmd = f'curl --silent --show-error -o {cwd}/hires_data.tgz {FTP_SITE}/{FTP_FILE}'
     print(f'Downloading {FTP_FILE}')
     os.system(cmd)
 
