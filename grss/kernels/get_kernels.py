@@ -11,63 +11,78 @@ NAIF_SITE = 'https://naif.jpl.nasa.gov/pub/naif/generic_kernels'
 SSD_SITE = 'https://ssd.jpl.nasa.gov/ftp'
 # get the custom spice kernels if they are not already present
 # de431 planets + big16 1950-2350
-print('Downloading combined DE430/431 planets and big16 asteroid kernels...')
-os.system((f'curl -H "Accept: application/vnd.github+json" '
-            f'-L --silent --show-error -o {script_dir}/planets_big16_de431_1950_2350.bsp '
-            f'{GRSS_SITE}/planets_big16_de431_1950_2350.bsp'))
-os.system((f'curl -H "Accept: application/vnd.github+json" '
-            f'-L --silent --show-error -o {script_dir}/planets_big16_de431_1950_2350.tm '
-            f'{GRSS_SITE}/planets_big16_de431_1950_2350.tm'))
+if not os.path.exists(f'{script_dir}/planets_big16_de431_1950_2350.bsp'):
+    print('Downloading combined DE430/431 planets and big16 asteroid SPK kernels...')
+    os.system((f'curl -H "Accept: application/vnd.github+json" '
+                f'-L --silent --show-error -o {script_dir}/planets_big16_de431_1950_2350.bsp '
+                f'{GRSS_SITE}/planets_big16_de431_1950_2350.bsp'))
+if not os.path.exists(f'{script_dir}/planets_big16_de431_1950_2350.tm'):
+    print('Downloading combined DE430/431 planets and big16 asteroid meta-kernel...')
+    os.system((f'curl -H "Accept: application/vnd.github+json" '
+                f'-L --silent --show-error -o {script_dir}/planets_big16_de431_1950_2350.tm '
+                f'{GRSS_SITE}/planets_big16_de431_1950_2350.tm'))
 # de441 planets + big16 1950-2350
-print('Downloading combined DE440/441 planets and big16 asteroid kernels...')
-os.system((f'curl -H "Accept: application/vnd.github+json" '
-            f'-L --silent --show-error -o {script_dir}/planets_big16_de441_1950_2350.bsp '
-            f'{GRSS_SITE}/planets_big16_de441_1950_2350.bsp'))
-os.system((f'curl -H "Accept: application/vnd.github+json" '
-            f'-L --silent --show-error -o {script_dir}/planets_big16_de441_1950_2350.tm '
-            f'{GRSS_SITE}/planets_big16_de441_1950_2350.tm'))
+if not os.path.exists(f'{script_dir}/planets_big16_de441_1950_2350.bsp'):
+    print('Downloading combined DE440/441 planets and big16 asteroid kernels...')
+    os.system((f'curl -H "Accept: application/vnd.github+json" '
+                f'-L --silent --show-error -o {script_dir}/planets_big16_de441_1950_2350.bsp '
+                f'{GRSS_SITE}/planets_big16_de441_1950_2350.bsp'))
+if not os.path.exists(f'{script_dir}/planets_big16_de441_1950_2350.tm'):
+    print('Downloading combined DE440/441 planets and big16 asteroid meta-kernel...')
+    os.system((f'curl -H "Accept: application/vnd.github+json" '
+                f'-L --silent --show-error -o {script_dir}/planets_big16_de441_1950_2350.tm '
+                f'{GRSS_SITE}/planets_big16_de441_1950_2350.tm'))
 
 # get the generic spice kernels if they are not already present
 # de430 planets + de431 big16
-print('Downloading generic DE430/431 planets and big16 asteroid kernels...')
-os.system((f'curl --silent --show-error -o {script_dir}/de430.bsp '
-            f'{NAIF_SITE}/spk/planets/de430.bsp'))
-os.system((f'curl --silent --show-error -o {script_dir}/sb431-n16s.bsp '
-            f'{SSD_SITE}/xfr/sb431-n16s.bsp'))
+if (not os.path.exists(f'{script_dir}/de430.bsp') or
+    not os.path.exists(f'{script_dir}/sb431-n16s.bsp')):
+    print('Downloading generic DE430/431 planets and big16 asteroid kernels...')
+    os.system((f'curl --silent --show-error -o {script_dir}/de430.bsp '
+                f'{NAIF_SITE}/spk/planets/de430.bsp'))
+    os.system((f'curl --silent --show-error -o {script_dir}/sb431-n16s.bsp '
+                f'{SSD_SITE}/xfr/sb431-n16s.bsp'))
 # de440 planets + de441 big16
-print('Downloading generic DE440/441 planets and big16 asteroid kernels...')
-os.system((f'curl --silent --show-error -o {script_dir}/de440.bsp '
-            f'{NAIF_SITE}/spk/planets/de440.bsp'))
-os.system((f'curl --silent --show-error -o {script_dir}/sb441-n16s.bsp '
-            f'{SSD_SITE}/xfr/sb441-n16s.bsp'))
+if (not os.path.exists(f'{script_dir}/de440.bsp') or
+    not os.path.exists(f'{script_dir}/sb441-n16s.bsp')):
+    print('Downloading generic DE440/441 planets and big16 asteroid kernels...')
+    os.system((f'curl --silent --show-error -o {script_dir}/de440.bsp '
+                f'{NAIF_SITE}/spk/planets/de440.bsp'))
+    os.system((f'curl --silent --show-error -o {script_dir}/sb441-n16s.bsp '
+                f'{SSD_SITE}/xfr/sb441-n16s.bsp'))
 
 # get the latest spice leap second kernel
-print('Downloading latest leap second kernel...')
-os.system((f'curl --silent --show-error -o {script_dir}/latest_leapseconds.tls '
-            f'{NAIF_SITE}/lsk/latest_leapseconds.tls'))
+if not os.path.exists(f'{script_dir}/latest_leapseconds.tls'):
+    print('Downloading latest leap second kernel...')
+    os.system((f'curl --silent --show-error -o {script_dir}/latest_leapseconds.tls '
+                f'{NAIF_SITE}/lsk/latest_leapseconds.tls'))
 # get the earth orientation binary spice kernels and their comments if they are not already present
 # latest earth pck
-print('Downloading latest Earth binary PCK...')
-os.system((f'curl --silent --show-error -o {script_dir}/earth_latest_high_prec.cmt '
-            f'{NAIF_SITE}/pck/earth_latest_high_prec.cmt'))
-os.system((f'curl --silent --show-error -o {script_dir}/earth_latest_high_prec.bpc '
-            f'{NAIF_SITE}/pck/earth_latest_high_prec.bpc'))
+if not os.path.exists(f'{script_dir}/earth_latest_high_prec.bpc'):
+    print('Downloading latest Earth binary PCK...')
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_latest_high_prec.cmt '
+                f'{NAIF_SITE}/pck/earth_latest_high_prec.cmt'))
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_latest_high_prec.bpc '
+                f'{NAIF_SITE}/pck/earth_latest_high_prec.bpc'))
 # historical earth pck
-print('Downloading historical Earth binary PCK...')
-os.system((f'curl --silent --show-error -o {script_dir}/earth_720101_230601.bpc '
-            f'{NAIF_SITE}/pck/earth_720101_230601.bpc'))
-os.system((f'curl --silent --show-error -o {script_dir}/earth_720101_230601.cmt '
-            f'{NAIF_SITE}/pck/earth_720101_230601.cmt'))
+if not os.path.exists(f'{script_dir}/earth_720101_230601.bpc'):
+    print('Downloading historical Earth binary PCK...')
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_720101_230601.bpc '
+                f'{NAIF_SITE}/pck/earth_720101_230601.bpc'))
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_720101_230601.cmt '
+                f'{NAIF_SITE}/pck/earth_720101_230601.cmt'))
 # predicted earth pck
-print('Downloading predicted Earth binary PCK...')
-os.system((f'curl --silent --show-error -o {script_dir}/earth_200101_990825_predict.bpc '
-            f'{NAIF_SITE}/pck/earth_200101_990825_predict.bpc'))
-os.system((f'curl --silent --show-error -o {script_dir}/earth_200101_990825_predict.cmt '
-            f'{NAIF_SITE}/pck/earth_200101_990825_predict.cmt'))
+if not os.path.exists(f'{script_dir}/earth_200101_990825_predict.bpc'):
+    print('Downloading predicted Earth binary PCK...')
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_200101_990825_predict.bpc '
+                f'{NAIF_SITE}/pck/earth_200101_990825_predict.bpc'))
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_200101_990825_predict.cmt '
+                f'{NAIF_SITE}/pck/earth_200101_990825_predict.cmt'))
 # generic frame kernels
-print('Downloading generic frame kernels...')
-os.system((f'curl --silent --show-error -o {script_dir}/pck00011.tpc '
-            f'{NAIF_SITE}/pck/pck00011.tpc'))
+if not os.path.exists(f'{script_dir}/pck00011.tpc'):
+    print('Downloading generic frame kernels...')
+    os.system((f'curl --silent --show-error -o {script_dir}/pck00011.tpc '
+                f'{NAIF_SITE}/pck/pck00011.tpc'))
 
 # run this code if the no-tm-overwrite flag argument is not present
 if len(sys.argv) > 1:
