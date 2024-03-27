@@ -17,6 +17,7 @@ void PropSimulation::integrate() {
     if (!this->parallelMode) furnsh_c(this->DEkernelPath.c_str());
     gr15(this);
     if (!this->parallelMode) unload_c(this->DEkernelPath.c_str());
+    this->unmap_ephemeris();
 
     // flip vectors if integration is backwards in time
     if (this->integParams.t0 > this->integParams.tf) {

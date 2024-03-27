@@ -183,6 +183,10 @@ cython_debug/
 *.app
 
 ################################### Individual user exceptions
+# temporary files
+temp*
+temp
+
 # Sphinx documentation
 docs/_build/
 docs/source/_autosummary/

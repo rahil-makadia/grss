@@ -154,7 +154,8 @@ class GetCSPICE(object):
             HTTPS GET call to the NAIF server to download the required CSPICE
             distribution package.
         """
-        cmd = f"wget --no-clobber {self._rcspice}"
+        # cmd = f"wget --no-clobber {self._rcspice}"
+        cmd = f"curl -O {self._rcspice} --silent --show-error"
         subprocess.run(cmd,shell=True,check=True)
         return
 

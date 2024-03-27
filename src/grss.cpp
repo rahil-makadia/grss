@@ -693,9 +693,6 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Path to the SPICE DE kernel.
             )mydelimiter")
-        .def_readwrite("ephem", &PropSimulation::ephem, R"mydelimiter(
-            Memory mapped SPK ephemeris of the simulation. PropSimulation.Ephemeris object.
-            )mydelimiter")
         .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
             Constants of the simulation. PropSimulation.Constants object.
             )mydelimiter")
@@ -815,6 +812,22 @@ PYBIND11_MODULE(libgrss, m) {
             ----------
             body : PropSimulation.SpiceBody
                 SPICE body to add to the simulation.
+            )mydelimiter")
+        .def("map_ephemeris", &PropSimulation::map_ephemeris, R"mydelimiter(
+            Memory maps the ephemeris of the simulation.
+
+            Returns
+            -------
+            None : NoneType
+                None.
+            )mydelimiter")
+        .def("unmap_ephemeris", &PropSimulation::unmap_ephemeris, R"mydelimiter(
+            Unmaps the ephemeris of the simulation.
+
+            Returns
+            -------
+            None : NoneType
+                None.
             )mydelimiter")
         .def("get_spiceBody_state", &PropSimulation::get_spiceBody_state,
              py::arg("t"), py::arg("bodyName"), R"mydelimiter(

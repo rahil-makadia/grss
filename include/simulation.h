@@ -7,6 +7,12 @@
 class PropSimulation;
 
 /**
+ * @brief Get the name of body-fixed frame for a given SPICE ID.
+ */
+void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
+                       ConstSpiceChar *&baseBodyFrame);
+
+/**
  * @brief Get the observer state for a given time.
  */
 void get_observer_state(const real &tObsMjd,
@@ -406,6 +412,7 @@ class PropSimulation {
    public:
     std::string name;
     std::string DEkernelPath;
+    Ephemeris ephem;
     /**
      * @brief Construct a new PropSimulation object.
      */
@@ -415,7 +422,14 @@ class PropSimulation {
      * @brief Construct a new PropSimulation object from a reference simulation.
      */
     PropSimulation(std::string name, const PropSimulation &simRef);
-    Ephemeris ephem;
+    /**
+     * @brief Memory map the ephemeris files.
+     */
+    void map_ephemeris();
+    /**
+     * @brief Unmap the ephemeris files.
+     */
+    void unmap_ephemeris();
     /**
      * @brief Get the state of a SpiceBody in the PropSimulation at a given time.
      */
