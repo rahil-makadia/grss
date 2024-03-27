@@ -1,40 +1,13 @@
 #include "simulation.h"
 
-/** 
- * @param[in] tObsMjd Observation time in Modified Julian Date.
- * @param[in] observerInfo Observer information (base body SPICE ID, lon [rad], lat [rad], alt [m])
- * @param[in] propSim PropSimulation object for querying Ephemeris of base body.
- * @param[in] tObsInUTC Flag to indicate if the observation time is in UTC (true) or TDB (false).
- * @param[out] observerState Output observer state (position [DU], velocity [DU/TU]).
+/**
+ * @param[in] spiceId SPICE ID of the body.
+ * @param[in] tMjdTDB Time of observation in Modified Julian Date (TDB).
+ * @param[out] baseBodyFrame Name of the body-fixed frame.
  */
-void get_observer_state(const real &tObsMjd,
-                        const std::vector<real> &observerInfo,
-                        PropSimulation *propSim, const bool tObsInUTC,
-                        std::vector<real> &observerState) {
-    SpiceInt baseBody = observerInfo[0];
-    if (observerInfo[0] == 500) baseBody = 399;
-    if (baseBody == 0) {
-        observerState[0] = 0.0L;
-        observerState[1] = 0.0L;
-        observerState[2] = 0.0L;
-        observerState[3] = 0.0L;
-        observerState[4] = 0.0L;
-        observerState[5] = 0.0L;
-        return;
-    }
-    real secPastJ2000 = mjd_to_et(tObsMjd);
-    real tObsMjdTDB;
-    if (tObsInUTC) {
-        const real etMinusUtc = delta_et_utc(tObsMjd);
-        secPastJ2000 += etMinusUtc;
-        tObsMjdTDB = et_to_mjd(secPastJ2000);
-    } else {
-        tObsMjdTDB = tObsMjd;
-    }
-    double baseBodyState[9];
-    get_spk_state(baseBody, tObsMjdTDB, propSim->ephem, baseBodyState);
-    ConstSpiceChar *baseBodyFrame;
-    switch ((int)observerInfo[0]) {
+void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
+                       ConstSpiceChar *&baseBodyFrame) {
+    switch (spiceId) {
         case 10:
             baseBodyFrame = "IAU_SUN";
             break;
@@ -48,19 +21,11 @@ void get_observer_state(const real &tObsMjd,
             break;
         case 399:
             baseBodyFrame = "ITRF93";
-            // High precision frame is not defined before 1972 JAN 01 00:00:42.183 TDB
-            if (tObsMjdTDB < 41317.0004882291666666666L) {
+            // High precision frame is not defined before 1972 JAN 01
+            // 00:00:42.183 TDB
+            if (tMjdTDB < 41317.000488239L) {
                 baseBodyFrame = "IAU_EARTH";
             }
-            break;
-        case 500:
-            observerState[0] = (real) baseBodyState[0] + observerInfo[1]/propSim->consts.du2m;
-            observerState[1] = (real) baseBodyState[1] + observerInfo[2]/propSim->consts.du2m;
-            observerState[2] = (real) baseBodyState[2] + observerInfo[3]/propSim->consts.du2m;
-            observerState[3] = (real) baseBodyState[3] + observerInfo[4]/propSim->consts.duptu2mps;
-            observerState[4] = (real) baseBodyState[4] + observerInfo[5]/propSim->consts.duptu2mps;
-            observerState[5] = (real) baseBodyState[5] + observerInfo[6]/propSim->consts.duptu2mps;
-            return;
             break;
         case 499:
             baseBodyFrame = "IAU_MARS";
@@ -81,10 +46,56 @@ void get_observer_state(const real &tObsMjd,
             baseBodyFrame = "IAU_PLUTO";
             break;
         default:
-            std::cout << "Given base body: " << baseBody << std::endl;
+            std::cout << "Given base body: " << spiceId << std::endl;
             throw std::invalid_argument("Given base body not supported");
             break;
     }
+}
+
+/** 
+ * @param[in] tObsMjd Observation time in Modified Julian Date.
+ * @param[in] observerInfo Observer information (base body SPICE ID, lon [rad], lat [rad], alt [m])
+ * @param[in] propSim PropSimulation object for querying Ephemeris of base body.
+ * @param[in] tObsInUTC Flag to indicate if the observation time is in UTC (true) or TDB (false).
+ * @param[out] observerState Output observer state (position [DU], velocity [DU/TU]).
+ */
+void get_observer_state(const real &tObsMjd,
+                        const std::vector<real> &observerInfo,
+                        PropSimulation *propSim, const bool tObsInUTC,
+                        std::vector<real> &observerState) {
+    SpiceInt baseBody = observerInfo[0];
+    if ((int)observerInfo[0] == 500) baseBody = 399;
+    if (baseBody == 0) {
+        observerState[0] = 0.0L;
+        observerState[1] = 0.0L;
+        observerState[2] = 0.0L;
+        observerState[3] = 0.0L;
+        observerState[4] = 0.0L;
+        observerState[5] = 0.0L;
+        return;
+    }
+    real secPastJ2000 = mjd_to_et(tObsMjd);
+    real tObsMjdTDB;
+    if (tObsInUTC) {
+        const real etMinusUtc = delta_et_utc(tObsMjd);
+        secPastJ2000 += etMinusUtc;
+        tObsMjdTDB = et_to_mjd(secPastJ2000);
+    } else {
+        tObsMjdTDB = tObsMjd;
+    }
+    double baseBodyState[9];
+    get_spk_state(baseBody, tObsMjdTDB, propSim->ephem, baseBodyState);
+    if ((int)observerInfo[0] == 500) {
+        observerState[0] = (real) baseBodyState[0] + observerInfo[1]/propSim->consts.du2m;
+        observerState[1] = (real) baseBodyState[1] + observerInfo[2]/propSim->consts.du2m;
+        observerState[2] = (real) baseBodyState[2] + observerInfo[3]/propSim->consts.du2m;
+        observerState[3] = (real) baseBodyState[3] + observerInfo[4]/propSim->consts.duptu2mps;
+        observerState[4] = (real) baseBodyState[4] + observerInfo[5]/propSim->consts.duptu2mps;
+        observerState[5] = (real) baseBodyState[5] + observerInfo[6]/propSim->consts.duptu2mps;
+        return;
+    }
+    ConstSpiceChar *baseBodyFrame;
+    get_baseBodyFrame((int)observerInfo[0], tObsMjdTDB, baseBodyFrame);
     SpiceDouble rotMatSpice[6][6];
     sxform_c(baseBodyFrame, "J2000", secPastJ2000, rotMatSpice);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));

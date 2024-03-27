@@ -7,6 +7,12 @@
 class PropSimulation;
 
 /**
+ * @brief Get the name of body-fixed frame for a given SPICE ID.
+ */
+void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
+                       ConstSpiceChar *&baseBodyFrame);
+
+/**
  * @brief Get the observer state for a given time.
  */
 void get_observer_state(const real &tObsMjd,

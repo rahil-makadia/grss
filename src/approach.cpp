@@ -633,49 +633,7 @@ void CloseApproachParameters::print_summary(int prec){
  */
 void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     ConstSpiceChar *baseBodyFrame;
-    switch (this->centralBodySpiceId) {
-        case 10:
-            baseBodyFrame = "IAU_SUN";
-            break;
-        case 1:
-        case 199:
-            baseBodyFrame = "IAU_MERCURY";
-            break;
-        case 2:
-        case 299:
-            baseBodyFrame = "IAU_VENUS";
-            break;
-        case 399:
-            baseBodyFrame = "ITRF93";
-            // High precision frame is not defined before 1972 JAN 01 00:00:42.183 TDB
-            if (this->t < 41317.0004882291666666666L) {
-                baseBodyFrame = "IAU_EARTH";
-            }
-            break;
-        case 499:
-            baseBodyFrame = "IAU_MARS";
-            break;
-        case 599:
-            baseBodyFrame = "IAU_JUPITER";
-            break;
-        case 699:
-            baseBodyFrame = "IAU_SATURN";
-            break;
-        case 799:
-            baseBodyFrame = "IAU_URANUS";
-            break;
-        case 899:
-            baseBodyFrame = "IAU_NEPTUNE";
-            break;
-        case 999:
-            baseBodyFrame = "IAU_PLUTO";
-            break;
-        default:
-            std::cout << "get_impact_parameters: Given impacted body: "
-                      << this->centralBody << std::endl;
-            throw std::invalid_argument("Given base body not supported");
-            break;
-    }
+    get_baseBodyFrame(this->centralBodySpiceId, this->t, baseBodyFrame);
     real tET;
     mjd_to_et(this->t, tET);
     SpiceDouble rotMatSpice[6][6];
