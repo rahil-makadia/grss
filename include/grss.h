@@ -13,6 +13,7 @@ void PropSimulation::integrate() {
     }
 
     // integrate the system
+    this->map_ephemeris();
     this->preprocess();
     if (!this->parallelMode) furnsh_c(this->DEkernelPath.c_str());
     gr15(this);

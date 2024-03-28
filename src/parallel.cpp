@@ -12,6 +12,13 @@ std::vector<PropSimulation> propSim_parallel_omp(
     size_t numBodies = allBodies.size();
     std::vector<PropSimulation> allSims(numBodies, refSim);
 
+    // make sure refSim is in parallel mode
+    if (!refSim.parallelMode) {
+        throw std::runtime_error(
+            "ERROR: The reference simulation must be in parallel mode to "
+            "propagate in parallel.");
+    }
+
     // parallel for loop to first create an integBody for each entry in the
     // allBodies vector, then integrate each integBody using the reference
     // simulation
@@ -48,5 +55,13 @@ std::vector<PropSimulation> propSim_parallel_omp(
             allSims[i] = sim;
         }
     }
+    // in serial, compute the body-fixed impact coordinates (lat,lon,alt) for each instance
+    furnsh_c(refSim.DEkernelPath.c_str());
+    for (size_t i = 0; i < allSims.size(); i++) {
+        for (size_t j = 0; j < allSims[i].impactParams.size(); j++) {
+            allSims[i].impactParams[j].get_impact_parameters(&(allSims[i]));
+        }
+    }
+    unload_c(refSim.DEkernelPath.c_str());
     return allSims;
 }
