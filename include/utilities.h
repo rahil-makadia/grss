@@ -1,6 +1,16 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include "SpiceUsr.h"
+
+#include <cstring>
+#include <iostream>
+#include <vector>
+#include <stdexcept>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -21,9 +31,6 @@ using std::sinh;
 using std::sqrt;
 using std::tan;
 using std::tanh;
-
-#include "SpiceUsr.h"
-#include "spk.h"
 
 /**
  * @brief Real type to be used for floating point calculations.

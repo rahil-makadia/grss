@@ -6,7 +6,7 @@
  * @param[out] baseBodyFrame Name of the body-fixed frame.
  */
 void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
-                       ConstSpiceChar *&baseBodyFrame) {
+                       std::string &baseBodyFrame) {
     switch (spiceId) {
         case 10:
             baseBodyFrame = "IAU_SUN";
@@ -63,7 +63,7 @@ void get_observer_state(const real &tObsMjd,
                         const std::vector<real> &observerInfo,
                         PropSimulation *propSim, const bool tObsInUTC,
                         std::vector<real> &observerState) {
-    SpiceInt baseBody = observerInfo[0];
+    int baseBody = observerInfo[0];
     if ((int)observerInfo[0] == 500) baseBody = 399;
     if (baseBody == 0) {
         observerState[0] = 0.0L;
@@ -94,16 +94,10 @@ void get_observer_state(const real &tObsMjd,
         observerState[5] = (real) baseBodyState[5] + observerInfo[6]/propSim->consts.duptu2mps;
         return;
     }
-    ConstSpiceChar *baseBodyFrame;
+    std::string baseBodyFrame;
     get_baseBodyFrame((int)observerInfo[0], tObsMjdTDB, baseBodyFrame);
-    SpiceDouble rotMatSpice[6][6];
-    sxform_c(baseBodyFrame, "J2000", secPastJ2000, rotMatSpice);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
-    for (size_t i = 0; i < 6; i++) {
-        for (size_t j = 0; j < 6; j++) {
-            rotMat[i][j] = (real)rotMatSpice[i][j];
-        }
-    }
+    get_pck_rotMat(baseBodyFrame, "J2000", secPastJ2000, rotMat);
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
@@ -680,14 +674,12 @@ PropSimulation::PropSimulation(std::string name, real t0,
         default:
             throw std::invalid_argument(
                 "The defaultSpiceBodies argument is only defined for no "
-                "default "
-                "SPICE bodies (case 0) or DE431 (case 431) or DE441 (case "
-                "441).");
+                "preloaded SPICE bodies (case 0) or DE431 (case 431) or DE441 "
+                "(case 441).");
             break;
     }
     this->ephem.mbPath = kernel_mb;
     this->ephem.sbPath = kernel_sb;
-    this->map_ephemeris();
 }
 
 /**
@@ -797,6 +789,7 @@ void PropSimulation::prepare_for_evaluation(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
     if (!this->parallelMode) {
+        this->map_ephemeris();
         furnsh_c(this->DEkernelPath.c_str());
         if (tEval.size() != 0) {
             for (size_t i = 0; i < tEval.size(); i++) {
@@ -813,12 +806,10 @@ void PropSimulation::prepare_for_evaluation(
                 }
                 get_observer_state(tEval[i], observerInfo[i], this,
                                 this->tEvalUTC, xObserver[i]);
-                // std::cout << xObserver[i][0] << " " << xObserver[i][1] << " " <<
-                // xObserver[i][2] << " " << xObserver[i][3] << " " <<
-                // xObserver[i][4] << " " << xObserver[i][5] << std::endl;
             }
         }
         unload_c(this->DEkernelPath.c_str());
+        this->unmap_ephemeris();
     }
 
     if (this->tEval.size() == 0) {
@@ -866,8 +857,8 @@ std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::s
     }
     if (this->ephem.mb == nullptr || this->ephem.sb == nullptr){
         throw std::invalid_argument(
-            "Ephemeris kernels are not loaded. Memory map the ephemeris using "
-            "PropSimulation.map_ephemeris() method first.");
+            "get_spiceBody_state: Ephemeris kernels are not loaded. Memory map "
+            "the ephemeris using PropSimulation.map_ephemeris() method first.");
     }
     double spiceState[9];
     get_spk_state(spiceId, t, this->ephem, spiceState);
@@ -913,18 +904,6 @@ void PropSimulation::add_integ_body(IntegBody body) {
             " TDB which is different from the simulation initial time: MJD " +
             std::to_string(this->integParams.t0) + " TDB.");
     }
-    if (body.isCometary) {
-        double sunState[9];
-        get_spk_state(10, body.t0, this->ephem, sunState);
-        body.pos[0] += sunState[0];
-        body.pos[1] += sunState[1];
-        body.pos[2] += sunState[2];
-        body.vel[0] += sunState[3];
-        body.vel[1] += sunState[4];
-        body.vel[2] += sunState[5];
-    }
-    body.initState = {body.pos[0], body.pos[1], body.pos[2],
-                      body.vel[0], body.vel[1], body.vel[2]};
     body.radius /= this->consts.du2m;
     this->integBodies.push_back(body);
     this->integParams.nInteg++;
@@ -1098,15 +1077,25 @@ void PropSimulation::preprocess() {
     if (!this->isPreprocessed) {
         this->t = this->integParams.t0;
         for (size_t i = 0; i < this->integParams.nInteg; i++) {
-            for (size_t j = 0; j < 3; j++) {
-                this->xInteg.push_back(integBodies[i].pos[j]);
+            if (this->integBodies[i].isCometary) {
+                double sunState[9];
+                get_spk_state(10, this->integBodies[i].t0, this->ephem, sunState);
+                this->integBodies[i].pos[0] += sunState[0];
+                this->integBodies[i].pos[1] += sunState[1];
+                this->integBodies[i].pos[2] += sunState[2];
+                this->integBodies[i].vel[0] += sunState[3];
+                this->integBodies[i].vel[1] += sunState[4];
+                this->integBodies[i].vel[2] += sunState[5];
             }
             for (size_t j = 0; j < 3; j++) {
-                this->xInteg.push_back(integBodies[i].vel[j]);
+                this->xInteg.push_back(this->integBodies[i].pos[j]);
             }
-            if (integBodies[i].propStm) {
-                for (size_t j = 0; j < integBodies[i].stm.size(); j++) {
-                    this->xInteg.push_back(integBodies[i].stm[j]);
+            for (size_t j = 0; j < 3; j++) {
+                this->xInteg.push_back(this->integBodies[i].vel[j]);
+            }
+            if (this->integBodies[i].propStm) {
+                for (size_t j = 0; j < this->integBodies[i].stm.size(); j++) {
+                    this->xInteg.push_back(this->integBodies[i].stm[j]);
                 }
             }
         }
@@ -1149,9 +1138,6 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->opticalPartials.clear();
     this->radarObs.clear();
     this->radarPartials.clear();
-
-    // map the ephemeris again
-    this->map_ephemeris();
 
     // first prepare for integration and then integrate
     this->integParams.t0 = this->t;

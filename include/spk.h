@@ -3,14 +3,7 @@
 #ifndef SPK_H
 #define SPK_H
 
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <cstring>
-#include <iostream>
-#include <vector>
-#include <stdexcept>
+#include "utilities.h"
 
 /**
  * @brief Structure to hold a single time,pos,vel,accel record from an SPK file.
@@ -156,5 +149,11 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
  */
 void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
                    double state[9]);
+
+/**
+ * @brief Using cspice to get the rotation matrix from one frame to another.
+ */
+void get_pck_rotMat(const std::string &from, const std::string &to,
+                    const real &et, std::vector<std::vector<real>> &rotMat);
 
 #endif

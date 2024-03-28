@@ -109,7 +109,7 @@ DafInfo* daf_init(const std::string &path, const std::string &type) {
         close(fd);
         return NULL;
     }
-    // std::cout << "record.summary.nsum: " << record.summary.nsum << std::endl;
+    // std::cout << "record.summaries.nsum: " << record.summaries.nsum << std::endl;
     // std::cout << "record.file.nd: " << record.file.nd << std::endl;
     // std::cout << "record.file.ni: " << record.file.ni << std::endl;
     // std::cout << "nc: " << nc << std::endl;
@@ -282,13 +282,11 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
     U[2] = 4.0;
     for (p = 2; p < P; p++) {
         T[p] = 2.0 * z * T[p - 1] - T[p - 2];
-        // Not used at the moment:
         S[p] = 2.0 * z * S[p - 1] + 2.0 * T[p - 1] - S[p - 2];
     }
     for (p = 3; p < P; p++) {
         U[p] = 2.0 * z * U[p - 1] + 4.0 * S[p - 1] - U[p - 2];
     }
-    // double c = (0.125 / 2 / 86400.0);
     double t1 = 32.0;
     int niv;
     switch (spiceId) {
@@ -365,6 +363,11 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
  */
 void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
                    double state[9]) {
+    if (ephem.mb == nullptr || ephem.sb == nullptr){
+        throw std::invalid_argument(
+            "get_spk_state: Ephemeris kernels are not loaded. Memory map "
+            "the ephemeris using PropSimulation.map_ephemeris() method first.");
+    }
     bool smallBody = spiceId > 1000000;
     DafInfo *infoToUse;
     if (smallBody) {
@@ -460,4 +463,21 @@ void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ax = state[6];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ay = state[7];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].az = state[8];
+}
+
+/**
+ * @param from Frame to rotate from.
+ * @param to Frame to rotate to.
+ * @param et TDB ephemeris time in seconds past J2000 to get the rotation matrix at.
+ * @param rotMat Rotation matrix from 'from' to 'to'.
+ */
+void get_pck_rotMat(const std::string &from, const std::string &to,
+                    const real &et, std::vector<std::vector<real>> &rotMat) {
+    SpiceDouble rotMatSpice[6][6];
+    sxform_c(from.c_str(), to.c_str(), et, rotMatSpice);
+    for (size_t i = 0; i < 6; i++) {
+        for (size_t j = 0; j < 6; j++) {
+            rotMat[i][j] = (real)rotMatSpice[i][j];
+        }
+    }
 }

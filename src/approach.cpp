@@ -81,9 +81,11 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     if (!propSim->parallelMode) impact.get_impact_parameters(propSim);
                     impact.impact = true;
                     propSim->impactParams.push_back(impact);
-                    std::cout << "Impact detected at MJD " << tImp << " TDB. "
-                              << propSim->integBodies[i].name
-                              << " collided with " << bodyj->name << "!" << std::endl;
+                    if (!propSim->parallelMode) {
+                        std::cout << "Impact detected at MJD " << tImp << " TDB. "
+                                << propSim->integBodies[i].name
+                                << " collided with " << bodyj->name << "!" << std::endl;
+                    }
                 }
                 // check close approach
                 real radialVel, radialVelOld;
@@ -632,18 +634,12 @@ void CloseApproachParameters::print_summary(int prec){
  * @param[in] propSim PropSimulation object.
  */
 void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
-    ConstSpiceChar *baseBodyFrame;
+    std::string baseBodyFrame;
     get_baseBodyFrame(this->centralBodySpiceId, this->t, baseBodyFrame);
     real tET;
     mjd_to_et(this->t, tET);
-    SpiceDouble rotMatSpice[6][6];
-    sxform_c("J2000", baseBodyFrame, tET, rotMatSpice);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
-    for (size_t i = 0; i < 6; i++) {
-        for (size_t j = 0; j < 6; j++) {
-            rotMat[i][j] = (real)rotMatSpice[i][j];
-        }
-    }
+    get_pck_rotMat("J2000", baseBodyFrame, tET, rotMat);
     std::vector<real> impactRelStateInertial(6);
     impactRelStateInertial[0] = this->xRel[0]*propSim->consts.du2m/1.0e3L;
     impactRelStateInertial[1] = this->xRel[1]*propSim->consts.du2m/1.0e3L;
