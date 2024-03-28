@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>simulation.h &#8212; GRSS 3.8.3 documentation</title>
+    <title>simulation.h &#8212; GRSS 3.8.4 documentation</title>
   
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.3 documentation</p>
+    <p class="title logo__title">GRSS v3.8.4 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -936,20 +936,29 @@ document.write(`
 <dt class="field-odd">Param a3<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Parameter for normal nongravitational forces. </p>
 </dd>
-<dt class="field-even">Param alpha<span class="colon">:</span></dt>
-<dd class="field-even"><p>Normalizing factor for nongravitational forces. </p>
+<dt class="field-even">Param a1Est<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if a1 is estimated (for orbit determination). </p>
 </dd>
-<dt class="field-odd">Param k<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Exponent for nongravitational forces. </p>
+<dt class="field-odd">Param a2Est<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if a2 is estimated (for orbit determination). </p>
 </dd>
-<dt class="field-even">Param m<span class="colon">:</span></dt>
+<dt class="field-even">Param a3Est<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if a3 is estimated (for orbit determination). </p>
+</dd>
+<dt class="field-odd">Param alpha<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Normalizing factor for nongravitational forces. </p>
+</dd>
+<dt class="field-even">Param k<span class="colon">:</span></dt>
 <dd class="field-even"><p>Exponent for nongravitational forces. </p>
 </dd>
-<dt class="field-odd">Param n<span class="colon">:</span></dt>
+<dt class="field-odd">Param m<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Exponent for nongravitational forces. </p>
 </dd>
-<dt class="field-even">Param r0_au<span class="colon">:</span></dt>
-<dd class="field-even"><p>Normalizing distance for nongravitational forces. </p>
+<dt class="field-even">Param n<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exponent for nongravitational forces. </p>
+</dd>
+<dt class="field-odd">Param r0_au<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Normalizing distance for nongravitational forces. </p>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
@@ -967,6 +976,21 @@ document.write(`
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters2a3E">
 <span class="target" id="struct_nongrav_parameters_1aad5a4d500a58f468cb8c07136c2da421"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters2a3E" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters5a1EstE">
+<span class="target" id="struct_nongrav_parameters_1a5077bf98fa9f2d1b733b329b86f90d38"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a1Est</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters5a1EstE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters5a2EstE">
+<span class="target" id="struct_nongrav_parameters_1a7fd19e6f693061477eb0aeb05248a4ae"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a2Est</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters5a2EstE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters5a3EstE">
+<span class="target" id="struct_nongrav_parameters_1a2fe23a16e23a4c5e5faf8d7ca7470af7"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a3Est</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters5a3EstE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">

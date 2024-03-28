@@ -27,8 +27,11 @@ grss.libgrss.NongravParameters
     .. autosummary::
     
         ~NongravParameters.a1
+        ~NongravParameters.a1Est
         ~NongravParameters.a2
+        ~NongravParameters.a2Est
         ~NongravParameters.a3
+        ~NongravParameters.a3Est
         ~NongravParameters.alpha
         ~NongravParameters.k
         ~NongravParameters.m

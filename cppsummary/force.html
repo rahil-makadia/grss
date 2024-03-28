@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>force.h &#8212; GRSS 3.8.3 documentation</title>
+    <title>force.h &#8212; GRSS 3.8.4 documentation</title>
   
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.3 documentation</p>
+    <p class="title logo__title">GRSS v3.8.4 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -556,13 +556,12 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv48force_J2RK4realPK14PropSimulationRNSt6vectorI4realEERNSt6vectorI13STMParametersEE">
-<span class="target" id="force_8h_1a6fbcf2a3329d50ca5e8d8af20bb596e5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">force_J2</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">accInteg</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="stm.html#_CPPv413STMParameters" title="STMParameters"><span class="n"><span class="pre">STMParameters</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">allSTMs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48force_J2RK4realPK14PropSimulationRNSt6vectorI4realEERNSt6vectorI13STMParametersEE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv48force_J2PK14PropSimulationRNSt6vectorI4realEERNSt6vectorI13STMParametersEE">
+<span class="target" id="force_8h_1aead6524c3b8e1a2131dcd8290acee62b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">force_J2</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">accInteg</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="stm.html#_CPPv413STMParameters" title="STMParameters"><span class="n"><span class="pre">STMParameters</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">allSTMs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48force_J2PK14PropSimulationRNSt6vectorI4realEERNSt6vectorI13STMParametersEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute the acceleration of the system due to the J2 zonal harmonic. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> – <strong>[in]</strong> Time [TDB MJD] </p></li>
 <li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object. </p></li>
 <li><p><strong>accInteg</strong> – <strong>[inout]</strong> State derivative vector. </p></li>
 <li><p><strong>allSTMs</strong> – <strong>[in]</strong> <a class="reference internal" href="stm.html#struct_s_t_m_parameters"><span class="std std-ref">STMParameters</span></a> vector for IntegBodies in the simulation. </p></li>
