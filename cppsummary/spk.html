@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>spk.h &#8212; GRSS 3.8.2 documentation</title>
+    <title>spk.h &#8212; GRSS 3.8.3 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="simulation.h" href="simulation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Mar 27, 2024"/>
+    <meta name="docbuild:last-update" content="Mar 28, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.2 documentation</p>
+    <p class="title logo__title">GRSS v3.8.3 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -592,6 +592,22 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realRNSt6vectorINSt6vectorI4realEEEE">
+<span class="target" id="spk_8h_1a05796919149b534731811b30d16827ad"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_pck_rotMat</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">et</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">rotMat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realRNSt6vectorINSt6vectorI4realEEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Using cspice to get the rotation matrix from one frame to another. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from</strong> – Frame to rotate from. </p></li>
+<li><p><strong>to</strong> – Frame to rotate to. </p></li>
+<li><p><strong>et</strong> – TDB ephemeris time in seconds past J2000 to get the rotation matrix at. </p></li>
+<li><p><strong>rotMat</strong> – Rotation matrix from ‘from’ to ‘to’. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49CacheItem">
@@ -976,7 +992,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Mar 27, 2024.
+  Last updated on Mar 28, 2024.
   <br/>
 </p>
   </div>
