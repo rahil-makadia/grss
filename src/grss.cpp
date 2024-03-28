@@ -102,6 +102,15 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("a3", &NongravParameters::a3, R"mydelimiter(
             Normal non-gravitational parameter a3.
             )mydelimiter")
+        .def_readwrite("a1Est", &NongravParameters::a1Est, R"mydelimiter(
+            Flag for whether to estimate a1 (used when propagating STM).
+            )mydelimiter")
+        .def_readwrite("a2Est", &NongravParameters::a2Est, R"mydelimiter(
+            Flag for whether to estimate a2 (used when propagating STM).
+            )mydelimiter")
+        .def_readwrite("a3Est", &NongravParameters::a3Est, R"mydelimiter(
+            Flag for whether to estimate a3 (used when propagating STM).
+            )mydelimiter")
         .def_readwrite("alpha", &NongravParameters::alpha, R"mydelimiter(
             Non-gravitational parameter alpha from Marsden et al. (1973).
             )mydelimiter")

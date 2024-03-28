@@ -78,7 +78,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     force_newton(propSim, accInteg, allSTMs);
     // force_ppn_simple(propSim, accInteg, allSTMs);
     force_ppn_eih(propSim, accInteg, allSTMs);
-    force_J2(t, propSim, accInteg, allSTMs);
+    force_J2(propSim, accInteg, allSTMs);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
     #ifdef PRINT_FORCES
@@ -408,13 +408,12 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
 }
 
 /**
- * @param[in] t Time [TDB MJD]
  * @param[in] propSim PropSimulation object.
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_J2(const real &t, const PropSimulation *propSim,
-              std::vector<real> &accInteg, std::vector<STMParameters> &allSTMs) {
+void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
+              std::vector<STMParameters> &allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;
     forceFile.precision(16);
@@ -445,15 +444,8 @@ void force_J2(const real &t, const PropSimulation *propSim,
                 const real rRel2 = rRel * rRel;
                 const real rRel5 = rRel2 * rRel2 * rRel;
                 const real radius = bodyj->radius;
-                real poleRA, poleDec;
-                if (bodyj->spiceId == 399) {
-                    // IAU 2009 pole orientation for Earth
-                    poleRA = (0 - 0.641*(t-51544.5)/36525)*DEG2RAD;
-                    poleDec = (90 - 0.557*(t-51544.5)/36525)*DEG2RAD;
-                } else {
-                    poleRA = bodyj->poleRA;
-                    poleDec = bodyj->poleDec;
-                }
+                const real poleRA = bodyj->poleRA;
+                const real poleDec = bodyj->poleDec;
                 const real sinRA = sin(poleRA);
                 const real cosRA = cos(poleRA);
                 const real sinDec = sin(poleDec);

@@ -1041,12 +1041,15 @@ class FitSimulation:
         """
         # pylint: disable=no-member
         nongrav_params = libgrss.NongravParameters()
-        a1_val = x_dict['a1'] if 'a1' in x_dict.keys() else self.fixed_propsim_params['a1']
-        a2_val = x_dict['a2'] if 'a2' in x_dict.keys() else self.fixed_propsim_params['a2']
-        a3_val = x_dict['a3'] if 'a3' in x_dict.keys() else self.fixed_propsim_params['a3']
-        nongrav_params.a1 = a1_val
-        nongrav_params.a2 = a2_val
-        nongrav_params.a3 = a3_val
+        a1_est = 'a1' in x_dict.keys()
+        a2_est = 'a2' in x_dict.keys()
+        a3_est = 'a3' in x_dict.keys()
+        nongrav_params.a1 = x_dict['a1'] if a1_est else self.fixed_propsim_params['a1']
+        nongrav_params.a2 = x_dict['a2'] if a2_est else self.fixed_propsim_params['a2']
+        nongrav_params.a3 = x_dict['a3'] if a3_est else self.fixed_propsim_params['a3']
+        nongrav_params.a1Est = a1_est
+        nongrav_params.a2Est = a2_est
+        nongrav_params.a3Est = a3_est
         nongrav_params.alpha = self.fixed_propsim_params['alpha']
         nongrav_params.k = self.fixed_propsim_params['k']
         nongrav_params.m = self.fixed_propsim_params['m']

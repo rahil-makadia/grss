@@ -31,7 +31,7 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
 /**
  * @brief Compute the acceleration of the system due to the J2 zonal harmonic.
  */
-void force_J2(const real &t, const PropSimulation *propSim,
+void force_J2(const PropSimulation *propSim,
               std::vector<real> &accInteg, std::vector<STMParameters> &allSTMs);
 
 /**

@@ -216,10 +216,14 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
     this->isNongrav = false;
-    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
+    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L ||
+            ngParams.a1Est || ngParams.a2Est || ngParams.a3Est) {
         this->ngParams.a1 = ngParams.a1;
         this->ngParams.a2 = ngParams.a2;
         this->ngParams.a3 = ngParams.a3;
+        this->ngParams.a1Est = ngParams.a1Est;
+        this->ngParams.a2Est = ngParams.a2Est;
+        this->ngParams.a3Est = ngParams.a3Est;
         this->ngParams.alpha = ngParams.alpha;
         this->ngParams.k = ngParams.k;
         this->ngParams.m = ngParams.m;
@@ -260,10 +264,14 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
     this->isNongrav = false;
-    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
+    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L ||
+            ngParams.a1Est || ngParams.a2Est || ngParams.a3Est) {
         this->ngParams.a1 = ngParams.a1;
         this->ngParams.a2 = ngParams.a2;
         this->ngParams.a3 = ngParams.a3;
+        this->ngParams.a1Est = ngParams.a1Est;
+        this->ngParams.a2Est = ngParams.a2Est;
+        this->ngParams.a3Est = ngParams.a3Est;
         this->ngParams.alpha = ngParams.alpha;
         this->ngParams.k = ngParams.k;
         this->ngParams.m = ngParams.m;
@@ -279,15 +287,15 @@ void IntegBody::prepare_stm(){
     int stmSize = 36;
     size_t numParams = 0;
     if (this->isNongrav) {
-        if (ngParams.a1 != 0.0L) {
+        if (ngParams.a1Est) {
             stmSize += 6;
             numParams++;
         }
-        if (ngParams.a2 != 0.0L) {
+        if (ngParams.a2Est) {
             stmSize += 6;
             numParams++;
         }
-        if (ngParams.a3 != 0.0L) {
+        if (ngParams.a3Est) {
             stmSize += 6;
             numParams++;
         }
@@ -692,10 +700,9 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->ephem = simRef.ephem;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
+    this->integParams.timestepCounter = 0;
     this->parallelMode = simRef.parallelMode;
     this->spiceBodies = simRef.spiceBodies;
-    // this->integBodies = simRef.integBodies;
-    // this->events = simRef.events;
     this->tEvalUTC = simRef.tEvalUTC;
     this->evalApparentState = simRef.evalApparentState;
     this->evalMeasurements = simRef.evalMeasurements;

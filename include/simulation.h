@@ -140,6 +140,9 @@ class SpiceBody : public Body {
  * @param a1 Parameter for radial nongravitational forces.
  * @param a2 Parameter for transverse nongravitational forces.
  * @param a3 Parameter for normal nongravitational forces.
+ * @param a1Est Flag to indicate if a1 is estimated (for orbit determination).
+ * @param a2Est Flag to indicate if a2 is estimated (for orbit determination).
+ * @param a3Est Flag to indicate if a3 is estimated (for orbit determination).
  * @param alpha Normalizing factor for nongravitational forces.
  * @param k Exponent for nongravitational forces.
  * @param m Exponent for nongravitational forces.
@@ -151,6 +154,9 @@ struct NongravParameters {
     real a1 = 0.0L;
     real a2 = 0.0L;
     real a3 = 0.0L;
+    bool a1Est = false;
+    bool a2Est = false;
+    bool a3Est = false;
     real alpha = 0.1112620426L;
     real k = 4.6142L;
     real m = 2.15L;
