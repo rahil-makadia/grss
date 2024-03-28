@@ -154,11 +154,9 @@ real delta_at_utc(const real mjdUtc) {
         return taiMinusUtc;
     }
     size_t len = sizeof(leapDatesMjdUtc) / sizeof(leapDatesMjdUtc[0]);
-    size_t i;
-    for (i = len - 1; i >= 0; i--) {
-        if (mjdUtc >= leapDatesMjdUtc[i]) {
-            break;
-        }
+    size_t i = len - 1;
+    while (i >= 0 && mjdUtc < leapDatesMjdUtc[i]) {
+        i--;
     }
     taiMinusUtc = leapSecs[i];
     if (mjdUtc >= leapDatesMjdUtc[0] && mjdUtc < 41317.0) {
