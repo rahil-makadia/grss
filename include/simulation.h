@@ -258,8 +258,8 @@ struct BPlaneParameters {
     real x;
     real y;
     real z;
-    std::vector<real> dx = std::vector<real>(6, 0.0L);
-    std::vector<real> dy = std::vector<real>(6, 0.0L);
+    std::vector<real> dx = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
+    std::vector<real> dy = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
 };
 
 /**

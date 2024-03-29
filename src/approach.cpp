@@ -40,14 +40,14 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     caTol = bodyj.caTol;
                     const real atm_offset = 100.0e3/propSim->consts.du2m;
                     centralBodyRadius += atm_offset;
-                    double xSpiceOld[9];
-                    get_spk_state(bodyj.spiceId,
-                                  tOld, propSim->ephem, xSpiceOld);
+                    double xSpice[9], xSpiceOld[9];
+                    get_spk_state(bodyj.spiceId, t, propSim->ephem, xSpice);
+                    get_spk_state(bodyj.spiceId, tOld, propSim->ephem, xSpiceOld);
                     for (size_t k = 0; k < 3; k++) {
                         relPosOld[k] = xIntegOld[starti + k] - xSpiceOld[k];
-                        relPos[k] = xInteg[starti + k] - bodyj.pos[k];
+                        relPos[k] = xInteg[starti + k] - xSpice[k];
                         relVelOld[k] = xIntegOld[starti + 3 + k] - xSpiceOld[3 + k];
-                        relVel[k] = xInteg[starti + 3 + k] - bodyj.vel[k];
+                        relVel[k] = xInteg[starti + 3 + k] - xSpice[3 + k];
                     }
                 }
                 relDistOld = sqrt(relPosOld[0] * relPosOld[0] +
@@ -231,6 +231,7 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
     zero_func(propSim, i, j, a, fa);
     zero_func(propSim, i, j, b, fb);
     if ((fa > 0.0 && fb > 0.0) || (fa < 0.0 && fb < 0.0)) {
+        std::cout << "t1: " << x1 << " t2: " << x2 << " f1: " << fa << " f2: " << fb << std::endl;
         throw std::runtime_error("Root must be bracketed in get_ca_or_impact_time");
     }
     fc = fb;
