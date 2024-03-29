@@ -697,9 +697,15 @@ PropSimulation::PropSimulation(std::string name, real t0,
 PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
-    this->ephem = simRef.ephem;
+    this->ephem.mbPath = simRef.ephem.mbPath;
+    this->ephem.sbPath = simRef.ephem.sbPath;
+    this->ephem.mb = nullptr;
+    this->ephem.sb = nullptr;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
+    this->integParams.nInteg = 0;
+    this->integParams.n2Derivs = 0;
+    this->integParams.nTotal = simRef.integParams.nSpice;
     this->integParams.timestepCounter = 0;
     this->parallelMode = simRef.parallelMode;
     this->spiceBodies = simRef.spiceBodies;
@@ -712,6 +718,7 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->tEvalMargin = simRef.tEvalMargin;
     this->tEval = simRef.tEval;
     this->radarObserver = simRef.radarObserver;
+    this->isPreprocessed = false;
 }
 
 /**
