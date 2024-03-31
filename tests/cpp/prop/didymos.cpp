@@ -47,6 +47,7 @@ int main() {
     NongravParameters ngPrms;
     ngPrms.a1 = 0.0L;
     ngPrms.a2 = -1.042309691002E-14;
+    ngPrms.a2Est = true;
     ngPrms.a3 = 0.0L;
     ngPrms.alpha = 1.0L;
     ngPrms.k = 0.0L;

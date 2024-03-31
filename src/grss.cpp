@@ -1018,5 +1018,14 @@ PYBIND11_MODULE(libgrss, m) {
                 Extra observer information. Each list at least contains the central body SPICE ID
                 (e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
                 This information might be repeated for bistatic radar observations.
+            )mydelimiter")
+        .def("save", &PropSimulation::save, py::arg("filename"),
+             R"mydelimiter(
+            Saves the simulation to a file.
+
+            Parameters
+            ----------
+            filename : str
+                Name of the file to save the simulation to.
             )mydelimiter");
 }

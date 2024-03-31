@@ -1162,3 +1162,172 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
                                      this->convergedLightTime, xObserverNew);
     this->integrate();
 }
+
+/**
+ * @param[in] filename Name of the file to save the simulation to.
+ */
+void PropSimulation::save(std::string filename) {
+    struct stat buffer;
+    if (stat(filename.c_str(), &buffer) == 0) {
+        throw std::invalid_argument("Cannot save PropSimulation '" + this->name +
+                                    "' to file " + filename +
+                                    " (File already exists).");
+    }
+    auto timeWidth = std::setw(8);
+    auto SpiceIdWidth = std::setw(7);
+    auto floatWidth = std::setw(12);
+    auto timeFloatPrec = std::setprecision(8);
+    auto doubleWidth = std::setw(20);
+    auto doublePrec = std::setprecision(12);
+    int maxChars = 121;
+    std::string tab = "    ";
+    std::string halfTab = "  ";
+    std::string subsectionFull = std::string(maxChars, '-');
+    std::string sectionFull = std::string(maxChars, '=');
+    std::string headerSectionHalf = std::string((int)(maxChars-13)/2, '=');
+    std::ofstream file(filename, std::ios::out);
+    // print header
+    file << std::string(maxChars, '=') << std::endl;
+    #if defined(GRSS_VERSION)
+        file << headerSectionHalf << " GRSS v" << GRSS_VERSION <<" " << headerSectionHalf << std::endl;
+    #else
+        file << headerSectionHalf << " GRSS vINFTY " << headerSectionHalf << std::endl;
+    #endif
+    file << std::string(maxChars, '=') << std::endl;
+
+    file << std::endl;
+    std::string nextSubsection = this->name;
+    file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+    file << subsectionFull << std::endl;
+    file << "Integration from MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.t0
+         << " to MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.tf << " [TDB]"
+         << std::endl;
+    file << "Main-body kernel path: " << this->ephem.mbPath << std::endl;
+    file << "Small-body kernel path: " << this->ephem.sbPath << std::endl;
+
+    file << std::endl;
+    nextSubsection = std::to_string(this->integParams.nInteg) + " Integration bodies";
+    file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+    file << subsectionFull << std::endl;
+    size_t starti = 0;
+    for (size_t i = 0; i < this->integBodies.size(); i++) {
+        file << this->integBodies[i].name << std::endl;
+        file << "Initial time : MJD " << timeWidth << std::fixed << timeFloatPrec << this->integBodies[i].t0
+             << " [TDB]" << std::endl;
+        file << "Radius       : " << floatWidth << std::fixed << timeFloatPrec << this->integBodies[i].radius*this->consts.du2m << " [m]" << std::endl;
+        file << "Mass         : " << floatWidth << std::fixed << timeFloatPrec << this->integBodies[i].mass << " [kg]" << std::endl;
+        file << "Initial state:" << std::endl;
+        if (this->integBodies[i].isCometary) {
+            file << " Cometary, heliocentric IAU76/J2000 ecliptic:" << std::endl;
+            file << doubleWidth << "ecc" << doubleWidth << "peri. dist. [AU]" << doubleWidth << "peri. t. [MJD TDB]"
+                    << doubleWidth << "l. asc. node [rad]" << doubleWidth << "arg. peri. [rad]" << doubleWidth << "inc. [rad]" << std::endl;
+            for (size_t j = 0; j < 6; j++) {
+                file << doubleWidth << std::scientific << doublePrec << this->integBodies[i].initState[j];
+            }
+            file << std::endl;
+        }
+        file << " Cartesian, J2000 barycentric:" << std::endl;
+        file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]" << std::endl;
+        for (size_t j = 0; j < 6; j++) {
+            file << doubleWidth << std::scientific << doublePrec << this->interpParams.xIntegStack[0][starti + j];
+        }
+        file << std::endl;
+        file << "Final state:" << std::endl;
+        file << " Cartesian, J2000 barycentric:" << std::endl;
+        file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]" << std::endl;
+        for (size_t j = 0; j < 6; j++) {
+            file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + j];
+        }
+        file << std::endl;
+        starti += 6;
+        if (this->integBodies[i].propStm) {
+            size_t numParams = (this->integBodies[i].n2Derivs - 21)/3;
+            file << "STM (final Cartesian state w.r.t. initial Cartesian state + any params):" << std::endl;
+            file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]";
+            if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
+            if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
+            if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
+            file << std::endl;
+            for (size_t j = 0; j < 6; j++) {
+                for (size_t k = 0; k < 6; k++) {
+                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 6*j + k];
+                }
+                for (size_t k = 0; k < numParams; k++) {
+                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 36 + 6*k + j];
+                }
+                file << std::endl;
+            }
+            if (this->integBodies[i].isCometary) {
+                file << "STM (initial Cartesian state + any params w.r.t. initial Cometary state + any params):" << std::endl;
+                file << doubleWidth << "ecc" << doubleWidth << "peri. dist. [AU]" << doubleWidth << "peri. t. [MJD TDB]"
+                        << doubleWidth << "l. asc. node [rad]" << doubleWidth << "arg. peri. [rad]" << doubleWidth << "inc. [rad]";
+                if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
+                if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
+                if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
+                file << std::endl;
+                for (size_t j = 0; j < this->integBodies[i].dCartdState.size(); j++) {
+                    for (size_t k = 0; k < this->integBodies[i].dCartdState[0].size(); k++) {
+                        file << doubleWidth << std::scientific << doublePrec << this->integBodies[i].dCartdState[j][k];
+                    }
+                    file << std::endl;
+                }
+            }
+        }
+        if (i!=this->integBodies.size()-1) file << std::endl << subsectionFull << std::endl;
+    }
+
+    file << std::endl;
+    nextSubsection = std::to_string(this->integParams.nSpice) + " SPICE bodies";
+    file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+    file << subsectionFull << std::endl;
+    for (size_t i = 0; i < this->spiceBodies.size(); i++) {
+        file << SpiceIdWidth << this->spiceBodies[i].spiceId << halfTab
+             << this->spiceBodies[i].name << std::endl;
+    }
+
+    if (this->impactParams.size() != 0) {
+        file << std::endl;
+        nextSubsection = std::to_string(this->impactParams.size()) + " Impacts detected";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        for (size_t i = 0; i < this->impactParams.size(); i++) {
+            ImpactParameters imp = this->impactParams[i];
+            file << "MJD " << timeWidth << std::fixed << imp.t << " TDB:" << std::endl;
+            file << " " << imp.flybyBody << " impacted " << imp.centralBody << " with a relative velocity of " << imp.vel << " AU/d." << std::endl;
+            file << " Impact location: " << std::endl;
+            file << "   Longitude: " << imp.lon*180.0L/PI << " deg" << std::endl;
+            file << "   Latitude: " << imp.lat*180.0L/PI << " deg" << std::endl;
+            file << "   Altitude: " << imp.alt << " km" << std::endl;
+        }
+    }
+
+    if (this->caParams.size() != 0) {
+        file << std::endl;
+        nextSubsection = std::to_string(this->caParams.size()) + " Close approaches detected";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        for (size_t i = 0; i < this->caParams.size(); i++) {
+            CloseApproachParameters ca = this->caParams[i];
+            file << "MJD " << timeWidth << std::fixed << ca.t << " TDB:" << std::endl;
+            file << " " << ca.flybyBody << " approached " << ca.centralBody << " at " << ca.dist << " AU." << std::endl;
+            file << " Relative Velocity: " << ca.vel << " AU/d. V-infinity: " << ca.vInf << " AU/d." << std::endl;
+            file << " Gravitational focusing factor: " << ca.gravFocusFactor << ". Impact: " << std::boolalpha << ca.impact << std::endl;
+        }
+    }
+
+    // // insert machine readable data for close approach and impact parameters
+    // file << subsectionFull << std::endl;
+    // file << "$$START_CA" << std::endl;
+    // file << "$$END_CA" << std::endl;
+    // file << subsectionFull << std::endl;
+    // file << "$$START_IMPACT" << std::endl;
+    // file << "$$END_IMPACT" << std::endl;
+
+    file << std::string(maxChars, '=') << std::endl;
+    file << headerSectionHalf << " END OF FILE " << headerSectionHalf << std::endl;
+    file << std::string(maxChars, '=') << std::endl;
+    file.close();
+}

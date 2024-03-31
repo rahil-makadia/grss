@@ -1,9 +1,5 @@
 #include "force.h"
 // #define PRINT_FORCES 1
-#ifdef PRINT_FORCES
-#include <iomanip>
-#include <fstream>
-#endif
 
 /**
  * @param[in] t Time [TDB MJD]

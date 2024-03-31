@@ -527,6 +527,10 @@ class PropSimulation {
     void extend(real tf, std::vector<real> tEvalNew = std::vector<real>(),
                 std::vector<std::vector<real>> xObserverNew =
                     std::vector<std::vector<real>>());
+    /**
+     * @brief Save the simulation to a file.
+     */
+    void save(std::string filename);
 };
 
 #endif
