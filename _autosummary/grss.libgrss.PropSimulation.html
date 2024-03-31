@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.PropSimulation &#8212; GRSS 3.8.5 documentation</title>
+    <title>grss.libgrss.PropSimulation &#8212; GRSS 3.8.6 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.NongravParameters" href="grss.libgrss.NongravParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Mar 29, 2024"/>
+    <meta name="docbuild:last-update" content="Mar 31, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.5 documentation</p>
+    <p class="title logo__title">GRSS v3.8.6 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -519,6 +519,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarObserver"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarObserver</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarPartials"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarPartials</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.remove_body"><code class="docutils literal notranslate"><span class="pre">PropSimulation.remove_body()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.save"><code class="docutils literal notranslate"><span class="pre">PropSimulation.save()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.set_integration_parameters"><code class="docutils literal notranslate"><span class="pre">PropSimulation.set_integration_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.set_sim_constants"><code class="docutils literal notranslate"><span class="pre">PropSimulation.set_sim_constants()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.spiceBodies"><code class="docutils literal notranslate"><span class="pre">PropSimulation.spiceBodies</span></code></a></li>
@@ -623,13 +624,16 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.remove_body" title="grss.libgrss.PropSimulation.remove_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_body</span></code></a>(self, name)</p></td>
 <td><p>Removes a body from the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.set_integration_parameters" title="grss.libgrss.PropSimulation.set_integration_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_integration_parameters</span></code></a>(self, tf[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.save" title="grss.libgrss.PropSimulation.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(self, filename)</p></td>
+<td><p>Saves the simulation to a file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.set_integration_parameters" title="grss.libgrss.PropSimulation.set_integration_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_integration_parameters</span></code></a>(self, tf[, ...])</p></td>
 <td><p>Sets the integration parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.set_sim_constants" title="grss.libgrss.PropSimulation.set_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sim_constants</span></code></a>(self[, du2m, tu2s, G, clight])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.set_sim_constants" title="grss.libgrss.PropSimulation.set_sim_constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sim_constants</span></code></a>(self[, du2m, tu2s, G, clight])</p></td>
 <td><p>Sets the constants of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.unmap_ephemeris" title="grss.libgrss.PropSimulation.unmap_ephemeris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unmap_ephemeris</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.unmap_ephemeris" title="grss.libgrss.PropSimulation.unmap_ephemeris"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unmap_ephemeris</span></code></a>(self)</p></td>
 <td><p>Unmaps the ephemeris of the simulation.</p></td>
 </tr>
 </tbody>
@@ -1006,6 +1010,17 @@ This information might be repeated for bistatic radar observations.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="grss.libgrss.PropSimulation.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><span class="pre">grss.libgrss.PropSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.save" title="Permalink to this definition">#</a></dt>
+<dd><p>Saves the simulation to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the file to save the simulation to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.set_integration_parameters">
 <span class="sig-name descname"><span class="pre">set_integration_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><span class="pre">grss.libgrss.PropSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tEval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tEvalUTC</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evalApparentState</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergedLightTims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observerInfo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptiveTimestep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtMax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">21.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtMin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtChangeFactor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolInteg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-11</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolPC</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-16</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.set_integration_parameters" title="Permalink to this definition">#</a></dt>
 <dd><p>Sets the integration parameters.</p>
@@ -1196,6 +1211,7 @@ as opposed to TDB.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarObserver"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarObserver</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarPartials"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarPartials</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.remove_body"><code class="docutils literal notranslate"><span class="pre">PropSimulation.remove_body()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.save"><code class="docutils literal notranslate"><span class="pre">PropSimulation.save()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.set_integration_parameters"><code class="docutils literal notranslate"><span class="pre">PropSimulation.set_integration_parameters()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.set_sim_constants"><code class="docutils literal notranslate"><span class="pre">PropSimulation.set_sim_constants()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.spiceBodies"><code class="docutils literal notranslate"><span class="pre">PropSimulation.spiceBodies</span></code></a></li>
@@ -1242,7 +1258,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Mar 29, 2024.
+  Last updated on Mar 31, 2024.
   <br/>
 </p>
   </div>

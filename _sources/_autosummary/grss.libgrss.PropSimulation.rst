@@ -28,6 +28,7 @@ grss.libgrss.PropSimulation
         ~PropSimulation.interpolate
         ~PropSimulation.map_ephemeris
         ~PropSimulation.remove_body
+        ~PropSimulation.save
         ~PropSimulation.set_integration_parameters
         ~PropSimulation.set_sim_constants
         ~PropSimulation.unmap_ephemeris
