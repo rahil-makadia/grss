@@ -193,6 +193,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     std::vector<real> cartesianVel(3);
     this->isCometary = true;
     this->initState = cometaryState;
+    this->initCart = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
 
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
@@ -254,6 +255,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->caTol = 0.0;
     this->isCometary = false;
     this->initState = {pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]};
+    this->initCart = initState;
     this->pos[0] = pos[0];
     this->pos[1] = pos[1];
     this->pos[2] = pos[2];
@@ -707,7 +709,6 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->integParams.n2Derivs = 0;
     this->integParams.nTotal = simRef.integParams.nSpice;
     this->integParams.timestepCounter = 0;
-    this->parallelMode = simRef.parallelMode;
     this->spiceBodies = simRef.spiceBodies;
     this->tEvalUTC = simRef.tEvalUTC;
     this->evalApparentState = simRef.evalApparentState;
@@ -1100,6 +1101,12 @@ void PropSimulation::preprocess() {
                 this->integBodies[i].vel[0] += sunState[3];
                 this->integBodies[i].vel[1] += sunState[4];
                 this->integBodies[i].vel[2] += sunState[5];
+                this->integBodies[i].initCart[0] = this->integBodies[i].pos[0];
+                this->integBodies[i].initCart[1] = this->integBodies[i].pos[1];
+                this->integBodies[i].initCart[2] = this->integBodies[i].pos[2];
+                this->integBodies[i].initCart[3] = this->integBodies[i].vel[0];
+                this->integBodies[i].initCart[4] = this->integBodies[i].vel[1];
+                this->integBodies[i].initCart[5] = this->integBodies[i].vel[2];
             }
             for (size_t j = 0; j < 3; j++) {
                 this->xInteg.push_back(this->integBodies[i].pos[j]);
@@ -1167,8 +1174,8 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
  * @param[in] filename Name of the file to save the simulation to.
  */
 void PropSimulation::save(std::string filename) {
-    struct stat buffer;
-    if (stat(filename.c_str(), &buffer) == 0) {
+    struct stat fileExistsBuffer;
+    if (stat(filename.c_str(), &fileExistsBuffer) == 0) {
         throw std::invalid_argument("Cannot save PropSimulation '" + this->name +
                                     "' to file " + filename +
                                     " (File already exists).");
@@ -1194,6 +1201,14 @@ void PropSimulation::save(std::string filename) {
         file << headerSectionHalf << " GRSS vINFTY " << headerSectionHalf << std::endl;
     #endif
     file << std::string(maxChars, '=') << std::endl;
+
+    time_t now = time(nullptr);
+    tm *utc = gmtime(&now);
+    const char *format = "%a %b %d %Y %H:%M:%S UTC";
+    char buffer[80];
+    strftime(buffer, 80, format, utc);
+    std::string timeStr(buffer);
+    file << std::string((int)(maxChars-timeStr.size())/2, ' ') << timeStr << std::string((int)(maxChars-timeStr.size())/2, ' ') << std::endl;
 
     file << std::endl;
     std::string nextSubsection = this->name;
@@ -1230,7 +1245,7 @@ void PropSimulation::save(std::string filename) {
         file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
                 << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]" << std::endl;
         for (size_t j = 0; j < 6; j++) {
-            file << doubleWidth << std::scientific << doublePrec << this->interpParams.xIntegStack[0][starti + j];
+            file << doubleWidth << std::scientific << doublePrec << this->integBodies[i].initCart[j];
         }
         file << std::endl;
         file << "Final state:" << std::endl;
@@ -1296,11 +1311,11 @@ void PropSimulation::save(std::string filename) {
         for (size_t i = 0; i < this->impactParams.size(); i++) {
             ImpactParameters imp = this->impactParams[i];
             file << "MJD " << timeWidth << std::fixed << imp.t << " TDB:" << std::endl;
-            file << " " << imp.flybyBody << " impacted " << imp.centralBody << " with a relative velocity of " << imp.vel << " AU/d." << std::endl;
-            file << " Impact location: " << std::endl;
-            file << "   Longitude: " << imp.lon*180.0L/PI << " deg" << std::endl;
-            file << "   Latitude: " << imp.lat*180.0L/PI << " deg" << std::endl;
-            file << "   Altitude: " << imp.alt << " km" << std::endl;
+            file << "  " << imp.flybyBody << " impacted " << imp.centralBody << " with a relative velocity of " << imp.vel << " AU/d." << std::endl;
+            file << "  Impact location: " << std::endl;
+            file << "    Longitude: " << imp.lon*180.0L/PI << " deg" << std::endl;
+            file << "    Latitude: " << imp.lat*180.0L/PI << " deg" << std::endl;
+            file << "    Altitude: " << imp.alt << " km" << std::endl;
         }
     }
 
@@ -1312,9 +1327,9 @@ void PropSimulation::save(std::string filename) {
         for (size_t i = 0; i < this->caParams.size(); i++) {
             CloseApproachParameters ca = this->caParams[i];
             file << "MJD " << timeWidth << std::fixed << ca.t << " TDB:" << std::endl;
-            file << " " << ca.flybyBody << " approached " << ca.centralBody << " at " << ca.dist << " AU." << std::endl;
-            file << " Relative Velocity: " << ca.vel << " AU/d. V-infinity: " << ca.vInf << " AU/d." << std::endl;
-            file << " Gravitational focusing factor: " << ca.gravFocusFactor << ". Impact: " << std::boolalpha << ca.impact << std::endl;
+            file << "  " << ca.flybyBody << " approached " << ca.centralBody << " at " << ca.dist << " AU." << std::endl;
+            file << "  Relative Velocity: " << ca.vel << " AU/d. V-infinity: " << ca.vInf << " AU/d." << std::endl;
+            file << "  Gravitational focusing factor: " << ca.gravFocusFactor << ". Impact: " << std::boolalpha << ca.impact << std::endl;
         }
     }
 

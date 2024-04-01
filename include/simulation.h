@@ -184,6 +184,7 @@ class IntegBody : public Body {
     int spiceId = -99999;
     bool isCometary = false;
     std::vector<real> initState;
+    std::vector<real> initCart;
     bool isInteg = true;
     bool isThrusting = false;
     NongravParameters ngParams;
@@ -294,9 +295,9 @@ class CloseApproachParameters {
    private:
    public:
     real t;
-    std::vector<real> xRel = std::vector<real>(6, 0.0L);
+    std::vector<real> xRel;
     real tMap;
-    std::vector<real> xRelMap = std::vector<real>(6, 0.0L);
+    std::vector<real> xRelMap;
     real dist;
     real vel;
     real vInf;

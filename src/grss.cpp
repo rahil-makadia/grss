@@ -590,7 +590,10 @@ PYBIND11_MODULE(libgrss, m) {
             Whether the body is a cometary body.
             )mydelimiter")
         .def_readwrite("initState", &IntegBody::initState, R"mydelimiter(
-            Initial state of the body.
+            Initial input state of the body (Cometary heliocentric/Cartesian barycentric).
+            )mydelimiter")
+        .def_readwrite("initCart", &IntegBody::initCart, R"mydelimiter(
+            Initial barycentric Cartesian state of the body.
             )mydelimiter")
         .def_readwrite("isInteg", &IntegBody::isInteg, R"mydelimiter(
             Whether the body is an integrated body. Always True.

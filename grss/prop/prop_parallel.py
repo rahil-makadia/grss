@@ -7,7 +7,7 @@ from .. import libgrss
 __all__ = [ 'cluster_ca_or_impacts',
 ]
 
-def _handle_one_cloned_sim(sol):
+def _handle_one_cloned_sim(sol, ref_nongrav):
     """
     Parse a solution dictionary into an IntegBody object.
 
@@ -15,6 +15,8 @@ def _handle_one_cloned_sim(sol):
     ----------
     sol : dict
         Dictionary of solution parameters.
+    ref_nongrav : libgrss.NongravParameters
+        Reference nongravitational parameters to use for propagating the orbits.
 
     Returns
     -------
@@ -23,18 +25,18 @@ def _handle_one_cloned_sim(sol):
     """
     mass = sol.get('mass', 0.0)
     radius = sol.get('radius', 0.0)
-    a1 = sol.get('a1', 0.0)
-    a2 = sol.get('a2', 0.0)
-    a3 = sol.get('a3', 0.0)
-    alpha = sol.get('alpha', 0.1112620426)
-    k = sol.get('k', 4.6142)
-    m = sol.get('m', 2.15)
-    n = sol.get('n', 5.093)
-    r0_au = sol.get('r0_au', 2.808)
+    a1 = sol['a1'] if ref_nongrav.a1Est else ref_nongrav.a1
+    a2 = sol['a2'] if ref_nongrav.a2Est else ref_nongrav.a2
+    a3 = sol['a3'] if ref_nongrav.a3Est else ref_nongrav.a3
+    alpha = ref_nongrav.alpha
+    k = ref_nongrav.k
+    m = ref_nongrav.m
+    n = ref_nongrav.n
+    r0_au = ref_nongrav.r0_au
     ng_list = [a1, a2, a3, alpha, k, m, n, r0_au]
     cometary = False
     cart = False
-    if 'e' in sol and 'q' in sol and 'tp' in sol and 'om' in sol and 'w' in sol and 'i' in sol:
+    if all(key in sol for key in ['e', 'q', 'tp', 'om', 'w', 'i']):
         e = sol['e']
         q = sol['q']
         tp = sol['tp']
@@ -43,7 +45,7 @@ def _handle_one_cloned_sim(sol):
         i = sol['i']*np.pi/180.0
         com = [e, q, tp, om, w, i]
         cometary = True
-    elif 'x' in sol and 'y' in sol and 'z' in sol and 'vx' in sol and 'vy' in sol and 'vz' in sol:
+    elif all(key in sol for key in ['x', 'y', 'z', 'vx', 'vy', 'vz']):
         pos = [sol['x'], sol['y'], sol['z']]
         vel = [sol['vx'], sol['vy'], sol['vz']]
         cart = True
@@ -56,7 +58,7 @@ def _handle_one_cloned_sim(sol):
         full_list = [sol['t'], mass, radius] + pos + vel + ng_list
     return full_list
 
-def parallel_propagate(ref_sol, ref_sim, clones):
+def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones):
     """
     Propagate multiple simulations in parallel using a reference simulation.
 
@@ -64,23 +66,22 @@ def parallel_propagate(ref_sol, ref_sim, clones):
     ----------
     ref_sol : dict
         Reference solution to use for propagating the reference simulation.
+    ref_nongrav : libgrss.NongravParameters
+        Reference nongravitational parameters to use for propagating the orbits.
     ref_sim : libgrss.PropSimulation
         Reference simulation to use for propagating the orbits.
     clones : dict
         Dictionary of orbit solutions to propagate in parallel.
     """
-    if ('e' in ref_sol and 'q' in ref_sol and 'tp' in ref_sol
-        and 'om' in ref_sol and 'w' in ref_sol and 'i' in ref_sol):
+    if all(key in ref_sol for key in ['e', 'q', 'tp', 'om', 'w', 'i']):
         is_cometary = True
-    elif ('x' in ref_sol and 'y' in ref_sol and 'z' in ref_sol
-            and 'vx' in ref_sol and 'vy' in ref_sol and 'vz' in ref_sol):
+    elif all(key in ref_sol for key in ['x', 'y', 'z', 'vx', 'vy', 'vz']):
         is_cometary = False
     else:
         raise ValueError('Invalid reference solution dictionary')
 
     # this does not need parallelism, only takes ~2.5s to do 1e6 clones!
-    all_info = [_handle_one_cloned_sim(sol) for sol in clones]
-    ref_sim.parallelMode = True
+    all_info = [_handle_one_cloned_sim(sol, ref_nongrav) for sol in clones]
 
     return libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info)
 

@@ -434,7 +434,7 @@ void gr15(PropSimulation *propSim) {
             if (dtReq / dt > 1.0 / propSim->integParams.dtChangeFactor) {
                 dtReq = dt / propSim->integParams.dtChangeFactor;
             }
-            propSim->interpParams.bStack.push_back(bOld);
+            propSim->interpParams.bStack.push_back(b);
             propSim->interpParams.accIntegStack.push_back(accInteg0);
             if (propSim->tEval.size() != propSim->xIntegEval.size()) {
                 interpolate_on_the_fly(propSim, t, dt);

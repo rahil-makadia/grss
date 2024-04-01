@@ -12,17 +12,13 @@ std::vector<PropSimulation> propSim_parallel_omp(
     size_t numBodies = allBodies.size();
     std::vector<PropSimulation> allSims(numBodies, refSim);
 
-    // make sure refSim is in parallel mode
-    if (!refSim.parallelMode) {
-        throw std::runtime_error(
-            "ERROR: The reference simulation must be in parallel mode to "
-            "propagate in parallel.");
-    }
-
     // parallel for loop to first create an integBody for each entry in the
     // allBodies vector, then integrate each integBody using the reference
     // simulation
-    omp_set_num_threads(omp_get_max_threads());
+    int maxThreads = 40;
+    int numThreads = omp_get_max_threads();
+    numThreads = numThreads > maxThreads ? maxThreads : numThreads;
+    omp_set_num_threads(numThreads);
     #pragma omp parallel shared(allBodies, refSim)
     {
         #pragma omp for schedule(static)
@@ -39,6 +35,7 @@ std::vector<PropSimulation> propSim_parallel_omp(
             ngParams.n = data[15];
             ngParams.r0_au = data[16];
             PropSimulation sim(name, refSim);
+            sim.parallelMode = true;
             if (isCometary) {
                 std::vector<real> com = {data[3], data[4], data[5],
                                          data[6], data[7], data[8]};

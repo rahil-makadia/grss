@@ -59,23 +59,17 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                 if (j > propSim->integParams.nInteg &&
                     relDist <= flybyBodyRadius + centralBodyRadius &&
                     relDistOld > flybyBodyRadius + centralBodyRadius) {
-                    real tImp;
-                    real xRelImp[6];
-                    get_ca_or_impact_time(propSim, i, j, tOld, t, tImp, impact_r_calc);
-                    get_rel_state(propSim, i, j, tImp, xRelImp);
                     ImpactParameters impact;
-                    impact.t = tImp;
-                    for (size_t k = 0; k < 6; k++) {
-                        impact.xRel[k] = xRelImp[k];
-                    }
+                    get_ca_or_impact_time(propSim, i, j, tOld, t, impact.t, impact_r_calc);
+                    impact.xRel = get_rel_state(propSim, i, j, impact.t);
                     impact.flybyBodyIdx = i;
                     impact.centralBodyIdx = j;
-                    impact.get_ca_parameters(propSim, tImp);
+                    impact.get_ca_parameters(propSim, impact.t);
                     if (!propSim->parallelMode) impact.get_impact_parameters(propSim);
                     impact.impact = true;
                     propSim->impactParams.push_back(impact);
                     if (!propSim->parallelMode) {
-                        std::cout << "Impact detected at MJD " << tImp
+                        std::cout << "Impact detected at MJD " << impact.t
                                   << " TDB. " << impact.flybyBody
                                   << " collided with " << impact.centralBody
                                   << "!" << std::endl;
@@ -99,18 +93,12 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                 }
                 const bool relDistWithinTol = relDist <= caTol || relDistOld <= caTol;
                 if (relDistMinimum && relDistWithinTol) {
-                    real tCA;
-                    real xRel[6];
-                    get_ca_or_impact_time(propSim, i, j, tOld, t, tCA, ca_rdot_calc);
-                    get_rel_state(propSim, i, j, tCA, xRel);
                     CloseApproachParameters ca;
-                    ca.t = tCA;
-                    for (size_t k = 0; k < 6; k++) {
-                        ca.xRel[k] = xRel[k];
-                    }
+                    get_ca_or_impact_time(propSim, i, j, tOld, t, ca.t, ca_rdot_calc);
+                    ca.xRel = get_rel_state(propSim, i, j, ca.t);
                     ca.flybyBodyIdx = i;
                     ca.centralBodyIdx = j;
-                    ca.get_ca_parameters(propSim, tCA);
+                    ca.get_ca_parameters(propSim, ca.t);
                     propSim->caParams.push_back(ca);
                 }
             }
@@ -133,8 +121,7 @@ void ca_rdot_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &rDot) {
     // Calculate the radial velocity between two bodies at a given time
     // This is used in get_ca_or_impact_time to find the time of closest approach
-    real xRel[6];
-    get_rel_state(propSim, i, j, t, xRel);
+    std::vector<real> xRel = get_rel_state(propSim, i, j, t);
     real relDist =
         sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
     rDot =
@@ -152,8 +139,7 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
                   const real &t, real &r) {
     // Calculate the distance between two bodies at a given time, accounting for
     // the radius of the bodies
-    real xRel[6];
-    get_rel_state(propSim, i, j, t, xRel);
+    std::vector<real> xRel = get_rel_state(propSim, i, j, t);
     real relDist =
         sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
     real flybyBodyRadius, centralBodyRadius;
@@ -173,14 +159,18 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
  * @param[in] i Index of the first body.
  * @param[in] j Index of the second body.
  * @param[in] t Time to compute the relative state.
- * @param[out] xRel Relative state of the body.
+ * @return xRel Relative state of the body.
  */
-void get_rel_state(PropSimulation *propSim, const size_t &i, const size_t &j,
-                   const real &t, real xRel[6]) {
+static std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
+                                       const size_t &j, const real &t) {
     std::vector<real> xInterp = propSim->interpolate(t);
+    std::vector<real> xRel(2*propSim->integBodies[i].n2Derivs, std::numeric_limits<real>::quiet_NaN());
     size_t starti = 0;
     for (size_t k = 0; k < i; k++) {
         starti += 2*propSim->integBodies[k].n2Derivs;
+    }
+    for (size_t k = 0; k < 2*propSim->integBodies[i].n2Derivs; k++) {
+        xRel[k] = xInterp[starti + k];
     }
     if (j < propSim->integParams.nInteg) {
         size_t startj = 0;
@@ -188,7 +178,7 @@ void get_rel_state(PropSimulation *propSim, const size_t &i, const size_t &j,
             startj += 2*propSim->integBodies[k].n2Derivs;
         }
         for (size_t k = 0; k < 6; k++) {
-            xRel[k] = xInterp[starti + k] - xInterp[startj + k];
+            xRel[k] -= xInterp[startj + k];
         }
     } else {
         double xSpice[9];
@@ -196,9 +186,10 @@ void get_rel_state(PropSimulation *propSim, const size_t &i, const size_t &j,
             propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId, t,
             propSim->ephem, xSpice);
         for (size_t k = 0; k < 6; k++) {
-            xRel[k] = xInterp[starti + k] - xSpice[k];
+            xRel[k] -= xSpice[k];
         }
     }
+    return xRel;
 }
 
 /**
@@ -303,14 +294,10 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
  */
 void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const real &tMap) {
     // Calculate the parameters of a close approach
-    this->tMap = tMap;
-    real xRelMap[6];
     const size_t i = this->flybyBodyIdx;
     const size_t j = this->centralBodyIdx;
-    get_rel_state(propSim, i, j, tMap, xRelMap);
-    for (size_t k = 0; k < 6; k++) {
-        this->xRelMap[k] = xRelMap[k];
-    }
+    this->tMap = tMap;
+    this->xRelMap = get_rel_state(propSim, i, j, tMap);
     this->flybyBody = propSim->integBodies[i].name;
     real mu;
     real radius;
