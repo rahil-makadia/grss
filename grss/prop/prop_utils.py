@@ -251,7 +251,7 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     fig.autofmt_xdate()
     return fig, ax1, ax2
 
-def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
+def data_to_ellipse(x_data, y_data, n_std, bplane_type,
                     print_ellipse_params, units, sigma_points):
     """
     Convert two sets of points to an ellipse.
@@ -264,8 +264,6 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
         y-coordinates of the points
     n_std : float, optional
         Number of standard deviations to plot
-    plot_offset : bool, optional
-        True to plot the offset from the mean, False to plot the raw data
     bplane_type : str
         type of B-plane
     print_ellipse_params : bool, optional
@@ -277,6 +275,8 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
 
     Returns
     -------
+    mean : np.ndarray
+        mean of the data
     ellipse : np.ndarray
         ellipse points
     """
@@ -289,9 +289,6 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
         mean, cov = sigma_points.reconstruct(xy_data)
         x_mean = mean[0]
         y_mean = mean[1]
-    if plot_offset:
-        x_data -= x_mean
-        y_data -= y_mean
     eigvals, eigvecs = np.linalg.eig(cov)
     idx = eigvals.argsort()[::-1]
     eigvals = eigvals[idx]
@@ -317,10 +314,7 @@ def data_to_ellipse(x_data, y_data, n_std, plot_offset, bplane_type,
     ellipse = np.array([sma*np.cos(theta_arr), smi*np.sin(theta_arr)])
     rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     ellipse = rot_mat @ ellipse
-    if not plot_offset:
-        ellipse[0,:] += x_mean
-        ellipse[1,:] += y_mean
-    return ellipse
+    return np.array([x_mean, y_mean]), ellipse
 
 def days_to_dhms(days):
     """
@@ -419,44 +413,44 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     impact_any = np.any(impact_bool)
     if len(ca_list) >= 100 or sigma_points is not None:
         if not kizner_nan:
-            kizner_ellipse = data_to_ellipse(kizner_x, kizner_y, n_std, plot_offset,
-                                                'kizner', print_ellipse_params, units, sigma_points)
+            kizner_data = data_to_ellipse(kizner_x, kizner_y, n_std, 'kizner',
+                                            print_ellipse_params, units, sigma_points)
         else:
-            kizner_ellipse = None
+            kizner_data = None
         if not opik_nan:
-            opik_ellipse = data_to_ellipse(opik_x, opik_y, n_std, plot_offset,
-                                                'opik', print_ellipse_params, units, sigma_points)
+            opik_data = data_to_ellipse(opik_x, opik_y, n_std, 'opik',
+                                        print_ellipse_params, units, sigma_points)
         else:
-            opik_ellipse = None
+            opik_data = None
         if not scaled_nan:
-            scaled_ellipse = data_to_ellipse(scaled_x, scaled_y, n_std, plot_offset,
-                                                'scaled', print_ellipse_params, units, sigma_points)
+            scaled_data = data_to_ellipse(scaled_x, scaled_y, n_std, 'scaled',
+                                            print_ellipse_params, units, sigma_points)
         else:
-            scaled_ellipse = None
+            scaled_data = None
         if not mtp_nan:
-            mtp_ellipse = data_to_ellipse(mtp_x, mtp_y, n_std, plot_offset,
-                                            'mtp', print_ellipse_params, units, sigma_points)
+            mtp_data = data_to_ellipse(mtp_x, mtp_y, n_std, 'mtp',
+                                        print_ellipse_params, units, sigma_points)
         else:
-            mtp_ellipse = None
+            mtp_data = None
     else:
-        kizner_ellipse = None
-        opik_ellipse = None
-        scaled_ellipse = None
-        mtp_ellipse = None
+        kizner_data = None
+        opik_data = None
+        scaled_data = None
+        mtp_data = None
     if kizner_nan and opik_nan and scaled_nan and not mtp_nan:
         print("WARNING: Close approaches have no valid B-planes but do have MTP. "
                 "Object might be captured.")
     fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=250)
-    plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_ellipse, 'kizner',
+    plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_data, 'kizner',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
-    plot_single_bplane(axes[0,1], opik_x, opik_y, opik_ellipse, 'opik',
+    plot_single_bplane(axes[0,1], opik_x, opik_y, opik_data, 'opik',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
-    plot_single_bplane(axes[1,0], scaled_x, scaled_y, scaled_ellipse, 'scaled',
+    plot_single_bplane(axes[1,0], scaled_x, scaled_y, scaled_data, 'scaled',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
-    plot_single_bplane(axes[1,1], mtp_x, mtp_y, mtp_ellipse, 'mtp',
+    plot_single_bplane(axes[1,1], mtp_x, mtp_y, mtp_data, 'mtp',
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis)
     patches, labels = axes[1,1].get_legend_handles_labels()
@@ -543,7 +537,7 @@ def _get_bplane_labels(bplane_type, plot_offset, units):
         title = "Modified Target Plane"
     return x_label, y_label, title
 
-def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
+def plot_single_bplane(axis, x_coord, y_coord, ellipse_data, bplane_type,
                         focus_factor, show_central_body, plot_offset, scale_coords,
                         central_body_radius, units, equal_axis):
     """
@@ -557,8 +551,8 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
         x-coordinates of the points
     y_coord : np.ndarray
         y-coordinates of the points
-    ellipse : np.ndarray
-        ellipse points
+    ellipse_data : tuple of np.ndarray
+        ellipse mean and points
     bplane_type : str
         type of B-plane
     focus_factor : float
@@ -591,6 +585,22 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     if bplane_type in {'scaled', 'mtp'}:
         focus_factor = 1.0
     x_label, y_label, title = _get_bplane_labels(bplane_type, plot_offset, units)
+    circle_x = 0
+    circle_y = 0
+    if ellipse_data is not None:
+        x_mean = ellipse_data[0][0]
+        y_mean = ellipse_data[0][1]
+        ellipse = ellipse_data[1]
+        if plot_offset:
+            x_coord -= x_mean
+            y_coord -= y_mean
+            circle_x = -x_mean
+            circle_y = -y_mean
+        else:
+            ellipse[0,:] += x_mean
+            ellipse[1,:] += y_mean
+    else:
+        ellipse = None
     msize = 5
     malpha = 0.5
     mspec = 'b.'
@@ -612,15 +622,16 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse, bplane_type,
     calpha = 0.5
     clst = '-'
     if scale_coords:
-        circle = plt.Circle((0, 0), 1, label="Central Body Extent",
-                            color=cclr, fill=True, alpha=0.55*calpha, linestyle=clst)
-        circle2 = plt.Circle((0, 0), focus_factor, label="Impact Cross Section",
-                            color=cclr, fill=True, alpha=0.4*calpha, linestyle=clst)
+        circle = plt.Circle((circle_x, circle_y), 1, label="Central Body Extent",
+                                color=cclr, fill=True, alpha=0.55*calpha, linestyle=clst)
+        circle2 = plt.Circle((circle_x, circle_y), focus_factor, label="Impact Cross Section",
+                                color=cclr, fill=True, alpha=0.4*calpha, linestyle=clst)
     else:
-        circle = plt.Circle((0, 0), central_body_radius, label="Central Body Extent",
-                            color=cclr, fill=True, alpha=0.55*calpha, linestyle=clst)
-        circle2 = plt.Circle((0, 0), focus_factor*central_body_radius, label="Impact Cross Section",
-                            color=cclr, fill=True, alpha=0.4*calpha, linestyle=clst)
+        circle = plt.Circle((circle_x, circle_y), central_body_radius, label="Central Body Extent",
+                                color=cclr, fill=True, alpha=0.55*calpha, linestyle=clst)
+        circle2 = plt.Circle((circle_x, circle_y), focus_factor*central_body_radius,
+                                label="Impact Cross Section", color=cclr, fill=True,
+                                alpha=0.4*calpha, linestyle=clst)
     if show_central_body:
         axis.add_patch(circle)
         axis.add_patch(circle2)
@@ -663,18 +674,14 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     if np.any(lon > 180):
         lon[lon > 180] -= 360
     lat = np.array([impact.lat for impact in impact_list])*180.0/np.pi
-    if sigma_points is None:
-        mean_lon = np.mean(lon)
-        mean_lat = np.mean(lat)
-    else:
-        lon_lat = np.vstack((lon, lat)).T
-        mean, _ = sigma_points.reconstruct(lon_lat)
-        mean_lon = mean[0]
-        mean_lat = mean[1]
 
-    impact_ell = data_to_ellipse(lon, lat, n_std=3.0, plot_offset=False, bplane_type='Impact',
+    impact_mean, impact_ell = data_to_ellipse(lon, lat, n_std=3.0, bplane_type='Impact',
                                     print_ellipse_params=print_ellipse_params,
                                     units='deg', sigma_points=sigma_points)
+    mean_lon = impact_mean[0]
+    mean_lat = impact_mean[1]
+    impact_ell[0,:] += mean_lon
+    impact_ell[1,:] += mean_lat
 
     plt.figure(figsize=(12, 6), dpi=150)
     plt.subplot(1, 2, 1)

@@ -1,6 +1,6 @@
 """Radar observation handling for the GRSS orbit determination code"""
 from json import loads
-from requests import request
+import requests
 from astropy.time import Time
 import numpy as np
 
@@ -22,7 +22,7 @@ def get_radar_raw_data(tdes):
         JSON output of small body information query from JPL small-body radar API
     """
     url = f"https://ssd-api.jpl.nasa.gov/sb_radar.api?des={tdes}"
-    req = request("GET", url, timeout=30)
+    req = requests.request("GET", url, timeout=30)
     return loads(req.text)
 
 def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
@@ -54,6 +54,13 @@ def get_radar_obs_array(tdes, t_min_tdb=None, t_max_tdb=None, verbose=False):
     ValueError
         If the observation type is not recognized
     """
+    response = requests.get("https://data.minorplanetcenter.net/api/query-identifier",
+                            data=tdes, timeout=60)
+    if response.ok:
+        tdes = response.json()['unpacked_primary_provisional_designation']
+    else:
+        print("get_radar_obs_array: ERROR. ", response.status_code, response.content)
+        raise ValueError("Failed to get JPL radar data")
     if t_min_tdb is None:
         t_min_utc = -np.inf
     else:
