@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_utils" href="grss.prop.prop_utils.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Mar 31, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 01, 2024"/>
   </head>
   
   
@@ -502,7 +502,7 @@ document.write(`
 <h1>grss.prop.prop_utils.data_to_ellipse<a class="headerlink" href="#grss-prop-prop-utils-data-to-ellipse" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.prop.prop_utils.data_to_ellipse">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">data_to_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bplane_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.data_to_ellipse" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">data_to_ellipse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bplane_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.data_to_ellipse" title="Permalink to this definition">#</a></dt>
 <dd><p>Convert two sets of points to an ellipse.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -510,7 +510,6 @@ document.write(`
 <li><p><strong>x_data</strong> (<em>np.ndarray</em>) – x-coordinates of the points</p></li>
 <li><p><strong>y_data</strong> (<em>np.ndarray</em>) – y-coordinates of the points</p></li>
 <li><p><strong>n_std</strong> (<em>float</em><em>, </em><em>optional</em>) – Number of standard deviations to plot</p></li>
-<li><p><strong>plot_offset</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to plot the offset from the mean, False to plot the raw data</p></li>
 <li><p><strong>bplane_type</strong> (<em>str</em>) – type of B-plane</p></li>
 <li><p><strong>print_ellipse_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to print the ellipse parameters, False to not print</p></li>
 <li><p><strong>units</strong> (<em>str</em>) – units of the plot</p></li>
@@ -518,10 +517,11 @@ document.write(`
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ellipse</strong> – ellipse points</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>np.ndarray</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>mean</strong> (<em>np.ndarray</em>) – mean of the data</p></li>
+<li><p><strong>ellipse</strong> (<em>np.ndarray</em>) – ellipse points</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -607,7 +607,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Mar 31, 2024.
+  Last updated on Apr 01, 2024.
   <br/>
 </p>
   </div>
