@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>approach.h &#8212; GRSS 3.8.6 documentation</title>
+    <title>approach.h &#8212; GRSS 3.8.7 documentation</title>
   
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.6 documentation</p>
+    <p class="title logo__title">GRSS v3.8.7 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -544,20 +544,9 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4realAL6E_4real">
-<span class="target" id="approach_8h_1a6c6ab3604b46d951a59d61e633dc9336"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_rel_state</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">i</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">j</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xRel</span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">6</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4realAL6E_4real" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4real">
+<span class="target" id="approach_8h_1acad8040916b1714f913f282ee8cb1c70"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_rel_state</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">i</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">j</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4real" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute relative state of a body at a given time. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
-<li><p><strong>i</strong> – <strong>[in]</strong> Index of the first body. </p></li>
-<li><p><strong>j</strong> – <strong>[in]</strong> Index of the second body. </p></li>
-<li><p><strong>t</strong> – <strong>[in]</strong> Time to compute the relative state. </p></li>
-<li><p><strong>xRel</strong> – <strong>[out]</strong> Relative state of the body. </p></li>
-</ul>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="cpp function">

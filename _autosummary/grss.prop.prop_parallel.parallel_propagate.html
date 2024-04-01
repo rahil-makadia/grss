@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_parallel.parallel_propagate &#8212; GRSS 3.8.6 documentation</title>
+    <title>grss.prop.prop_parallel.parallel_propagate &#8212; GRSS 3.8.7 documentation</title>
   
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.6 documentation</p>
+    <p class="title logo__title">GRSS v3.8.7 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -502,12 +502,13 @@ document.write(`
 <h1>grss.prop.prop_parallel.parallel_propagate<a class="headerlink" href="#grss-prop-prop-parallel-parallel-propagate" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.prop.prop_parallel.parallel_propagate">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_parallel.</span></span><span class="sig-name descname"><span class="pre">parallel_propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_parallel.parallel_propagate" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_parallel.</span></span><span class="sig-name descname"><span class="pre">parallel_propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_nongrav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_parallel.parallel_propagate" title="Permalink to this definition">#</a></dt>
 <dd><p>Propagate multiple simulations in parallel using a reference simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ref_sol</strong> (<em>dict</em>) – Reference solution to use for propagating the reference simulation.</p></li>
+<li><p><strong>ref_nongrav</strong> (<a class="reference internal" href="grss.libgrss.NongravParameters.html#grss.libgrss.NongravParameters" title="grss.libgrss.NongravParameters"><em>libgrss.NongravParameters</em></a>) – Reference nongravitational parameters to use for propagating the orbits.</p></li>
 <li><p><strong>ref_sim</strong> (<a class="reference internal" href="grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><em>libgrss.PropSimulation</em></a>) – Reference simulation to use for propagating the orbits.</p></li>
 <li><p><strong>clones</strong> (<em>dict</em>) – Dictionary of orbit solutions to propagate in parallel.</p></li>
 </ul>

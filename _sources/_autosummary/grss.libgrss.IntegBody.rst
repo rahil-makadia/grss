@@ -31,6 +31,7 @@ grss.libgrss.IntegBody
         ~IntegBody.J2
         ~IntegBody.caTol
         ~IntegBody.dCartdState
+        ~IntegBody.initCart
         ~IntegBody.initState
         ~IntegBody.isCometary
         ~IntegBody.isInteg

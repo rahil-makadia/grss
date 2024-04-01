@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.IntegBody &#8212; GRSS 3.8.6 documentation</title>
+    <title>grss.libgrss.IntegBody &#8212; GRSS 3.8.7 documentation</title>
   
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.6 documentation</p>
+    <p class="title logo__title">GRSS v3.8.7 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -491,6 +491,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.J2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.caTol"><code class="docutils literal notranslate"><span class="pre">IntegBody.caTol</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.dCartdState"><code class="docutils literal notranslate"><span class="pre">IntegBody.dCartdState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.initCart"><code class="docutils literal notranslate"><span class="pre">IntegBody.initCart</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.initState"><code class="docutils literal notranslate"><span class="pre">IntegBody.initState</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isCometary"><code class="docutils literal notranslate"><span class="pre">IntegBody.isCometary</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isInteg"><code class="docutils literal notranslate"><span class="pre">IntegBody.isInteg</span></code></a></li>
@@ -606,61 +607,64 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.dCartdState" title="grss.libgrss.IntegBody.dCartdState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dCartdState</span></code></a></p></td>
 <td><p>Partials of initial cartesian state with repect to initial input state of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.initState" title="grss.libgrss.IntegBody.initState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initState</span></code></a></p></td>
-<td><p>Initial state of the body.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.initCart" title="grss.libgrss.IntegBody.initCart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initCart</span></code></a></p></td>
+<td><p>Initial barycentric Cartesian state of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isCometary" title="grss.libgrss.IntegBody.isCometary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isCometary</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.initState" title="grss.libgrss.IntegBody.initState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initState</span></code></a></p></td>
+<td><p>Initial input state of the body (Cometary heliocentric/Cartesian barycentric).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isCometary" title="grss.libgrss.IntegBody.isCometary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isCometary</span></code></a></p></td>
 <td><p>Whether the body is a cometary body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isInteg" title="grss.libgrss.IntegBody.isInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isInteg</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isInteg" title="grss.libgrss.IntegBody.isInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isInteg</span></code></a></p></td>
 <td><p>Whether the body is an integrated body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isJ2" title="grss.libgrss.IntegBody.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isJ2" title="grss.libgrss.IntegBody.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
 <td><p>Whether the body is a J2 body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isMajor" title="grss.libgrss.IntegBody.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isMajor" title="grss.libgrss.IntegBody.isMajor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isMajor</span></code></a></p></td>
 <td><p>Whether the body is a major body (used for EIH PPN).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isNongrav" title="grss.libgrss.IntegBody.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isNongrav" title="grss.libgrss.IntegBody.isNongrav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isNongrav</span></code></a></p></td>
 <td><p>Whether the body has non-gravitational accelerations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isPPN" title="grss.libgrss.IntegBody.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isPPN" title="grss.libgrss.IntegBody.isPPN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isPPN</span></code></a></p></td>
 <td><p>Whether the body is a PPN body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isThrusting" title="grss.libgrss.IntegBody.isThrusting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isThrusting</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isThrusting" title="grss.libgrss.IntegBody.isThrusting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isThrusting</span></code></a></p></td>
 <td><p>Whether the body is thrusting.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.mass" title="grss.libgrss.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.mass" title="grss.libgrss.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
 <td><p>Mass of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.n2Derivs" title="grss.libgrss.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.n2Derivs" title="grss.libgrss.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
 <td><p>Number of second derivatives of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.name" title="grss.libgrss.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.name" title="grss.libgrss.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.ngParams" title="grss.libgrss.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.ngParams" title="grss.libgrss.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
 <td><p>Non-gravitational parameters of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleDec" title="grss.libgrss.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleDec" title="grss.libgrss.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
 <td><p>Declination of the pole of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleRA" title="grss.libgrss.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleRA" title="grss.libgrss.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
 <td><p>Right ascension of the pole of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.propStm" title="grss.libgrss.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.propStm" title="grss.libgrss.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
 <td><p>Boolean for whether to propagate the state transition matrix of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.radius" title="grss.libgrss.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.radius" title="grss.libgrss.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
 <td><p>Radius of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.spiceId" title="grss.libgrss.IntegBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.spiceId" title="grss.libgrss.IntegBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
 <td><p>SPICE ID of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.stm" title="grss.libgrss.IntegBody.stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stm</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.stm" title="grss.libgrss.IntegBody.stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stm</span></code></a></p></td>
 <td><p>State transition matrix of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.t0" title="grss.libgrss.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.t0" title="grss.libgrss.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
 <td><p>Initial MJD TDB time of the body.</p></td>
 </tr>
 </tbody>
@@ -684,9 +688,15 @@ document.write(`
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.IntegBody.initCart">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initCart</span></span><a class="headerlink" href="#grss.libgrss.IntegBody.initCart" title="Permalink to this definition">#</a></dt>
+<dd><p>Initial barycentric Cartesian state of the body.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.IntegBody.initState">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initState</span></span><a class="headerlink" href="#grss.libgrss.IntegBody.initState" title="Permalink to this definition">#</a></dt>
-<dd><p>Initial state of the body.</p>
+<dd><p>Initial input state of the body (Cometary heliocentric/Cartesian barycentric).</p>
 </dd></dl>
 
 <dl class="py property">
@@ -886,6 +896,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.J2"><code class="docutils literal notranslate"><span class="pre">IntegBody.J2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.caTol"><code class="docutils literal notranslate"><span class="pre">IntegBody.caTol</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.dCartdState"><code class="docutils literal notranslate"><span class="pre">IntegBody.dCartdState</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.initCart"><code class="docutils literal notranslate"><span class="pre">IntegBody.initCart</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.initState"><code class="docutils literal notranslate"><span class="pre">IntegBody.initState</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isCometary"><code class="docutils literal notranslate"><span class="pre">IntegBody.isCometary</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isInteg"><code class="docutils literal notranslate"><span class="pre">IntegBody.isInteg</span></code></a></li>
