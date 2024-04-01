@@ -1333,14 +1333,208 @@ void PropSimulation::save(std::string filename) {
         }
     }
 
-    // // insert machine readable data for close approach and impact parameters
-    // file << subsectionFull << std::endl;
-    // file << "$$START_CA" << std::endl;
-    // file << "$$END_CA" << std::endl;
-    // file << subsectionFull << std::endl;
-    // file << "$$START_IMPACT" << std::endl;
-    // file << "$$END_IMPACT" << std::endl;
+    // insert machine readable data for close approach and impact parameters
+    file.precision(18);
+    if (this->impactParams.size() > 0) {
+        file << std::endl;
+        nextSubsection = "Impact data";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        file << "$$IMPACT_START" << std::endl;
+        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | kizner_dx | kizner_dy | opik_x | opik_y | opik_z | opik_dx | opik_dy | scaled_x | scaled_y | scaled_z | scaled_dx | scaled_dy | mtp_x | mtp_y | mtp_z | mtp_dx | mtp_dy | xRelBodyFixed | lon | lat | alt" << std::endl;
+        for (size_t i = 0; i < this->impactParams.size(); i++) {
+            ImpactParameters imp = this->impactParams[i];
+            file << imp.t << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.xRel.size(); j++) {
+                file << imp.xRel[j] << ",";
+            }
+            file << "] | ";
+            file << imp.tMap << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.xRelMap.size(); j++) {
+                file << imp.xRelMap[j] << ",";
+            }
+            file << "] | ";
+            file << imp.dist << " | ";
+            file << imp.vel << " | ";
+            file << imp.vInf << " | ";
+            file << imp.flybyBody << " | ";
+            file << imp.flybyBodyIdx << " | ";
+            file << imp.centralBody << " | ";
+            file << imp.centralBodyIdx << " | ";
+            file << imp.centralBodySpiceId << " | ";
+            file << imp.impact << " | ";
+            file << imp.tPeri << " | ";
+            file << imp.tLin << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.bVec.size(); j++) {
+                file << imp.bVec[j] << ",";
+            }
+            file << "] | ";
+            file << imp.bMag << " | ";
+            file << imp.gravFocusFactor << " | ";
+            file << imp.kizner.x << " | ";
+            file << imp.kizner.y << " | ";
+            file << imp.kizner.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.kizner.dx.size(); j++) {
+                file << imp.kizner.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.kizner.dy.size(); j++) {
+                file << imp.kizner.dy[j] << ",";
+            }
+            file << "] | ";
+            file << imp.opik.x << " | ";
+            file << imp.opik.y << " | ";
+            file << imp.opik.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.opik.dx.size(); j++) {
+                file << imp.opik.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.opik.dy.size(); j++) {
+                file << imp.opik.dy[j] << ",";
+            }
+            file << "] | ";
+            file << imp.scaled.x << " | ";
+            file << imp.scaled.y << " | ";
+            file << imp.scaled.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.scaled.dx.size(); j++) {
+                file << imp.scaled.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.scaled.dy.size(); j++) {
+                file << imp.scaled.dy[j] << ",";
+            }
+            file << "] | ";
+            file << imp.mtp.x << " | ";
+            file << imp.mtp.y << " | ";
+            file << imp.mtp.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.mtp.dx.size(); j++) {
+                file << imp.mtp.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.mtp.dy.size(); j++) {
+                file << imp.mtp.dy[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.xRelBodyFixed.size(); j++) {
+                file << imp.xRelBodyFixed[j] << ",";
+            }
+            file << "] | ";
+            file << imp.lon << " | ";
+            file << imp.lat << " | ";
+            file << imp.alt;
+            file << std::endl;
+        }
+        file << "$$IMPACT_END" << std::endl;
+    }
+    if (this->caParams.size() > 0) {
+        file << std::endl;
+        nextSubsection = "Close approach data";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        file << "$$CA_START" << std::endl;
+        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | kizner_dx | kizner_dy | opik_x | opik_y | opik_z | opik_dx | opik_dy | scaled_x | scaled_y | scaled_z | scaled_dx | scaled_dy | mtp_x | mtp_y | mtp_z | mtp_dx | mtp_dy" << std::endl;
+        for (size_t i = 0; i < this->caParams.size(); i++) {
+            CloseApproachParameters ca = this->caParams[i];
+            file << ca.t << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.xRel.size(); j++) {
+                file << ca.xRel[j] << ",";
+            }
+            file << "] | ";
+            file << ca.tMap << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.xRelMap.size(); j++) {
+                file << ca.xRelMap[j] << ",";
+            }
+            file << "] | ";
+            file << ca.dist << " | ";
+            file << ca.vel << " | ";
+            file << ca.vInf << " | ";
+            file << ca.flybyBody << " | ";
+            file << ca.flybyBodyIdx << " | ";
+            file << ca.centralBody << " | ";
+            file << ca.centralBodyIdx << " | ";
+            file << ca.centralBodySpiceId << " | ";
+            file << ca.impact << " | ";
+            file << ca.tPeri << " | ";
+            file << ca.tLin << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.bVec.size(); j++) {
+                file << ca.bVec[j] << ",";
+            }
+            file << "] | ";
+            file << ca.bMag << " | ";
+            file << ca.gravFocusFactor << " | ";
+            file << ca.kizner.x << " | ";
+            file << ca.kizner.y << " | ";
+            file << ca.kizner.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.kizner.dx.size(); j++) {
+                file << ca.kizner.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.kizner.dy.size(); j++) {
+                file << ca.kizner.dy[j] << ",";
+            }
+            file << "] | ";
+            file << ca.opik.x << " | ";
+            file << ca.opik.y << " | ";
+            file << ca.opik.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.opik.dx.size(); j++) {
+                file << ca.opik.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.opik.dy.size(); j++) {
+                file << ca.opik.dy[j] << ",";
+            }
+            file << "] | ";
+            file << ca.scaled.x << " | ";
+            file << ca.scaled.y << " | ";
+            file << ca.scaled.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.scaled.dx.size(); j++) {
+                file << ca.scaled.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.scaled.dy.size(); j++) {
+                file << ca.scaled.dy[j] << ",";
+            }
+            file << "] | ";
+            file << ca.mtp.x << " | ";
+            file << ca.mtp.y << " | ";
+            file << ca.mtp.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.mtp.dx.size(); j++) {
+                file << ca.mtp.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.mtp.dy.size(); j++) {
+                file << ca.mtp.dy[j] << ",";
+            }
+            file << "]";
+            file << std::endl;
+        }
+        file << "$$CA_END" << std::endl;
+    }
 
+    file << std::endl;
     file << std::string(maxChars, '=') << std::endl;
     file << headerSectionHalf << " END OF FILE " << headerSectionHalf << std::endl;
     file << std::string(maxChars, '=') << std::endl;
