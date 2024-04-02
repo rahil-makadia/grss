@@ -65,6 +65,39 @@ void bcd_and_dot(const std::vector<real> &stm, real *B, real *Bdot, real *C,
 }
 
 /**
+ * @param[in] stm The flattened STM vector.
+ * @return The reconstructed STM matrix.
+ */
+std::vector<std::vector<real>> reconstruct_stm(const std::vector<real> &stm) {
+    const size_t numParams = (stm.size() - 36) / 6;
+    std::vector<std::vector<real>> stmMatrix = std::vector<std::vector<real>>(
+        6 + numParams, std::vector<real>(6 + numParams, 0.0));
+    real *B = new real[9];
+    real *Bdot = new real[9];
+    real *C = new real[9];
+    real *Cdot = new real[9];
+    real *D = new real[3 * numParams];
+    real *Ddot = new real[3 * numParams];
+    bcd_and_dot(stm, B, Bdot, C, Cdot, D, Ddot);
+    for (size_t i = 0; i < 3; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            stmMatrix[i][j] = B[3 * i + j];
+            stmMatrix[i][j + 3] = C[3 * i + j];
+            stmMatrix[i + 3][j] = Bdot[3 * i + j];
+            stmMatrix[i + 3][j + 3] = Cdot[3 * i + j];
+        }
+    }
+    for (size_t j = 6; j < 6 + numParams; j++) {
+        for (size_t i = 0; i < 3; i++) {
+            stmMatrix[i][j] = D[3 * (j - 6) + i];
+            stmMatrix[i + 3][j] = Ddot[3 * (j - 6) + i];
+        }
+        stmMatrix[j][j] = 1.0;
+    }
+    return stmMatrix;
+}
+
+/**
  * @param[in] stmParams Structure containing the STM submatrices and their derivatives.
  * @param[in] numParams Number of parameters.
  * @param[in] stmStarti Index of the first element of the STM in the second derivative vector.

@@ -45,9 +45,9 @@ def _handle_one_cloned_sim(sol, ref_nongrav):
         e = sol['e']
         q = sol['q']
         tp = sol['tp']
-        om = sol['om']*np.pi/180.0
-        w = sol['w']*np.pi/180.0
-        i = sol['i']*np.pi/180.0
+        om = sol['om']
+        w = sol['w']
+        i = sol['i']
         com = [e, q, tp, om, w, i]
         cometary = True
     elif all(key in sol for key in ['x', 'y', 'z', 'vx', 'vy', 'vz']):
@@ -132,7 +132,9 @@ def reconstruct_all_log_files(log_dir):
     start_time = time.time()
     ca_list = []
     impact_list = []
-    for file in sorted(os.listdir(log_dir)):
+    files = os.listdir(log_dir)
+    files.sort()
+    for file in files:
         if file.endswith('.log'):
             log_file = os.path.join(log_dir, file)
             ca_list_, impact_list_ = _reconstruct_one_log_file(log_file)

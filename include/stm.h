@@ -35,6 +35,11 @@ void bcd_and_dot(const std::vector<real> &stm, real *B, real *Bdot, real *C,
                  real *Cdot, real *D, real *Ddot);
 
 /**
+ * @brief Reconstruct the STM matrix from the flattened STM vector.
+ */
+std::vector<std::vector<real>> reconstruct_stm(const std::vector<real> &stm);
+
+/**
  * @brief Compute the derivatives of the STM submatrices.
  */
 void bcd_2dot(STMParameters &stmParams, size_t numParams,
