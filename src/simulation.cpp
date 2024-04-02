@@ -22,8 +22,8 @@ void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
         case 399:
             baseBodyFrame = "ITRF93";
             // High precision frame is not defined before 1972 JAN 01
-            // 00:00:42.183 TDB
-            if (tMjdTDB < 41317.000488239L) {
+            // 00:00:42.183 TDB or after 2099 AUG 25 00:01:09.182 TDB
+            if (tMjdTDB < 41317.000488239L || tMjdTDB > 87940.000800717L) {
                 baseBodyFrame = "IAU_EARTH";
             }
             break;
