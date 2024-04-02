@@ -104,17 +104,13 @@ def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False)
     ss = duration % 60
     print(f'Parallel propagation took {mm:02d} minute(s) and {ss:.6f} seconds')
 
+    ca_list, impact_list = None, None
     if reconstruct:
-        start_time = time.time()
-        # reconstruct all log files
         ca_list, impact_list = reconstruct_all_log_files(save_dir)
-        end_time = time.time()
-        duration = end_time - start_time
-        mm = int(duration / 60)
-        ss = duration % 60
-        print(f'Reconstruction took {mm:02d} minute(s) and {ss:.6f} seconds')
-        return ca_list, impact_list
-    return None, None
+    else:
+        print(('No reconstruction requested. '
+                f'Log files can be reconstructed later from the "{save_dir}" directory'))
+    return ca_list, impact_list
 
 def reconstruct_all_log_files(log_dir):
     """
@@ -133,6 +129,7 @@ def reconstruct_all_log_files(log_dir):
     impact_list : list of libgrss.ImpactParameters
         List of impacts in all log files.
     """
+    start_time = time.time()
     ca_list = []
     impact_list = []
     for file in os.listdir(log_dir):
@@ -141,6 +138,11 @@ def reconstruct_all_log_files(log_dir):
             ca_list_, impact_list_ = _reconstruct_one_log_file(log_file)
             ca_list.append(ca_list_)
             impact_list.append(impact_list_)
+    end_time = time.time()
+    duration = end_time - start_time
+    mm = int(duration / 60)
+    ss = duration % 60
+    print(f'Reconstruction took {mm:02d} minute(s) and {ss:.6f} seconds')
     return ca_list, impact_list
 
 def _reconstruct_one_dataframe(lines, typ):
