@@ -29,6 +29,7 @@ void daf_free(DafInfo* pl) {
 
 /**
  * @param[in] path Path to the DAF file.
+ * @param[in] type Type of the DAF file (SPK or PCK).
  * @return DafInfo* Pointer to the DafInfo structure.
  */
 DafInfo* daf_init(const std::string &path, const std::string &type) {

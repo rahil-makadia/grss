@@ -7,7 +7,7 @@
  */
 void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
                           const std::vector<std::vector<real> > &allBodies) {
-    size_t numBodies = allBodies.size();
+    const size_t numBodies = allBodies.size();
     // save directory is ref_sim.name with spaces replaced by underscores
     std::string saveDir = refSim.name;
     std::replace(saveDir.begin(), saveDir.end(), ' ', '_');
@@ -20,7 +20,7 @@ void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
     int numThreads = omp_get_max_threads();
     numThreads = numThreads > maxThreads ? maxThreads : numThreads;
     omp_set_num_threads(numThreads);
-    #pragma omp parallel shared(allBodies, refSim, isCometary, numBodies, saveDir)
+    #pragma omp parallel shared(allBodies, refSim, saveDir)
     {
         #pragma omp for schedule(static)
         for (size_t i = 0; i < numBodies; i++) {
