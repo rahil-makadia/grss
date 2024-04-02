@@ -4,14 +4,15 @@
  * @param[in] refSim Reference simulation to use as a template for the parallel propagation.
  * @param[in] isCometary Flag to indicate whether the bodies are cometary states or Cartesian states.
  * @param[in] allBodies Array of information for bodies to propagate in parallel.
- * @return std::vector<PropSimulation> Array of propagated simulations.
  */
-std::vector<PropSimulation> propSim_parallel_omp(
-    const PropSimulation refSim, const bool isCometary,
-    const std::vector<std::vector<real> > &allBodies) {
+void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
+                          const std::vector<std::vector<real> > &allBodies) {
     size_t numBodies = allBodies.size();
-    std::vector<PropSimulation> allSims(numBodies, refSim);
+    // save directory is ref_sim.name with spaces replaced by underscores
+    std::string saveDir = refSim.name;
+    std::replace(saveDir.begin(), saveDir.end(), ' ', '_');
 
+    furnsh_c(refSim.DEkernelPath.c_str());
     // parallel for loop to first create an integBody for each entry in the
     // allBodies vector, then integrate each integBody using the reference
     // simulation
@@ -19,7 +20,7 @@ std::vector<PropSimulation> propSim_parallel_omp(
     int numThreads = omp_get_max_threads();
     numThreads = numThreads > maxThreads ? maxThreads : numThreads;
     omp_set_num_threads(numThreads);
-    #pragma omp parallel shared(allBodies, refSim)
+    #pragma omp parallel shared(allBodies, refSim, isCometary, numBodies, saveDir)
     {
         #pragma omp for schedule(static)
         for (size_t i = 0; i < numBodies; i++) {
@@ -49,16 +50,19 @@ std::vector<PropSimulation> propSim_parallel_omp(
                 sim.add_integ_body(body);
             }
             sim.integrate();
-            allSims[i] = sim;
-        }
-    }
-    // in serial, compute the body-fixed impact coordinates (lat,lon,alt) for each instance
-    furnsh_c(refSim.DEkernelPath.c_str());
-    for (size_t i = 0; i < allSims.size(); i++) {
-        for (size_t j = 0; j < allSims[i].impactParams.size(); j++) {
-            allSims[i].impactParams[j].get_impact_parameters(&(allSims[i]));
+            // compute the body-fixed impact coordinates (lat,lon,alt) in a critical section
+            #pragma omp critical
+            {
+                for (size_t j = 0; j < sim.impactParams.size(); j++) {
+                    sim.impactParams[j].get_impact_parameters(&sim);
+                }
+                // save file name as refSim.name + "/" + i but i has leading zeros for the number of digits in numBodies
+                std::string num = std::to_string(i);
+                std::string zeros = std::string(std::to_string(numBodies-1).size()-num.size(), '0');
+                std::string filename = "./logdir_"+saveDir+"/"+zeros+num+".log";
+                sim.save(filename);
+            }
         }
     }
     unload_c(refSim.DEkernelPath.c_str());
-    return allSims;
 }

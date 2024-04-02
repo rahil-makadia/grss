@@ -1,10 +1,15 @@
 """Parallel computing utilities for the GRSS orbit propagation code"""
+import os
+import time
 import numpy as np
 import pandas as pd
 # pylint: disable=no-name-in-module
 from .. import libgrss
 
-__all__ = [ 'cluster_ca_or_impacts',
+__all__ = [
+    'parallel_propagate',
+    'cluster_ca_or_impacts',
+    'reconstruct_all_log_files',
 ]
 
 def _handle_one_cloned_sim(sol, ref_nongrav):
@@ -58,7 +63,7 @@ def _handle_one_cloned_sim(sol, ref_nongrav):
         full_list = [sol['t'], mass, radius] + pos + vel + ng_list
     return full_list
 
-def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones):
+def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False):
     """
     Propagate multiple simulations in parallel using a reference simulation.
 
@@ -83,7 +88,284 @@ def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones):
     # this does not need parallelism, only takes ~2.5s to do 1e6 clones!
     all_info = [_handle_one_cloned_sim(sol, ref_nongrav) for sol in clones]
 
-    return libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info)
+    # save directory is ref_sim.name with spaces replaced by underscores
+    save_dir = './logdir_'+ref_sim.name.replace(' ', '_')
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    else:
+        # clear the directory if it already exists
+        for file in os.listdir(save_dir):
+            os.remove(os.path.join(save_dir, file))
+    start_time = time.time()
+    libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info)
+    end_time = time.time()
+    duration = end_time - start_time
+    mm = int(duration / 60)
+    ss = duration % 60
+    print(f'Parallel propagation took {mm:02d} minute(s) and {ss:.6f} seconds')
+
+    if reconstruct:
+        start_time = time.time()
+        # reconstruct all log files
+        ca_list, impact_list = reconstruct_all_log_files(save_dir)
+        end_time = time.time()
+        duration = end_time - start_time
+        mm = int(duration / 60)
+        ss = duration % 60
+        print(f'Reconstruction took {mm:02d} minute(s) and {ss:.6f} seconds')
+        return ca_list, impact_list
+    return None, None
+
+def reconstruct_all_log_files(log_dir):
+    """
+    Reconstruct CloseApproachParameters and ImpactParameters objects
+    from all log files in a directory.
+
+    Parameters
+    ----------
+    log_dir : str
+        Path to the directory containing the log files.
+
+    Returns
+    -------
+    ca_list : list of libgrss.CloseApproachParameters
+        List of close approaches in all log files.
+    impact_list : list of libgrss.ImpactParameters
+        List of impacts in all log files.
+    """
+    ca_list = []
+    impact_list = []
+    for file in os.listdir(log_dir):
+        if file.endswith('.log'):
+            log_file = os.path.join(log_dir, file)
+            ca_list_, impact_list_ = _reconstruct_one_log_file(log_file)
+            ca_list.append(ca_list_)
+            impact_list.append(impact_list_)
+    return ca_list, impact_list
+
+def _reconstruct_one_dataframe(lines, typ):
+    """
+    Reconstruct a pandas dataframe from a log file for close approaches or impacts.
+
+    Parameters
+    ----------
+    lines : list of str
+        List of lines from the log file.
+    typ : str
+        Type of the log file. Must be either 'ca' or 'impact'.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        DataFrame of close approaches or impacts.
+
+    Raises
+    ------
+    ValueError
+        If typ is not 'ca' or 'impact'.
+    """
+    if typ not in ['ca', 'impact']:
+        raise ValueError('typ must be either "ca" or "impact"')
+    elif typ == 'ca':
+        start_key = '$$CA_START'
+        end_key = '$$CA_END'
+    elif typ == 'impact':
+        start_key = '$$IMPACT_START'
+        end_key = '$$IMPACT_END'
+    # find the index of the line that starts with "$$IMPACT_START" and "$$IMPACT_END"
+    start = [i for i, line in enumerate(lines) if line.startswith(start_key)]
+    end = [i for i, line in enumerate(lines) if line.startswith(end_key)]
+    # if start and end keys do not exist, return None
+    if not start or not end:
+        return None
+    start = start[0]
+    end = end[0]
+    # delimiter is "|"
+    delimiter = ' | '
+    # first line is the header
+    header = lines[start+1].strip().split(delimiter)
+    # create pandas dataframe
+    df = pd.DataFrame([line.strip().split(delimiter) for line in lines[start+2:end]],
+                        columns=header)
+    # convert the columns to numeric
+    str_cols = [
+        'flybyBody', 'centralBody',
+    ]
+    list_cols = [
+        'xRel', 'xRelMap', 'bVec',
+        'kizner_dx', 'kizner_dy',
+        'opik_dx', 'opik_dy',
+        'scaled_dx', 'scaled_dy',
+        'mtp_dx', 'mtp_dy',
+        'xRelBodyFixed',
+    ]
+    bool_cols = [
+        'impact',
+    ]
+    int_cols = [
+        'flybyBodyIdx',
+        'centralBodyIdx',
+        'centralBodySpiceId',
+    ]
+    for col in df.columns:
+        if col in str_cols:
+            df[col] = df[col].astype(str)
+        elif col in list_cols:
+            df[col] = df[col].apply(lambda x: [float(num) for num in
+                                                x.replace('[','').replace(']','').split(',')
+                                                if num])
+        elif col in bool_cols:
+            df[col] = df[col].apply(lambda x: x == 'true')
+        elif col in int_cols:
+            df[col] = df[col].astype(int)
+        else:
+            df[col] = df[col].astype(float)
+    return df
+
+def _reconstruct_ca_params(row):
+    """
+    Reconstruct a CloseApproachParameters object from a row in a dataframe.
+
+    Parameters
+    ----------
+    row : pandas.Series
+        Row in a dataframe.
+
+    Returns
+    -------
+    ca : libgrss.CloseApproachParameters
+        CloseApproachParameters object.
+    """
+    ca = libgrss.CloseApproachParameters()
+    ca.t = row['t']
+    ca.xRel = row['xRel']
+    ca.tMap = row['tMap']
+    ca.xRelMap = row['xRelMap']
+    ca.dist = row['dist']
+    ca.vel = row['vel']
+    ca.vInf = row['vInf']
+    ca.flybyBody = row['flybyBody']
+    ca.flybyBodyIdx = row['flybyBodyIdx']
+    ca.centralBody = row['centralBody']
+    ca.centralBodyIdx = row['centralBodyIdx']
+    ca.centralBodySpiceId = row['centralBodySpiceId']
+    ca.impact = row['impact']
+    ca.tPeri = row['tPeri']
+    ca.tLin = row['tLin']
+    ca.bVec = row['bVec']
+    ca.bMag = row['bMag']
+    ca.gravFocusFactor = row['gravFocusFactor']
+    ca.kizner.x = row['kizner_x']
+    ca.kizner.y = row['kizner_y']
+    ca.kizner.z = row['kizner_z']
+    ca.kizner.dx = row['kizner_dx']
+    ca.kizner.dy = row['kizner_dy']
+    ca.opik.x = row['opik_x']
+    ca.opik.y = row['opik_y']
+    ca.opik.z = row['opik_z']
+    ca.opik.dx = row['opik_dx']
+    ca.opik.dy = row['opik_dy']
+    ca.scaled.x = row['scaled_x']
+    ca.scaled.y = row['scaled_y']
+    ca.scaled.z = row['scaled_z']
+    ca.scaled.dx = row['scaled_dx']
+    ca.scaled.dy = row['scaled_dy']
+    ca.mtp.x = row['mtp_x']
+    ca.mtp.y = row['mtp_y']
+    ca.mtp.z = row['mtp_z']
+    ca.mtp.dx = row['mtp_dx']
+    ca.mtp.dy = row['mtp_dy']
+    return ca
+
+def _reconstruct_impact_params(row):
+    """
+    Reconstruct an ImpactParameters object from a row in a dataframe.
+
+    Parameters
+    ----------
+    row : pandas.Series
+        Row in a dataframe.
+
+    Returns
+    -------
+    impact : libgrss.ImpactParameters
+        ImpactParameters object.
+    """
+    impact = libgrss.ImpactParameters()
+    impact.t = row['t']
+    impact.xRel = row['xRel']
+    impact.dist = row['dist']
+    impact.vel = row['vel']
+    impact.vInf = row['vInf']
+    impact.flybyBody = row['flybyBody']
+    impact.flybyBodyIdx = row['flybyBodyIdx']
+    impact.centralBody = row['centralBody']
+    impact.centralBodyIdx = row['centralBodyIdx']
+    impact.centralBodySpiceId = row['centralBodySpiceId']
+    impact.impact = row['impact']
+    impact.tPeri = row['tPeri']
+    impact.tLin = row['tLin']
+    impact.bVec = row['bVec']
+    impact.bMag = row['bMag']
+    impact.gravFocusFactor = row['gravFocusFactor']
+    impact.kizner.x = row['kizner_x']
+    impact.kizner.y = row['kizner_y']
+    impact.kizner.z = row['kizner_z']
+    impact.kizner.dx = row['kizner_dx']
+    impact.kizner.dy = row['kizner_dy']
+    impact.opik.x = row['opik_x']
+    impact.opik.y = row['opik_y']
+    impact.opik.z = row['opik_z']
+    impact.opik.dx = row['opik_dx']
+    impact.opik.dy = row['opik_dy']
+    impact.scaled.x = row['scaled_x']
+    impact.scaled.y = row['scaled_y']
+    impact.scaled.z = row['scaled_z']
+    impact.scaled.dx = row['scaled_dx']
+    impact.scaled.dy = row['scaled_dy']
+    impact.mtp.x = row['mtp_x']
+    impact.mtp.y = row['mtp_y']
+    impact.mtp.z = row['mtp_z']
+    impact.mtp.dx = row['mtp_dx']
+    impact.mtp.dy = row['mtp_dy']
+    impact.xRelBodyFixed = row['xRelBodyFixed']
+    impact.lon = row['lon']
+    impact.lat = row['lat']
+    impact.alt = row['alt']
+    return impact
+
+def _reconstruct_one_log_file(log_file):
+    """
+    Reconstruct CloseApproachParameters and ImpactParameters objects from a log file.
+
+    Parameters
+    ----------
+    log_file : str
+        Path to the log file.
+
+    Returns
+    -------
+    ca_list : list of libgrss.CloseApproachParameters or None
+        List of close approaches in the log file.
+    impact_list : list of libgrss.ImpactParameters or None
+        List of impacts in the log file.
+    """
+    # first read the log file
+    with open(log_file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    ca_df = _reconstruct_one_dataframe(lines, 'ca')
+    impact_df = _reconstruct_one_dataframe(lines, 'impact')
+    ca_list = []
+    impact_list = []
+    if ca_df is not None:
+        for i in range(len(ca_df)):
+            ca = _reconstruct_ca_params(ca_df.iloc[i])
+            ca_list.append(ca)
+    if impact_df is not None:
+        for i in range(len(impact_df)):
+            impact = _reconstruct_impact_params(impact_df.iloc[i])
+            impact_list.append(impact)
+    return ca_list, impact_list
 
 def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
     """

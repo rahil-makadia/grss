@@ -205,9 +205,17 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Name of the flyby body.
             )mydelimiter")
+        .def_readwrite("flybyBodyIdx", &CloseApproachParameters::flybyBodyIdx,
+                       R"mydelimiter(
+            Index of the flyby body.
+            )mydelimiter")
         .def_readwrite("centralBody", &CloseApproachParameters::centralBody,
                        R"mydelimiter(
             Name of the central body.
+            )mydelimiter")
+        .def_readwrite("centralBodyIdx", &CloseApproachParameters::centralBodyIdx,
+                       R"mydelimiter(
+            Index of the central body.
             )mydelimiter")
         .def_readwrite("centralBodySpiceId",
                        &CloseApproachParameters::centralBodySpiceId,
