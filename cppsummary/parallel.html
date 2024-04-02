@@ -62,7 +62,7 @@
     <link rel="prev" title="interpolate.h" href="interpolate.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 01, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 02, 2024"/>
   </head>
   
   
@@ -249,6 +249,7 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="../_autosummary/grss.prop.prop_parallel.html">grss.prop.prop_parallel</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../_autosummary/grss.prop.prop_parallel.cluster_ca_or_impacts.html">grss.prop.prop_parallel.cluster_ca_or_impacts</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../_autosummary/grss.prop.prop_parallel.parallel_propagate.html">grss.prop.prop_parallel.parallel_propagate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../_autosummary/grss.prop.prop_parallel.reconstruct_all_log_files.html">grss.prop.prop_parallel.reconstruct_all_log_files</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../_autosummary/grss.prop.prop_unscented.html">grss.prop.prop_unscented</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-11"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -494,7 +495,7 @@ document.write(`
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv420propSim_parallel_ompK14PropSimulationKbRKNSt6vectorINSt6vectorI4realEEEE">
-<span class="target" id="parallel_8h_1a25703f9bfcd56c59a0d9fccd5db549b7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">propSim_parallel_omp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">refSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">isCometary</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">allBodies</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420propSim_parallel_ompK14PropSimulationKbRKNSt6vectorINSt6vectorI4realEEEE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="parallel_8h_1a31632ef22e1245399c6e82ddc7928035"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">propSim_parallel_omp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">refSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">isCometary</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">allBodies</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420propSim_parallel_ompK14PropSimulationKbRKNSt6vectorINSt6vectorI4realEEEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Propagate an array of bodies in parallel via OpenMP, using a reference simulation as a template. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -503,9 +504,6 @@ document.write(`
 <li><p><strong>isCometary</strong> – <strong>[in]</strong> Flag to indicate whether the bodies are cometary states or Cartesian states. </p></li>
 <li><p><strong>allBodies</strong> – <strong>[in]</strong> Array of information for bodies to propagate in parallel. </p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>std::vector&lt;PropSimulation&gt; Array of propagated simulations. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -579,7 +577,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 01, 2024.
+  Last updated on Apr 02, 2024.
   <br/>
 </p>
   </div>

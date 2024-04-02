@@ -31,11 +31,13 @@ grss.libgrss.CloseApproachParameters
         ~CloseApproachParameters.bMag
         ~CloseApproachParameters.bVec
         ~CloseApproachParameters.centralBody
+        ~CloseApproachParameters.centralBodyIdx
         ~CloseApproachParameters.centralBodySpiceId
         ~CloseApproachParameters.dTLinMinusT
         ~CloseApproachParameters.dist
         ~CloseApproachParameters.dt
         ~CloseApproachParameters.flybyBody
+        ~CloseApproachParameters.flybyBodyIdx
         ~CloseApproachParameters.gravFocusFactor
         ~CloseApproachParameters.impact
         ~CloseApproachParameters.kizner

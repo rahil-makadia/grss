@@ -32,11 +32,13 @@ grss.libgrss.ImpactParameters
         ~ImpactParameters.bMag
         ~ImpactParameters.bVec
         ~ImpactParameters.centralBody
+        ~ImpactParameters.centralBodyIdx
         ~ImpactParameters.centralBodySpiceId
         ~ImpactParameters.dTLinMinusT
         ~ImpactParameters.dist
         ~ImpactParameters.dt
         ~ImpactParameters.flybyBody
+        ~ImpactParameters.flybyBodyIdx
         ~ImpactParameters.gravFocusFactor
         ~ImpactParameters.impact
         ~ImpactParameters.kizner
