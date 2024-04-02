@@ -1,9 +1,5 @@
 #include "force.h"
 // #define PRINT_FORCES 1
-#ifdef PRINT_FORCES
-#include <iomanip>
-#include <fstream>
-#endif
 
 /**
  * @param[in] t Time [TDB MJD]
@@ -63,12 +59,12 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     }
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
-    forceFile.precision(8);
+    forceFile.precision(16);
     forceFile.setf(std::ios::scientific);
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
-    forceFile << "time (MJD): " << std::setw(16) << t << " state:";
-    forceFile.precision(16);
+    forceFile << std::setw(10) << "timeMJDTDB" << std::setw(25) << t << std::endl;
+    forceFile << std::setw(10) << "Cart_State";
     for (size_t i = 0; i < 6; i++) {
         forceFile << std::setw(25) << xInteg[i];
     }
@@ -78,12 +74,12 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     force_newton(propSim, accInteg, allSTMs);
     // force_ppn_simple(propSim, accInteg, allSTMs);
     force_ppn_eih(propSim, accInteg, allSTMs);
-    force_J2(t, propSim, accInteg, allSTMs);
+    force_J2(propSim, accInteg, allSTMs);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
     #ifdef PRINT_FORCES
     forceFile.open("cpp.11", std::ios::app);
-    forceFile << std::setw(10) << "total acc:" << std::setw(25) << accInteg[0]
+    forceFile << std::setw(10) << "total_acc" << std::setw(25) << accInteg[0]
               << std::setw(25) << accInteg[1] << std::setw(25) << accInteg[2]
               << std::endl;
     forceFile.close();
@@ -151,7 +147,7 @@ void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
                     stm_newton(allSTMs[i], G*massj, dx, dy, dz);
                 }
                 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
+                forceFile << std::setw(10) << "g_" + std::to_string(bodyj->spiceId) << std::setw(25)
                           << G * massj << std::setw(25) << dx << std::setw(25)
                           << dy << std::setw(25) << dz << std::setw(25)
                           << fac * dx << std::setw(25)
@@ -160,6 +156,10 @@ void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
                 #endif
             }
         }
+        #ifdef PRINT_FORCES
+        forceFile << std::setw(10) << "g_all" << std::setw(25) << accInteg[starti + 0]
+                  << std::setw(25) << accInteg[starti + 1] << std::setw(25) << accInteg[starti + 2] << std::endl;
+        #endif
         starti += propSim->integBodies[i].n2Derivs;
     }
     #ifdef PRINT_FORCES
@@ -228,8 +228,7 @@ void force_ppn_simple(const PropSimulation *propSim,
                                    dy, dz, dvx, dvy, dvz);
                 }
                 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
-                          << G * massj << std::setw(25)
+                forceFile << std::setw(10) << "PPN_" + std::to_string(bodyj->spiceId) << std::setw(25)
                           << fac1 * (fac2 * dx + fac3 * dvx) << std::setw(25)
                           << fac1 * (fac2 * dy + fac3 * dvy) << std::setw(25)
                           << fac1 * (fac2 * dz + fac3 * dvz) << std::endl;
@@ -386,7 +385,7 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
                                    dxij, dyij, dzij, dvxij, dvyij, dvzij);
                 }
                 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
+                forceFile << std::setw(10) << "EIH_" + std::to_string(bodyj->spiceId) << std::setw(25)
                           << term1X + term2X + term3X << std::setw(25)
                           << term1Y + term2Y + term3Y << std::setw(25)
                           << term1Z + term2Z + term3Z << std::endl;
@@ -394,7 +393,7 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
             }
         }
         #ifdef PRINT_FORCES
-        forceFile << std::setw(10) << "EIH" << std::setw(25) << axi
+        forceFile << std::setw(10) << "EIH_all" << std::setw(25) << axi
                   << std::setw(25) << ayi << std::setw(25) << azi << std::endl;
         #endif
         accInteg[starti + 0] += axi;
@@ -408,13 +407,12 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
 }
 
 /**
- * @param[in] t Time [TDB MJD]
  * @param[in] propSim PropSimulation object.
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_J2(const real &t, const PropSimulation *propSim,
-              std::vector<real> &accInteg, std::vector<STMParameters> &allSTMs) {
+void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
+              std::vector<STMParameters> &allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;
     forceFile.precision(16);
@@ -445,15 +443,8 @@ void force_J2(const real &t, const PropSimulation *propSim,
                 const real rRel2 = rRel * rRel;
                 const real rRel5 = rRel2 * rRel2 * rRel;
                 const real radius = bodyj->radius;
-                real poleRA, poleDec;
-                if (bodyj->spiceId == 399) {
-                    // IAU 2009 pole orientation for Earth
-                    poleRA = (0 - 0.641*(t-51544.5)/36525)*DEG2RAD;
-                    poleDec = (90 - 0.557*(t-51544.5)/36525)*DEG2RAD;
-                } else {
-                    poleRA = bodyj->poleRA;
-                    poleDec = bodyj->poleDec;
-                }
+                const real poleRA = bodyj->poleRA;
+                const real poleDec = bodyj->poleDec;
                 const real sinRA = sin(poleRA);
                 const real cosRA = cos(poleRA);
                 const real sinDec = sin(poleDec);
@@ -490,7 +481,7 @@ void force_J2(const real &t, const PropSimulation *propSim,
                            smoothing_threshold);
                 }
                 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
+                forceFile << std::setw(10) << "J2_" + std::to_string(bodyj->spiceId) << std::setw(25)
                           << -axBody * sinRA - ayBody * cosRA * sinDec +
                         azBody * cosRA * cosDec
                           << std::setw(25)
@@ -587,7 +578,7 @@ void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
                                 dvx, dvy, dvz, dpos, hRelVec);
                 }
                 #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << bodyj->spiceId << std::setw(25)
+                forceFile << std::setw(10) << "ng_" + std::to_string(bodyj->spiceId) << std::setw(25)
                           << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])
                           << std::setw(25)
                           << g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1])

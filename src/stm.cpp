@@ -355,6 +355,9 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
     const real a1 = ngParams.a1;
     const real a2 = ngParams.a2;
     const real a3 = ngParams.a3;
+    const bool a1Est = ngParams.a1Est;
+    const bool a2Est = ngParams.a2Est;
+    const bool a3Est = ngParams.a3Est;
     const real alpha = ngParams.alpha;
     const real k = ngParams.k;
     const real m = ngParams.m;
@@ -438,36 +441,36 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
     stmParams.dfdvel[7] += g*(a2*(-dz*dy/tNorm - tyt3*r2*tVec[2]) - a3*(nzn3*(r2*dvy - dy*rDotV) - dx/nNorm));
     stmParams.dfdvel[8] += g*(a2*((dx*dx + dy*dy)/tNorm - tzt3*r2*tVec[2]) - a3*(nzn3*(r2*dvz - dz*rDotV)));
 
-    // Case 1, only one of a1, a2, or a3 is non-zero
-    if (a1 != 0 && a2 == 0 && a3 == 0) {
+    // Case 1, only one of a1, a2, or a3 is estimated
+    if (a1Est && !a2Est && !a3Est) {
         stmParams.dfdpar[0] += g*rHat[0];
         stmParams.dfdpar[1] += g*rHat[1];
         stmParams.dfdpar[2] += g*rHat[2];
-    } else if (a1 == 0 && a2 != 0 && a3 == 0) {
+    } else if (!a1Est && a2Est && !a3Est) {
         stmParams.dfdpar[0] += g*tHat[0];
         stmParams.dfdpar[1] += g*tHat[1];
         stmParams.dfdpar[2] += g*tHat[2];
-    } else if (a1 == 0 && a2 == 0 && a3 != 0) {
+    } else if (!a1Est && !a2Est && a3Est) {
         stmParams.dfdpar[0] += g*nHat[0];
         stmParams.dfdpar[1] += g*nHat[1];
         stmParams.dfdpar[2] += g*nHat[2];
     }
-    // Case 2, two of a1, a2, or a3 are non-zero
-    if (a1 != 0 && a2 != 0 && a3 == 0) {
+    // Case 2, two of a1, a2, or a3 are estimated
+    if (a1Est && a2Est && !a3Est) {
         stmParams.dfdpar[0] += g*rHat[0];
         stmParams.dfdpar[1] += g*rHat[1];
         stmParams.dfdpar[2] += g*rHat[2];
         stmParams.dfdpar[3] += g*tHat[0];
         stmParams.dfdpar[4] += g*tHat[1];
         stmParams.dfdpar[5] += g*tHat[2];
-    } else if (a1 != 0 && a2 == 0 && a3 != 0) {
+    } else if (a1Est && !a2Est && a3Est) {
         stmParams.dfdpar[0] += g*rHat[0];
         stmParams.dfdpar[1] += g*rHat[1];
         stmParams.dfdpar[2] += g*rHat[2];
         stmParams.dfdpar[3] += g*nHat[0];
         stmParams.dfdpar[4] += g*nHat[1];
         stmParams.dfdpar[5] += g*nHat[2];
-    } else if (a1 == 0 && a2 != 0 && a3 != 0) {
+    } else if (!a1Est && a2Est && a3Est) {
         stmParams.dfdpar[0] += g*tHat[0];
         stmParams.dfdpar[1] += g*tHat[1];
         stmParams.dfdpar[2] += g*tHat[2];
@@ -475,8 +478,8 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
         stmParams.dfdpar[4] += g*nHat[1];
         stmParams.dfdpar[5] += g*nHat[2];
     }
-    // Case 3, all of a1, a2, and a3 are non-zero
-    if (a1 != 0 && a2 != 0 && a3 != 0) {
+    // Case 3, all of a1, a2, and a3 are estimated
+    if (a1Est && a2Est && a3Est) {
         stmParams.dfdpar[0] += g*rHat[0];
         stmParams.dfdpar[1] += g*rHat[1];
         stmParams.dfdpar[2] += g*rHat[2];

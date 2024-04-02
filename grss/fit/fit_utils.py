@@ -1,7 +1,7 @@
 """Utilities for the GRSS orbit determination code"""
 import os
 from json import loads
-from requests import request
+import requests
 import numpy as np
 from numba import jit
 import spiceypy as spice
@@ -357,7 +357,7 @@ def get_sbdb_raw_data(tdes):
         JSON output of small body information query from SBDB
     """
     url = f"https://ssd-api.jpl.nasa.gov/sbdb.api?sstr={tdes}&cov=mat&phys-par=true&full-prec=true"
-    req = request("GET", url, timeout=30)
+    req = requests.request("GET", url, timeout=30)
     return loads(req.text)
 
 def get_sbdb_elems(tdes, cov_elems=True):
@@ -378,6 +378,13 @@ def get_sbdb_elems(tdes, cov_elems=True):
     elements : dict
         Dictionary containing desired cometary elements for the small body
     """
+    response = requests.get("https://data.minorplanetcenter.net/api/query-identifier",
+                            data=tdes, timeout=60)
+    if response.ok:
+        tdes = response.json()['unpacked_primary_provisional_designation']
+    else:
+        print("get_radar_obs_array: ERROR. ", response.status_code, response.content)
+        raise ValueError("Failed to get JPL orbit data")
     raw_data = get_sbdb_raw_data(tdes)
     if cov_elems:
         # epoch of orbital elements at reference time [JD -> MJD]

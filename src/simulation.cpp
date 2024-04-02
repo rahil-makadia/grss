@@ -193,6 +193,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     std::vector<real> cartesianVel(3);
     this->isCometary = true;
     this->initState = cometaryState;
+    this->initCart = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
 
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
@@ -216,10 +217,14 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
     this->isNongrav = false;
-    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
+    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L ||
+            ngParams.a1Est || ngParams.a2Est || ngParams.a3Est) {
         this->ngParams.a1 = ngParams.a1;
         this->ngParams.a2 = ngParams.a2;
         this->ngParams.a3 = ngParams.a3;
+        this->ngParams.a1Est = ngParams.a1Est;
+        this->ngParams.a2Est = ngParams.a2Est;
+        this->ngParams.a3Est = ngParams.a3Est;
         this->ngParams.alpha = ngParams.alpha;
         this->ngParams.k = ngParams.k;
         this->ngParams.m = ngParams.m;
@@ -250,6 +255,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->caTol = 0.0;
     this->isCometary = false;
     this->initState = {pos[0], pos[1], pos[2], vel[0], vel[1], vel[2]};
+    this->initCart = initState;
     this->pos[0] = pos[0];
     this->pos[1] = pos[1];
     this->pos[2] = pos[2];
@@ -260,10 +266,14 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
     this->isNongrav = false;
-    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L) {
+    if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L ||
+            ngParams.a1Est || ngParams.a2Est || ngParams.a3Est) {
         this->ngParams.a1 = ngParams.a1;
         this->ngParams.a2 = ngParams.a2;
         this->ngParams.a3 = ngParams.a3;
+        this->ngParams.a1Est = ngParams.a1Est;
+        this->ngParams.a2Est = ngParams.a2Est;
+        this->ngParams.a3Est = ngParams.a3Est;
         this->ngParams.alpha = ngParams.alpha;
         this->ngParams.k = ngParams.k;
         this->ngParams.m = ngParams.m;
@@ -279,15 +289,15 @@ void IntegBody::prepare_stm(){
     int stmSize = 36;
     size_t numParams = 0;
     if (this->isNongrav) {
-        if (ngParams.a1 != 0.0L) {
+        if (ngParams.a1Est) {
             stmSize += 6;
             numParams++;
         }
-        if (ngParams.a2 != 0.0L) {
+        if (ngParams.a2Est) {
             stmSize += 6;
             numParams++;
         }
-        if (ngParams.a3 != 0.0L) {
+        if (ngParams.a3Est) {
             stmSize += 6;
             numParams++;
         }
@@ -689,13 +699,17 @@ PropSimulation::PropSimulation(std::string name, real t0,
 PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
-    this->ephem = simRef.ephem;
+    this->ephem.mbPath = simRef.ephem.mbPath;
+    this->ephem.sbPath = simRef.ephem.sbPath;
+    this->ephem.mb = nullptr;
+    this->ephem.sb = nullptr;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
-    this->parallelMode = simRef.parallelMode;
+    this->integParams.nInteg = 0;
+    this->integParams.n2Derivs = 0;
+    this->integParams.nTotal = simRef.integParams.nSpice;
+    this->integParams.timestepCounter = 0;
     this->spiceBodies = simRef.spiceBodies;
-    // this->integBodies = simRef.integBodies;
-    // this->events = simRef.events;
     this->tEvalUTC = simRef.tEvalUTC;
     this->evalApparentState = simRef.evalApparentState;
     this->evalMeasurements = simRef.evalMeasurements;
@@ -705,6 +719,7 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->tEvalMargin = simRef.tEvalMargin;
     this->tEval = simRef.tEval;
     this->radarObserver = simRef.radarObserver;
+    this->isPreprocessed = false;
 }
 
 /**
@@ -1086,6 +1101,12 @@ void PropSimulation::preprocess() {
                 this->integBodies[i].vel[0] += sunState[3];
                 this->integBodies[i].vel[1] += sunState[4];
                 this->integBodies[i].vel[2] += sunState[5];
+                this->integBodies[i].initCart[0] = this->integBodies[i].pos[0];
+                this->integBodies[i].initCart[1] = this->integBodies[i].pos[1];
+                this->integBodies[i].initCart[2] = this->integBodies[i].pos[2];
+                this->integBodies[i].initCart[3] = this->integBodies[i].vel[0];
+                this->integBodies[i].initCart[4] = this->integBodies[i].vel[1];
+                this->integBodies[i].initCart[5] = this->integBodies[i].vel[2];
             }
             for (size_t j = 0; j < 3; j++) {
                 this->xInteg.push_back(this->integBodies[i].pos[j]);
@@ -1147,4 +1168,375 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
                                      this->evalApparentState,
                                      this->convergedLightTime, xObserverNew);
     this->integrate();
+}
+
+/**
+ * @param[in] filename Name of the file to save the simulation to.
+ */
+void PropSimulation::save(std::string filename) {
+    struct stat fileExistsBuffer;
+    if (stat(filename.c_str(), &fileExistsBuffer) == 0) {
+        throw std::invalid_argument("Cannot save PropSimulation '" + this->name +
+                                    "' to file " + filename +
+                                    " (File already exists).");
+    }
+    auto timeWidth = std::setw(8);
+    auto SpiceIdWidth = std::setw(7);
+    auto floatWidth = std::setw(12);
+    auto timeFloatPrec = std::setprecision(8);
+    auto doubleWidth = std::setw(20);
+    auto doublePrec = std::setprecision(12);
+    int maxChars = 121;
+    std::string tab = "    ";
+    std::string halfTab = "  ";
+    std::string subsectionFull = std::string(maxChars, '-');
+    std::string sectionFull = std::string(maxChars, '=');
+    std::string headerSectionHalf = std::string((int)(maxChars-13)/2, '=');
+    std::ofstream file(filename, std::ios::out);
+    // print header
+    file << std::string(maxChars, '=') << std::endl;
+    #if defined(GRSS_VERSION)
+        file << headerSectionHalf << " GRSS v" << GRSS_VERSION <<" " << headerSectionHalf << std::endl;
+    #else
+        file << headerSectionHalf << " GRSS vINFTY " << headerSectionHalf << std::endl;
+    #endif
+    file << std::string(maxChars, '=') << std::endl;
+
+    time_t now = time(nullptr);
+    tm *utc = gmtime(&now);
+    const char *format = "%a %b %d %Y %H:%M:%S UTC";
+    char buffer[80];
+    strftime(buffer, 80, format, utc);
+    std::string timeStr(buffer);
+    file << std::string((int)(maxChars-timeStr.size())/2, ' ') << timeStr << std::string((int)(maxChars-timeStr.size())/2, ' ') << std::endl;
+
+    file << std::endl;
+    std::string nextSubsection = this->name;
+    file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+    file << subsectionFull << std::endl;
+    file << "Integration from MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.t0
+         << " to MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.tf << " [TDB]"
+         << std::endl;
+    file << "Main-body kernel path: " << this->ephem.mbPath << std::endl;
+    file << "Small-body kernel path: " << this->ephem.sbPath << std::endl;
+
+    file << std::endl;
+    nextSubsection = std::to_string(this->integParams.nInteg) + " Integration bodies";
+    file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+    file << subsectionFull << std::endl;
+    size_t starti = 0;
+    for (size_t i = 0; i < this->integBodies.size(); i++) {
+        file << this->integBodies[i].name << std::endl;
+        file << "Initial time : MJD " << timeWidth << std::fixed << timeFloatPrec << this->integBodies[i].t0
+             << " [TDB]" << std::endl;
+        file << "Radius       : " << floatWidth << std::fixed << timeFloatPrec << this->integBodies[i].radius*this->consts.du2m << " [m]" << std::endl;
+        file << "Mass         : " << floatWidth << std::fixed << timeFloatPrec << this->integBodies[i].mass << " [kg]" << std::endl;
+        file << "Initial state:" << std::endl;
+        if (this->integBodies[i].isCometary) {
+            file << " Cometary, heliocentric IAU76/J2000 ecliptic:" << std::endl;
+            file << doubleWidth << "ecc" << doubleWidth << "peri. dist. [AU]" << doubleWidth << "peri. t. [MJD TDB]"
+                    << doubleWidth << "l. asc. node [rad]" << doubleWidth << "arg. peri. [rad]" << doubleWidth << "inc. [rad]" << std::endl;
+            for (size_t j = 0; j < 6; j++) {
+                file << doubleWidth << std::scientific << doublePrec << this->integBodies[i].initState[j];
+            }
+            file << std::endl;
+        }
+        file << " Cartesian, J2000 barycentric:" << std::endl;
+        file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]" << std::endl;
+        for (size_t j = 0; j < 6; j++) {
+            file << doubleWidth << std::scientific << doublePrec << this->integBodies[i].initCart[j];
+        }
+        file << std::endl;
+        file << "Final state:" << std::endl;
+        file << " Cartesian, J2000 barycentric:" << std::endl;
+        file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]" << std::endl;
+        for (size_t j = 0; j < 6; j++) {
+            file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + j];
+        }
+        file << std::endl;
+        starti += 6;
+        if (this->integBodies[i].propStm) {
+            size_t numParams = (this->integBodies[i].n2Derivs - 21)/3;
+            file << "STM (final Cartesian state w.r.t. initial Cartesian state + any params):" << std::endl;
+            file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]";
+            if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
+            if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
+            if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
+            file << std::endl;
+            for (size_t j = 0; j < 6; j++) {
+                for (size_t k = 0; k < 6; k++) {
+                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 6*j + k];
+                }
+                for (size_t k = 0; k < numParams; k++) {
+                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 36 + 6*k + j];
+                }
+                file << std::endl;
+            }
+            if (this->integBodies[i].isCometary) {
+                file << "STM (initial Cartesian state + any params w.r.t. initial Cometary state + any params):" << std::endl;
+                file << doubleWidth << "ecc" << doubleWidth << "peri. dist. [AU]" << doubleWidth << "peri. t. [MJD TDB]"
+                        << doubleWidth << "l. asc. node [rad]" << doubleWidth << "arg. peri. [rad]" << doubleWidth << "inc. [rad]";
+                if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
+                if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
+                if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
+                file << std::endl;
+                for (size_t j = 0; j < this->integBodies[i].dCartdState.size(); j++) {
+                    for (size_t k = 0; k < this->integBodies[i].dCartdState[0].size(); k++) {
+                        file << doubleWidth << std::scientific << doublePrec << this->integBodies[i].dCartdState[j][k];
+                    }
+                    file << std::endl;
+                }
+            }
+        }
+        if (i!=this->integBodies.size()-1) file << std::endl << subsectionFull << std::endl;
+    }
+
+    file << std::endl;
+    nextSubsection = std::to_string(this->integParams.nSpice) + " SPICE bodies";
+    file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+    file << subsectionFull << std::endl;
+    for (size_t i = 0; i < this->spiceBodies.size(); i++) {
+        file << SpiceIdWidth << this->spiceBodies[i].spiceId << halfTab
+             << this->spiceBodies[i].name << std::endl;
+    }
+
+    if (this->impactParams.size() != 0) {
+        file << std::endl;
+        nextSubsection = std::to_string(this->impactParams.size()) + " Impacts detected";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        for (size_t i = 0; i < this->impactParams.size(); i++) {
+            ImpactParameters imp = this->impactParams[i];
+            file << "MJD " << timeWidth << std::fixed << imp.t << " TDB:" << std::endl;
+            file << "  " << imp.flybyBody << " impacted " << imp.centralBody << " with a relative velocity of " << imp.vel << " AU/d." << std::endl;
+            file << "  Impact location: " << std::endl;
+            file << "    Longitude: " << imp.lon*180.0L/PI << " deg" << std::endl;
+            file << "    Latitude: " << imp.lat*180.0L/PI << " deg" << std::endl;
+            file << "    Altitude: " << imp.alt << " km" << std::endl;
+        }
+    }
+
+    if (this->caParams.size() != 0) {
+        file << std::endl;
+        nextSubsection = std::to_string(this->caParams.size()) + " Close approaches detected";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        for (size_t i = 0; i < this->caParams.size(); i++) {
+            CloseApproachParameters ca = this->caParams[i];
+            file << "MJD " << timeWidth << std::fixed << ca.t << " TDB:" << std::endl;
+            file << "  " << ca.flybyBody << " approached " << ca.centralBody << " at " << ca.dist << " AU." << std::endl;
+            file << "  Relative Velocity: " << ca.vel << " AU/d. V-infinity: " << ca.vInf << " AU/d." << std::endl;
+            file << "  Gravitational focusing factor: " << ca.gravFocusFactor << ". Impact: " << std::boolalpha << ca.impact << std::endl;
+        }
+    }
+
+    // insert machine readable data for close approach and impact parameters
+    file.precision(18);
+    if (this->impactParams.size() > 0) {
+        file << std::endl;
+        nextSubsection = "Impact data";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        file << "$$IMPACT_START" << std::endl;
+        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | kizner_dx | kizner_dy | opik_x | opik_y | opik_z | opik_dx | opik_dy | scaled_x | scaled_y | scaled_z | scaled_dx | scaled_dy | mtp_x | mtp_y | mtp_z | mtp_dx | mtp_dy | xRelBodyFixed | lon | lat | alt" << std::endl;
+        for (size_t i = 0; i < this->impactParams.size(); i++) {
+            ImpactParameters imp = this->impactParams[i];
+            file << imp.t << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.xRel.size(); j++) {
+                file << imp.xRel[j] << ",";
+            }
+            file << "] | ";
+            file << imp.tMap << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.xRelMap.size(); j++) {
+                file << imp.xRelMap[j] << ",";
+            }
+            file << "] | ";
+            file << imp.dist << " | ";
+            file << imp.vel << " | ";
+            file << imp.vInf << " | ";
+            file << imp.flybyBody << " | ";
+            file << imp.flybyBodyIdx << " | ";
+            file << imp.centralBody << " | ";
+            file << imp.centralBodyIdx << " | ";
+            file << imp.centralBodySpiceId << " | ";
+            file << imp.impact << " | ";
+            file << imp.tPeri << " | ";
+            file << imp.tLin << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.bVec.size(); j++) {
+                file << imp.bVec[j] << ",";
+            }
+            file << "] | ";
+            file << imp.bMag << " | ";
+            file << imp.gravFocusFactor << " | ";
+            file << imp.kizner.x << " | ";
+            file << imp.kizner.y << " | ";
+            file << imp.kizner.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.kizner.dx.size(); j++) {
+                file << imp.kizner.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.kizner.dy.size(); j++) {
+                file << imp.kizner.dy[j] << ",";
+            }
+            file << "] | ";
+            file << imp.opik.x << " | ";
+            file << imp.opik.y << " | ";
+            file << imp.opik.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.opik.dx.size(); j++) {
+                file << imp.opik.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.opik.dy.size(); j++) {
+                file << imp.opik.dy[j] << ",";
+            }
+            file << "] | ";
+            file << imp.scaled.x << " | ";
+            file << imp.scaled.y << " | ";
+            file << imp.scaled.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.scaled.dx.size(); j++) {
+                file << imp.scaled.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.scaled.dy.size(); j++) {
+                file << imp.scaled.dy[j] << ",";
+            }
+            file << "] | ";
+            file << imp.mtp.x << " | ";
+            file << imp.mtp.y << " | ";
+            file << imp.mtp.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < imp.mtp.dx.size(); j++) {
+                file << imp.mtp.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.mtp.dy.size(); j++) {
+                file << imp.mtp.dy[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < imp.xRelBodyFixed.size(); j++) {
+                file << imp.xRelBodyFixed[j] << ",";
+            }
+            file << "] | ";
+            file << imp.lon << " | ";
+            file << imp.lat << " | ";
+            file << imp.alt;
+            file << std::endl;
+        }
+        file << "$$IMPACT_END" << std::endl;
+    }
+    if (this->caParams.size() > 0) {
+        file << std::endl;
+        nextSubsection = "Close approach data";
+        file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+        file << subsectionFull << std::endl;
+        file << "$$CA_START" << std::endl;
+        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | kizner_dx | kizner_dy | opik_x | opik_y | opik_z | opik_dx | opik_dy | scaled_x | scaled_y | scaled_z | scaled_dx | scaled_dy | mtp_x | mtp_y | mtp_z | mtp_dx | mtp_dy" << std::endl;
+        for (size_t i = 0; i < this->caParams.size(); i++) {
+            CloseApproachParameters ca = this->caParams[i];
+            file << ca.t << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.xRel.size(); j++) {
+                file << ca.xRel[j] << ",";
+            }
+            file << "] | ";
+            file << ca.tMap << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.xRelMap.size(); j++) {
+                file << ca.xRelMap[j] << ",";
+            }
+            file << "] | ";
+            file << ca.dist << " | ";
+            file << ca.vel << " | ";
+            file << ca.vInf << " | ";
+            file << ca.flybyBody << " | ";
+            file << ca.flybyBodyIdx << " | ";
+            file << ca.centralBody << " | ";
+            file << ca.centralBodyIdx << " | ";
+            file << ca.centralBodySpiceId << " | ";
+            file << ca.impact << " | ";
+            file << ca.tPeri << " | ";
+            file << ca.tLin << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.bVec.size(); j++) {
+                file << ca.bVec[j] << ",";
+            }
+            file << "] | ";
+            file << ca.bMag << " | ";
+            file << ca.gravFocusFactor << " | ";
+            file << ca.kizner.x << " | ";
+            file << ca.kizner.y << " | ";
+            file << ca.kizner.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.kizner.dx.size(); j++) {
+                file << ca.kizner.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.kizner.dy.size(); j++) {
+                file << ca.kizner.dy[j] << ",";
+            }
+            file << "] | ";
+            file << ca.opik.x << " | ";
+            file << ca.opik.y << " | ";
+            file << ca.opik.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.opik.dx.size(); j++) {
+                file << ca.opik.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.opik.dy.size(); j++) {
+                file << ca.opik.dy[j] << ",";
+            }
+            file << "] | ";
+            file << ca.scaled.x << " | ";
+            file << ca.scaled.y << " | ";
+            file << ca.scaled.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.scaled.dx.size(); j++) {
+                file << ca.scaled.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.scaled.dy.size(); j++) {
+                file << ca.scaled.dy[j] << ",";
+            }
+            file << "] | ";
+            file << ca.mtp.x << " | ";
+            file << ca.mtp.y << " | ";
+            file << ca.mtp.z << " | ";
+            file << "[";
+            for (size_t j = 0; j < ca.mtp.dx.size(); j++) {
+                file << ca.mtp.dx[j] << ",";
+            }
+            file << "] | ";
+            file << "[";
+            for (size_t j = 0; j < ca.mtp.dy.size(); j++) {
+                file << ca.mtp.dy[j] << ",";
+            }
+            file << "]";
+            file << std::endl;
+        }
+        file << "$$CA_END" << std::endl;
+    }
+
+    file << std::endl;
+    file << std::string(maxChars, '=') << std::endl;
+    file << headerSectionHalf << " END OF FILE " << headerSectionHalf << std::endl;
+    file << std::string(maxChars, '=') << std::endl;
+    file.close();
 }

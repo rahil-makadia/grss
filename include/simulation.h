@@ -140,6 +140,9 @@ class SpiceBody : public Body {
  * @param a1 Parameter for radial nongravitational forces.
  * @param a2 Parameter for transverse nongravitational forces.
  * @param a3 Parameter for normal nongravitational forces.
+ * @param a1Est Flag to indicate if a1 is estimated (for orbit determination).
+ * @param a2Est Flag to indicate if a2 is estimated (for orbit determination).
+ * @param a3Est Flag to indicate if a3 is estimated (for orbit determination).
  * @param alpha Normalizing factor for nongravitational forces.
  * @param k Exponent for nongravitational forces.
  * @param m Exponent for nongravitational forces.
@@ -151,6 +154,9 @@ struct NongravParameters {
     real a1 = 0.0L;
     real a2 = 0.0L;
     real a3 = 0.0L;
+    bool a1Est = false;
+    bool a2Est = false;
+    bool a3Est = false;
     real alpha = 0.1112620426L;
     real k = 4.6142L;
     real m = 2.15L;
@@ -178,6 +184,7 @@ class IntegBody : public Body {
     int spiceId = -99999;
     bool isCometary = false;
     std::vector<real> initState;
+    std::vector<real> initCart;
     bool isInteg = true;
     bool isThrusting = false;
     NongravParameters ngParams;
@@ -252,8 +259,8 @@ struct BPlaneParameters {
     real x;
     real y;
     real z;
-    std::vector<real> dx = std::vector<real>(6, 0.0L);
-    std::vector<real> dy = std::vector<real>(6, 0.0L);
+    std::vector<real> dx = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
+    std::vector<real> dy = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
 };
 
 /**
@@ -288,9 +295,9 @@ class CloseApproachParameters {
    private:
    public:
     real t;
-    std::vector<real> xRel = std::vector<real>(6, 0.0L);
+    std::vector<real> xRel;
     real tMap;
-    std::vector<real> xRelMap = std::vector<real>(6, 0.0L);
+    std::vector<real> xRelMap;
     real dist;
     real vel;
     real vInf;
@@ -521,6 +528,10 @@ class PropSimulation {
     void extend(real tf, std::vector<real> tEvalNew = std::vector<real>(),
                 std::vector<std::vector<real>> xObserverNew =
                     std::vector<std::vector<real>>());
+    /**
+     * @brief Save the simulation to a file.
+     */
+    void save(std::string filename);
 };
 
 #endif
