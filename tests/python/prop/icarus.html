@@ -233,6 +233,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.delta_et_utc.html">grss.libgrss.delta_et_utc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -530,9 +531,9 @@ document.write(`
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">e</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span>
 <span class="n">q</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;q&#39;</span><span class="p">]</span>
 <span class="n">tp</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;tp&#39;</span><span class="p">]</span>
-<span class="n">om</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;om&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span>
-<span class="n">w</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span>
-<span class="n">i</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span>
+<span class="n">om</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;om&#39;</span><span class="p">]</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
+<span class="n">i</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">]</span>
 
 <span class="n">cometary_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">om</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
 <span class="n">ng_params</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">NongravParameters</span><span class="p">()</span>

@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.InterpolationParameters &#8212; GRSS 3.8.7 documentation</title>
+    <title>grss.libgrss.reconstruct_stm &#8212; GRSS 3.8.7 documentation</title>
   
   
   
@@ -55,11 +55,11 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.libgrss.InterpolationParameters';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.libgrss.reconstruct_stm';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.libgrss.NongravParameters" href="grss.libgrss.NongravParameters.html" />
-    <link rel="prev" title="grss.libgrss.IntegrationParameters" href="grss.libgrss.IntegrationParameters.html" />
+    <link rel="next" title="grss.libgrss.BPlaneParameters" href="grss.libgrss.BPlaneParameters.html" />
+    <link rel="prev" title="grss.libgrss.propSim_parallel_omp" href="grss.libgrss.propSim_parallel_omp.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
     <meta name="docbuild:last-update" content="Apr 02, 2024"/>
@@ -230,7 +230,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.delta_et_utc.html">grss.libgrss.delta_et_utc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
-<li class="toctree-l3"><a class="reference internal" href="grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.libgrss.reconstruct_stm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -240,7 +240,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.ImpulseEvent.html">grss.libgrss.ImpulseEvent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.IntegBody.html">grss.libgrss.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.IntegrationParameters.html">grss.libgrss.IntegrationParameters</a></li>
-<li class="toctree-l3 current active"><a class="current reference internal" href="#">grss.libgrss.InterpolationParameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.libgrss.InterpolationParameters.html">grss.libgrss.InterpolationParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.NongravParameters.html">grss.libgrss.NongravParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.PropSimulation.html">grss.libgrss.PropSimulation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.SpiceBody.html">grss.libgrss.SpiceBody</a></li>
@@ -364,7 +364,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.libgrss.InterpolationParameters.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.libgrss.reconstruct_stm.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -394,7 +394,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.libgrss.InterpolationParameters.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.libgrss.reconstruct_stm.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -478,7 +478,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.libgrss.InterpolationParameters</h1>
+    <h1>grss.libgrss.reconstruct_stm</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -488,14 +488,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.__init__"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.accIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.accIntegStack</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.bStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.bStack</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.tStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.tStack</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.xIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.xIntegStack</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.reconstruct_stm"><code class="docutils literal notranslate"><span class="pre">reconstruct_stm()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -507,68 +500,23 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="grss-libgrss-interpolationparameters">
-<h1>grss.libgrss.InterpolationParameters<a class="headerlink" href="#grss-libgrss-interpolationparameters" title="Permalink to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="grss.libgrss.InterpolationParameters">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.libgrss.</span></span><span class="sig-name descname"><span class="pre">InterpolationParameters</span></span><a class="headerlink" href="#grss.libgrss.InterpolationParameters" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>The InterpolationParameters class contains parameters used for
-interpolation of the states of the integrated bodies.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="grss.libgrss.InterpolationParameters.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.libgrss.InterpolationParameters" title="grss.libgrss.InterpolationParameters"><span class="pre">grss.libgrss.InterpolationParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.libgrss.InterpolationParameters.__init__" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.InterpolationParameters.__init__" title="grss.libgrss.InterpolationParameters.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.InterpolationParameters.accIntegStack" title="grss.libgrss.InterpolationParameters.accIntegStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accIntegStack</span></code></a></p></td>
-<td><p>Stack of accelerations of the integrated bodies at steps taken by the integrator.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.InterpolationParameters.bStack" title="grss.libgrss.InterpolationParameters.bStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bStack</span></code></a></p></td>
-<td><p>Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.InterpolationParameters.tStack" title="grss.libgrss.InterpolationParameters.tStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tStack</span></code></a></p></td>
-<td><p>Stack of times used for interpolation at steps taken by the integrator.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.InterpolationParameters.xIntegStack" title="grss.libgrss.InterpolationParameters.xIntegStack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegStack</span></code></a></p></td>
-<td><p>Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.libgrss.InterpolationParameters.accIntegStack">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">accIntegStack</span></span><a class="headerlink" href="#grss.libgrss.InterpolationParameters.accIntegStack" title="Permalink to this definition">#</a></dt>
-<dd><p>Stack of accelerations of the integrated bodies at steps taken by the integrator.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.libgrss.InterpolationParameters.bStack">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bStack</span></span><a class="headerlink" href="#grss.libgrss.InterpolationParameters.bStack" title="Permalink to this definition">#</a></dt>
-<dd><p>Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.libgrss.InterpolationParameters.tStack">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tStack</span></span><a class="headerlink" href="#grss.libgrss.InterpolationParameters.tStack" title="Permalink to this definition">#</a></dt>
-<dd><p>Stack of times used for interpolation at steps taken by the integrator.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.libgrss.InterpolationParameters.xIntegStack">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xIntegStack</span></span><a class="headerlink" href="#grss.libgrss.InterpolationParameters.xIntegStack" title="Permalink to this definition">#</a></dt>
-<dd><p>Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.</p>
-</dd></dl>
-
+  <section id="grss-libgrss-reconstruct-stm">
+<h1>grss.libgrss.reconstruct_stm<a class="headerlink" href="#grss-libgrss-reconstruct-stm" title="Permalink to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="grss.libgrss.reconstruct_stm">
+<span class="sig-prename descclassname"><span class="pre">grss.libgrss.</span></span><span class="sig-name descname"><span class="pre">reconstruct_stm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.libgrss.reconstruct_stm" title="Permalink to this definition">#</a></dt>
+<dd><p>Reconstruct the state transition matrix from the flattened vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>stm</strong> (<em>list</em><em> of </em><em>real</em>) – Flattened state transition matrix.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>stmMat</strong> – Reconstructed state transition matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list of real</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -585,20 +533,20 @@ interpolation of the states of the integrated bodies.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.libgrss.IntegrationParameters.html"
+       href="grss.libgrss.propSim_parallel_omp.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.libgrss.IntegrationParameters</p>
+        <p class="prev-next-title">grss.libgrss.propSim_parallel_omp</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.libgrss.NongravParameters.html"
+       href="grss.libgrss.BPlaneParameters.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.libgrss.NongravParameters</p>
+        <p class="prev-next-title">grss.libgrss.BPlaneParameters</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -618,14 +566,7 @@ interpolation of the states of the integrated bodies.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.__init__"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.__init__()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.accIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.accIntegStack</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.bStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.bStack</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.tStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.tStack</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.InterpolationParameters.xIntegStack"><code class="docutils literal notranslate"><span class="pre">InterpolationParameters.xIntegStack</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.reconstruct_stm"><code class="docutils literal notranslate"><span class="pre">reconstruct_stm()</span></code></a></li>
 </ul>
   </nav></div>
 

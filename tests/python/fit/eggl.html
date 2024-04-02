@@ -233,6 +233,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.delta_et_utc.html">grss.libgrss.delta_et_utc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -556,12 +557,11 @@ document.write(`
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Skipped 0 observations
-         0 of which were non-geocentric occultations,
          0 were either roving or radar observations (radar is handled separately),
          0 of which were outside the specified time range.
-No debiasing needed for 531 observations. Debiased 900 observations. No biasing information for 6 observations.
-Applied default weight of 1 arcsec to 73 CCD observations
-Deweighted 333 observations as part of deweighting scheme.
+No debiasing needed for 554 observations. Debiased 900 observations. No biasing information for 6 observations.
+Applied default weight of 1 arcsec to 88 CCD observations
+Deweighted 341 observations as part of deweighting scheme.
 Found 273 observations from gaiafpr
          Added 273 of those observations.
 </pre></div></div>
@@ -589,13 +589,13 @@ Found 273 observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.389                   0.571                   877.786                         0.257
-2                        0.389                   0.570                   878.152                         0.257
-3                        0.389                   0.570                   878.152                         0.257
+1                        0.388                   4.254                   863.614                         0.250
+2                        0.412                   4.226                   1016.494                        0.294
+3                        0.412                   4.226                   1016.495                        0.294
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.380                   0.555                   816.151                         0.240
-5                        0.380                   0.555                   816.045                         0.240
-Converged after rejecting outliers. Rejected 4 out of 1710 optical observations.
+4                        0.404                   4.224                   973.367                         0.282
+5                        0.404                   4.224                   972.860                         0.282
+Converged after rejecting outliers. Rejected 3 out of 1733 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -613,22 +613,22 @@ Converged after rejecting outliers. Rejected 4 out of 1710 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.3795774124052052
-RMS weighted: 0.5545018203593028
-chi-squared: 816.0447336713537
-reduced chi-squared: 0.23959035046134872
-square root of reduced chi-squared: 0.4894796731850555
+RMS unweighted: 0.4040936266495137
+RMS weighted: 4.22411943484201
+chi-squared: 972.859967237385
+reduced chi-squared: 0.28166183185795746
+square root of reduced chi-squared: 0.5307182226548826
 --------------------------------------------------------------
-Solution Time: MJD 57740.000 TDB = 2016-12-18 00:00:00.000 TDB
-Solution Observation Arc: 10617.24 days
+Solution Time: MJD 57741.000 TDB = 2016-12-19 00:00:00.000 TDB
+Solution Observation Arc: 10695.86 days (29.28 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.13399715844e-01               2.69633242926e-09               1.13399717415e-01               2.69154916891e-09               +1.57167252823e-09              +0.583
-q                       2.23467425007e+00               5.19282411147e-09               2.23467424610e+00               5.18768983201e-09               -3.97005628372e-09              -0.765
-tp                      5.79392966824e+04               3.10448664475e-06               5.79392966850e+04               3.10431790293e-06               +2.61388777290e-06              +0.842
-om                      2.76278222023e+02               2.72959109750e-06               2.76278223490e+02               2.73378832865e-06               +1.46710857507e-06              +0.537
-w                       4.93508757691e+01               2.91417672985e-06               4.93508749893e+01               2.91741665200e-06               -7.79835779952e-07              -0.268
-i                       1.74617955679e+00               7.18382253978e-08               1.74617944517e+00               7.15800956673e-08               -1.11620676035e-07              -1.554
+e                       1.13399665350e-01               2.69625665978e-09               1.13399683744e-01               2.03935378192e-09               +1.83943542342e-08              +6.822
+q                       2.23467360050e+00               5.19283554850e-09               2.23467362463e+00               4.11451844753e-09               +2.41272757329e-08              +4.646
+tp                      5.79392972848e+04               3.10450994087e-06               5.79392973234e+04               2.80599848718e-06               +3.86201281799e-05              +12.440
+om                      2.76278216706e+02               2.72960955336e-06               2.76278204683e+02               2.70075936111e-06               -1.20232245422e-05              -4.405
+w                       4.93510740600e+01               2.91419563683e-06               4.93510985736e+01               2.81651754976e-06               +2.45135900343e-05              +8.412
+i                       1.74618044353e+00               7.18389915226e-08               1.74618317551e+00               7.07629395362e-08               +2.73197924017e-06              +38.029
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -690,13 +690,13 @@ i                       1.74617955679e+00               7.18382253978e-08       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 2.02
-Mahalonobis distance between GRSS and JPL solution: 2.02
-Bhattacharya distance between JPL and GRSS solution: 0.0001
-Bhattacharya coefficient between JPL and GRSS solution: 0.9999
+Mahalonobis distance between JPL and GRSS solution: 56.55
+Mahalonobis distance between GRSS and JPL solution: 73.57
+Bhattacharya distance between JPL and GRSS solution: 0.0375
+Bhattacharya coefficient between JPL and GRSS solution: 0.9632
 </pre></div></div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
@@ -706,6 +706,21 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.9999
 <span class="k">assert</span> <span class="n">bhatt_coeff</span> <span class="o">&gt;</span> <span class="mf">0.90</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[11], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_f <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
+<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_0 <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> bhattacharya <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">0.10</span>
+
+<span class="ansi-red-fg">AssertionError</span>:
+</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
