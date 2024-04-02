@@ -132,7 +132,7 @@ def reconstruct_all_log_files(log_dir):
     start_time = time.time()
     ca_list = []
     impact_list = []
-    for file in os.listdir(log_dir):
+    for file in sorted(os.listdir(log_dir)):
         if file.endswith('.log'):
             log_file = os.path.join(log_dir, file)
             ca_list_, impact_list_ = _reconstruct_one_log_file(log_file)
