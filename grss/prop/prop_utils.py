@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from astropy.time import Time
+from .. import libgrss
 
 __all__ = [ 'equat2eclip',
             'eclip2equat',
@@ -251,6 +252,155 @@ def plot_ca_summary(prop_sim, flyby_body, central_body='Earth',
     fig.autofmt_xdate()
     return fig, ax1, ax2
 
+def mean_cov_to_ellipse(mean, cov, n_std, bplane_type, print_ellipse_params, units):
+    """
+    Convert a mean and corresponding covariance to an ellipse.
+
+    Parameters
+    ----------
+    mean : np.ndarray
+        mean of the data
+    cov : np.ndarray
+        covariance of the data
+    n_std : float
+        Number of standard deviations to plot
+    bplane_type : str
+        type of B-plane
+    print_ellipse_params : bool
+        True to print the ellipse parameters, False to not print
+    units : str
+        units of the plot
+
+    Returns
+    -------
+    ellipse : np.ndarray
+        ellipse points
+    """
+    eigvals, eigvecs = np.linalg.eig(cov)
+    idx = eigvals.argsort()[::-1]
+    eigvals = eigvals[idx]
+    eigvecs = eigvecs[:,idx]
+    theta = np.arctan(eigvecs[1,0]/eigvecs[0,0])
+    if theta < 0:
+        theta += np.pi
+    sma = np.sqrt(eigvals[0]) * n_std
+    smi = np.sqrt(eigvals[1]) * n_std
+    if print_ellipse_params:
+        sma_print = sma/n_std
+        smi_print = smi/n_std
+        print(f'{bplane_type} ellipse mean: ({mean[0]}, {mean[1]}) {units}')
+        if bplane_type == 'Impact':
+            # convert lat/lon to km
+            sma_print *= np.pi/180*6378.1367
+            smi_print *= np.pi/180*6378.1367
+            units = "km"
+        print(f'{bplane_type} ellipse sma: {sma_print} {units}')
+        print(f'{bplane_type} ellipse smi: {smi_print} {units}')
+        print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')
+    theta_arr = np.linspace(0, 2*np.pi, 100)
+    ellipse = np.array([sma*np.cos(theta_arr), smi*np.sin(theta_arr)])
+    rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+    ellipse = rot_mat @ ellipse
+    return ellipse
+
+def partials_to_ellipse(ca, au2units, n_std, print_ellipse_params, units, analytic_info):
+    """
+    Convert the B-plane partial derivatives to a mean and covariance.
+
+    Parameters
+    ----------
+    ca : grss.libgrss.CloseApproachParameters
+        CloseApproachParameters object with computed partial derivatives
+    au2units : float
+        AU to units conversion factor
+    n_std : float
+        Number of standard deviations to plot
+    print_ellipse_params : bool
+        True to print the ellipse parameters, False to not print
+    units : str
+        units of the plot
+    analytic_info : tuple
+        Tuple of analytic B-plane information (initial covariance
+        and state conversion partial derivatives)
+
+    Returns
+    -------
+    mean : np.ndarray
+        mean of the data
+    ellipse : np.ndarray
+        ellipse points
+    """
+    if not isinstance(analytic_info[0], np.ndarray):
+        init_cov = np.array(analytic_info[0])
+    else:
+        init_cov = analytic_info[0]
+    if not isinstance(analytic_info[1], np.ndarray):
+        part_cart_part_state = np.array(analytic_info[1])
+    else:
+        part_cart_part_state = analytic_info[1]
+    part_state_part_cart = np.linalg.inv(part_cart_part_state)
+
+    stm_flat = ca.xRel[6:]
+    stm_tca_t0 = np.array(libgrss.reconstruct_stm(stm_flat)) @ part_state_part_cart
+    stm_flat = ca.xRelMap[6:]
+    stm_tmap_t0 = np.array(libgrss.reconstruct_stm(stm_flat)) @ part_state_part_cart
+    if ca.t == ca.tMap:
+        stm_tca_tmap = np.eye(stm_tca_t0.shape[0])
+    else:
+        stm_tca_tmap = stm_tca_t0 @ np.linalg.inv(stm_tmap_t0)
+
+    extra_zeros = [0]*(stm_tca_tmap.shape[0]-6)
+    part_tlin_minus_t = ca.dTLinMinusT + extra_zeros
+    part_tlin = part_tlin_minus_t @ stm_tca_tmap
+    part_t = ca.dt + extra_zeros
+    # part_tlin += part_t
+    part_kizner = np.zeros((3,stm_tca_tmap.shape[0]))
+    part_kizner[:2,:] = np.array([ca.kizner.dx+extra_zeros,ca.kizner.dy+extra_zeros])@stm_tca_tmap
+    part_kizner[2,:] = part_tlin
+    part_scaled = np.zeros((3,stm_tca_tmap.shape[0]))
+    part_scaled[:2,:] = np.array([ca.scaled.dx+extra_zeros,ca.scaled.dy+extra_zeros])@stm_tca_tmap
+    part_scaled[2,:] = part_tlin
+    part_opik = np.zeros((3,stm_tca_tmap.shape[0]))
+    part_opik[:2,:] = np.array([ca.opik.dx+extra_zeros,ca.opik.dy+extra_zeros])@stm_tca_tmap
+    part_opik[2,:] = part_tlin
+    part_mtp = np.zeros((3,stm_tca_tmap.shape[0]))
+    part_mtp[:2,:] = np.array([ca.mtp.dx+extra_zeros,ca.mtp.dy+extra_zeros])@stm_tca_tmap
+    part_mtp[2,:] = part_tlin
+
+    init_cart_cov = part_cart_part_state @ init_cov @ part_cart_part_state.T
+    cov_tmap = stm_tmap_t0 @ init_cart_cov @ stm_tmap_t0.T
+    cov_kizner = part_kizner @ cov_tmap @ part_kizner.T
+    cov_scaled = part_scaled @ cov_tmap @ part_scaled.T
+    cov_opik = part_opik @ cov_tmap @ part_opik.T
+    cov_mtp = part_mtp @ cov_tmap @ part_mtp.T
+
+    t_dev = (part_t @ cov_tmap @ part_t)**0.5
+
+    cov_kizner = cov_kizner[:2,:2]*au2units**2
+    cov_opik = cov_opik[:2,:2]*au2units**2
+    cov_scaled = cov_scaled[:2,:2]*au2units**2
+    cov_mtp = cov_mtp[:2,:2]*au2units**2
+
+    mean_kizner = np.array([ca.kizner.x, ca.kizner.y])*au2units
+    mean_opik = np.array([ca.opik.x, ca.opik.y])*au2units
+    mean_scaled = np.array([ca.scaled.x, ca.scaled.y])*au2units
+    mean_mtp = np.array([ca.mtp.x, ca.mtp.y])*au2units
+
+    ellipse_kizner = mean_cov_to_ellipse(mean_kizner, cov_kizner, n_std,
+                                        'kizner', print_ellipse_params, units)
+    ellipse_opik = mean_cov_to_ellipse(mean_opik, cov_opik, n_std,
+                                        'opik', print_ellipse_params, units)
+    ellipse_scaled = mean_cov_to_ellipse(mean_scaled, cov_scaled, n_std,
+                                        'scaled', print_ellipse_params, units)
+    ellipse_mtp = mean_cov_to_ellipse(mean_mtp, cov_mtp, n_std,
+                                        'mtp', print_ellipse_params, units)
+
+    kizner_data = (mean_kizner, ellipse_kizner)
+    opik_data = (mean_opik, ellipse_opik)
+    scaled_data = (mean_scaled, ellipse_scaled)
+    mtp_data = (mean_mtp, ellipse_mtp)
+    return (kizner_data, opik_data, scaled_data, mtp_data, t_dev)
+
 def data_to_ellipse(x_data, y_data, n_std, bplane_type,
                     print_ellipse_params, units, sigma_points):
     """
@@ -283,37 +433,14 @@ def data_to_ellipse(x_data, y_data, n_std, bplane_type,
     if sigma_points is None:
         x_mean = np.mean(x_data)
         y_mean = np.mean(y_data)
+        mean = np.array([x_mean, y_mean])
         cov = np.cov(x_data, y_data)
     else:
         xy_data = np.vstack((x_data, y_data)).T
         mean, cov = sigma_points.reconstruct(xy_data)
         x_mean = mean[0]
         y_mean = mean[1]
-    eigvals, eigvecs = np.linalg.eig(cov)
-    idx = eigvals.argsort()[::-1]
-    eigvals = eigvals[idx]
-    eigvecs = eigvecs[:,idx]
-    theta = np.arctan(eigvecs[1,0]/eigvecs[0,0])
-    if theta < 0:
-        theta += np.pi
-    sma = np.sqrt(eigvals[0]) * n_std
-    smi = np.sqrt(eigvals[1]) * n_std
-    if print_ellipse_params:
-        sma_print = sma/n_std
-        smi_print = smi/n_std
-        print(f'{bplane_type} ellipse mean: ({x_mean}, {y_mean}) {units}')
-        if bplane_type == 'Impact':
-            # convert lat/lon to km
-            sma_print *= np.pi/180*6378.1367
-            smi_print *= np.pi/180*6378.1367
-            units = "km"
-        print(f'{bplane_type} ellipse sma: {sma_print} {units}')
-        print(f'{bplane_type} ellipse smi: {smi_print} {units}')
-        print(f'{bplane_type} ellipse theta: {theta*180/np.pi} deg')
-    theta_arr = np.linspace(0, 2*np.pi, 100)
-    ellipse = np.array([sma*np.cos(theta_arr), smi*np.sin(theta_arr)])
-    rot_mat = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-    ellipse = rot_mat @ ellipse
+    ellipse = mean_cov_to_ellipse(mean, cov, n_std, bplane_type, print_ellipse_params, units)
     return np.array([x_mean, y_mean]), ellipse
 
 def days_to_dhms(days):
@@ -348,7 +475,7 @@ def days_to_dhms(days):
 
 def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_km=False,
                 equal_axis=True, print_ellipse_params=False, show_central_body=True,
-                sigma_points=None):
+                sigma_points=None, analytic_info=None):
     # sourcery skip: low-code-quality
     """
     Plot the B-planes of a list of close approaches.
@@ -373,6 +500,9 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         True to show the central body, False to not show it, by default True.
     sigma_points : prop.SigmaPoints, optional
         SigmaPoints object for reconstructing mean and cov, by default None.
+    analytic_info : tuple, optional
+        Tuple of analytic B-plane information (initial covariance
+        and state conversion partial derivatives), by default None.
 
     Returns
     -------
@@ -432,6 +562,10 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
                                         print_ellipse_params, units, sigma_points)
         else:
             mtp_data = None
+    elif len(ca_list[0].xRel) >= 42 and analytic_info is not None:
+        all_data = partials_to_ellipse(ca_list[0], au2units, n_std,
+                                        print_ellipse_params, units, analytic_info)
+        kizner_data, opik_data, scaled_data, mtp_data, t_dev = all_data
     else:
         kizner_data = None
         opik_data = None
@@ -459,14 +593,22 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     fig.tight_layout()
     event = "Impact" if impact_any else "Close Approach"
     unit = "UTC" if impact_any else "TDB"
-    if sigma_points is None:
-        t_mean = np.mean(times)
-        t_dev = np.std(times)
-        t_map_mean = np.mean(map_times)
-    else:
+    if sigma_points is not None:
         t_mean, t_var = sigma_points.reconstruct(times)
         t_dev = np.sqrt(t_var[0,0])
         t_map_mean, _ = sigma_points.reconstruct(map_times)
+    elif len(ca_list) >= 100:
+        t_mean = np.mean(times)
+        t_dev = np.std(times)
+        t_map_mean = np.mean(map_times)
+    elif analytic_info is not None:
+        t_mean = ca_list[0].t
+        # t_dev computed in partials_to_ellipse
+        t_map_mean = ca_list[0].tMap
+    else:
+        t_mean = np.nan
+        t_dev = np.nan
+        t_map_mean = np.nan
     if impact_any:
         t_mean_str = Time(t_mean, format='mjd', scale='tdb').utc.iso
         t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').utc.iso

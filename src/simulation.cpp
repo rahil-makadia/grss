@@ -308,6 +308,7 @@ void IntegBody::prepare_stm(){
     }
     this->n2Derivs += (size_t) stmSize/2;
     this->propStm = true;
+    // build 6x(6+numParams) state transition matrix first
     if (this->isCometary){
         std::vector<std::vector<real>> partialsEclip(6, std::vector<real>(6, 0.0L));
         get_cartesian_partials(this->t0, this->initState, "com2cart", partialsEclip);
@@ -322,20 +323,24 @@ void IntegBody::prepare_stm(){
         for (size_t i = 0; i < 36; i++) {
             this->stm[i] = partials[i/6][i%6];
         }
+        // add extra entries to each row for nongravitational parameters
         for (size_t i = 0; i < 6; i++) {
             for (size_t j = 0; j < numParams; j++) {
                 this->dCartdState[i].push_back(0.0L);
             }
         }
     } else {
+        // state transition matrix is the identity matrix in this case
         this->dCartdState = std::vector<std::vector<real>>(6, std::vector<real>(6+numParams, 0.0L));
         for (size_t i = 0; i < 6; i++) {
             this->dCartdState[i][i] = 1.0L;
         }
     }
+    // add extra nongravitational parameter blocks at bottom for (6+numParams)x(6+numParams) state transition matrix
     for (size_t i = 0; i < numParams; i++) {
         this->dCartdState.push_back(std::vector<real>(6+numParams, 0.0L));
     }
+    // set diagonals of these extra blocks to 1
     for (size_t i = 6; i < 6+numParams; i++) {
         this->dCartdState[i][i] = 1.0L;
     }
@@ -1259,19 +1264,27 @@ void PropSimulation::save(std::string filename) {
         starti += 6;
         if (this->integBodies[i].propStm) {
             size_t numParams = (this->integBodies[i].n2Derivs - 21)/3;
-            file << "STM (final Cartesian state w.r.t. initial Cartesian state + any params):" << std::endl;
-            file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
-                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]";
+            if (this->integBodies[i].isCometary) {
+                file << "STM (final Cartesian state w.r.t. initial Cometary state + any params):" << std::endl;
+                file << doubleWidth << "ecc" << doubleWidth << "peri. dist. [AU]" << doubleWidth << "peri. t. [MJD TDB]"
+                        << doubleWidth << "l. asc. node [rad]" << doubleWidth << "arg. peri. [rad]" << doubleWidth << "inc. [rad]";
+            } else {
+                file << "STM (final Cartesian state w.r.t. initial Cartesian state + any params):" << std::endl;
+                file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                        << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]";
+            }
             if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
             if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
             if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
             file << std::endl;
-            for (size_t j = 0; j < 6; j++) {
-                for (size_t k = 0; k < 6; k++) {
-                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 6*j + k];
-                }
-                for (size_t k = 0; k < numParams; k++) {
-                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 36 + 6*k + j];
+            std::vector<real> stmFinalFlat = std::vector<real>(36+6*numParams, 0.0);
+            for (size_t j = 0; j < 36+6*numParams; j++) {
+                stmFinalFlat[j] = this->xInteg[starti + j];
+            }
+            std::vector<std::vector<real>> stmFinal = reconstruct_stm(stmFinalFlat);
+            for (size_t j = 0; j < stmFinal.size(); j++) {
+                for (size_t k = 0; k < stmFinal[0].size(); k++) {
+                    file << doubleWidth << std::scientific << doublePrec << stmFinal[j][k];
                 }
                 file << std::endl;
             }
@@ -1341,7 +1354,7 @@ void PropSimulation::save(std::string filename) {
         file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
         file << subsectionFull << std::endl;
         file << "$$IMPACT_START" << std::endl;
-        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | kizner_dx | kizner_dy | opik_x | opik_y | opik_z | opik_dx | opik_dy | scaled_x | scaled_y | scaled_z | scaled_dx | scaled_dy | mtp_x | mtp_y | mtp_z | mtp_dx | mtp_dy | xRelBodyFixed | lon | lat | alt" << std::endl;
+        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | opik_x | opik_y | opik_z | scaled_x | scaled_y | scaled_z | mtp_x | mtp_y | mtp_z | xRelBodyFixed | lon | lat | alt" << std::endl;
         for (size_t i = 0; i < this->impactParams.size(); i++) {
             ImpactParameters imp = this->impactParams[i];
             file << imp.t << " | ";
@@ -1377,55 +1390,15 @@ void PropSimulation::save(std::string filename) {
             file << imp.kizner.x << " | ";
             file << imp.kizner.y << " | ";
             file << imp.kizner.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.kizner.dx.size(); j++) {
-                file << imp.kizner.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.kizner.dy.size(); j++) {
-                file << imp.kizner.dy[j] << ",";
-            }
-            file << "] | ";
             file << imp.opik.x << " | ";
             file << imp.opik.y << " | ";
             file << imp.opik.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.opik.dx.size(); j++) {
-                file << imp.opik.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.opik.dy.size(); j++) {
-                file << imp.opik.dy[j] << ",";
-            }
-            file << "] | ";
             file << imp.scaled.x << " | ";
             file << imp.scaled.y << " | ";
             file << imp.scaled.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.scaled.dx.size(); j++) {
-                file << imp.scaled.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.scaled.dy.size(); j++) {
-                file << imp.scaled.dy[j] << ",";
-            }
-            file << "] | ";
             file << imp.mtp.x << " | ";
             file << imp.mtp.y << " | ";
             file << imp.mtp.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.mtp.dx.size(); j++) {
-                file << imp.mtp.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.mtp.dy.size(); j++) {
-                file << imp.mtp.dy[j] << ",";
-            }
-            file << "] | ";
             file << "[";
             for (size_t j = 0; j < imp.xRelBodyFixed.size(); j++) {
                 file << imp.xRelBodyFixed[j] << ",";

@@ -2,7 +2,6 @@
 import os
 import time
 import numpy as np
-import pandas as pd
 # pylint: disable=no-name-in-module
 from .. import libgrss
 
@@ -137,9 +136,9 @@ def reconstruct_all_log_files(log_dir):
     for file in files:
         if file.endswith('.log'):
             log_file = os.path.join(log_dir, file)
-            ca_list_, impact_list_ = _reconstruct_one_log_file(log_file)
-            ca_list.append(ca_list_)
-            impact_list.append(impact_list_)
+            file_ca_list, file_impact_list = _reconstruct_one_log_file(log_file)
+            ca_list.append(file_ca_list)
+            impact_list.append(file_impact_list)
     end_time = time.time()
     duration = end_time - start_time
     mm = int(duration / 60)
@@ -147,84 +146,106 @@ def reconstruct_all_log_files(log_dir):
     print(f'Reconstruction took {mm:02d} minute(s) and {ss:.6f} seconds')
     return ca_list, impact_list
 
-def _reconstruct_one_dataframe(lines, typ):
+def _reconstruct_one_log_file(log_file):
     """
-    Reconstruct a pandas dataframe from a log file for close approaches or impacts.
+    Reconstruct CloseApproachParameters and ImpactParameters objects from a log file.
+
+    Parameters
+    ----------
+    log_file : str
+        Path to the log file.
+
+    Returns
+    -------
+    ca_list : list of libgrss.CloseApproachParameters or None
+        List of close approaches in the log file.
+    impact_list : list of libgrss.ImpactParameters or None
+        List of impacts in the log file.
+    """
+    # first read the log file
+    with open(log_file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    try:
+        ca_list, impact_list = _reconstruct_ca_and_impact(lines)
+    except:
+        print(f'Error in reconstructing log file: {log_file}')
+        print(f'result: {_reconstruct_ca_and_impact(lines)}')
+        raise
+    return ca_list, impact_list
+
+def _reconstruct_ca_and_impact(lines):
+    """
+    Reconstruct CloseApproachParameters and ImpactParameters objects from a list of lines.
 
     Parameters
     ----------
     lines : list of str
         List of lines from the log file.
-    typ : str
-        Type of the log file. Must be either 'ca' or 'impact'.
 
     Returns
     -------
-    df : pandas.DataFrame
-        DataFrame of close approaches or impacts.
-
-    Raises
-    ------
-    ValueError
-        If typ is not 'ca' or 'impact'.
+    out_list : list
+        List of CloseApproachParameters (index 0) and ImpactParameters (index 1) objects.
     """
-    if typ not in ['ca', 'impact']:
-        raise ValueError('typ must be either "ca" or "impact"')
-    elif typ == 'ca':
-        start_key = '$$CA_START'
-        end_key = '$$CA_END'
-    elif typ == 'impact':
-        start_key = '$$IMPACT_START'
-        end_key = '$$IMPACT_END'
-    # find the index of the line that starts with "$$IMPACT_START" and "$$IMPACT_END"
-    start = [i for i, line in enumerate(lines) if line.startswith(start_key)]
-    end = [i for i, line in enumerate(lines) if line.startswith(end_key)]
-    # if start and end keys do not exist, return None
-    if not start or not end:
-        return None
-    start = start[0]
-    end = end[0]
-    # delimiter is "|"
     delimiter = ' | '
-    # first line is the header
-    header = lines[start+1].strip().split(delimiter)
-    # create pandas dataframe
-    df = pd.DataFrame([line.strip().split(delimiter) for line in lines[start+2:end]],
-                        columns=header)
-    # convert the columns to numeric
-    str_cols = [
-        'flybyBody', 'centralBody',
-    ]
-    list_cols = [
-        'xRel', 'xRelMap', 'bVec',
-        'kizner_dx', 'kizner_dy',
-        'opik_dx', 'opik_dy',
-        'scaled_dx', 'scaled_dy',
-        'mtp_dx', 'mtp_dy',
-        'xRelBodyFixed',
-    ]
-    bool_cols = [
-        'impact',
-    ]
-    int_cols = [
-        'flybyBodyIdx',
-        'centralBodyIdx',
-        'centralBodySpiceId',
-    ]
-    for col in df.columns:
-        if col in str_cols:
-            df[col] = df[col].astype(str)
-        elif col in list_cols:
-            df[col] = df[col].apply(lambda x: [float(num) for num in
-                                                x.replace('[','').replace(']','').split(',')
-                                                if num])
-        elif col in bool_cols:
-            df[col] = df[col].apply(lambda x: x == 'true')
-        elif col in int_cols:
-            df[col] = df[col].astype(int)
-        else:
-            df[col] = df[col].astype(float)
-    return df
+    str_cols = ['flybyBody', 'centralBody',]
+    list_cols = ['xRel', 'xRelMap', 'bVec', 'kizner_dx', 'kizner_dy', 'opik_dx', 'opik_dy',
+                    'scaled_dx', 'scaled_dy', 'mtp_dx', 'mtp_dy', 'xRelBodyFixed',]
+    bool_cols = ['impact',]
+    int_cols = ['flybyBodyIdx', 'centralBodyIdx', 'centralBodySpiceId']
+    float_cols = ['t', 'tMap', 'dist', 'vel', 'vInf', 'tPeri', 'tLin', 'bMag', 'gravFocusFactor',
+                    'kizner_x', 'kizner_y', 'kizner_z', 'opik_x', 'opik_y', 'opik_z', 'scaled_x',
+                    'scaled_y', 'scaled_z', 'mtp_x', 'mtp_y', 'mtp_z', 'lon', 'lat', 'alt']
+    out_list = [[],[]]
+    for idx, typ in enumerate(['ca', 'impact']):
+        if typ == 'ca':
+            start_key = '$$CA_START'
+            end_key = '$$CA_END'
+        elif typ == 'impact':
+            start_key = '$$IMPACT_START'
+            end_key = '$$IMPACT_END'
+        # find the index of the line that starts with "$$IMPACT_START" and "$$IMPACT_END"
+        start = [i for i, line in enumerate(lines) if line.startswith(start_key)]
+        end = [i for i, line in enumerate(lines) if line.startswith(end_key)]
+        # if start and end keys do not exist, return None
+        if not start or not end:
+            continue
+        start = start[0]
+        end = end[0]
+        # first line is the header
+        header = lines[start+1].strip().split(delimiter)
+        # create dict wiht key as index and value as column name
+        col_dict = dict(enumerate(header))
+        all_data = [line.strip().split(delimiter) for line in lines[start+2:end]]
+
+        single_list = []
+        for data in all_data:
+            # convert data to appropriate type
+            for i, raw_info in enumerate(data):
+                col = col_dict[i]
+                if col in str_cols:
+                    # do nothing, data is already string
+                    pass
+                elif col in list_cols:
+                    parsed_info = raw_info.replace('[','').replace(']','').split(',')
+                    data[i] = [float(num) for num in parsed_info if num]
+                elif col in bool_cols:
+                    data[i] = raw_info == 'true'
+                elif col in int_cols:
+                    data[i] = int(raw_info)
+                elif col in float_cols:
+                    data[i] = float(raw_info)
+                else:
+                    raise ValueError(f'Unrecognized column name in log file: {col}')
+            # create a dictionary with column name as key and data as value
+            data_dict = {col_dict[i]: data[i] for i in range(len(data))}
+            if typ == 'ca':
+                out = _reconstruct_ca_params(data_dict)
+            else:
+                out = _reconstruct_impact_params(data_dict)
+            single_list.append(out)
+        out_list[idx] = single_list
+    return out_list
 
 def _reconstruct_ca_params(row):
     """
@@ -232,8 +253,8 @@ def _reconstruct_ca_params(row):
 
     Parameters
     ----------
-    row : pandas.Series
-        Row in a dataframe.
+    row : dict
+        Dictionary of column names from the log file mapped to values from the row.
 
     Returns
     -------
@@ -287,8 +308,8 @@ def _reconstruct_impact_params(row):
 
     Parameters
     ----------
-    row : pandas.Series
-        Row in a dataframe.
+    row : dict
+        Dictionary of column names from the log file mapped to values from the row.
 
     Returns
     -------
@@ -338,39 +359,6 @@ def _reconstruct_impact_params(row):
     impact.alt = row['alt']
     return impact
 
-def _reconstruct_one_log_file(log_file):
-    """
-    Reconstruct CloseApproachParameters and ImpactParameters objects from a log file.
-
-    Parameters
-    ----------
-    log_file : str
-        Path to the log file.
-
-    Returns
-    -------
-    ca_list : list of libgrss.CloseApproachParameters or None
-        List of close approaches in the log file.
-    impact_list : list of libgrss.ImpactParameters or None
-        List of impacts in the log file.
-    """
-    # first read the log file
-    with open(log_file, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    ca_df = _reconstruct_one_dataframe(lines, 'ca')
-    impact_df = _reconstruct_one_dataframe(lines, 'impact')
-    ca_list = []
-    impact_list = []
-    if ca_df is not None:
-        for i in range(len(ca_df)):
-            ca = _reconstruct_ca_params(ca_df.iloc[i])
-            ca_list.append(ca)
-    if impact_df is not None:
-        for i in range(len(impact_df)):
-            impact = _reconstruct_impact_params(impact_df.iloc[i])
-            impact_list.append(impact)
-    return ca_list, impact_list
-
 def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
     """
     Cluster a list of close approaches by time and uniqueness.
@@ -397,26 +385,20 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
         return tuple(all_clusters)
     times = [ca_or_impact.t for ca_or_impact in full_list]
     bodies = [ca_or_impact.flybyBody for ca_or_impact in full_list]
-    idx_list = list(range(len(full_list)))
 
-    df = pd.DataFrame({'time': times, 'body': bodies, 'idx': idx_list})
-    df = df.sort_values(by=['time'])
-
-    # create a new cluster if one of two conditions is met:
-    # 1. the time between the current close approach and the last close approach
-    #       is greater than max_duration
-    # 2. the current close approach body is already in the current cluster
-    cluster = [full_list[df.iloc[0]['idx']]]
-    cluster_bodies = [df.iloc[0]['body']]
-    for i in range(1, len(df)):
-        time_condition = df.iloc[i]['time'] - df.iloc[i-1]['time'] > max_duration
-        body_condition = df.iloc[i]['body'] in cluster_bodies
+    sort_idx = np.argsort(times)
+    cluster = [full_list[sort_idx[0]]]
+    cluster_bodies = [bodies[sort_idx[0]]]
+    for i in range(1, len(sort_idx)):
+        idx = sort_idx[i]
+        time_condition = times[idx] - times[sort_idx[i-1]] > max_duration
+        body_condition = bodies[idx] in cluster_bodies
         if time_condition or body_condition:
             all_clusters.append(cluster)
-            cluster = [full_list[df.iloc[i]['idx']]]
-            cluster_bodies = [df.iloc[i]['body']]
+            cluster = [full_list[idx]]
+            cluster_bodies = [bodies[idx]]
         else:
-            cluster.append(full_list[df.iloc[i]['idx']])
-            cluster_bodies.append(df.iloc[i]['body'])
+            cluster.append(full_list[idx])
+            cluster_bodies.append(bodies[idx])
     all_clusters.append(cluster)
     return tuple(all_clusters)

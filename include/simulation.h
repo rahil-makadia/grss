@@ -6,6 +6,12 @@
 // forward declaration for main PropSimulation class
 class PropSimulation;
 
+// forward declaration for reconstruct_stm function (defined in stm.cpp)
+/**
+ * @brief Reconstruct the STM matrix from the flattened STM vector.
+ */
+std::vector<std::vector<real>> reconstruct_stm(const std::vector<real> &stm);
+
 /**
  * @brief Get the name of body-fixed frame for a given SPICE ID.
  */
