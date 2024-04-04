@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_utils.plot_bplane &#8212; GRSS 3.8.7 documentation</title>
+    <title>grss.prop.prop_utils.plot_bplane &#8212; GRSS 3.8.8 documentation</title>
   
   
   
@@ -59,10 +59,10 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.prop.prop_utils.plot_ca_summary" href="grss.prop.prop_utils.plot_ca_summary.html" />
-    <link rel="prev" title="grss.prop.prop_utils.get_scale_factor" href="grss.prop.prop_utils.get_scale_factor.html" />
+    <link rel="prev" title="grss.prop.prop_utils.partials_to_ellipse" href="grss.prop.prop_utils.partials_to_ellipse.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 02, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 04, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.7 documentation</p>
+    <p class="title logo__title">GRSS v3.8.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -261,6 +261,8 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.data_to_ellipse.html">grss.prop.prop_utils.data_to_ellipse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.days_to_dhms.html">grss.prop.prop_utils.days_to_dhms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.get_scale_factor.html">grss.prop.prop_utils.get_scale_factor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.mean_cov_to_ellipse.html">grss.prop.prop_utils.mean_cov_to_ellipse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.partials_to_ellipse.html">grss.prop.prop_utils.partials_to_ellipse</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.prop.prop_utils.plot_bplane</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.plot_ca_summary.html">grss.prop.prop_utils.plot_ca_summary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.plot_earth_impact.html">grss.prop.prop_utils.plot_earth_impact</a></li>
@@ -504,7 +506,7 @@ document.write(`
 <h1>grss.prop.prop_utils.plot_bplane<a class="headerlink" href="#grss-prop-prop-utils-plot-bplane" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.prop.prop_utils.plot_bplane">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">plot_bplane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units_km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_central_body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.plot_bplane" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_utils.</span></span><span class="sig-name descname"><span class="pre">plot_bplane</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ca_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units_km</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equal_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_ellipse_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_central_body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analytic_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_utils.plot_bplane" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot the B-planes of a list of close approaches.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -518,6 +520,8 @@ document.write(`
 <li><p><strong>print_ellipse_params</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to print the ellipse parameters, False to not print, by default False.</p></li>
 <li><p><strong>show_central_body</strong> (<em>bool</em><em>, </em><em>optional</em>) – True to show the central body, False to not show it, by default True.</p></li>
 <li><p><strong>sigma_points</strong> (<em>prop.SigmaPoints</em><em>, </em><em>optional</em>) – SigmaPoints object for reconstructing mean and cov, by default None.</p></li>
+<li><p><strong>analytic_info</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Tuple of analytic B-plane information (initial covariance
+and state conversion partial derivatives), by default None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -543,12 +547,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.prop.prop_utils.get_scale_factor.html"
+       href="grss.prop.prop_utils.partials_to_ellipse.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.prop.prop_utils.get_scale_factor</p>
+        <p class="prev-next-title">grss.prop.prop_utils.partials_to_ellipse</p>
       </div>
     </a>
     <a class="right-next"
@@ -610,7 +614,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 02, 2024.
+  Last updated on Apr 04, 2024.
   <br/>
 </p>
   </div>

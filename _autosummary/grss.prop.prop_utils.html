@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.prop.prop_utils &#8212; GRSS 3.8.7 documentation</title>
+    <title>grss.prop.prop_utils &#8212; GRSS 3.8.8 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_unscented.SigmaPoints" href="grss.prop.prop_unscented.SigmaPoints.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 02, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 04, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.7 documentation</p>
+    <p class="title logo__title">GRSS v3.8.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -261,6 +261,8 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.data_to_ellipse.html">grss.prop.prop_utils.data_to_ellipse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.days_to_dhms.html">grss.prop.prop_utils.days_to_dhms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.get_scale_factor.html">grss.prop.prop_utils.get_scale_factor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.mean_cov_to_ellipse.html">grss.prop.prop_utils.mean_cov_to_ellipse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.partials_to_ellipse.html">grss.prop.prop_utils.partials_to_ellipse</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.plot_bplane.html">grss.prop.prop_utils.plot_bplane</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.plot_ca_summary.html">grss.prop.prop_utils.plot_ca_summary</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.prop.prop_utils.plot_earth_impact.html">grss.prop.prop_utils.plot_earth_impact</a></li>
@@ -505,6 +507,12 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.prop_utils.get_scale_factor.html#grss.prop.prop_utils.get_scale_factor" title="grss.prop.prop_utils.get_scale_factor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_scale_factor</span></code></a>(body_id)</p></td>
 <td><p>Get the scale factor for plotting close approaches.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.prop.prop_utils.mean_cov_to_ellipse.html#grss.prop.prop_utils.mean_cov_to_ellipse" title="grss.prop.prop_utils.mean_cov_to_ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_cov_to_ellipse</span></code></a>(mean, cov, n_std, ...)</p></td>
+<td><p>Convert a mean and corresponding covariance to an ellipse.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.prop.prop_utils.partials_to_ellipse.html#grss.prop.prop_utils.partials_to_ellipse" title="grss.prop.prop_utils.partials_to_ellipse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">partials_to_ellipse</span></code></a>(ca, au2units, n_std, ...)</p></td>
+<td><p>Convert the B-plane partial derivatives to a mean and covariance.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="grss.prop.prop_utils.plot_bplane.html#grss.prop.prop_utils.plot_bplane" title="grss.prop.prop_utils.plot_bplane"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_bplane</span></code></a>(ca_list[, plot_offset, ...])</p></td>
 <td><p>Plot the B-planes of a list of close approaches.</p></td>
 </tr>
@@ -590,7 +598,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 02, 2024.
+  Last updated on Apr 04, 2024.
   <br/>
 </p>
   </div>

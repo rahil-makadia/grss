@@ -17,6 +17,8 @@ grss.prop.prop\_utils
         data_to_ellipse
         days_to_dhms
         get_scale_factor
+        mean_cov_to_ellipse
+        partials_to_ellipse
         plot_bplane
         plot_ca_summary
         plot_earth_impact
