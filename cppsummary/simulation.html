@@ -59,10 +59,10 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="spk.h" href="spk.html" />
-    <link rel="prev" title="parallel.h" href="parallel.html" />
+    <link rel="prev" title="pck.h" href="pck.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 04, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 06, 2024"/>
   </head>
   
   
@@ -287,6 +287,7 @@
 <li class="toctree-l2"><a class="reference internal" href="gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpolate.html">interpolate.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="parallel.html">parallel.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pck.html">pck.h</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">simulation.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spk.html">spk.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stm.html">stm.h</a></li>
@@ -534,7 +535,7 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tObsMjd</strong> – <strong>[in]</strong> Observation time in Modified Julian Date. </p></li>
 <li><p><strong>observerInfo</strong> – <strong>[in]</strong> Observer information (base body SPICE ID, lon [rad], lat [rad], alt [m]) </p></li>
-<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for querying <a class="reference internal" href="spk.html#struct_ephemeris"><span class="std std-ref">Ephemeris</span></a> of base body. </p></li>
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for querying Ephemeris of base body. </p></li>
 <li><p><strong>tObsInUTC</strong> – <strong>[in]</strong> Flag to indicate if the observation time is in UTC (true) or TDB (false). </p></li>
 <li><p><strong>observerState</strong> – <strong>[out]</strong> Output observer state (position [DU], velocity [DU/TU]). </p></li>
 </ul>
@@ -623,7 +624,7 @@ document.write(`
 <dd class="field-odd"><p>Number of integrated bodies. </p>
 </dd>
 <dt class="field-even">Param nSpice<span class="colon">:</span></dt>
-<dd class="field-even"><p>Number of SPICE bodies (queried from <a class="reference internal" href="#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> <a class="reference internal" href="spk.html#struct_ephemeris"><span class="std std-ref">Ephemeris</span></a> object). </p>
+<dd class="field-even"><p>Number of SPICE bodies (queried from <a class="reference internal" href="#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> Ephemeris object). </p>
 </dd>
 <dt class="field-odd">Param nTotal<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Total number of bodies (nInteg + nSpice). </p>
@@ -1684,7 +1685,7 @@ document.write(`
 <dd class="field-even"><p>Path to DE kernels. </p>
 </dd>
 <dt class="field-odd">Param ephem<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="spk.html#struct_ephemeris"><span class="std std-ref">Ephemeris</span></a> object for the simulation. </p>
+<dd class="field-odd"><p>Ephemeris object for the simulation. </p>
 </dd>
 <dt class="field-even">Param consts<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#struct_constants"><span class="std std-ref">Constants</span></a> object for the simulation. </p>
@@ -2004,8 +2005,8 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation5ephemE">
-<span class="target" id="class_prop_simulation_1aeb0cbf7b57caca42672e63cae57e0023"></span><a class="reference internal" href="spk.html#_CPPv49Ephemeris" title="Ephemeris"><span class="n"><span class="pre">Ephemeris</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ephem</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation5ephemE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation8spkEphemE">
+<span class="target" id="class_prop_simulation_1a59abc54940f4359d6f1c94a3a811080f"></span><a class="reference internal" href="spk.html#_CPPv412SpkEphemeris" title="SpkEphemeris"><span class="n"><span class="pre">SpkEphemeris</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">spkEphem</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation8spkEphemE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -2191,12 +2192,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="parallel.html"
+       href="pck.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">parallel.h</p>
+        <p class="prev-next-title">pck.h</p>
       </div>
     </a>
     <a class="right-next"
@@ -2245,7 +2246,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 04, 2024.
+  Last updated on Apr 06, 2024.
   <br/>
 </p>
   </div>
