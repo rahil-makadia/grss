@@ -41,8 +41,8 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     const real atm_offset = 100.0e3/propSim->consts.du2m;
                     centralBodyRadius += atm_offset;
                     double xSpice[9], xSpiceOld[9];
-                    get_spk_state(bodyj.spiceId, t, propSim->ephem, xSpice);
-                    get_spk_state(bodyj.spiceId, tOld, propSim->ephem, xSpiceOld);
+                    get_spk_state(bodyj.spiceId, t, propSim->spkEphem, xSpice);
+                    get_spk_state(bodyj.spiceId, tOld, propSim->spkEphem, xSpiceOld);
                     for (size_t k = 0; k < 3; k++) {
                         relPosOld[k] = xIntegOld[starti + k] - xSpiceOld[k];
                         relPos[k] = xInteg[starti + k] - xSpice[k];
@@ -184,7 +184,7 @@ static std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
         double xSpice[9];
         get_spk_state(
             propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId, t,
-            propSim->ephem, xSpice);
+            propSim->spkEphem, xSpice);
         for (size_t k = 0; k < 6; k++) {
             xRel[k] -= xSpice[k];
         }
@@ -383,9 +383,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     this->tLin = this->tPeri - log(e) / n;
     // calculate B-plane parameters (Öpik xi, zeta formulation)
     double xCentralBody[9];
-    get_spk_state(this->centralBodySpiceId, tMap, propSim->ephem, xCentralBody);
+    get_spk_state(this->centralBodySpiceId, tMap, propSim->spkEphem, xCentralBody);
     double xSun[9];
-    get_spk_state(10, tMap, propSim->ephem, xSun);
+    get_spk_state(10, tMap, propSim->spkEphem, xSun);
     real vCentralBodyHelio[3];
     for (size_t k = 0; k < 3; k++) {
         vCentralBodyHelio[k] = xCentralBody[3+k]-xSun[3+k];

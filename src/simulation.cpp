@@ -84,7 +84,7 @@ void get_observer_state(const real &tObsMjd,
         tObsMjdTDB = tObsMjd;
     }
     double baseBodyState[9];
-    get_spk_state(baseBody, tObsMjdTDB, propSim->ephem, baseBodyState);
+    get_spk_state(baseBody, tObsMjdTDB, propSim->spkEphem, baseBodyState);
     if ((int)observerInfo[0] == 500) {
         observerState[0] = (real) baseBodyState[0] + observerInfo[1]/propSim->consts.du2m;
         observerState[1] = (real) baseBodyState[1] + observerInfo[2]/propSim->consts.du2m;
@@ -198,7 +198,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
     std::vector<std::vector<real>> eclipToEquatorial(3, std::vector<real>(3));
-    rot_mat_x(-EARTH_OBLIQUITY, eclipToEquatorial);
+    rot_mat_x(EARTH_OBLIQUITY, eclipToEquatorial);
     mat_vec_mul(eclipToEquatorial,
                 {cartesianStateEclip[0], cartesianStateEclip[1],
                  cartesianStateEclip[2]},
@@ -693,8 +693,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
                 "(case 441).");
             break;
     }
-    this->ephem.mbPath = kernel_mb;
-    this->ephem.sbPath = kernel_sb;
+    this->spkEphem.mbPath = kernel_mb;
+    this->spkEphem.sbPath = kernel_sb;
 }
 
 /**
@@ -704,10 +704,10 @@ PropSimulation::PropSimulation(std::string name, real t0,
 PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
-    this->ephem.mbPath = simRef.ephem.mbPath;
-    this->ephem.sbPath = simRef.ephem.sbPath;
-    this->ephem.mb = nullptr;
-    this->ephem.sb = nullptr;
+    this->spkEphem.mbPath = simRef.spkEphem.mbPath;
+    this->spkEphem.sbPath = simRef.spkEphem.sbPath;
+    this->spkEphem.mb = nullptr;
+    this->spkEphem.sb = nullptr;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
     this->integParams.nInteg = 0;
@@ -846,15 +846,15 @@ void PropSimulation::prepare_for_evaluation(
 }
 
 void PropSimulation::map_ephemeris(){
-    this->ephem.mb = spk_init(this->ephem.mbPath);
-    this->ephem.sb = spk_init(this->ephem.sbPath);
+    this->spkEphem.mb = spk_init(this->spkEphem.mbPath);
+    this->spkEphem.sb = spk_init(this->spkEphem.sbPath);
 }
 
 void PropSimulation::unmap_ephemeris(){
-    daf_free(this->ephem.mb);
-    daf_free(this->ephem.sb);
-    this->ephem.mb = nullptr;
-    this->ephem.sb = nullptr;
+    spk_free(this->spkEphem.mb);
+    spk_free(this->spkEphem.sb);
+    this->spkEphem.mb = nullptr;
+    this->spkEphem.sb = nullptr;
 }
 
 /**
@@ -875,13 +875,13 @@ std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::s
                                         " does not exist in simulation " +
                                         this->name);
     }
-    if (this->ephem.mb == nullptr || this->ephem.sb == nullptr){
+    if (this->spkEphem.mb == nullptr || this->spkEphem.sb == nullptr){
         throw std::invalid_argument(
             "get_spiceBody_state: Ephemeris kernels are not loaded. Memory map "
             "the ephemeris using PropSimulation.map_ephemeris() method first.");
     }
     double spiceState[9];
-    get_spk_state(spiceId, t, this->ephem, spiceState);
+    get_spk_state(spiceId, t, this->spkEphem, spiceState);
     std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
                                spiceState[3], spiceState[4], spiceState[5]};
     return state;
@@ -1099,7 +1099,7 @@ void PropSimulation::preprocess() {
         for (size_t i = 0; i < this->integParams.nInteg; i++) {
             if (this->integBodies[i].isCometary) {
                 double sunState[9];
-                get_spk_state(10, this->integBodies[i].t0, this->ephem, sunState);
+                get_spk_state(10, this->integBodies[i].t0, this->spkEphem, sunState);
                 this->integBodies[i].pos[0] += sunState[0];
                 this->integBodies[i].pos[1] += sunState[1];
                 this->integBodies[i].pos[2] += sunState[2];
@@ -1222,8 +1222,8 @@ void PropSimulation::save(std::string filename) {
     file << "Integration from MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.t0
          << " to MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.tf << " [TDB]"
          << std::endl;
-    file << "Main-body kernel path: " << this->ephem.mbPath << std::endl;
-    file << "Small-body kernel path: " << this->ephem.sbPath << std::endl;
+    file << "Main-body kernel path: " << this->spkEphem.mbPath << std::endl;
+    file << "Small-body kernel path: " << this->spkEphem.sbPath << std::endl;
 
     file << std::endl;
     nextSubsection = std::to_string(this->integParams.nInteg) + " Integration bodies";

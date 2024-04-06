@@ -9,38 +9,38 @@
 static double inline _mjd(double et) { return 51544.5 + et / 86400.0; }
 
 /**
- * @param[in] pl DafInfo structure.
+ * @param[in] bsp SpkInfo structure.
  */
-void daf_free(DafInfo* pl) {
-	if (pl == nullptr)
-		return;
+void spk_free(SpkInfo* bsp) {
+    if (bsp == nullptr)
+        return;
 
-    if (pl->targets){
-        for (int m = 0; m < pl->num; m++) {
-            free(pl->targets[m].one);
-            free(pl->targets[m].two);
+    if (bsp->targets){
+        for (int m = 0; m < bsp->num; m++) {
+            free(bsp->targets[m].one);
+            free(bsp->targets[m].two);
         }
-        free(pl->targets);
+        free(bsp->targets);
     }
-	munmap(pl->map, pl->len);
-	memset(pl, 0, sizeof(DafInfo));
-	free(pl);
+    munmap(bsp->map, bsp->len);
+    memset(bsp, 0, sizeof(SpkInfo));
+    free(bsp);
 }
 
 /**
- * @param[in] path Path to the DAF file.
- * @param[in] type Type of the DAF file (SPK or PCK).
- * @return DafInfo* Pointer to the DafInfo structure.
+ * @param[in] path Path to the SPK file.
+ * @return SpkInfo* Pointer to the SpkInfo structure.
  */
-DafInfo* daf_init(const std::string &path, const std::string &type) {
+SpkInfo* spk_init(const std::string &path) {
     // For file format information, see
-    // https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/daf.html
+    // https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/daf.html#The%20File%20Record
+    // https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/spk.html#SPK%20File%20Structure
 
     // Format for one summary
     struct summary {
         double beg;  // begin epoch, seconds since J2000.0
         double end;  // ending epoch
-        int tar;     // target code
+        int code;     // target code
         int cen;     // centre code (10 = sun)
         int ref;     // reference frame (1 = J2000.0)
         int ver;     // type of ephemeris (2 = chebyshev)
@@ -57,7 +57,6 @@ DafInfo* daf_init(const std::string &path, const std::string &type) {
             double nsum;    // Number of summaries in this record
             summary s[25];  // Summaries (25 is the maximum)
         } summaries;        // Summary record
-        // See: https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/daf.html#The%20File%20Record
         struct {
             char locidw[8]; // An identification word
             int nd;         // The number of double precision components in each array summary.
@@ -77,7 +76,7 @@ DafInfo* daf_init(const std::string &path, const std::string &type) {
     // Read the file record.
     read(fd, &record, RECORD_LEN);
     // Check if the file is a valid double Precision Array File
-    std::string full_file_type = "DAF/" + type;
+    std::string full_file_type = "DAF/SPK";
     if (strncmp(record.file.locidw, full_file_type.c_str(), 7) != 0) {
         throw std::runtime_error(
             "Error parsing "+full_file_type+". Incorrect "
@@ -114,8 +113,8 @@ DafInfo* daf_init(const std::string &path, const std::string &type) {
     // std::cout << "record.file.nd: " << record.file.nd << std::endl;
     // std::cout << "record.file.ni: " << record.file.ni << std::endl;
     // std::cout << "nc: " << nc << std::endl;
-    // okay, let's go
-    DafInfo *pl = (DafInfo *)calloc(1, sizeof(DafInfo));
+    // okay, here we go
+    SpkInfo *bsp = (SpkInfo *)calloc(1, sizeof(SpkInfo));
     // Loop over records
     while (true) {
         // Loop over summaries
@@ -123,29 +122,29 @@ DafInfo* daf_init(const std::string &path, const std::string &type) {
             // get current summary
             summary *sum = &record.summaries.s[b];
             // Index in our arrays for current target
-            int m = pl->num - 1;
+            int m = bsp->num - 1;
             // New target?
-            if (pl->num == 0 || sum->tar != pl->targets[m].code) {
-                if (pl->num <= pl->allocatedNum) {
-                    pl->allocatedNum += SPK_CACHE_ITEM_SIZE;  // increase space in batches of SPK_CACHE_ITEM_SIZE
-                    pl->targets = (SpkTarget *)realloc(
-                        pl->targets, pl->allocatedNum * sizeof(SpkTarget));
+            if (bsp->num == 0 || sum->code != bsp->targets[m].code) {
+                if (bsp->num <= bsp->allocatedNum) {
+                    bsp->allocatedNum += SPK_CACHE_ITEM_SIZE;  // increase space in batches of SPK_CACHE_ITEM_SIZE
+                    bsp->targets = (SpkTarget *)realloc(
+                        bsp->targets, bsp->allocatedNum * sizeof(SpkTarget));
                 }
                 m++;
-                pl->targets[m].code = sum->tar;
-                pl->targets[m].cen = sum->cen;
-                pl->targets[m].beg = _mjd(sum->beg);
-                pl->targets[m].res = _mjd(sum->end) - pl->targets[m].beg;
-                pl->targets[m].one = (int *)calloc(32768, sizeof(int));
-                pl->targets[m].two = (int *)calloc(32768, sizeof(int));
-                pl->targets[m].ind = 0;
-                pl->num++;
+                bsp->targets[m].code = sum->code;
+                bsp->targets[m].cen = sum->cen;
+                bsp->targets[m].beg = _mjd(sum->beg);
+                bsp->targets[m].res = _mjd(sum->end) - bsp->targets[m].beg;
+                bsp->targets[m].one = (int *)calloc(32768, sizeof(int));
+                bsp->targets[m].two = (int *)calloc(32768, sizeof(int));
+                bsp->targets[m].ind = 0;
+                bsp->num++;
             }
             // add index for target
-            pl->targets[m].one[pl->targets[m].ind] = sum->one;
-            pl->targets[m].two[pl->targets[m].ind] = sum->two;
-            pl->targets[m].end = _mjd(sum->end);
-            pl->targets[m].ind++;
+            bsp->targets[m].one[bsp->targets[m].ind] = sum->one;
+            bsp->targets[m].two[bsp->targets[m].ind] = sum->two;
+            bsp->targets[m].end = _mjd(sum->end);
+            bsp->targets[m].ind++;
         }
 
         // Location of next record
@@ -166,34 +165,26 @@ DafInfo* daf_init(const std::string &path, const std::string &type) {
         throw std::runtime_error("Error calculating size for "+full_file_type+".");
         return NULL;
     }
-    pl->len = sb.st_size;
+    bsp->len = sb.st_size;
 
     // Memory map
-    pl->map = mmap(NULL, pl->len, PROT_READ, MAP_SHARED, fd, 0);
-    if (pl->map == NULL) {
+    bsp->map = mmap(NULL, bsp->len, PROT_READ, MAP_SHARED, fd, 0);
+    if (bsp->map == NULL) {
         throw std::runtime_error("Error creating memory map.");
         return NULL;  // Will leak memory
     }
     #if defined(MADV_RANDOM)
-        if (madvise(pl->map, pl->len, MADV_RANDOM) < 0) {
+        if (madvise(bsp->map, bsp->len, MADV_RANDOM) < 0) {
             throw std::runtime_error("Error while calling madvise().");
             return NULL;  // Will leak memory
         }
     #endif
     close(fd);
-    return pl;
+    return bsp;
 }
 
 /**
- * @param[in] path Path to the SPK file.
- * @return DafInfo* Pointer to the DafInfo structure for the SPK file.
- */
-DafInfo* spk_init(const std::string &path) {
-    return daf_init(path, "SPK");
-}
-
-/**
- * @param[in] pl DafInfo structure.
+ * @param[in] bsp SpkInfo structure.
  * @param[in] epoch Epoch to compute the state at (MJD ET).
  * @param[in] spiceId SPICE ID of the body.
  * @param[out] out_x X position of the body [AU].
@@ -206,38 +197,32 @@ DafInfo* spk_init(const std::string &path) {
  * @param[out] out_ay Y acceleration of the body [AU/day^2].
  * @param[out] out_az Z acceleration of the body [AU/day^2].
  */
-void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
+void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
              double *out_vz, double *out_ax, double *out_ay, double *out_az) {
-    if (pl == NULL) {
-        throw std::runtime_error("The JPL ephemeris file has not been found.");
+    if (bsp == NULL) {
+        throw std::runtime_error("The SPK ephemeris file has not been found.");
     }
     if (spiceId == 199) spiceId = 1;
     if (spiceId == 299) spiceId = 2;
     int m;
-    m = spiceId;
-    for (m = 0; m < pl->num; m++) {
-        if (pl->targets[m].code == spiceId) {
+    for (m = 0; m < bsp->num; m++) {
+        if (bsp->targets[m].code == spiceId) {
             break;
         }
-        if (m == pl->num - 1) {
-            throw std::invalid_argument(
-                "ERROR: Requested SPICE ID not found in SPK file");
+        if (m == bsp->num - 1) {
+            throw std::invalid_argument("ERROR: Requested SPICE ID not found in SPK file");
         }
     }
-    if (m < 0 || m >= pl->num) {
+    if (m < 0 || m >= bsp->num) {
         throw std::runtime_error("The requested spice ID has not been found.");
     }
-    SpkTarget *target = &(pl->targets[m]);
+    SpkTarget *target = &(bsp->targets[m]);
     if (epoch < target->beg || epoch > target->end) {
         throw std::runtime_error(
             "The requested time is outside the coverage "
             "provided by the ephemeris file.");
     }
-    double T[32];
-    double S[32];
-    double U[32];
-    double *val, z;
     *out_x = 0.0;
     *out_y = 0.0;
     *out_z = 0.0;
@@ -249,7 +234,7 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
     *out_az = 0.0;
     if (target->cen == 3) {
         double xc, yc, zc, vxc, vyc, vzc, axc, ayc, azc;
-        spk_calc(pl, epoch, target->cen, &xc, &yc, &zc, &vxc, &vyc, &vzc, &axc,
+        spk_calc(bsp, epoch, target->cen, &xc, &yc, &zc, &vxc, &vyc, &vzc, &axc,
                  &ayc, &azc);
         *out_x = xc;
         *out_y = yc;
@@ -264,16 +249,20 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
     int n, b, p, P, R;
     // find location of 'directory' describing the data records
     n = (int)((epoch - target->beg) / target->res);
-    val = (double *)pl->map + target->two[n] - 1;
+    double *val;
+    val = (double *)bsp->map + target->two[n] - 1;
     // record size and number of coefficients per coordinate
     R = (int)val[-1];
     P = (R - 2) / 3;  // must be < 32 !!
     // pick out the precise record
     b = (int)((epoch - _mjd(val[-3])) / (val[-2] / 86400.0));
-    val = (double *)pl->map + (target->one[n] - 1) + b * R;
+    val = (double *)bsp->map + (target->one[n] - 1) + b * R;
     // scale to interpolation units
-    z = (epoch - _mjd(val[0])) / (val[1] / 86400.0);
+    const double z = (epoch - _mjd(val[0])) / (val[1] / 86400.0);
     // set up Chebyshev polynomials
+    double T[32];
+    double S[32];
+    double U[32];
     T[0] = 1.0;
     T[1] = z;
     S[0] = 0.0;
@@ -288,50 +277,7 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
     for (p = 3; p < P; p++) {
         U[p] = 2.0 * z * U[p - 1] + 4.0 * S[p - 1] - U[p - 2];
     }
-    double t1 = 32.0;
-    int niv;
-    switch (spiceId) {
-        case 1:
-            niv = 4;
-            break;
-        case 2:
-            niv = 2;
-            break;
-        case 3:
-            niv = 2;
-            break;
-        case 4:
-            niv = 1;
-            break;
-        case 5:
-            niv = 1;
-            break;
-        case 6:
-            niv = 1;
-            break;
-        case 7:
-            niv = 1;
-            break;
-        case 8:
-            niv = 1;
-            break;
-        case 9:
-            niv = 1;
-            break;
-        case 10:
-            niv = 2;
-            break;
-        case 301:
-            niv = 8;
-            break;
-        case 399:
-            niv = 8;
-            break;
-        default:
-            niv = 1;
-            break;
-    }
-    double c = (double)(niv * 2) / t1 / 86400.0;
+    double c = 1.0 / val[1]; // derivative scaling factor from SPICE/spke02.f and chbint.f
     double pos[3] = {0.0, 0.0, 0.0};
     double vel[3] = {0.0, 0.0, 0.0};
     double acc[3] = {0.0, 0.0, 0.0};
@@ -362,7 +308,7 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
  * @param[in] ephem Ephemeris data from the PropSimulation.
  * @param[out] state State+acceleration of the body at the requested epoch [AU, AU/day, AU/day^2].
  */
-void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
+void get_spk_state(const int &spiceId, const double &t0_mjd, SpkEphemeris &ephem,
                    double state[9]) {
     if (ephem.mb == nullptr || ephem.sb == nullptr){
         throw std::invalid_argument(
@@ -370,7 +316,7 @@ void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
             "the ephemeris using PropSimulation.map_ephemeris() method first.");
     }
     bool smallBody = spiceId > 1000000;
-    DafInfo *infoToUse;
+    SpkInfo *infoToUse;
     if (smallBody) {
         infoToUse = ephem.sb;
     } else {
@@ -378,7 +324,6 @@ void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
     }
     // find what cache index corresponds to the requested SPICE ID
     int m;
-    m = spiceId;
     for (m = 0; m < infoToUse->num; m++) {
         if (infoToUse->targets[m].code == spiceId) {
             break;
@@ -464,21 +409,4 @@ void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ax = state[6];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ay = state[7];
     ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].az = state[8];
-}
-
-/**
- * @param from Frame to rotate from.
- * @param to Frame to rotate to.
- * @param et TDB ephemeris time in seconds past J2000 to get the rotation matrix at.
- * @param rotMat Rotation matrix from 'from' to 'to'.
- */
-void get_pck_rotMat(const std::string &from, const std::string &to,
-                    const real &et, std::vector<std::vector<real>> &rotMat) {
-    SpiceDouble rotMatSpice[6][6];
-    sxform_c(from.c_str(), to.c_str(), et, rotMatSpice);
-    for (size_t i = 0; i < 6; i++) {
-        for (size_t j = 0; j < 6; j++) {
-            rotMat[i][j] = (real)rotMatSpice[i][j];
-        }
-    }
 }

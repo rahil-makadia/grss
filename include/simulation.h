@@ -425,7 +425,7 @@ class PropSimulation {
    public:
     std::string name;
     std::string DEkernelPath;
-    Ephemeris ephem;
+    SpkEphemeris spkEphem;
     /**
      * @brief Construct a new PropSimulation object.
      */

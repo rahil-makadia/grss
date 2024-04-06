@@ -11,8 +11,7 @@
 
     PATH_SYMBOLS = ( 'GRSS' )
 
-    KERNELS_TO_LOAD = ( '$GRSS/latest_leapseconds.tls',
-                        '$GRSS/pck00011.tpc',
+    KERNELS_TO_LOAD = ( '$GRSS/pck00011.tpc',
                         '$GRSS/earth_200101_990825_predict.bpc',
                         '$GRSS/earth_720101_230601.bpc',
                         '$GRSS/earth_latest_high_prec.bpc' )

@@ -390,8 +390,8 @@ void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     double sunState[9];
     double earthState[9];
-    get_spk_state(10, tInterpGeom, propSim->ephem, sunState);
-    get_spk_state(399, tInterpGeom, propSim->ephem, earthState);
+    get_spk_state(10, tInterpGeom, propSim->spkEphem, sunState);
+    get_spk_state(399, tInterpGeom, propSim->spkEphem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -743,8 +743,8 @@ void get_delta_delay_relativistic(PropSimulation *propSim,
     // https://ui.adsabs.harvard.edu/abs/1990A&A...233..252S
     double sunState[9];
     double earthState[9];
-    get_spk_state(10, tForSpice, propSim->ephem, sunState);
-    get_spk_state(399, tForSpice, propSim->ephem, earthState);
+    get_spk_state(10, tForSpice, propSim->spkEphem, sunState);
+    get_spk_state(399, tForSpice, propSim->spkEphem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -832,8 +832,8 @@ void get_doppler_measurement(PropSimulation *propSim, const size_t &i,
 
     double xSun3[9];
     double xSun1[9];
-    get_spk_state(10, receiveTimeTDB, propSim->ephem, xSun3);
-    get_spk_state(10, transmitTimeTDB, propSim->ephem, xSun1);
+    get_spk_state(10, receiveTimeTDB, propSim->spkEphem, xSun3);
+    get_spk_state(10, transmitTimeTDB, propSim->spkEphem, xSun1);
 
     std::vector<real> posHelio3(3), velHelio3(3), posHelio1(3), velHelio1(3);
     posHelio3[0] = pos3[0] - xSun3[0];

@@ -3,7 +3,7 @@
 #ifndef SPK_H
 #define SPK_H
 
-#include "utilities.h"
+#include "pck.h"
 
 /**
  * @brief Structure to hold a single time,pos,vel,accel record from an SPK file.
@@ -20,7 +20,7 @@
  * @param ay Y acceleration of the state.
  * @param az Z acceleration of the state.
  */
-struct CacheItem {
+struct SpkCacheItem {
     int spiceId = -99999;
     double t;
     double x;
@@ -47,9 +47,9 @@ struct CacheItem {
  * @param t Time of the cache.
  * @param items Array of CacheItems.
  */
-struct EphemerisCache {
+struct SpkCache {
     double t;
-    CacheItem items[SPK_CACHE_ITEM_SIZE];
+    SpkCacheItem items[SPK_CACHE_ITEM_SIZE];
 };
 
 /**
@@ -95,7 +95,7 @@ struct SpkTarget {
  * @param map Memory map of the SPK file.
  * @param len Length of the memory map.
  */
-struct DafInfo {
+struct SpkInfo {
     SpkTarget* targets;
     int num;
     int allocatedNum;
@@ -109,37 +109,32 @@ struct DafInfo {
  * @param mb Main body ephemeris data.
  * @param sb Small body ephemeris data.
  * @param nextIdxToWrite Next index to write to in the cache.
- * @param cache Cache of recently queried SPK data.
+ * @param spkCache Cache of recently queried SPK data.
  */
-struct Ephemeris {
+struct SpkEphemeris {
     std::string mbPath;
     std::string sbPath;
-    DafInfo* mb = nullptr;
-    DafInfo* sb = nullptr;
+    SpkInfo* mb = nullptr;
+    SpkInfo* sb = nullptr;
     size_t nextIdxToWrite = -1;
-    EphemerisCache cache[SPK_CACHE_SIZE];
+    SpkCache cache[SPK_CACHE_SIZE];
 };
 
 /**
- * @brief Free the memory allocated for an DafInfo structure.
+ * @brief Free the memory allocated for an SpkInfo structure.
  */
-void daf_free(DafInfo *pl);
+void spk_free(SpkInfo *bsp);
 
 /**
- * @brief Initialise a DAF file.
+ * @brief Initialise a SPK file.
  */
-DafInfo* daf_init(const std::string &path, const std::string &type);
-
-/**
- * @brief Initialise an SPK file.
- */
-DafInfo* spk_init(const std::string &path);
+SpkInfo* spk_init(const std::string &path);
 
 /**
  * @brief Compute pos, vel, and acc for a given body
- * at a given time using an DafInfo structure.
+ * at a given time using an SpkInfo structure.
  */
-void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
+void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
              double *out_vz, double *out_ax, double *out_ay, double *out_az);
 
@@ -147,13 +142,7 @@ void spk_calc(DafInfo *pl, double epoch, int spiceId, double *out_x,
  * @brief Top level function to get the state of a body at a given time
  * using the ephemeris data in a PropSimulation.
  */
-void get_spk_state(const int &spiceId, const double &t0_mjd, Ephemeris &ephem,
+void get_spk_state(const int &spiceId, const double &t0_mjd, SpkEphemeris &ephem,
                    double state[9]);
-
-/**
- * @brief Using cspice to get the rotation matrix from one frame to another.
- */
-void get_pck_rotMat(const std::string &from, const std::string &to,
-                    const real &et, std::vector<std::vector<real>> &rotMat);
 
 #endif

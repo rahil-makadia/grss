@@ -5,6 +5,7 @@ force.cpp
 gr15.cpp
 interpolate.cpp
 parallel.cpp
+pck.cpp
 simulation.cpp
 spk.cpp
 stm.cpp
