@@ -156,13 +156,9 @@ void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &
     get_interpIdxInWindow(propSim, t, tNext, forwardProp,
                           backwardProp, interpIdxInWindow);
     while (interpIdx < propSim->tEval.size() && interpIdxInWindow) {
-        real tInterpGeom;
+        real tInterpGeom = propSim->tEval[interpIdx];
         if (propSim->tEvalUTC) {
-            const real secPastJ2000Utc = mjd_to_et(propSim->tEval[interpIdx]);
-            const real etMinusUtc = delta_et_utc(propSim->tEval[interpIdx]);
-            tInterpGeom = et_to_mjd(secPastJ2000Utc + etMinusUtc);
-        } else {
-            tInterpGeom = propSim->tEval[interpIdx];
+            tInterpGeom += delta_et_utc(tInterpGeom)/86400.0;
         }
         std::vector<real> xInterpGeom(propSim->xInteg.size(), 0.0);
         evaluate_one_interpolation(propSim, t, dt, tInterpGeom, xInterpGeom);
@@ -390,8 +386,8 @@ void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     double sunState[9];
     double earthState[9];
-    get_spk_state(10, tInterpGeom, propSim->ephem, sunState);
-    get_spk_state(399, tInterpGeom, propSim->ephem, earthState);
+    get_spk_state(10, tInterpGeom, propSim->spkEphem, sunState);
+    get_spk_state(399, tInterpGeom, propSim->spkEphem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -490,10 +486,8 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                                 opticalPartials);
         break;
     case 1: case 2:
-        if (!propSim->parallelMode) {
-            get_radar_measurement(propSim, interpIdx, t, dt, tInterpGeom,
-                                  xInterpGeom, radarMeasurement, radarPartials);
-        }
+        get_radar_measurement(propSim, interpIdx, t, dt, tInterpGeom,
+                                xInterpGeom, radarMeasurement, radarPartials);
         break;
     default:
         throw std::runtime_error(
@@ -704,8 +698,8 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
     delayMeasurement = (delayDownleg + delayUpleg) * 86400.0L *
         1e6;  // days -> seconds -> microseconds
     if (propSim->tEvalUTC) {
-        const real etMinusUtcReceiveTime = delta_et_utc(receiveTimeTDB);
-        const real etMinusUtcTransmitTime = delta_et_utc(transmitTimeTDB);
+        const real etMinusUtcReceiveTime = delta_et_tdb(receiveTimeTDB);
+        const real etMinusUtcTransmitTime = delta_et_tdb(transmitTimeTDB);
         delayMeasurement +=
             (etMinusUtcTransmitTime - etMinusUtcReceiveTime) * 1e6;
     }
@@ -743,8 +737,8 @@ void get_delta_delay_relativistic(PropSimulation *propSim,
     // https://ui.adsabs.harvard.edu/abs/1990A&A...233..252S
     double sunState[9];
     double earthState[9];
-    get_spk_state(10, tForSpice, propSim->ephem, sunState);
-    get_spk_state(399, tForSpice, propSim->ephem, earthState);
+    get_spk_state(10, tForSpice, propSim->spkEphem, sunState);
+    get_spk_state(399, tForSpice, propSim->spkEphem, earthState);
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -832,8 +826,8 @@ void get_doppler_measurement(PropSimulation *propSim, const size_t &i,
 
     double xSun3[9];
     double xSun1[9];
-    get_spk_state(10, receiveTimeTDB, propSim->ephem, xSun3);
-    get_spk_state(10, transmitTimeTDB, propSim->ephem, xSun1);
+    get_spk_state(10, receiveTimeTDB, propSim->spkEphem, xSun3);
+    get_spk_state(10, transmitTimeTDB, propSim->spkEphem, xSun1);
 
     std::vector<real> posHelio3(3), velHelio3(3), posHelio1(3), velHelio1(3);
     posHelio3[0] = pos3[0] - xSun3[0];

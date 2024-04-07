@@ -22,8 +22,8 @@ void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
         case 399:
             baseBodyFrame = "ITRF93";
             // High precision frame is not defined before 1972 JAN 01
-            // 00:00:42.183 TDB
-            if (tMjdTDB < 41317.000488239L) {
+            // 00:00:42.183 TDB or after 2099 AUG 25 00:01:09.182 TDB
+            if (tMjdTDB < 41317.000488239L || tMjdTDB > 87940.000800717L) {
                 baseBodyFrame = "IAU_EARTH";
             }
             break;
@@ -74,17 +74,12 @@ void get_observer_state(const real &tObsMjd,
         observerState[5] = 0.0L;
         return;
     }
-    real secPastJ2000 = mjd_to_et(tObsMjd);
-    real tObsMjdTDB;
+    real tObsMjdTDB = tObsMjd;
     if (tObsInUTC) {
-        const real etMinusUtc = delta_et_utc(tObsMjd);
-        secPastJ2000 += etMinusUtc;
-        tObsMjdTDB = et_to_mjd(secPastJ2000);
-    } else {
-        tObsMjdTDB = tObsMjd;
+        tObsMjdTDB += delta_et_utc(tObsMjd)/86400.0L;
     }
     double baseBodyState[9];
-    get_spk_state(baseBody, tObsMjdTDB, propSim->ephem, baseBodyState);
+    get_spk_state(baseBody, tObsMjdTDB, propSim->spkEphem, baseBodyState);
     if ((int)observerInfo[0] == 500) {
         observerState[0] = (real) baseBodyState[0] + observerInfo[1]/propSim->consts.du2m;
         observerState[1] = (real) baseBodyState[1] + observerInfo[2]/propSim->consts.du2m;
@@ -97,7 +92,7 @@ void get_observer_state(const real &tObsMjd,
     std::string baseBodyFrame;
     get_baseBodyFrame((int)observerInfo[0], tObsMjdTDB, baseBodyFrame);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
-    get_pck_rotMat(baseBodyFrame, "J2000", secPastJ2000, rotMat);
+    get_pck_rotMat(baseBodyFrame, "J2000", tObsMjdTDB, propSim->pckEphem, rotMat);
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
@@ -198,7 +193,7 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     cometary_to_cartesian(t0, cometaryState, cartesianStateEclip);
     // rotate to eme2000
     std::vector<std::vector<real>> eclipToEquatorial(3, std::vector<real>(3));
-    rot_mat_x(-EARTH_OBLIQUITY, eclipToEquatorial);
+    rot_mat_x(EARTH_OBLIQUITY, eclipToEquatorial);
     mat_vec_mul(eclipToEquatorial,
                 {cartesianStateEclip[0], cartesianStateEclip[1],
                  cartesianStateEclip[2]},
@@ -308,6 +303,7 @@ void IntegBody::prepare_stm(){
     }
     this->n2Derivs += (size_t) stmSize/2;
     this->propStm = true;
+    // build 6x(6+numParams) state transition matrix first
     if (this->isCometary){
         std::vector<std::vector<real>> partialsEclip(6, std::vector<real>(6, 0.0L));
         get_cartesian_partials(this->t0, this->initState, "com2cart", partialsEclip);
@@ -322,20 +318,24 @@ void IntegBody::prepare_stm(){
         for (size_t i = 0; i < 36; i++) {
             this->stm[i] = partials[i/6][i%6];
         }
+        // add extra entries to each row for nongravitational parameters
         for (size_t i = 0; i < 6; i++) {
             for (size_t j = 0; j < numParams; j++) {
                 this->dCartdState[i].push_back(0.0L);
             }
         }
     } else {
+        // state transition matrix is the identity matrix in this case
         this->dCartdState = std::vector<std::vector<real>>(6, std::vector<real>(6+numParams, 0.0L));
         for (size_t i = 0; i < 6; i++) {
             this->dCartdState[i][i] = 1.0L;
         }
     }
+    // add extra nongravitational parameter blocks at bottom for (6+numParams)x(6+numParams) state transition matrix
     for (size_t i = 0; i < numParams; i++) {
         this->dCartdState.push_back(std::vector<real>(6+numParams, 0.0L));
     }
+    // set diagonals of these extra blocks to 1
     for (size_t i = 6; i < 6+numParams; i++) {
         this->dCartdState[i][i] = 1.0L;
     }
@@ -688,8 +688,11 @@ PropSimulation::PropSimulation(std::string name, real t0,
                 "(case 441).");
             break;
     }
-    this->ephem.mbPath = kernel_mb;
-    this->ephem.sbPath = kernel_sb;
+    this->spkEphem.mbPath = kernel_mb;
+    this->spkEphem.sbPath = kernel_sb;
+    this->pckEphem.histPckPath = mapKernelPath + "earth_720101_230601.bpc";
+    this->pckEphem.latestPckPath = mapKernelPath + "earth_latest_high_prec.bpc";
+    this->pckEphem.predictPckPath = mapKernelPath + "earth_200101_990825_predict.bpc";
 }
 
 /**
@@ -699,10 +702,16 @@ PropSimulation::PropSimulation(std::string name, real t0,
 PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->name = name;
     this->DEkernelPath = simRef.DEkernelPath;
-    this->ephem.mbPath = simRef.ephem.mbPath;
-    this->ephem.sbPath = simRef.ephem.sbPath;
-    this->ephem.mb = nullptr;
-    this->ephem.sb = nullptr;
+    this->spkEphem.mbPath = simRef.spkEphem.mbPath;
+    this->spkEphem.sbPath = simRef.spkEphem.sbPath;
+    this->spkEphem.mb = nullptr;
+    this->spkEphem.sb = nullptr;
+    this->pckEphem.histPckPath = simRef.pckEphem.histPckPath;
+    this->pckEphem.latestPckPath = simRef.pckEphem.latestPckPath;
+    this->pckEphem.predictPckPath = simRef.pckEphem.predictPckPath;
+    this->pckEphem.histPck = nullptr;
+    this->pckEphem.latestPck = nullptr;
+    this->pckEphem.predictPck = nullptr;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
     this->integParams.nInteg = 0;
@@ -803,29 +812,25 @@ void PropSimulation::prepare_for_evaluation(
     std::vector<std::vector<real>> xObserver = std::vector<std::vector<real>>(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
-    if (!this->parallelMode) {
-        this->map_ephemeris();
-        furnsh_c(this->DEkernelPath.c_str());
-        if (tEval.size() != 0) {
-            for (size_t i = 0; i < tEval.size(); i++) {
-                if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
-                    radarObserver[i] = 0;
-                } else if (observerInfo[i].size() == 9) {
-                    radarObserver[i] = 1;
-                } else if (observerInfo[i].size() == 10) {
-                    radarObserver[i] = 2;
-                } else {
-                    throw std::invalid_argument(
-                        "The observerInfo vector must have 4/7 (optical), 9 (radar "
-                        "delay), or 10 elements (radar doppler).");
-                }
-                get_observer_state(tEval[i], observerInfo[i], this,
-                                this->tEvalUTC, xObserver[i]);
+    this->map_ephemeris();
+    if (tEval.size() != 0) {
+        for (size_t i = 0; i < tEval.size(); i++) {
+            if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
+                radarObserver[i] = 0;
+            } else if (observerInfo[i].size() == 9) {
+                radarObserver[i] = 1;
+            } else if (observerInfo[i].size() == 10) {
+                radarObserver[i] = 2;
+            } else {
+                throw std::invalid_argument(
+                    "The observerInfo vector must have 4/7 (optical), 9 (radar "
+                    "delay), or 10 elements (radar doppler).");
             }
+            get_observer_state(tEval[i], observerInfo[i], this,
+                            this->tEvalUTC, xObserver[i]);
         }
-        unload_c(this->DEkernelPath.c_str());
-        this->unmap_ephemeris();
     }
+    this->unmap_ephemeris();
 
     if (this->tEval.size() == 0) {
         this->tEval = tEval;
@@ -841,15 +846,24 @@ void PropSimulation::prepare_for_evaluation(
 }
 
 void PropSimulation::map_ephemeris(){
-    this->ephem.mb = spk_init(this->ephem.mbPath);
-    this->ephem.sb = spk_init(this->ephem.sbPath);
+    this->spkEphem.mb = spk_init(this->spkEphem.mbPath);
+    this->spkEphem.sb = spk_init(this->spkEphem.sbPath);
+    this->pckEphem.histPck = pck_init(this->pckEphem.histPckPath);
+    this->pckEphem.latestPck = pck_init(this->pckEphem.latestPckPath);
+    this->pckEphem.predictPck = pck_init(this->pckEphem.predictPckPath);
 }
 
 void PropSimulation::unmap_ephemeris(){
-    daf_free(this->ephem.mb);
-    daf_free(this->ephem.sb);
-    this->ephem.mb = nullptr;
-    this->ephem.sb = nullptr;
+    spk_free(this->spkEphem.mb);
+    spk_free(this->spkEphem.sb);
+    this->spkEphem.mb = nullptr;
+    this->spkEphem.sb = nullptr;
+    pck_free(this->pckEphem.histPck);
+    pck_free(this->pckEphem.latestPck);
+    pck_free(this->pckEphem.predictPck);
+    this->pckEphem.histPck = nullptr;
+    this->pckEphem.latestPck = nullptr;
+    this->pckEphem.predictPck = nullptr;
 }
 
 /**
@@ -870,13 +884,13 @@ std::vector<real> PropSimulation::get_spiceBody_state(const real t, const std::s
                                         " does not exist in simulation " +
                                         this->name);
     }
-    if (this->ephem.mb == nullptr || this->ephem.sb == nullptr){
+    if (this->spkEphem.mb == nullptr || this->spkEphem.sb == nullptr){
         throw std::invalid_argument(
             "get_spiceBody_state: Ephemeris kernels are not loaded. Memory map "
             "the ephemeris using PropSimulation.map_ephemeris() method first.");
     }
     double spiceState[9];
-    get_spk_state(spiceId, t, this->ephem, spiceState);
+    get_spk_state(spiceId, t, this->spkEphem, spiceState);
     std::vector<real> state = {spiceState[0], spiceState[1], spiceState[2],
                                spiceState[3], spiceState[4], spiceState[5]};
     return state;
@@ -1094,7 +1108,7 @@ void PropSimulation::preprocess() {
         for (size_t i = 0; i < this->integParams.nInteg; i++) {
             if (this->integBodies[i].isCometary) {
                 double sunState[9];
-                get_spk_state(10, this->integBodies[i].t0, this->ephem, sunState);
+                get_spk_state(10, this->integBodies[i].t0, this->spkEphem, sunState);
                 this->integBodies[i].pos[0] += sunState[0];
                 this->integBodies[i].pos[1] += sunState[1];
                 this->integBodies[i].pos[2] += sunState[2];
@@ -1217,8 +1231,8 @@ void PropSimulation::save(std::string filename) {
     file << "Integration from MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.t0
          << " to MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.tf << " [TDB]"
          << std::endl;
-    file << "Main-body kernel path: " << this->ephem.mbPath << std::endl;
-    file << "Small-body kernel path: " << this->ephem.sbPath << std::endl;
+    file << "Main-body kernel path: " << this->spkEphem.mbPath << std::endl;
+    file << "Small-body kernel path: " << this->spkEphem.sbPath << std::endl;
 
     file << std::endl;
     nextSubsection = std::to_string(this->integParams.nInteg) + " Integration bodies";
@@ -1259,19 +1273,27 @@ void PropSimulation::save(std::string filename) {
         starti += 6;
         if (this->integBodies[i].propStm) {
             size_t numParams = (this->integBodies[i].n2Derivs - 21)/3;
-            file << "STM (final Cartesian state w.r.t. initial Cartesian state + any params):" << std::endl;
-            file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
-                << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]";
+            if (this->integBodies[i].isCometary) {
+                file << "STM (final Cartesian state w.r.t. initial Cometary state + any params):" << std::endl;
+                file << doubleWidth << "ecc" << doubleWidth << "peri. dist. [AU]" << doubleWidth << "peri. t. [MJD TDB]"
+                        << doubleWidth << "l. asc. node [rad]" << doubleWidth << "arg. peri. [rad]" << doubleWidth << "inc. [rad]";
+            } else {
+                file << "STM (final Cartesian state w.r.t. initial Cartesian state + any params):" << std::endl;
+                file << doubleWidth << "x [AU]" << doubleWidth << "y [AU]" << doubleWidth << "z [AU]"
+                        << doubleWidth << "vx [AU/day]" << doubleWidth << "vy [AU/day]" << doubleWidth << "vz [AU/day]";
+            }
             if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
             if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
             if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
             file << std::endl;
-            for (size_t j = 0; j < 6; j++) {
-                for (size_t k = 0; k < 6; k++) {
-                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 6*j + k];
-                }
-                for (size_t k = 0; k < numParams; k++) {
-                    file << doubleWidth << std::scientific << doublePrec << this->xInteg[starti + 36 + 6*k + j];
+            std::vector<real> stmFinalFlat = std::vector<real>(36+6*numParams, 0.0);
+            for (size_t j = 0; j < 36+6*numParams; j++) {
+                stmFinalFlat[j] = this->xInteg[starti + j];
+            }
+            std::vector<std::vector<real>> stmFinal = reconstruct_stm(stmFinalFlat);
+            for (size_t j = 0; j < stmFinal.size(); j++) {
+                for (size_t k = 0; k < stmFinal[0].size(); k++) {
+                    file << doubleWidth << std::scientific << doublePrec << stmFinal[j][k];
                 }
                 file << std::endl;
             }
@@ -1341,7 +1363,7 @@ void PropSimulation::save(std::string filename) {
         file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
         file << subsectionFull << std::endl;
         file << "$$IMPACT_START" << std::endl;
-        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | kizner_dx | kizner_dy | opik_x | opik_y | opik_z | opik_dx | opik_dy | scaled_x | scaled_y | scaled_z | scaled_dx | scaled_dy | mtp_x | mtp_y | mtp_z | mtp_dx | mtp_dy | xRelBodyFixed | lon | lat | alt" << std::endl;
+        file << "t | xRel | tMap | xRelMap | dist | vel | vInf | flybyBody | flybyBodyIdx | centralBody | centralBodyIdx | centralBodySpiceId | impact | tPeri | tLin | bVec | bMag | gravFocusFactor | kizner_x | kizner_y | kizner_z | opik_x | opik_y | opik_z | scaled_x | scaled_y | scaled_z | mtp_x | mtp_y | mtp_z | xRelBodyFixed | lon | lat | alt" << std::endl;
         for (size_t i = 0; i < this->impactParams.size(); i++) {
             ImpactParameters imp = this->impactParams[i];
             file << imp.t << " | ";
@@ -1377,55 +1399,15 @@ void PropSimulation::save(std::string filename) {
             file << imp.kizner.x << " | ";
             file << imp.kizner.y << " | ";
             file << imp.kizner.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.kizner.dx.size(); j++) {
-                file << imp.kizner.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.kizner.dy.size(); j++) {
-                file << imp.kizner.dy[j] << ",";
-            }
-            file << "] | ";
             file << imp.opik.x << " | ";
             file << imp.opik.y << " | ";
             file << imp.opik.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.opik.dx.size(); j++) {
-                file << imp.opik.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.opik.dy.size(); j++) {
-                file << imp.opik.dy[j] << ",";
-            }
-            file << "] | ";
             file << imp.scaled.x << " | ";
             file << imp.scaled.y << " | ";
             file << imp.scaled.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.scaled.dx.size(); j++) {
-                file << imp.scaled.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.scaled.dy.size(); j++) {
-                file << imp.scaled.dy[j] << ",";
-            }
-            file << "] | ";
             file << imp.mtp.x << " | ";
             file << imp.mtp.y << " | ";
             file << imp.mtp.z << " | ";
-            file << "[";
-            for (size_t j = 0; j < imp.mtp.dx.size(); j++) {
-                file << imp.mtp.dx[j] << ",";
-            }
-            file << "] | ";
-            file << "[";
-            for (size_t j = 0; j < imp.mtp.dy.size(); j++) {
-                file << imp.mtp.dy[j] << ",";
-            }
-            file << "] | ";
             file << "[";
             for (size_t j = 0; j < imp.xRelBodyFixed.size(); j++) {
                 file << imp.xRelBodyFixed[j] << ",";

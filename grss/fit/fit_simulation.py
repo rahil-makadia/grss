@@ -1019,7 +1019,7 @@ class FitSimulation:
             arg_peri = x_dict['w']
             inc = x_dict['i']
             cometary_elements = [ecc, peri_dist, time_peri,
-                                    omega*np.pi/180.0, arg_peri*np.pi/180.0, inc*np.pi/180.0]
+                                    omega, arg_peri, inc]
             state = cometary_elements
         else:
             raise ValueError("fit_cartesian or fit_cometary must be True")
@@ -1147,11 +1147,13 @@ class FitSimulation:
             elif key in {'vx', 'vy', 'vz'}:
                 fd_pert = 1e-10
         elif self.fit_cometary:
-            fd_pert = 1e-7
+            fd_pert = 1e-9
             if key == 'e':
                 fd_pert = 7.5e-9
             elif key == 'q':
                 fd_pert = 1e-9
+            elif key == 'tp':
+                fd_pert = 1e-7
         if key in {'a1', 'a2', 'a3'}:
             fd_pert = 1e-12
         if key[:4] == 'mult':
@@ -1329,19 +1331,8 @@ class FitSimulation:
         return computed_obs
 
     def _get_analytic_stm(self, t_eval, prop_sim):
-        stm_state_full = np.array(prop_sim.interpolate(t_eval))
-        stm = stm_state_full[6:42].reshape((6,6))
-        if self.fit_cometary:
-            stm[:, 3:6] /= 180.0/np.pi # covert partial w.r.t. rad -> partial w.r.t. deg
-        if len(stm_state_full) > 42:
-            param_block = stm_state_full[42:].reshape((6, -1), order='F')
-            stm = np.hstack((stm, param_block))
-            num_params = param_block.shape[1]
-            if num_params > 0:
-                bottom_block = np.zeros((num_params, 6+num_params))
-                bottom_block[:,6:] = np.eye(num_params)
-                stm = np.vstack((stm, bottom_block))
-        return stm
+        stm = prop_sim.interpolate(t_eval)[6:]
+        return libgrss.reconstruct_stm(stm)
 
     def _get_analytic_partials(self, prop_sim_past, prop_sim_future):
         """
@@ -1763,10 +1754,19 @@ class FitSimulation:
         final_sol = data.x_nom
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
-                print(f"{key}\t\t\t{init_sol[key]:.11e}\t\t{init_variance[i]:.11e}",
-                        f"\t\t{final_sol[key]:.11e}\t\t{final_variance[i]:.11e}",
-                        f"\t\t{final_sol[key]-init_sol[key]:+.11e}"
-                        f"\t\t{(final_sol[key]-init_sol[key])/init_variance[i]:+.3f}")
+                init_val = init_sol[key]
+                init_unc = init_variance[i]
+                final_val = final_sol[key]
+                final_unc = final_variance[i]
+                if self.fit_cometary and key in ['om', 'w', 'i']:
+                    init_val *= 180/np.pi
+                    init_unc *= 180/np.pi
+                    final_val *= 180/np.pi
+                    final_unc *= 180/np.pi
+                print(f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}",
+                        f"\t\t{final_val:.11e}\t\t{final_unc:.11e}",
+                        f"\t\t{final_val-init_val:+.11e}"
+                        f"\t\t{(final_val-init_val)/init_unc:+.3f}")
         return None
 
     def plot_summary(self, auto_close=False):
@@ -1938,7 +1938,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         arg_peri = ref_sol['w']
         inc = ref_sol['i']
         cometary_elements = [ecc, peri_dist, time_peri,
-                                omega*np.pi/180.0, arg_peri*np.pi/180.0, inc*np.pi/180.0]
+                                omega, arg_peri, inc]
         target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'],
                                         ref_sol['mass'], ref_sol['radius'], cometary_elements,
                                         ref_cov, nongrav_params)

@@ -415,8 +415,8 @@ def get_sbdb_elems(tdes, cov_elems=True):
         elements[key] = full_elements_dict[key]
         if key == 'tp':
             elements[key] = full_elements_dict[key] - 2400000.5
-        # if key in {'om', 'w', 'i'}:
-        #     elements[key] = full_elements_dict[key]*np.pi/180
+        if key in {'om', 'w', 'i'}:
+            elements[key] = full_elements_dict[key]*np.pi/180
     return elements
 
 def get_sbdb_info(tdes):
@@ -445,6 +445,9 @@ def get_sbdb_info(tdes):
     # covariance matrix for cometary orbital elements
     cov_keys = raw_data['orbit']['covariance']['labels']
     cov_mat = (np.array(raw_data['orbit']['covariance']['data'])).astype(float)
+    # convert covariance matrix angle blocks from degrees to radians
+    cov_mat[3:6, :] *= np.pi/180
+    cov_mat[:, 3:6] *= np.pi/180
     # nongravitatinoal constants for target body
     nongrav_data = raw_data['orbit']['model_pars']
     hdr = [param['name'] for param in nongrav_data]

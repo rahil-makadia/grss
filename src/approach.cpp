@@ -41,8 +41,8 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     const real atm_offset = 100.0e3/propSim->consts.du2m;
                     centralBodyRadius += atm_offset;
                     double xSpice[9], xSpiceOld[9];
-                    get_spk_state(bodyj.spiceId, t, propSim->ephem, xSpice);
-                    get_spk_state(bodyj.spiceId, tOld, propSim->ephem, xSpiceOld);
+                    get_spk_state(bodyj.spiceId, t, propSim->spkEphem, xSpice);
+                    get_spk_state(bodyj.spiceId, tOld, propSim->spkEphem, xSpiceOld);
                     for (size_t k = 0; k < 3; k++) {
                         relPosOld[k] = xIntegOld[starti + k] - xSpiceOld[k];
                         relPos[k] = xInteg[starti + k] - xSpice[k];
@@ -65,15 +65,13 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     impact.flybyBodyIdx = i;
                     impact.centralBodyIdx = j;
                     impact.get_ca_parameters(propSim, impact.t);
-                    if (!propSim->parallelMode) impact.get_impact_parameters(propSim);
+                    impact.get_impact_parameters(propSim);
                     impact.impact = true;
                     propSim->impactParams.push_back(impact);
-                    if (!propSim->parallelMode) {
-                        std::cout << "Impact detected at MJD " << impact.t
-                                  << " TDB. " << impact.flybyBody
-                                  << " collided with " << impact.centralBody
-                                  << "!" << std::endl;
-                    }
+                    // std::cout << "Impact detected at MJD " << impact.t
+                    //             << " TDB. " << impact.flybyBody
+                    //             << " collided with " << impact.centralBody
+                    //             << "!" << std::endl;
                 }
                 // check close approach
                 real radialVel, radialVelOld;
@@ -184,7 +182,7 @@ static std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
         double xSpice[9];
         get_spk_state(
             propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId, t,
-            propSim->ephem, xSpice);
+            propSim->spkEphem, xSpice);
         for (size_t k = 0; k < 6; k++) {
             xRel[k] -= xSpice[k];
         }
@@ -383,9 +381,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     this->tLin = this->tPeri - log(e) / n;
     // calculate B-plane parameters (Öpik xi, zeta formulation)
     double xCentralBody[9];
-    get_spk_state(this->centralBodySpiceId, tMap, propSim->ephem, xCentralBody);
+    get_spk_state(this->centralBodySpiceId, tMap, propSim->spkEphem, xCentralBody);
     double xSun[9];
-    get_spk_state(10, tMap, propSim->ephem, xSun);
+    get_spk_state(10, tMap, propSim->spkEphem, xSun);
     real vCentralBodyHelio[3];
     for (size_t k = 0; k < 3; k++) {
         vCentralBodyHelio[k] = xCentralBody[3+k]-xSun[3+k];
@@ -576,6 +574,64 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             this->scaled.dx[k] = (this->kizner.dx[k] - this->scaled.x*partial_lambda[k])/this->gravFocusFactor;
             this->scaled.dy[k] = (this->kizner.dy[k] - this->scaled.y*partial_lambda[k])/this->gravFocusFactor;
         }
+
+        // // Acceleration of the Sun is not included in the calculation
+        // // because it is negligibly small
+        // real accSun[3];
+        // memset(accSun, 0, 3*sizeof(real));
+        // for (size_t k = 0; k < propSim->integParams.nSpice; k++) {
+        //     if (propSim->spiceBodies[k].spiceId == 10) {
+        //         accSun[0] = propSim->spiceBodies[k].acc[0];
+        //         accSun[1] = propSim->spiceBodies[k].acc[1];
+        //         accSun[2] = propSim->spiceBodies[k].acc[2];
+        //         break;
+        //     }
+        // }
+        real **partial_vel_planet = new real*[6];
+        for (size_t k = 0; k < 6; k++) {
+            partial_vel_planet[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                // partial_vel_planet[k][k2] = this->dt[k]*(accPlanet[k2] - accSun[k2]);
+                partial_vel_planet[k][k2] = this->dt[k]*accPlanet[k2];
+            }
+        }
+        real **partial_xiHat = new real*[6];
+        real temp3, temp3Vec[3];
+        real temp4, temp4Vec[3];
+        for (size_t k = 0; k < 6; k++) {
+            partial_xiHat[k] = new real[3];
+            vcross(partial_v_vec[k], sHat, temp1Vec);
+            vcross(vCentralBodyHelio, partial_sHat[k], temp2Vec);
+            vcross(vCentralBodyHelio, sHat, temp3Vec);
+            vnorm(temp3Vec, 3, temp3);
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                temp4Vec[0] = (temp1Vec[k2]+temp2Vec[k2])*xiHat[0];
+                temp4Vec[1] = (temp1Vec[k2]+temp2Vec[k2])*xiHat[1];
+                temp4Vec[2] = (temp1Vec[k2]+temp2Vec[k2])*xiHat[2];
+                vdot(xiHat, temp4Vec, 3, temp4);
+                partial_xiHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - temp4)/temp3;
+            }
+        }
+        real **partial_zetaHat = new real*[6];
+        for (size_t k = 0; k < 6; k++) {
+            partial_zetaHat[k] = new real[3];
+            vcross(partial_sHat[k], xiHat, temp1Vec);
+            vcross(sHat, partial_xiHat[k], temp2Vec);
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_zetaHat[k][k2] = -(temp1Vec[k2] + temp2Vec[k2]);
+            }
+        }
+        for (size_t k = 0; k < 6; k++) {
+            vdot(zetaHat, partial_hVec[k], 3, temp1);
+            vdot(hVec, partial_zetaHat[k], 3, temp2);
+            this->opik.dx[k] = (temp1 + temp2 - this->opik.x*partial_vInf[k])/vInf;
+            vdot(xiHat, partial_hVec[k], 3, temp1);
+            vdot(hVec, partial_xiHat[k], 3, temp2);
+            this->opik.dy[k] = -(temp1 + temp2 + this->opik.y*partial_vInf[k])/vInf;
+        }
+
+        this->mtp.dx = {eHatX[0], eHatX[1], eHatX[2], 0.0, 0.0, 0.0};
+        this->mtp.dy = {eHatY[0], eHatY[1], eHatY[2], 0.0, 0.0, 0.0};
         // clean up
         for (size_t k = 0; k < 6; k++) {
             delete[] partial_r_vec[k];
@@ -587,6 +643,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             delete[] partial_rHat[k];
             delete[] partial_sHat[k];
             delete[] partial_tHat[k];
+            delete[] partial_vel_planet[k];
+            delete[] partial_xiHat[k];
+            delete[] partial_zetaHat[k];
         }
         delete[] partial_alpha;
         delete[] partial_vInf;
@@ -602,6 +661,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         delete[] partial_sHat;
         delete[] partial_tHat;
         delete[] partial_lambda;
+        delete[] partial_vel_planet;
+        delete[] partial_xiHat;
+        delete[] partial_zetaHat;
     }
 }
 
@@ -622,10 +684,8 @@ void CloseApproachParameters::print_summary(int prec){
 void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     std::string baseBodyFrame;
     get_baseBodyFrame(this->centralBodySpiceId, this->t, baseBodyFrame);
-    real tET;
-    mjd_to_et(this->t, tET);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
-    get_pck_rotMat("J2000", baseBodyFrame, tET, rotMat);
+    get_pck_rotMat("J2000", baseBodyFrame, this->t, propSim->pckEphem, rotMat);
     std::vector<real> impactRelStateInertial(6);
     impactRelStateInertial[0] = this->xRel[0]*propSim->consts.du2m/1.0e3L;
     impactRelStateInertial[1] = this->xRel[1]*propSim->consts.du2m/1.0e3L;

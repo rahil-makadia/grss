@@ -45,7 +45,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     }
     double xSpice[9];
     for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
-        get_spk_state(propSim->spiceBodies[i].spiceId, t, propSim->ephem,
+        get_spk_state(propSim->spiceBodies[i].spiceId, t, propSim->spkEphem,
                       xSpice);
         propSim->spiceBodies[i].pos[0] = xSpice[0];
         propSim->spiceBodies[i].pos[1] = xSpice[1];

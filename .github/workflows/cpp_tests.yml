@@ -23,6 +23,7 @@ jobs:
       - name: Run tests
         run: |
           cd tests/cpp/prop
+          ./pck_map.out
+          ./spk_map.out
           ./apophis.out
           ./didymos.out
-          ./spk_map.out

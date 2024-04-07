@@ -1,17 +1,25 @@
 #include "grss.h"
 #include <sys/time.h>
 #include <assert.h>
+#include <random>
 
 int main(){
     timeval t1, t2;
     gettimeofday(&t1, NULL);
     real tDiff;
+
+    std::random_device rd;  // Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+    // limits of distribution are dictated by the time span of sb431-n16s.bsp
+    std::uniform_real_distribution<> dis(-94576.0, 234192.0);
+
     std::cout
         << "/////////////////////// SPK map accuracy test ///////////////////////"
         << std::endl
         << std::endl;
-    std::cout.precision(5);
-    SpiceDouble mjd = 51544.5+1000;
+    std::cout.precision(8);
+    SpiceDouble mjd = dis(gen);
+    std::cout << "MJD: " << mjd << std::endl;
     int kernel = 431;
     std::string kernel_sb, kernel_mb;
     std::vector<int> spiceIds;
@@ -23,9 +31,9 @@ int main(){
                 2000704, 2000048, 2000003, 2000002, 2000016, 2000087, 2000088, 2000004};
     furnsh_c(kernel_sb.c_str());
     furnsh_c(kernel_mb.c_str());
-    DafInfo* mbInfo431 = spk_init(kernel_mb);
-    DafInfo* sbInfo431 = spk_init(kernel_sb);
-    Ephemeris eph431;
+    SpkInfo* mbInfo431 = spk_init(kernel_mb);
+    SpkInfo* sbInfo431 = spk_init(kernel_sb);
+    SpkEphemeris eph431;
     eph431.mb = mbInfo431;
     eph431.sb = sbInfo431;
     double pos_error, vel_error;
@@ -50,15 +58,18 @@ int main(){
         // printf("mapstate: %0.20f %0.20f %0.20f %0.20f %0.20f %0.20f\n", mapState[0], mapState[1], mapState[2], mapState[3], mapState[4], mapState[5]);
         // printf("factors: %0.5e %0.5e %0.5e %0.5e %0.5e %0.5e\n", state[0]-mapState[0], state[1]-mapState[1], state[2]-mapState[2], state[3]-mapState[3], state[4]-mapState[4], state[5]-mapState[5]);
         for (size_t j = 0; j < 3; j++){
-            pos_error += fabs(state[j]-mapState[j]);
-            vel_error += fabs(state[j+3]-mapState[j+3]);
+            pos_error += fabs((state[j]-mapState[j])/state[j]);
+            vel_error += fabs((state[j+3]-mapState[j+3])/state[j+3]);
         }
     }
     kclear_c();
+    spk_free(mbInfo431);
+    spk_free(sbInfo431);
     std::cout << "DE" << kernel << " errors: " << std::endl;
-    printf("pos_error: %0.5e\nvel_error: %0.5e\n\n", pos_error, vel_error);
-    assert(pos_error < 0.1/1.495978707e11);
-    assert(vel_error < 1e-9/1.495978707e11*86400.0);
+    std::cout << "Position Cumulative Relative Error: " << pos_error*100 << "%" << std::endl;
+    std::cout << "Velocity Cumulative Relative Error: " << vel_error*100 << "%" << std::endl;
+    assert(pos_error < 1e-5); // 0.001%
+    assert(vel_error < 1e-5); // 0.001%
 
     kernel = 441;
     kernel_sb = "../../../grss/kernels/sb441-n16s.bsp";
@@ -69,9 +80,9 @@ int main(){
                 2000704, 2000007, 2000003, 2000002, 2000016, 2000087, 2000088, 2000004};
     furnsh_c(kernel_sb.c_str());
     furnsh_c(kernel_mb.c_str());
-    DafInfo* mbInfo441 = spk_init(kernel_mb);
-    DafInfo* sbInfo441 = spk_init(kernel_sb);
-    Ephemeris eph441;
+    SpkInfo* mbInfo441 = spk_init(kernel_mb);
+    SpkInfo* sbInfo441 = spk_init(kernel_sb);
+    SpkEphemeris eph441;
     eph441.mb = mbInfo441;
     eph441.sb = sbInfo441;
     pos_error = vel_error = 0;
@@ -95,14 +106,18 @@ int main(){
         // printf("mapstate: %0.20f %0.20f %0.20f %0.20f %0.20f %0.20f\n", mapState[0], mapState[1], mapState[2], mapState[3], mapState[4], mapState[5]);
         // printf("factors: %0.5e %0.5e %0.5e %0.5e %0.5e %0.5e\n", state[0]-mapState[0], state[1]-mapState[1], state[2]-mapState[2], state[3]-mapState[3], state[4]-mapState[4], state[5]-mapState[5]);
         for (size_t j = 0; j < 3; j++){
-            pos_error += fabs(state[j]-mapState[j]);
-            vel_error += fabs(state[j+3]-mapState[j+3]);
+            pos_error += fabs((state[j]-mapState[j])/state[j]);
+            vel_error += fabs((state[j+3]-mapState[j+3])/state[j+3]);
         }
     }
+    kclear_c();
+    spk_free(mbInfo441);
+    spk_free(sbInfo441);
     std::cout << "DE" << kernel << " errors: " << std::endl;
-    printf("pos_error: %0.5e\nvel_error: %0.5e\n", pos_error, vel_error);
-    assert(pos_error < 0.1/1.495978707e11);
-    assert(vel_error < 1e-9/1.495978707e11*86400.0);
+    std::cout << "Position Cumulative Relative Error: " << pos_error*100 << "%" << std::endl;
+    std::cout << "Velocity Cumulative Relative Error: " << vel_error*100 << "%" << std::endl;
+    assert(pos_error < 1e-5); // 0.001%
+    assert(vel_error < 1e-5); // 0.001%
 
     std::cout
         << std::endl

@@ -7,12 +7,11 @@
  */
 void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
                           const std::vector<std::vector<real> > &allBodies) {
-    size_t numBodies = allBodies.size();
+    const size_t numBodies = allBodies.size();
     // save directory is ref_sim.name with spaces replaced by underscores
     std::string saveDir = refSim.name;
     std::replace(saveDir.begin(), saveDir.end(), ' ', '_');
 
-    furnsh_c(refSim.DEkernelPath.c_str());
     // parallel for loop to first create an integBody for each entry in the
     // allBodies vector, then integrate each integBody using the reference
     // simulation
@@ -20,7 +19,7 @@ void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
     int numThreads = omp_get_max_threads();
     numThreads = numThreads > maxThreads ? maxThreads : numThreads;
     omp_set_num_threads(numThreads);
-    #pragma omp parallel shared(allBodies, refSim, isCometary, numBodies, saveDir)
+    #pragma omp parallel shared(allBodies, refSim, saveDir)
     {
         #pragma omp for schedule(static)
         for (size_t i = 0; i < numBodies; i++) {
@@ -36,7 +35,6 @@ void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
             ngParams.n = data[15];
             ngParams.r0_au = data[16];
             PropSimulation sim(name, refSim);
-            sim.parallelMode = true;
             if (isCometary) {
                 std::vector<real> com = {data[3], data[4], data[5],
                                          data[6], data[7], data[8]};
@@ -50,19 +48,11 @@ void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
                 sim.add_integ_body(body);
             }
             sim.integrate();
-            // compute the body-fixed impact coordinates (lat,lon,alt) in a critical section
-            #pragma omp critical
-            {
-                for (size_t j = 0; j < sim.impactParams.size(); j++) {
-                    sim.impactParams[j].get_impact_parameters(&sim);
-                }
-                // save file name as refSim.name + "/" + i but i has leading zeros for the number of digits in numBodies
-                std::string num = std::to_string(i);
-                std::string zeros = std::string(std::to_string(numBodies-1).size()-num.size(), '0');
-                std::string filename = "./logdir_"+saveDir+"/"+zeros+num+".log";
-                sim.save(filename);
-            }
+            // save file name as refSim.name + "/" + i but i has leading zeros for the number of digits in numBodies
+            std::string num = std::to_string(i);
+            std::string zeros = std::string(std::to_string(numBodies-1).size()-num.size(), '0');
+            std::string filename = "./logdir_"+saveDir+"/"+zeros+num+".log";
+            sim.save(filename);
         }
     }
-    unload_c(refSim.DEkernelPath.c_str());
 }

@@ -633,6 +633,20 @@ PYBIND11_MODULE(libgrss, m) {
                 None.
             )mydelimiter");
 
+    m.def("reconstruct_stm", &reconstruct_stm, py::arg("stm"), R"mydelimiter(
+        Reconstruct the state transition matrix from the flattened vector.
+
+        Parameters
+        ----------
+        stm : list of real
+            Flattened state transition matrix.
+
+        Returns
+        -------
+        stmMat : list of list of real
+            Reconstructed state transition matrix.
+        )mydelimiter");
+
     py::class_<Event>(m, "Event", R"mydelimiter(
         The Event class contains the properties of an integration event.
         )mydelimiter")
@@ -719,10 +733,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("integParams", &PropSimulation::integParams,
                        R"mydelimiter(
             Integration parameters of the simulation. PropSimulation.IntegParams object.
-            )mydelimiter")
-        .def_readwrite("parallelMode", &PropSimulation::parallelMode,
-                       R"mydelimiter(
-            Whether to use parallel mode for the simulation (helps decide whether to use SPICE binary PCKs for Earth).
             )mydelimiter")
         .def_readwrite("spiceBodies", &PropSimulation::spiceBodies,
                        R"mydelimiter(
