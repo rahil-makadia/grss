@@ -216,7 +216,6 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.mjd2et.html">grss.fit.fit_utils.mjd2et</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.parallax_constants_to_lat_lon_alt.html">grss.fit.fit_utils.parallax_constants_to_lat_lon_alt</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.radec2icrf.html">grss.fit.fit_utils.radec2icrf</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.rec2lat.html">grss.fit.fit_utils.rec2lat</a></li>
 </ul>
 </li>
 </ul>
@@ -273,7 +272,6 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="grss.utils.html">grss.utils</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="grss.utils.default_kernel_path.html">grss.utils.default_kernel_path</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.utils.get_obs_codes_file.html">grss.utils.get_obs_codes_file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.utils.initialize.html">grss.utils.initialize</a></li>
 </ul>
@@ -507,12 +505,11 @@ document.write(`
 <h1>grss.fit.fit_optical.get_space_based_observer_code<a class="headerlink" href="#grss-fit-fit-optical-get-space-based-observer-code" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.fit.fit_optical.get_space_based_observer_code">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_space_based_observer_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_time_mjd_tdb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_80</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_space_based_observer_code" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_space_based_observer_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_80</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_space_based_observer_code" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the full observer code for a space-based observation from the Minor Planet Center.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obs_time_mjd_tdb</strong> (<em>float</em>) – Observation time (MJD TDB)</p></li>
 <li><p><strong>first_80</strong> (<em>str</em>) – First 80 characters of the space-based observation</p></li>
 <li><p><strong>last_80</strong> (<em>str</em>) – Last 80 characters of the space-based observation</p></li>
 </ul>

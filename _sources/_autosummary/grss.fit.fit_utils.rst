@@ -30,7 +30,6 @@ grss.fit.fit\_utils
         mjd2et
         parallax_constants_to_lat_lon_alt
         radec2icrf
-        rec2lat
     
     
 
