@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from astropy.time import Time
 
 from .. import libgrss
+from ..utils import default_kernel_path
 from .fit_utils import get_observer_info
 
 __all__ = [ 'FitSimulation',
@@ -530,7 +531,7 @@ class FitSimulation:
     """
     def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None,
                     obs_array_radar=None, observer_codes_radar=None, n_iter_max=10,
-                    de_kernel=441, de_kernel_path='', radius=0.0, nongrav_info=None, events=None):
+                    de_kernel=441, radius=0.0, nongrav_info=None, events=None):
         """
         Constructor of the FitSimulation class.
 
@@ -552,8 +553,6 @@ class FitSimulation:
             Number of maximum iterations to correct the orbit estimate, by default 10
         de_kernel : int, optional
             SPICE kernel version, by default 441
-        de_kernel_path : str, optional
-            Path to the SPICE kernel, by default ''
         radius : float, optional
             Radius of the body, by default 0.0
         nongrav_info : dict, optional
@@ -582,7 +581,7 @@ class FitSimulation:
         self.n_iter_max = n_iter_max
         self.iters = []
         self.de_kernel = de_kernel
-        self.de_kernel_path = de_kernel_path
+        self.de_kernel_path = default_kernel_path
         self.analytic_partials = False
         self.prop_sims = [None, None]
         self.fixed_propsim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0,
@@ -1828,10 +1827,9 @@ class FitSimulation:
             plt.close()
         return None
 
-def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_arrays,
+def _generate_simulated_obs(ref_sol, ref_ng_info, events, modified_obs_arrays,
                             simulated_optical_obs_idx, optical_obs_types,
-                            simulated_radar_obs_idx, radar_obs_types, de_kernel,
-                            de_kernel_path, noise):
+                            simulated_radar_obs_idx, radar_obs_types, de_kernel, noise):
     """
     Generates simulated observations for a given reference solution.
 
@@ -1839,8 +1837,6 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     ----------
     ref_sol : dict
         Dictionary containing the reference solution.
-    ref_cov : array
-        Covariance matrix for the reference solution.
     ref_ng_info : dict
         Dictionary containing the reference non-gravitational acceleration information.
     events : list
@@ -1857,8 +1853,6 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         List of radar observation types.
     de_kernel : int
         SPICE kernel version.
-    de_kernel_path : str
-        Path to SPICE kernel.
     noise : bool
         Flag to add noise to the simulated observations.
 
@@ -1928,8 +1922,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         pos = [ref_sol['x'], ref_sol['y'], ref_sol['z']]
         vel = [ref_sol['vx'], ref_sol['vy'], ref_sol['vz']]
         target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'], ref_sol['mass'],
-                                        ref_sol['radius'], pos, vel,
-                                        ref_cov, nongrav_params)
+                                        ref_sol['radius'], pos, vel, nongrav_params)
     elif all(key in ref_sol for key in ("e", "q", "tp", "om", "w", "i")):
         ecc = ref_sol['e']
         peri_dist = ref_sol['q']
@@ -1940,8 +1933,8 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
         cometary_elements = [ecc, peri_dist, time_peri,
                                 omega, arg_peri, inc]
         target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'],
-                                        ref_sol['mass'], ref_sol['radius'], cometary_elements,
-                                        ref_cov, nongrav_params)
+                                        ref_sol['mass'], ref_sol['radius'],
+                                        cometary_elements, nongrav_params)
     else:
         raise ValueError("Must provide either a full cartesian or cometary",
                                 "state for the initial solution.")
@@ -1970,6 +1963,7 @@ def _generate_simulated_obs(ref_sol, ref_cov, ref_ng_info, events, modified_obs_
     t_eval_utc = True
     eval_apparent_state = True
     converged_light_time = True
+    de_kernel_path = default_kernel_path
     prop_sim_past = libgrss.PropSimulation("simulated_obs_past", ref_sol['t'],
                                         de_kernel, de_kernel_path)
     prop_sim_past.tEvalMargin = 1.0
@@ -2107,8 +2101,8 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     observer_codes_radar : tuple
         Real and simulated observer locations for each observation in obs_array_radar
     """
-    (x_nom, covariance, events, target_radius, nongrav_info,
-        de_kernel, de_kernel_path) = simulated_traj_info
+    (x_nom, events, target_radius, nongrav_info,
+        de_kernel) = simulated_traj_info
     (obs_array_optical, observer_codes_optical,
         obs_array_radar, observer_codes_radar) = real_obs_arrays
     if add_extra_simulated_obs:
@@ -2187,12 +2181,11 @@ def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_
     simulated_obs_ref_sol = x_nom.copy()
     simulated_obs_ref_sol['mass'] = 0.0
     simulated_obs_ref_sol['radius'] = target_radius
-    simulated_obs_ref_cov = covariance.copy()
     simulated_obs_event = events if events is not None else None
     modified_obs_arrays = (obs_array_optical, observer_codes_optical,
                             obs_array_radar, observer_codes_radar)
-    return _generate_simulated_obs(simulated_obs_ref_sol, simulated_obs_ref_cov, nongrav_info,
+    return _generate_simulated_obs(simulated_obs_ref_sol, nongrav_info,
                                     simulated_obs_event, modified_obs_arrays,
                                     simulated_optical_obs_idx, optical_obs_types,
                                     simulated_radar_obs_idx, radar_obs_types,
-                                    de_kernel, de_kernel_path, noise)
+                                    de_kernel, noise)

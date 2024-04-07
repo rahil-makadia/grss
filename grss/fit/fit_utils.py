@@ -4,7 +4,6 @@ from json import loads
 import requests
 import numpy as np
 from numba import jit
-import spiceypy as spice
 
 __all__ = [ 'get_ra_from_hms',
             'get_dec_from_dms',
@@ -314,8 +313,8 @@ def get_observer_info(observer_codes):
     body_id = 399 # default to Earth
     gaia = ['258']
     occultation = ['275']
-    spacecraft = [ '245', '249', '250', '258', '274', 'C49', 'C50', 'C51',
-                    'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', 'S/C']
+    spacecraft = [ 'S/C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
+                    'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', ]
     for code in observer_codes:
         info_list = []
         # check if code is a tuple - corresponds to a radar observation
@@ -334,8 +333,8 @@ def get_observer_info(observer_codes):
         # code is a tuple but needs to be decomposed for the follwoing obs types:
         # Gaia spacecraft, Occultations, Spacecraft
         elif isinstance(code, tuple) and code[0] in gaia+occultation+spacecraft:
-            info_list.extend((body_id, code[1], code[2], code[3]))
-            # info_list.extend((500, code[1], code[2], code[3], code[4], code[5], code[6]))
+            # 500 is also earth, but it means input state is already inertial
+            info_list.extend((500, code[1], code[2], code[3], code[4], code[5], code[6]))
         else:
             info = codes_dict[code]
             info_list.extend((body_id, info[0], info[1], info[2]))
@@ -532,39 +531,6 @@ def radec2icrf(r_asc, dec, deg=False):
     pos_y = cosd*np.sin(alpha)
     pos_z = np.sin(delta)
     return np.array([pos_x, pos_y, pos_z])
-
-def rec2lat(time, x_j2000, y_j2000, z_j2000):
-    """
-    Convert rectangular coordinates (geocentric J2000) to latitudinal
-    coordinates (geocentric ITRF93).
-
-    Parameters
-    ----------
-    time : float
-        Time in MJD TDB
-    x_j2000 : float
-        x-coordinate in geocentric J2000 frame
-    y_j2000 : float
-        y-coordinate in geocentric J2000 frame
-    z_j2000 : float
-        z-coordinate in geocentric J2000 frame
-
-    Returns
-    -------
-    lon : float
-        Longitude in radians
-    lat : float
-        Latitude in radians
-    rho : float
-        Distance from center of Earth in km
-    """
-    rot_mat = spice.pxform('J2000', 'ITRF93', mjd2et(time))
-    observer_pos_j2000 = np.array([x_j2000, y_j2000, z_j2000])
-    rho = np.linalg.norm(observer_pos_j2000)
-    observer_pos_itrf93 = np.dot(rot_mat, observer_pos_j2000)
-    lon = np.arctan2(observer_pos_itrf93[1], observer_pos_itrf93[0])
-    lat = np.arcsin(observer_pos_itrf93[2]/np.linalg.norm(observer_pos_itrf93))
-    return lon, lat, rho
 
 def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
     """
