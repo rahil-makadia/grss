@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.PropSimulation &#8212; GRSS 3.8.8 documentation</title>
+    <title>grss.libgrss.PropSimulation &#8212; GRSS 3.9.0 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.NongravParameters" href="grss.libgrss.NongravParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 06, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 07, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.8 documentation</p>
+    <p class="title logo__title">GRSS v3.9.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -519,7 +519,6 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.observerInfo"><code class="docutils literal notranslate"><span class="pre">PropSimulation.observerInfo</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.opticalObs"><code class="docutils literal notranslate"><span class="pre">PropSimulation.opticalObs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.opticalPartials"><code class="docutils literal notranslate"><span class="pre">PropSimulation.opticalPartials</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.parallelMode"><code class="docutils literal notranslate"><span class="pre">PropSimulation.parallelMode</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarObs"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarObs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarObserver"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarObserver</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarPartials"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarPartials</span></code></a></li>
@@ -694,40 +693,37 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.opticalPartials" title="grss.libgrss.PropSimulation.opticalPartials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opticalPartials</span></code></a></p></td>
 <td><p>Optical observation partials of each integration body in the simulation for each value in PropSimulation.tEval.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.parallelMode" title="grss.libgrss.PropSimulation.parallelMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parallelMode</span></code></a></p></td>
-<td><p>Whether to use parallel mode for the simulation (helps decide whether to use SPICE binary PCKs for Earth).</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.radarObs" title="grss.libgrss.PropSimulation.radarObs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObs</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.radarObs" title="grss.libgrss.PropSimulation.radarObs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObs</span></code></a></p></td>
 <td><p>Radar observation of each integration body in the simulation for each value in PropSimulation.tEval.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.radarObserver" title="grss.libgrss.PropSimulation.radarObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObserver</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.radarObserver" title="grss.libgrss.PropSimulation.radarObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarObserver</span></code></a></p></td>
 <td><p>Whether the observer for each value in PropSimulation.tEval is for radar.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.radarPartials" title="grss.libgrss.PropSimulation.radarPartials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarPartials</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.radarPartials" title="grss.libgrss.PropSimulation.radarPartials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radarPartials</span></code></a></p></td>
 <td><p>Radar observation partials of each integration body in the simulation for each value in PropSimulation.tEval.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.spiceBodies" title="grss.libgrss.PropSimulation.spiceBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceBodies</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.spiceBodies" title="grss.libgrss.PropSimulation.spiceBodies"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceBodies</span></code></a></p></td>
 <td><p>SPICE bodies of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.t" title="grss.libgrss.PropSimulation.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.t" title="grss.libgrss.PropSimulation.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
 <td><p>Current time of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.tEval" title="grss.libgrss.PropSimulation.tEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEval</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.tEval" title="grss.libgrss.PropSimulation.tEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEval</span></code></a></p></td>
 <td><p>MJD Times to evaluate the states of the integrated bodies at.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.tEvalMargin" title="grss.libgrss.PropSimulation.tEvalMargin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalMargin</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.tEvalMargin" title="grss.libgrss.PropSimulation.tEvalMargin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalMargin</span></code></a></p></td>
 <td><p>Margin for allowing evaluation past the propagation start and end times.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.tEvalUTC" title="grss.libgrss.PropSimulation.tEvalUTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalUTC</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.tEvalUTC" title="grss.libgrss.PropSimulation.tEvalUTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tEvalUTC</span></code></a></p></td>
 <td><p>Whether the MJD evaluation time is in UTC for each value in PropSimulation.tEval, as opposed to TDB.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.xInteg" title="grss.libgrss.PropSimulation.xInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xInteg</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.xInteg" title="grss.libgrss.PropSimulation.xInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xInteg</span></code></a></p></td>
 <td><p>Current states of each integration body in the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.xIntegEval" title="grss.libgrss.PropSimulation.xIntegEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegEval</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.xIntegEval" title="grss.libgrss.PropSimulation.xIntegEval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xIntegEval</span></code></a></p></td>
 <td><p>States of each integration body in the simulation for each value in PropSimulation.tEval.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.xObserver" title="grss.libgrss.PropSimulation.xObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xObserver</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.xObserver" title="grss.libgrss.PropSimulation.xObserver"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xObserver</span></code></a></p></td>
 <td><p>State of the observer for each value in PropSimulation.tEval.</p></td>
 </tr>
 </tbody>
@@ -980,12 +976,6 @@ This information might be repeated for bistatic radar observations.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="grss.libgrss.PropSimulation.parallelMode">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parallelMode</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.parallelMode" title="Permalink to this definition">#</a></dt>
-<dd><p>Whether to use parallel mode for the simulation (helps decide whether to use SPICE binary PCKs for Earth).</p>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.radarObs">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">radarObs</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.radarObs" title="Permalink to this definition">#</a></dt>
 <dd><p>Radar observation of each integration body in the simulation for each value in PropSimulation.tEval.</p>
@@ -1211,7 +1201,6 @@ as opposed to TDB.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.observerInfo"><code class="docutils literal notranslate"><span class="pre">PropSimulation.observerInfo</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.opticalObs"><code class="docutils literal notranslate"><span class="pre">PropSimulation.opticalObs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.opticalPartials"><code class="docutils literal notranslate"><span class="pre">PropSimulation.opticalPartials</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.parallelMode"><code class="docutils literal notranslate"><span class="pre">PropSimulation.parallelMode</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarObs"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarObs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarObserver"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarObserver</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.PropSimulation.radarPartials"><code class="docutils literal notranslate"><span class="pre">PropSimulation.radarPartials</span></code></a></li>
@@ -1263,7 +1252,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 06, 2024.
+  Last updated on Apr 07, 2024.
   <br/>
 </p>
   </div>

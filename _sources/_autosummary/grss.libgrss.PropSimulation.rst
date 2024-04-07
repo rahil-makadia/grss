@@ -57,7 +57,6 @@ grss.libgrss.PropSimulation
         ~PropSimulation.observerInfo
         ~PropSimulation.opticalObs
         ~PropSimulation.opticalPartials
-        ~PropSimulation.parallelMode
         ~PropSimulation.radarObs
         ~PropSimulation.radarObserver
         ~PropSimulation.radarPartials

@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>simulation.h &#8212; GRSS 3.8.8 documentation</title>
+    <title>simulation.h &#8212; GRSS 3.9.0 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="pck.h" href="pck.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 06, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 07, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.8 documentation</p>
+    <p class="title logo__title">GRSS v3.9.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -1693,83 +1693,80 @@ document.write(`
 <dt class="field-odd">Param integParams<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Integration parameters for the simulation. </p>
 </dd>
-<dt class="field-even">Param parallelMode<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if the simulation is in parallel mode. </p>
+<dt class="field-even">Param spiceBodies<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of <a class="reference internal" href="#class_spice_body"><span class="std std-ref">SpiceBody</span></a> objects in the simulation. </p>
 </dd>
-<dt class="field-odd">Param spiceBodies<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of <a class="reference internal" href="#class_spice_body"><span class="std std-ref">SpiceBody</span></a> objects in the simulation. </p>
+<dt class="field-odd">Param integBodies<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of <a class="reference internal" href="#class_integ_body"><span class="std std-ref">IntegBody</span></a> objects in the simulation. </p>
 </dd>
-<dt class="field-even">Param integBodies<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of <a class="reference internal" href="#class_integ_body"><span class="std std-ref">IntegBody</span></a> objects in the simulation. </p>
+<dt class="field-even">Param events<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of <a class="reference internal" href="#class_impulse_event"><span class="std std-ref">ImpulseEvent</span></a> objects in the simulation. </p>
 </dd>
-<dt class="field-odd">Param events<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of <a class="reference internal" href="#class_impulse_event"><span class="std std-ref">ImpulseEvent</span></a> objects in the simulation. </p>
+<dt class="field-odd">Param caParams<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of <a class="reference internal" href="#class_close_approach_parameters"><span class="std std-ref">CloseApproachParameters</span></a> objects in the simulation. </p>
 </dd>
-<dt class="field-even">Param caParams<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of <a class="reference internal" href="#class_close_approach_parameters"><span class="std std-ref">CloseApproachParameters</span></a> objects in the simulation. </p>
+<dt class="field-even">Param impactParams<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of <a class="reference internal" href="#class_impact_parameters"><span class="std std-ref">ImpactParameters</span></a> objects in the simulation. </p>
 </dd>
-<dt class="field-odd">Param impactParams<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of <a class="reference internal" href="#class_impact_parameters"><span class="std std-ref">ImpactParameters</span></a> objects in the simulation. </p>
+<dt class="field-odd">Param isPreprocessed<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if the simulation is preprocessed. </p>
 </dd>
-<dt class="field-even">Param isPreprocessed<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if the simulation is preprocessed. </p>
+<dt class="field-even">Param t<span class="colon">:</span></dt>
+<dd class="field-even"><p>Current time of the simulation. </p>
 </dd>
-<dt class="field-odd">Param t<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Current time of the simulation. </p>
+<dt class="field-odd">Param xInteg<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Current state of the simulation. </p>
 </dd>
-<dt class="field-even">Param xInteg<span class="colon">:</span></dt>
-<dd class="field-even"><p>Current state of the simulation. </p>
+<dt class="field-even">Param interpParams<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolation parameters for the simulation. </p>
 </dd>
-<dt class="field-odd">Param interpParams<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Interpolation parameters for the simulation. </p>
+<dt class="field-odd">Param interpIdx<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Index of the interpolation parameters. </p>
 </dd>
-<dt class="field-even">Param interpIdx<span class="colon">:</span></dt>
-<dd class="field-even"><p>Index of the interpolation parameters. </p>
+<dt class="field-even">Param tEvalUTC<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if the evaluation times are in UTC. </p>
 </dd>
-<dt class="field-odd">Param tEvalUTC<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Flag to indicate if the evaluation times are in UTC. </p>
+<dt class="field-odd">Param evalApparentState<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if the apparent state is evaluated. </p>
 </dd>
-<dt class="field-even">Param evalApparentState<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if the apparent state is evaluated. </p>
+<dt class="field-even">Param evalMeasurements<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if measurements are evaluated. </p>
 </dd>
-<dt class="field-odd">Param evalMeasurements<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Flag to indicate if measurements are evaluated. </p>
+<dt class="field-odd">Param convergedLightTime<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if converged light time needs to be computed. </p>
 </dd>
-<dt class="field-even">Param convergedLightTime<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if converged light time needs to be computed. </p>
+<dt class="field-even">Param xObserver<span class="colon">:</span></dt>
+<dd class="field-even"><p>Observer states array. </p>
 </dd>
-<dt class="field-odd">Param xObserver<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Observer states array. </p>
+<dt class="field-odd">Param observerInfo<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Observer information array. </p>
 </dd>
-<dt class="field-even">Param observerInfo<span class="colon">:</span></dt>
-<dd class="field-even"><p>Observer information array. </p>
+<dt class="field-even">Param tEvalMargin<span class="colon">:</span></dt>
+<dd class="field-even"><p>Margin for interpolation outside integration arc. </p>
 </dd>
-<dt class="field-odd">Param tEvalMargin<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Margin for interpolation outside integration arc. </p>
+<dt class="field-odd">Param tEval<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of times at which to evaluate the integrated state. </p>
 </dd>
-<dt class="field-even">Param tEval<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of times at which to evaluate the integrated state. </p>
+<dt class="field-even">Param radarObserver<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of radar observer flags (0=none, 1=delay, 2=doppler). </p>
 </dd>
-<dt class="field-odd">Param radarObserver<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of radar observer flags (0=none, 1=delay, 2=doppler). </p>
+<dt class="field-odd">Param lightTimeEval<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of computed light times. </p>
 </dd>
-<dt class="field-even">Param lightTimeEval<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of computed light times. </p>
+<dt class="field-even">Param xIntegEval<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of integrated states at evaluation times. </p>
 </dd>
-<dt class="field-odd">Param xIntegEval<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of integrated states at evaluation times. </p>
+<dt class="field-odd">Param opticalObs<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of optical observations. </p>
 </dd>
-<dt class="field-even">Param opticalObs<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of optical observations. </p>
+<dt class="field-even">Param opticalPartials<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of optical observation partials. </p>
 </dd>
-<dt class="field-odd">Param opticalPartials<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of optical observation partials. </p>
+<dt class="field-odd">Param radarObs<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of radar observations. </p>
 </dd>
-<dt class="field-even">Param radarObs<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of radar observations. </p>
-</dd>
-<dt class="field-odd">Param radarPartials<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of radar observation partials. </p>
+<dt class="field-even">Param radarPartials<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of radar observation partials. </p>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
@@ -2010,6 +2007,11 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation8pckEphemE">
+<span class="target" id="class_prop_simulation_1acf44aaff0ccdefa7cdac4822b7b8cb2f"></span><a class="reference internal" href="pck.html#_CPPv412PckEphemeris" title="PckEphemeris"><span class="n"><span class="pre">PckEphemeris</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pckEphem</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation8pckEphemE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation6constsE">
 <span class="target" id="class_prop_simulation_1a3d41fbe87cea6d748f47b8310c3f0f3c"></span><a class="reference internal" href="#_CPPv49Constants" title="Constants"><span class="n"><span class="pre">Constants</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">consts</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation6constsE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
@@ -2017,11 +2019,6 @@ document.write(`
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation11integParamsE">
 <span class="target" id="class_prop_simulation_1ab27872cb9b8be7c0c6fc8a8f9d402c01"></span><a class="reference internal" href="#_CPPv421IntegrationParameters" title="IntegrationParameters"><span class="n"><span class="pre">IntegrationParameters</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">integParams</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation11integParamsE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation12parallelModeE">
-<span class="target" id="class_prop_simulation_1ae0cf3f670cfeab2f60b2000fe92f96bc"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">parallelMode</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N14PropSimulation12parallelModeE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -2246,7 +2243,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 06, 2024.
+  Last updated on Apr 07, 2024.
   <br/>
 </p>
   </div>

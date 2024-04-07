@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; GRSS 3.8.8 documentation</title>
+    <title>Index &#8212; GRSS 3.9.0 documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 06, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 07, 2024"/>
   </head>
   
   
@@ -139,7 +139,7 @@
     <script>document.write(`<img src="_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.8 documentation</p>
+    <p class="title logo__title">GRSS v3.9.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
@@ -899,7 +899,7 @@ document.write(`
 </li>
       <li><a href="cppsummary/timeconvert.html#_CPPv49et_to_mjdK4real">et_to_mjd (C++ function)</a>, <a href="cppsummary/timeconvert.html#_CPPv49et_to_mjdK4realR4real">[1]</a>
 </li>
-      <li><a href="cppsummary/pck.html#_CPPv418euler313_to_rotmatAL6E_K4realP4realP4real">euler313_to_rotmat (C++ function)</a>
+      <li><a href="cppsummary/pck.html#_CPPv418euler313_to_rotMatAL6E_K4realP4realP4real">euler313_to_rotMat (C++ function)</a>
 </li>
       <li><a href="_autosummary/grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation.evalApparentState">evalApparentState (grss.libgrss.PropSimulation property)</a>
 </li>
@@ -1027,9 +1027,7 @@ document.write(`
 </li>
       <li><a href="cppsummary/interpolate.html#_CPPv423get_optical_measurementP14PropSimulationRKNSt6vectorI4realEERNSt6vectorI4realEERNSt6vectorI4realEE">get_optical_measurement (C++ function)</a>
 </li>
-      <li><a href="cppsummary/pck.html#_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realRNSt6vectorINSt6vectorI4realEEEE">get_pck_rotMat (C++ function)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv415get_pck_rotMat2RKNSt6stringERKNSt6stringERK4realP7PckInfoRNSt6vectorINSt6vectorI4realEEEE">get_pck_rotMat2 (C++ function)</a>
+      <li><a href="cppsummary/pck.html#_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realR12PckEphemerisRNSt6vectorINSt6vectorI4realEEEE">get_pck_rotMat (C++ function)</a>
 </li>
       <li><a href="_autosummary/grss.fit.fit_utils.get_ra_from_hms.html#grss.fit.fit_utils.get_ra_from_hms">get_ra_from_hms() (in module grss.fit.fit_utils)</a>
 </li>
@@ -1041,10 +1039,10 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.fit.fit_radar.get_radar_raw_data.html#grss.fit.fit_radar.get_radar_raw_data">get_radar_raw_data() (in module grss.fit.fit_radar)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.fit.fit_utils.get_radec.html#grss.fit.fit_utils.get_radec">get_radec() (in module grss.fit.fit_utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cppsummary/approach.html#_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4real">get_rel_state (C++ function)</a>
 </li>
       <li><a href="_autosummary/grss.fit.fit_utils.get_sbdb_elems.html#grss.fit.fit_utils.get_sbdb_elems">get_sbdb_elems() (in module grss.fit.fit_utils)</a>
@@ -1166,6 +1164,8 @@ document.write(`
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cppsummary/pck.html#_CPPv412iau_to_eulerK4realNSt6stringEP4real">iau_to_euler (C++ function)</a>
+</li>
       <li><a href="_autosummary/grss.fit.fit_utils.icrf2radec.html#grss.fit.fit_utils.icrf2radec">icrf2radec() (in module grss.fit.fit_utils)</a>
 </li>
       <li><a href="_autosummary/grss.libgrss.CloseApproachParameters.html#grss.libgrss.CloseApproachParameters.impact">impact (grss.libgrss.CloseApproachParameters property)</a>
@@ -1587,43 +1587,13 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.prop.prop_parallel.parallel_propagate.html#grss.prop.prop_parallel.parallel_propagate">parallel_propagate() (in module grss.prop.prop_parallel)</a>
 </li>
-      <li><a href="_autosummary/grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation.parallelMode">parallelMode (grss.libgrss.PropSimulation property)</a>
-</li>
       <li><a href="_autosummary/grss.prop.prop_utils.partials_to_ellipse.html#grss.prop.prop_utils.partials_to_ellipse">partials_to_ellipse() (in module grss.prop.prop_utils)</a>
 </li>
-      <li><a href="cppsummary/pck.html#c.PCK_CACHE_ITEM_SIZE">PCK_CACHE_ITEM_SIZE (C macro)</a>
-</li>
-      <li><a href="cppsummary/pck.html#c.PCK_CACHE_SIZE">PCK_CACHE_SIZE (C macro)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv48pck_calcP7PckInfo4realibP4realP4real">pck_calc (C++ function)</a>
+      <li><a href="cppsummary/pck.html#_CPPv48pck_calcP7PckInfo4realiP4realP4real">pck_calc (C++ function)</a>
 </li>
       <li><a href="cppsummary/pck.html#_CPPv48pck_freeP7PckInfo">pck_free (C++ function)</a>
 </li>
       <li><a href="cppsummary/pck.html#_CPPv48pck_initRKNSt6stringE">pck_init (C++ function)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv48PckCache">PckCache (C++ struct)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N8PckCache5itemsE">PckCache::items (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N8PckCache1tE">PckCache::t (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv412PckCacheItem">PckCacheItem (C++ struct)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem5alphaE">PckCacheItem::alpha (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem8alphaDotE">PckCacheItem::alphaDot (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem5deltaE">PckCacheItem::delta (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem8deltaDotE">PckCacheItem::deltaDot (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem7spiceIdE">PckCacheItem::spiceId (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem1tE">PckCacheItem::t (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem1wE">PckCacheItem::w (C++ member)</a>
-</li>
-      <li><a href="cppsummary/pck.html#_CPPv4N12PckCacheItem4wDotE">PckCacheItem::wDot (C++ member)</a>
 </li>
       <li><a href="cppsummary/pck.html#_CPPv412PckEphemeris">PckEphemeris (C++ struct)</a>
 </li>
@@ -1701,8 +1671,6 @@ document.write(`
         <li><a href="_autosummary/grss.libgrss.SpiceBody.html#grss.libgrss.SpiceBody.poleRA">(grss.libgrss.SpiceBody property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.libgrss.IntegBody.html#grss.libgrss.IntegBody.prepare_stm">prepare_stm() (grss.libgrss.IntegBody method)</a>
 </li>
       <li><a href="_autosummary/grss.fit.fit_simulation.FitSimulation.html#grss.fit.fit_simulation.FitSimulation.print_summary">print_summary() (grss.fit.fit_simulation.FitSimulation method)</a>
@@ -1723,6 +1691,8 @@ document.write(`
         <li><a href="_autosummary/grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation">(class in grss.libgrss)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cppsummary/simulation.html#_CPPv4N14PropSimulation9add_eventE9IntegBody4realNSt6vectorI4realEE4real">PropSimulation::add_event (C++ function)</a>
 </li>
       <li><a href="cppsummary/simulation.html#_CPPv4N14PropSimulation14add_integ_bodyE9IntegBody">PropSimulation::add_integ_body (C++ function)</a>
@@ -1779,7 +1749,7 @@ document.write(`
 </li>
       <li><a href="cppsummary/simulation.html#_CPPv4N14PropSimulation15opticalPartialsE">PropSimulation::opticalPartials (C++ member)</a>
 </li>
-      <li><a href="cppsummary/simulation.html#_CPPv4N14PropSimulation12parallelModeE">PropSimulation::parallelMode (C++ member)</a>
+      <li><a href="cppsummary/simulation.html#_CPPv4N14PropSimulation8pckEphemE">PropSimulation::pckEphem (C++ member)</a>
 </li>
       <li><a href="cppsummary/simulation.html#_CPPv4N14PropSimulation22prepare_for_evaluationERNSt6vectorI4realEERNSt6vectorINSt6vectorI4realEEEE">PropSimulation::prepare_for_evaluation (C++ function)</a>
 </li>
@@ -2269,7 +2239,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 06, 2024.
+  Last updated on Apr 07, 2024.
   <br/>
 </p>
   </div>

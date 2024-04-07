@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>spk.h &#8212; GRSS 3.8.8 documentation</title>
+    <title>spk.h &#8212; GRSS 3.9.0 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="simulation.h" href="simulation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 06, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 07, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.8.8 documentation</p>
+    <p class="title logo__title">GRSS v3.9.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -851,17 +851,23 @@ document.write(`
 <em>#include &lt;spk.h&gt;</em></div>
 <p>Structure to hold all the data for the SPK files in a <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a>. </p>
 <dl class="field-list simple">
+<dt class="field-odd">Param mbPath<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path to the main-body SPK file. </p>
+</dd>
+<dt class="field-even">Param sbPath<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path to the small-body SPK file. </p>
+</dd>
 <dt class="field-odd">Param mb<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Main body ephemeris data. </p>
+<dd class="field-odd"><p><a class="reference internal" href="#struct_spk_info"><span class="std std-ref">SpkInfo</span></a> structure for the main-body SPK file. </p>
 </dd>
 <dt class="field-even">Param sb<span class="colon">:</span></dt>
-<dd class="field-even"><p>Small body ephemeris data. </p>
+<dd class="field-even"><p><a class="reference internal" href="#struct_spk_info"><span class="std std-ref">SpkInfo</span></a> structure for the small-body SPK file. </p>
 </dd>
 <dt class="field-odd">Param nextIdxToWrite<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Next index to write to in the cache. </p>
+<dd class="field-odd"><p>Index of the next cache item to write. </p>
 </dd>
-<dt class="field-even">Param spkCache<span class="colon">:</span></dt>
-<dd class="field-even"><p>Cache of recently queried SPK data. </p>
+<dt class="field-even">Param cache<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of <a class="reference internal" href="#struct_spk_cache"><span class="std std-ref">SpkCache</span></a> containing recently queried SPK data. </p>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
@@ -967,7 +973,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 06, 2024.
+  Last updated on Apr 07, 2024.
   <br/>
 </p>
   </div>
