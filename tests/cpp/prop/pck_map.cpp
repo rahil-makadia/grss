@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <random>
+#include "SpiceUsr.h"
 
 int main(){
     timeval t1, t2;
@@ -55,6 +56,22 @@ int main(){
     sxform_c(from.c_str(), to.c_str(), et, spiceMat);
     kclear_c();
 
+    // // print both matrices
+    // std::cout << "Spice Matrix:" << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     for (int j = 0; j < 6; j++){
+    //         std::cout << std::setw(25) << std::scientific << spiceMat[i][j];
+    //     }
+    //     std::cout << std::endl;
+    // }
+    // std::cout << "Map Matrix:" << std::endl;
+    // for (int i = 0; i < 6; i++){
+    //     for (int j = 0; j < 6; j++){
+    //         std::cout << std::setw(25) << std::scientific << mapMat[i][j];
+    //     }
+    //     std::cout << std::endl;
+    // }
+
     // compute relative error
     real error = 0;
     for (int i = 0; i < 6; i++){
@@ -66,21 +83,6 @@ int main(){
     }
     std::cout << "Cumulative Relative Error: " << error*100 << "%" << std::endl;
     assert(error < 1e-5); // 0.001%
-    // // print both matrices
-    // std::cout << "Spice Matrix:" << std::endl;
-    // for (int i = 0; i < 6; i++){
-    //     for (int j = 0; j < 6; j++){
-    //         std::cout << std::setw(20) << std::scientific << spiceMat[i][j];
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // std::cout << "Map Matrix:" << std::endl;
-    // for (int i = 0; i < 6; i++){
-    //     for (int j = 0; j < 6; j++){
-    //         std::cout << std::setw(20) << std::scientific << mapMat[i][j];
-    //     }
-    //     std::cout << std::endl;
-    // }
     std::cout
         << std::endl
         << "/////////////////////// PCK map accuracy test ///////////////////////"

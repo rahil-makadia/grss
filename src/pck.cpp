@@ -283,6 +283,7 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
     cdec0 = cdec1 = cdec2 = 0.0;
     real cw0, cw1, cw2;
     cw0 = cw1 = cw2 = 0.0;
+    std::vector<real> raNutPrec, decNutPrec, wNutPrec, nutPrecIntercept, nutPrecSlope;
     // numbers are from NAIF's pck00011.tpc file
     if (iauFrame == "IAU_SUN"){
         // BODY10_POLE_RA         = (  286.13       0.          0. )
@@ -296,15 +297,31 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         // BODY199_POLE_RA          = (  281.0103   -0.0328     0. )
         // BODY199_POLE_DEC         = (   61.4155   -0.0049     0. )
         // BODY199_PM               = (  329.5988    6.1385108  0. )
-        std::cout << "Note: the IAU Mercury model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
+        // BODY199_NUT_PREC_RA  = ( 0. 0. 0. 0. 0. )
+        // BODY199_NUT_PREC_DEC = ( 0. 0. 0. 0. 0. )
+        // BODY199_NUT_PREC_PM  = (    0.01067257
+        //                            -0.00112309
+        //                            -0.00011040
+        //                            -0.00002539
+        //                            -0.00000571  )
+        // BODY1_NUT_PREC_ANGLES  = ( 174.7910857  0.14947253587500003E+06
+        //                            349.5821714  0.29894507175000006E+06
+        //                            164.3732571  0.44841760762500006E+06
+        //                            339.1643429  0.59789014350000012E+06
+        //                            153.9554286  0.74736267937499995E+06 )
         cra0 = 281.0103;
         cra1 = -0.0328;
         cdec0 = 61.4155;
         cdec1 = -0.0049;
         cw0 = 329.5988;
         cw1 = 6.1385108;
+        wNutPrec = {0.01067257, -0.00112309, -0.00011040, -0.00002539,
+                    -0.00000571};
+        nutPrecIntercept = {174.7910857, 349.5821714, 164.3732571, 339.1643429,
+                            153.9554286};
+        nutPrecSlope = {0.14947253587500003E+06, 0.29894507175000006E+06,
+                        0.44841760762500006E+06, 0.59789014350000012E+06,
+                        0.74736267937499995E+06};
     } else if (iauFrame == "IAU_VENUS"){
         // BODY299_POLE_RA          = (  272.76       0.          0. )
         // BODY299_POLE_DEC         = (   67.16       0.          0. )
@@ -326,9 +343,33 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         // BODY301_POLE_RA      = (  269.9949        0.0031        0.      )
         // BODY301_POLE_DEC     = (   66.5392        0.0130        0.      )
         // BODY301_PM           = (   38.3213       13.17635815   -1.4D-12 )
-        std::cout << "Note: the IAU Moon model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
+        // BODY301_NUT_PREC_RA  = (   -3.8787   -0.1204   0.0700   -0.0172
+        //                             0.0       0.0072   0.0       0.0
+        //                             0.0      -0.0052   0.0       0.0
+        //                             0.0043                              )
+
+        // BODY301_NUT_PREC_DEC = (   1.5419     0.0239  -0.0278    0.0068
+        //                            0.0       -0.0029   0.0009    0.0
+        //                            0.0        0.0008   0.0       0.0
+        //                           -0.0009                               )
+
+        // BODY301_NUT_PREC_PM  = (   3.5610     0.1208  -0.0642    0.0158
+        //                            0.0252    -0.0066  -0.0047   -0.0046
+        //                            0.0028     0.0052   0.0040    0.0019
+        //                           -0.0044                               )
+        // BODY3_NUT_PREC_ANGLES  = (  125.045         -1935.5364525000
+        //                             250.089         -3871.0729050000
+        //                             260.008        475263.3328725000
+        //                             176.625        487269.6299850000
+        //                             357.529         35999.0509575000
+        //                             311.589        964468.4993100000
+        //                             134.963        477198.8693250000
+        //                             276.617         12006.3007650000
+        //                              34.226         63863.5132425000
+        //                              15.134         -5806.6093575000
+        //                             119.743           131.8406400000
+        //                             239.961          6003.1503825000
+        //                              25.053        473327.7964200000 )
         cra0 = 269.9949;
         cra1 = 0.0031;
         cdec0 = 66.5392;
@@ -336,39 +377,163 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         cw0 = 38.3213;
         cw1 = 13.17635815;
         cw2 = -1.4e-12;
+        raNutPrec = {-3.8787, -0.1204, 0.0700,  -0.0172, 0.0, 0.0072, 0.0,
+                     0.0,     0.0,     -0.0052, 0.0,     0.0, 0.0043};
+        decNutPrec = {1.5419, 0.0239, -0.0278, 0.0068, 0.0, -0.0029, 0.0009,
+                      0.0,    0.0,    0.0008,  0.0,    0.0, -0.0009};
+        wNutPrec = {3.5610,  0.1208, -0.0642, 0.0158, 0.0252, -0.0066, -0.0047,
+                    -0.0046, 0.0028, 0.0052,  0.0040, 0.0019, -0.0044};
+        nutPrecIntercept = {125.045, 250.089, 260.008, 176.625, 357.529,
+                            311.589, 134.963, 276.617, 34.226,  15.134,
+                            119.743, 239.961, 25.053};
+        nutPrecSlope = {-1935.5364525000,  -3871.0729050000, 475263.3328725000,
+                        487269.6299850000, 35999.0509575000, 964468.4993100000,
+                        477198.8693250000, 12006.3007650000, 63863.5132425000,
+                        -5806.6093575000,  131.8406400000,   6003.1503825000,
+                        473327.7964200000};
     } else if (iauFrame == "IAU_MARS"){
         // BODY499_POLE_RA          = (  317.269202  -0.10927547        0.  )
         // BODY499_POLE_DEC         = (   54.432516  -0.05827105        0.  )
         // BODY499_PM               = (  176.049863  +350.891982443297  0.  )
-        std::cout << "Note: the IAU Mars model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
+        // BODY499_NUT_PREC_RA      = (  0     0     0     0     0
+        //                               0     0     0     0     0
+        //                               0.000068
+        //                               0.000238
+        //                               0.000052
+        //                               0.000009
+        //                               0.419057                  )
+        // BODY499_NUT_PREC_DEC     = (  0     0     0     0     0
+        //                               0     0     0     0     0
+        //                               0     0     0     0     0
+        //                               0.000051
+        //                               0.000141
+        //                               0.000031
+        //                               0.000005
+        //                               1.591274                  )
+        // BODY499_NUT_PREC_PM      = (  0     0     0     0     0
+        //                               0     0     0     0     0
+        //                               0     0     0     0     0
+        //                               0     0     0     0     0
+        //                               0.000145
+        //                               0.000157
+        //                               0.000040
+        //                               0.000001
+        //                               0.000001
+        //                               0.584542                  )
+        // BODY4_NUT_PREC_ANGLES  = (
+
+        //     190.72646643      15917.10818695   0
+        //     21.46892470       31834.27934054   0
+        //     332.86082793      19139.89694742   0
+        //     394.93256437      38280.79631835   0
+        //     189.63271560   41215158.18420050   12.711923222
+
+        //     121.46893664        660.22803474   0
+        //     231.05028581        660.99123540   0
+        //     251.37314025       1320.50145245   0
+        //     217.98635955      38279.96125550   0
+        //     196.19729402      19139.83628608   0
+
+        //     198.991226        19139.4819985    0
+        //     226.292679        38280.8511281    0
+        //     249.663391        57420.7251593    0
+        //     266.183510        76560.6367950    0
+        //     79.398797             0.5042615    0
+
+        //     122.433576        19139.9407476    0
+        //     43.058401         38280.8753272    0
+        //     57.663379         57420.7517205    0
+        //     79.476401         76560.6495004    0
+        //     166.325722            0.5042615    0
+
+        //     129.071773        19140.0328244    0
+        //     36.352167         38281.0473591    0
+        //     56.668646         57420.9295360    0
+        //     67.364003         76560.2552215    0
+        //     104.792680        95700.4387578    0
+        //     95.391654             0.5042615    0 )
         cra0 = 317.269202;
         cra1 = -0.10927547;
         cdec0 = 54.432516;
         cdec1 = -0.05827105;
         cw0 = 176.049863;
         cw1 = 350.891982443297;
+        raNutPrec = {0.0, 0.0, 0.0, 0.0, 0.0, 
+                     0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.000068, 0.000238, 0.000052, 0.000009, 0.419057};
+        decNutPrec = {0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.0, 0.0, 0.0, 0.0, 0.0,
+                        0.000051, 0.000141, 0.000031, 0.000005, 1.591274};
+        wNutPrec = {0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 0.0, 0.0,
+                    0.000145, 0.000157, 0.000040, 0.000001, 0.000001, 0.584542};
+        nutPrecIntercept = {190.72646643, 21.46892470, 332.86082793, 394.93256437, 189.63271560,
+                            121.46893664, 231.05028581, 251.37314025, 217.98635955, 196.19729402,
+                            198.991226, 226.292679, 249.663391, 266.183510, 79.398797,
+                            122.433576, 43.058401, 57.663379, 79.476401, 166.325722,
+                            129.071773, 36.352167, 56.668646, 67.364003, 104.792680, 95.391654};
+        nutPrecSlope = {15917.10818695, 31834.27934054, 19139.89694742, 38280.79631835, 41215158.18420050,
+                        660.22803474, 660.99123540, 1320.50145245, 38279.96125550, 19139.83628608,
+                        19139.4819985, 38280.8511281, 57420.7251593, 76560.6367950, 0.5042615,
+                        19139.9407476, 38280.8753272, 57420.7517205, 76560.6495004, 0.5042615,
+                        19140.0328244, 38281.0473591, 57420.9295360, 76560.2552215, 95700.4387578, 0.5042615};
     } else if (iauFrame == "IAU_JUPITER"){
         // BODY599_POLE_RA        = (   268.056595     -0.006499       0. )
         // BODY599_POLE_DEC       = (    64.495303      0.002413       0. )
         // BODY599_PM             = (   284.95        870.5360000      0. )
-        std::cout << "Note: the IAU Jupiter model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
+        // BODY599_NUT_PREC_RA  = ( 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.  0.000117
+        //                                                         0.000938
+        //                                                         0.001432
+        //                                                         0.000030
+        //                                                         0.002150 )
+        // BODY599_NUT_PREC_DEC = ( 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.  0.000050
+        //                                                         0.000404
+        //                                                         0.000617
+        //                                                        -0.000013
+        //                                                         0.000926 )
+        // BODY599_NUT_PREC_PM  = ( 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.  0.0
+        //                                                         0.0
+        //                                                         0.0
+        //                                                         0.0
+        //                                                         0.0  )
+        // BODY5_NUT_PREC_ANGLES  = (    73.32      91472.9
+        //                               24.62      45137.2
+        //                              283.90       4850.7
+        //                              355.80       1191.3
+        //                              119.90        262.1
+        //                              229.80         64.3
+        //                              352.25       2382.6
+        //                              113.35       6070.0
+        //                              146.64     182945.8
+        //                               49.24      90274.4
+        //                               99.360714   4850.4046
+        //                              175.895369   1191.9605
+        //                              300.323162    262.5475
+        //                              114.012305   6070.2476
+        //                               49.511251     64.3000  )
         cra0 = 268.056595;
         cra1 = -0.006499;
         cdec0 = 64.495303;
         cdec1 = 0.002413;
         cw0 = 284.95;
         cw1 = 870.5360000;
+        raNutPrec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                     0.000117, 0.000938, 0.001432, 0.000030, 0.002150};
+        decNutPrec = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                      0.000050, 0.000404, 0.000617, -0.000013, 0.000926};
+        nutPrecIntercept = {73.32, 24.62, 283.90, 355.80, 119.90, 229.80, 352.25, 113.35,
+                            146.64, 49.24, 99.360714, 175.895369, 300.323162, 114.012305,
+                            49.511251};
+        nutPrecSlope = {91472.9, 45137.2, 4850.7, 1191.3, 262.1, 64.3, 2382.6, 6070.0,
+                        182945.8, 90274.4, 4850.4046, 1191.9605, 262.5475, 6070.2476,
+                        64.3000};
     } else if (iauFrame == "IAU_SATURN"){
         // BODY699_POLE_RA        = (   40.589       -0.036       0. )
         // BODY699_POLE_DEC       = (   83.537       -0.004       0. )
         // BODY699_PM             = (   38.90       810.7939024   0. )
-        std::cout << "Note: the IAU Saturn model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
         cra0 = 40.589;
         cra1 = -0.036;
         cdec0 = 83.537;
@@ -379,9 +544,6 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         // BODY799_POLE_RA        = (  257.311     0.         0.  )
         // BODY799_POLE_DEC       = (  -15.175     0.         0.  )
         // BODY799_PM             = (  203.81   -501.1600928  0.  )
-        std::cout << "Note: the IAU Uranus model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
         cra0 = 257.311;
         cdec0 = -15.175;
         cw0 = 203.81;
@@ -390,13 +552,39 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         // BODY899_POLE_RA        = (  299.36     0.         0. )
         // BODY899_POLE_DEC       = (   43.46     0.         0. )
         // BODY899_PM             = (  249.978  541.1397757  0. )
-        std::cout << "Note: the IAU Neptune model has nutation and precision "
-                     "terms that are not included in GRSS."
-                  << std::endl;
+        // BODY899_NUT_PREC_RA    = (  0.70 0. 0. 0. 0. 0. 0. 0. )
+        // BODY899_NUT_PREC_DEC   = ( -0.51 0. 0. 0. 0. 0. 0. 0. )
+        // BODY899_NUT_PREC_PM    = ( -0.48 0. 0. 0. 0. 0. 0. 0. )
+        // BODY8_NUT_PREC_ANGLES = (   357.85         52.316
+        //                             323.92      62606.6
+        //                             220.51      55064.2
+        //                             354.27      46564.5
+        //                             75.31      26109.4
+        //                             35.36      14325.4
+        //                             142.61       2824.6
+        //                             177.85         52.316
+        //                             647.840    125213.200
+        //                             355.700       104.632
+        //                             533.550       156.948
+        //                             711.400       209.264
+        //                             889.250       261.580
+        //                             1067.100       313.896
+        //                             1244.950       366.212
+        //                             1422.800       418.528
+        //                             1600.650       470.844   )
         cra0 = 299.36;
         cdec0 = 43.46;
         cw0 = 249.978;
         cw1 = 541.1397757;
+        raNutPrec = {0.70};
+        decNutPrec = {-0.51};
+        wNutPrec = {-0.48};
+        nutPrecIntercept = {357.85, 323.92, 220.51, 354.27, 75.31, 35.36, 142.61, 177.85,
+                            647.840, 355.700, 533.550, 711.400, 889.250, 1067.100, 1244.950,
+                            1422.800, 1600.650};
+        nutPrecSlope = {52.316, 62606.6, 55064.2, 46564.5, 26109.4, 14325.4, 2824.6, 52.316,
+                        125213.200, 104.632, 156.948, 209.264, 261.580, 313.896, 366.212,
+                        418.528, 470.844};
     } else if (iauFrame == "IAU_PLUTO"){
         // BODY999_POLE_RA        = (  132.993   0.          0. )
         // BODY999_POLE_DEC       = (   -6.163   0.          0. )
@@ -415,6 +603,26 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
     raDot = (cra1 + 2.0 * T * cra2) / secInCentury;
     decDot = (cdec1 + 2.0 * T * cdec2) / secInCentury;
     wDot = (cw1 + 2.0 * D * cw2) / secInDay;
+    // maxIter is the maximum of the lengths of raNutPrec, decNutPrec, wNutPrec
+    size_t maxIter = std::max({raNutPrec.size(), decNutPrec.size(), wNutPrec.size()});
+    for (size_t i = 0; i < maxIter; i++){
+        const real theta = (nutPrecIntercept[i] + nutPrecSlope[i] * T) * DEG2RAD;
+        const real cTheta = cos(theta);
+        const real sTheta = sin(theta);
+        const real thetaDot = nutPrecSlope[i] * DEG2RAD / secInCentury;
+        if (i < raNutPrec.size()){
+            ra += raNutPrec[i] * sTheta;
+            raDot += raNutPrec[i] * cTheta * thetaDot;
+        }
+        if (i < decNutPrec.size()){
+            dec += decNutPrec[i] * cTheta;
+            decDot += decNutPrec[i] * -sTheta * thetaDot;
+        }
+        if (i < wNutPrec.size()){
+            w += wNutPrec[i] * sTheta;
+            wDot += wNutPrec[i] * cTheta * thetaDot;
+        }
+    }
     w *= DEG2RAD;
     ra *= DEG2RAD;
     dec *= DEG2RAD;
@@ -437,47 +645,44 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
 void euler313_to_rotMat(const real euler[6], real *rotMat, real *rotMatDot){
     // convert euler angles to rotation matrix
     // (we need w, delta, phi 3-1-3 euler angles here)
-    double angZ1 = euler[2];
-    double angX = euler[1];
-    double angZ2 = euler[0];
-    double rz2[3][3] = {
-        {cos(angZ2), sin(angZ2), 0.0},
-        {-sin(angZ2), cos(angZ2), 0.0},
-        {0.0, 0.0, 1.0}
-    };
-    double rx[3][3] = {
-        {1.0, 0.0, 0.0},
-        {0.0, cos(angX), sin(angX)},
-        {0.0, -sin(angX), cos(angX)}
-    };
-    double rz1[3][3] = {
-        {cos(angZ1), sin(angZ1), 0.0},
-        {-sin(angZ1), cos(angZ1), 0.0},
-        {0.0, 0.0, 1.0}
-    };
-    double rotMatTemp[3][3];
-    mat3_mat3_mul(*rx, *rz1, *rotMatTemp);
-    mat3_mat3_mul(*rz2, *rotMatTemp, rotMat);
+    real angZ1 = euler[2];
+    real cAngZ1 = cos(angZ1);
+    real sAngZ1 = sin(angZ1);
+    real angX = euler[1];
+    real cAngX = cos(angX);
+    real sAngX = sin(angX);
+    real angZ2 = euler[0];
+    real cAngZ2 = cos(angZ2);
+    real sAngZ2 = sin(angZ2);
+    rotMat[0] = cAngZ1*cAngZ2 - cAngX*sAngZ1*sAngZ2;
+    rotMat[1] = cAngZ2*sAngZ1 + cAngX*cAngZ1*sAngZ2;
+    rotMat[2] = sAngX*sAngZ2;
+    rotMat[3] = -cAngZ1*sAngZ2 - cAngX*cAngZ2*sAngZ1;
+    rotMat[4] = cAngX*cAngZ1*cAngZ2 - sAngZ1*sAngZ2;
+    rotMat[5] = cAngZ2*sAngX;
+    rotMat[6] = sAngX*sAngZ1;
+    rotMat[7] = -cAngZ1*sAngX;
+    rotMat[8] = cAngX;
 
     // from SPICE subroutine XF2EUL entry point EUL2XF for Rdot
-    double ca, sa, u, v;
+    real ca, sa, u, v;
     ca = cos(euler[0]);
     sa = sin(euler[0]);
     u = cos(euler[1]);
     v = sin(euler[1]);
-    double solutn[3][3] = {
+    real solutn[3][3] = {
         {-1.0, 0.0, -u},
         {0.0, -ca, -sa*v},
         {0.0, sa, -ca*v}
     };
-    double domega[3];
+    real domega[3];
     for (int i = 0; i < 3; i++){
         domega[i] = 0.0;
         for (int j = 0; j < 3; j++){
             domega[i] += solutn[i][j] * euler[j+3];
         }
     }
-    double rotDotTimesRotTranspose[3][3] = {
+    real rotDotTimesRotTranspose[3][3] = {
         {0.0, -domega[0], domega[2]},
         {domega[0], 0.0, -domega[1]},
         {-domega[2], domega[1], 0.0}

@@ -1,7 +1,7 @@
 # minimum required CMake version
 cmake_minimum_required(VERSION 3.18.0)
 
-# if on a Mac, use gnu compilers instead of clang
+# if on a Mac, use gnu compilers instead of clang for ease of use with OpenMP
 if(APPLE)
     set(CMAKE_C_COMPILER gcc-13)
     set(CMAKE_CXX_COMPILER g++-13)
@@ -18,11 +18,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}") # operational flags
 # add_compile_options(-std=c++11 -g3 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}" -Werror -Wall -Wextra -pedantic) # debugging flags
 
-# Set header file directories
+# Set header file directory
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/extern/cspice/include)
 
-# Set source code directories
+# Set source code directory
 add_subdirectory(src)
 
 # create pybind11 module

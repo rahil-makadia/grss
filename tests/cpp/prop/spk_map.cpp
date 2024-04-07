@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <random>
+#include "SpiceUsr.h"
 
 int main(){
     timeval t1, t2;
