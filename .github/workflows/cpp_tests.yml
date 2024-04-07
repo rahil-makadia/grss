@@ -18,7 +18,7 @@ jobs:
       - name: Build GRSS library
         run: |
           sudo apt-get install doxygen
-          source initialize.sh --tm-overwrite
+          source initialize.sh
           source build_cpp.sh -clean
       - name: Run tests
         run: |
