@@ -381,20 +381,18 @@ PropSimulation::PropSimulation(std::string name, real t0,
     this->integParams.n2Derivs = 0;
     this->integParams.timestepCounter = 0;
 
-    std::string mapKernelPath =
-        DEkernelPath.substr(0, DEkernelPath.find_last_of("/\\")) + "/";
     std::string kernel_sb, kernel_mb;
     switch (defaultSpiceBodies) {
         case 0: {
-            kernel_sb = mapKernelPath + "sb441-n16s.bsp";
-            kernel_mb = mapKernelPath + "de440.bsp";
+            kernel_sb = DEkernelPath + "sb441-n16s.bsp";
+            kernel_mb = DEkernelPath + "de440.bsp";
             break;
         }
         // DE430 or DE431
         case 430:
         case 431: {
-            kernel_sb = mapKernelPath + "sb431-n16s.bsp";
-            kernel_mb = mapKernelPath + "de430.bsp";
+            kernel_sb = DEkernelPath + "sb431-n16s.bsp";
+            kernel_mb = DEkernelPath + "de430.bsp";
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
@@ -539,8 +537,8 @@ PropSimulation::PropSimulation(std::string name, real t0,
         // DE440 or DE441
         case 440:
         case 441: {
-            kernel_sb = mapKernelPath + "sb441-n16s.bsp";
-            kernel_mb = mapKernelPath + "de440.bsp";
+            kernel_sb = DEkernelPath + "sb441-n16s.bsp";
+            kernel_mb = DEkernelPath + "de440.bsp";
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
@@ -690,9 +688,9 @@ PropSimulation::PropSimulation(std::string name, real t0,
     }
     this->spkEphem.mbPath = kernel_mb;
     this->spkEphem.sbPath = kernel_sb;
-    this->pckEphem.histPckPath = mapKernelPath + "earth_720101_230601.bpc";
-    this->pckEphem.latestPckPath = mapKernelPath + "earth_latest_high_prec.bpc";
-    this->pckEphem.predictPckPath = mapKernelPath + "earth_200101_990825_predict.bpc";
+    this->pckEphem.histPckPath = DEkernelPath + "earth_720101_230601.bpc";
+    this->pckEphem.latestPckPath = DEkernelPath + "earth_latest_high_prec.bpc";
+    this->pckEphem.predictPckPath = DEkernelPath + "earth_200101_990825_predict.bpc";
 }
 
 /**

@@ -18,11 +18,7 @@ int main() {
     real tDiff;
 
     int DEkernel = 441;
-    std::string DEkernelPath = "../../../grss/kernels/planets_big16_de" +
-        std::to_string(DEkernel) + "_1950_2350.tm";
-    if (DEkernel == 0) {
-        DEkernelPath = "../../../grss/kernels/planets_big16_de441_1950_2350.tm";
-    }
+    std::string DEkernelPath = "../../../grss/kernels/";
     real t0SimMjd = 2.4621385359989386E+06L - 2400000.5L;
     real tfSimMjd = 2.4625030372426095E+06L - 2400000.5L;
     PropSimulation simTest("simTest", t0SimMjd, DEkernel, DEkernelPath);

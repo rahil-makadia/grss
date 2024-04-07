@@ -9,11 +9,7 @@ pip3 install "pybind11[global]>=2.10.0"
 cd ../grss/debias/
 python3 get_debiasing_data.py
 cd ../kernels/
-if [ "$1" = "--tm-overwrite" ]; then
-    python3 get_kernels.py
-else
-    python3 get_kernels.py --no-tm-overwrite
-fi
+python3 get_kernels.py
 
 # return to root
 cd ../..
