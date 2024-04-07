@@ -382,7 +382,6 @@ struct InterpolationParameters {
  * @param ephem Ephemeris object for the simulation.
  * @param consts Constants object for the simulation.
  * @param integParams Integration parameters for the simulation.
- * @param parallelMode Flag to indicate if the simulation is in parallel mode.
  * @param spiceBodies Vector of SpiceBody objects in the simulation.
  * @param integBodies Vector of IntegBody objects in the simulation.
  * @param events Vector of ImpulseEvent objects in the simulation.
@@ -426,6 +425,7 @@ class PropSimulation {
     std::string name;
     std::string DEkernelPath;
     SpkEphemeris spkEphem;
+    PckEphemeris pckEphem;
     /**
      * @brief Construct a new PropSimulation object.
      */
@@ -449,7 +449,6 @@ class PropSimulation {
     std::vector<real> get_spiceBody_state(const real t, const std::string &bodyName);
     Constants consts;
     IntegrationParameters integParams;
-    bool parallelMode = false;
     std::vector<SpiceBody> spiceBodies;
     std::vector<IntegBody> integBodies;
     std::vector<ImpulseEvent> events;

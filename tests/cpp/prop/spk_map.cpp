@@ -1,17 +1,25 @@
 #include "grss.h"
 #include <sys/time.h>
 #include <assert.h>
+#include <random>
 
 int main(){
     timeval t1, t2;
     gettimeofday(&t1, NULL);
     real tDiff;
+
+    std::random_device rd;  // Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+    // limits of distribution are dictated by the time span of sb431-n16s.bsp
+    std::uniform_real_distribution<> dis(-94576.0, 234192.0);
+
     std::cout
         << "/////////////////////// SPK map accuracy test ///////////////////////"
         << std::endl
         << std::endl;
     std::cout.precision(8);
-    SpiceDouble mjd = 51544.5+1000;
+    SpiceDouble mjd = dis(gen);
+    std::cout << "MJD: " << mjd << std::endl;
     int kernel = 431;
     std::string kernel_sb, kernel_mb;
     std::vector<int> spiceIds;

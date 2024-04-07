@@ -734,10 +734,6 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Integration parameters of the simulation. PropSimulation.IntegParams object.
             )mydelimiter")
-        .def_readwrite("parallelMode", &PropSimulation::parallelMode,
-                       R"mydelimiter(
-            Whether to use parallel mode for the simulation (helps decide whether to use SPICE binary PCKs for Earth).
-            )mydelimiter")
         .def_readwrite("spiceBodies", &PropSimulation::spiceBodies,
                        R"mydelimiter(
             SPICE bodies of the simulation. List of PropSimulation.SpiceBodies objects.

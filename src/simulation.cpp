@@ -74,14 +74,9 @@ void get_observer_state(const real &tObsMjd,
         observerState[5] = 0.0L;
         return;
     }
-    real secPastJ2000 = mjd_to_et(tObsMjd);
-    real tObsMjdTDB;
+    real tObsMjdTDB = tObsMjd;
     if (tObsInUTC) {
-        const real etMinusUtc = delta_et_utc(tObsMjd);
-        secPastJ2000 += etMinusUtc;
-        tObsMjdTDB = et_to_mjd(secPastJ2000);
-    } else {
-        tObsMjdTDB = tObsMjd;
+        tObsMjdTDB += delta_et_utc(tObsMjd)/86400.0L;
     }
     double baseBodyState[9];
     get_spk_state(baseBody, tObsMjdTDB, propSim->spkEphem, baseBodyState);
@@ -97,7 +92,7 @@ void get_observer_state(const real &tObsMjd,
     std::string baseBodyFrame;
     get_baseBodyFrame((int)observerInfo[0], tObsMjdTDB, baseBodyFrame);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
-    get_pck_rotMat(baseBodyFrame, "J2000", secPastJ2000, rotMat);
+    get_pck_rotMat(baseBodyFrame, "J2000", tObsMjdTDB, propSim->pckEphem, rotMat);
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
@@ -695,6 +690,9 @@ PropSimulation::PropSimulation(std::string name, real t0,
     }
     this->spkEphem.mbPath = kernel_mb;
     this->spkEphem.sbPath = kernel_sb;
+    this->pckEphem.histPckPath = mapKernelPath + "earth_720101_230601.bpc";
+    this->pckEphem.latestPckPath = mapKernelPath + "earth_latest_high_prec.bpc";
+    this->pckEphem.predictPckPath = mapKernelPath + "earth_200101_990825_predict.bpc";
 }
 
 /**
@@ -708,6 +706,12 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->spkEphem.sbPath = simRef.spkEphem.sbPath;
     this->spkEphem.mb = nullptr;
     this->spkEphem.sb = nullptr;
+    this->pckEphem.histPckPath = simRef.pckEphem.histPckPath;
+    this->pckEphem.latestPckPath = simRef.pckEphem.latestPckPath;
+    this->pckEphem.predictPckPath = simRef.pckEphem.predictPckPath;
+    this->pckEphem.histPck = nullptr;
+    this->pckEphem.latestPck = nullptr;
+    this->pckEphem.predictPck = nullptr;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
     this->integParams.nInteg = 0;
@@ -808,29 +812,25 @@ void PropSimulation::prepare_for_evaluation(
     std::vector<std::vector<real>> xObserver = std::vector<std::vector<real>>(
         tEval.size(), std::vector<real>(6, 0.0L));
     std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
-    if (!this->parallelMode) {
-        this->map_ephemeris();
-        furnsh_c(this->DEkernelPath.c_str());
-        if (tEval.size() != 0) {
-            for (size_t i = 0; i < tEval.size(); i++) {
-                if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
-                    radarObserver[i] = 0;
-                } else if (observerInfo[i].size() == 9) {
-                    radarObserver[i] = 1;
-                } else if (observerInfo[i].size() == 10) {
-                    radarObserver[i] = 2;
-                } else {
-                    throw std::invalid_argument(
-                        "The observerInfo vector must have 4/7 (optical), 9 (radar "
-                        "delay), or 10 elements (radar doppler).");
-                }
-                get_observer_state(tEval[i], observerInfo[i], this,
-                                this->tEvalUTC, xObserver[i]);
+    this->map_ephemeris();
+    if (tEval.size() != 0) {
+        for (size_t i = 0; i < tEval.size(); i++) {
+            if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
+                radarObserver[i] = 0;
+            } else if (observerInfo[i].size() == 9) {
+                radarObserver[i] = 1;
+            } else if (observerInfo[i].size() == 10) {
+                radarObserver[i] = 2;
+            } else {
+                throw std::invalid_argument(
+                    "The observerInfo vector must have 4/7 (optical), 9 (radar "
+                    "delay), or 10 elements (radar doppler).");
             }
+            get_observer_state(tEval[i], observerInfo[i], this,
+                            this->tEvalUTC, xObserver[i]);
         }
-        unload_c(this->DEkernelPath.c_str());
-        this->unmap_ephemeris();
     }
+    this->unmap_ephemeris();
 
     if (this->tEval.size() == 0) {
         this->tEval = tEval;
@@ -848,6 +848,9 @@ void PropSimulation::prepare_for_evaluation(
 void PropSimulation::map_ephemeris(){
     this->spkEphem.mb = spk_init(this->spkEphem.mbPath);
     this->spkEphem.sb = spk_init(this->spkEphem.sbPath);
+    this->pckEphem.histPck = pck_init(this->pckEphem.histPckPath);
+    this->pckEphem.latestPck = pck_init(this->pckEphem.latestPckPath);
+    this->pckEphem.predictPck = pck_init(this->pckEphem.predictPckPath);
 }
 
 void PropSimulation::unmap_ephemeris(){
@@ -855,6 +858,12 @@ void PropSimulation::unmap_ephemeris(){
     spk_free(this->spkEphem.sb);
     this->spkEphem.mb = nullptr;
     this->spkEphem.sb = nullptr;
+    pck_free(this->pckEphem.histPck);
+    pck_free(this->pckEphem.latestPck);
+    pck_free(this->pckEphem.predictPck);
+    this->pckEphem.histPck = nullptr;
+    this->pckEphem.latestPck = nullptr;
+    this->pckEphem.predictPck = nullptr;
 }
 
 /**

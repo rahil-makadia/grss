@@ -65,15 +65,13 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     impact.flybyBodyIdx = i;
                     impact.centralBodyIdx = j;
                     impact.get_ca_parameters(propSim, impact.t);
-                    if (!propSim->parallelMode) impact.get_impact_parameters(propSim);
+                    impact.get_impact_parameters(propSim);
                     impact.impact = true;
                     propSim->impactParams.push_back(impact);
-                    if (!propSim->parallelMode) {
-                        std::cout << "Impact detected at MJD " << impact.t
-                                  << " TDB. " << impact.flybyBody
-                                  << " collided with " << impact.centralBody
-                                  << "!" << std::endl;
-                    }
+                    // std::cout << "Impact detected at MJD " << impact.t
+                    //             << " TDB. " << impact.flybyBody
+                    //             << " collided with " << impact.centralBody
+                    //             << "!" << std::endl;
                 }
                 // check close approach
                 real radialVel, radialVelOld;
@@ -686,10 +684,8 @@ void CloseApproachParameters::print_summary(int prec){
 void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     std::string baseBodyFrame;
     get_baseBodyFrame(this->centralBodySpiceId, this->t, baseBodyFrame);
-    real tET;
-    mjd_to_et(this->t, tET);
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
-    get_pck_rotMat("J2000", baseBodyFrame, tET, rotMat);
+    get_pck_rotMat("J2000", baseBodyFrame, this->t, propSim->pckEphem, rotMat);
     std::vector<real> impactRelStateInertial(6);
     impactRelStateInertial[0] = this->xRel[0]*propSim->consts.du2m/1.0e3L;
     impactRelStateInertial[1] = this->xRel[1]*propSim->consts.du2m/1.0e3L;

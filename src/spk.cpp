@@ -70,7 +70,7 @@ SpkInfo* spk_init(const std::string &path) {
     // Try opening file.
     int fd = open(path.c_str(), O_RDONLY);
     if (fd < 0) {
-        return NULL;
+        throw std::runtime_error("Error opening "+path+".");
     }
 
     // Read the file record.
@@ -78,22 +78,20 @@ SpkInfo* spk_init(const std::string &path) {
     // Check if the file is a valid double Precision Array File
     std::string full_file_type = "DAF/SPK";
     if (strncmp(record.file.locidw, full_file_type.c_str(), 7) != 0) {
+        close(fd);
         throw std::runtime_error(
             "Error parsing "+full_file_type+". Incorrect "
             "header.");
-        close(fd);
-        return NULL;
     }
 
     // Check that the size of a summary record is equal to the size of our
     // struct.
     int nc = 8 * (record.file.nd + (record.file.ni + 1) / 2);
     if (nc != sizeof(summary)) {
+        close(fd);
         throw std::runtime_error(
             "Error parsing "+full_file_type+". Wrong size of "
             "summary record.");
-        close(fd);
-        return NULL;
     }
 
     // Seek until the first summary record using the file record's fward pointer.
@@ -103,11 +101,10 @@ SpkInfo* spk_init(const std::string &path) {
 
     // We are at the first summary block, validate
     if ((int64_t)record.buf[8] != 0) {
+        close(fd);
         throw std::runtime_error(
             "Error parsing "+full_file_type+". Cannot find "
             "summary block.");
-        close(fd);
-        return NULL;
     }
     // std::cout << "record.summaries.nsum: " << record.summaries.nsum << std::endl;
     // std::cout << "record.file.nd: " << record.file.nd << std::endl;
@@ -163,20 +160,19 @@ SpkInfo* spk_init(const std::string &path) {
     struct stat sb;
     if (fstat(fd, &sb) < 0) {
         throw std::runtime_error("Error calculating size for "+full_file_type+".");
-        return NULL;
     }
     bsp->len = sb.st_size;
 
     // Memory map
     bsp->map = mmap(NULL, bsp->len, PROT_READ, MAP_SHARED, fd, 0);
     if (bsp->map == NULL) {
+        // this will leak memory
         throw std::runtime_error("Error creating memory map.");
-        return NULL;  // Will leak memory
     }
     #if defined(MADV_RANDOM)
         if (madvise(bsp->map, bsp->len, MADV_RANDOM) < 0) {
+            // this will leak memory
             throw std::runtime_error("Error while calling madvise().");
-            return NULL;  // Will leak memory
         }
     #endif
     close(fd);
@@ -200,9 +196,6 @@ SpkInfo* spk_init(const std::string &path) {
 void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
              double *out_y, double *out_z, double *out_vx, double *out_vy,
              double *out_vz, double *out_ax, double *out_ay, double *out_az) {
-    if (bsp == NULL) {
-        throw std::runtime_error("The SPK ephemeris file has not been found.");
-    }
     if (spiceId == 199) spiceId = 1;
     if (spiceId == 299) spiceId = 2;
     int m;

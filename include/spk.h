@@ -106,10 +106,12 @@ struct SpkInfo {
 /**
  * @brief Structure to hold all the data for the SPK files in a PropSimulation.
  *
- * @param mb Main body ephemeris data.
- * @param sb Small body ephemeris data.
- * @param nextIdxToWrite Next index to write to in the cache.
- * @param spkCache Cache of recently queried SPK data.
+ * @param mbPath Path to the main-body SPK file.
+ * @param sbPath Path to the small-body SPK file.
+ * @param mb SpkInfo structure for the main-body SPK file.
+ * @param sb SpkInfo structure for the small-body SPK file.
+ * @param nextIdxToWrite Index of the next cache item to write.
+ * @param cache Array of SpkCache containing recently queried SPK data.
  */
 struct SpkEphemeris {
     std::string mbPath;

@@ -1,7 +1,7 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include "spk.h"
+#include "utilities.h"
 
 /**
  * @brief Convert Julian Date to TDB ephemeris time.

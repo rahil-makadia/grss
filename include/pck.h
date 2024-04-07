@@ -1,54 +1,7 @@
 #ifndef PCK_H
 #define PCK_H
 
-#include "utilities.h"
-
-/**
- * @brief Structure to hold a single time,angle,angleDot record from an PCK file.
- *
- * @param spiceId SPICE ID of the frame.
- * @param t Time of the frame angles.
- * @param alpha Right ascension of the pole.
- * @param delta Declination of the pole.
- * @param w Prime meridian angle.
- * @param alphaDot Right ascension rate.
- * @param deltaDot Declination rate.
- * @param wDot Prime meridian angle rate.
- */
-struct PckCacheItem {
-    int spiceId = -99999;
-    double t;
-    double alpha;
-    double delta;
-    double w;
-    double alphaDot;
-    double deltaDot;
-    double wDot;
-};
-
-/**
- * @brief Size of each item in the cache.
- * It is set to 32, which is a bit of a buffer on the usual number of
- * 1 frame in a binary PCK (e.g. ITRF93 for Earth).
- */
-#define PCK_CACHE_ITEM_SIZE 4
-
-/**
- * @brief Structure to hold a cache of PCK data.
- *
- * @param t Time of the cache.
- * @param items Array of CacheItems.
- */
-struct PckCache {
-    double t;
-    PckCacheItem items[PCK_CACHE_ITEM_SIZE];
-};
-
-/**
- * @brief Number of items in the cache.
- * This is the number of PCK queries that are remembered.
- */
-#define PCK_CACHE_SIZE 5
+#include "timeconvert.h"
 
 /**
  * @brief Length of a record in an PCK file.
@@ -105,6 +58,16 @@ void pck_free(PckInfo *bpc);
  */
 PckInfo* pck_init(const std::string &path);
 
+/**
+ * @brief Structure to hold all the data for the PCK files in a PropSimulation.
+ *
+ * @param histPckPath Path to the historical PCK file.
+ * @param latestPckPath Path to the latest PCK file.
+ * @param predictPckPath Path to the predicted PCK file.
+ * @param histPck PckInfo structure for the historical PCK file.
+ * @param latestPck PckInfo structure for the latest PCK file.
+ * @param predictPck PckInfo structure for the predicted PCK file.
+ */
 struct PckEphemeris {
     std::string histPckPath;
     std::string latestPckPath;
@@ -118,22 +81,25 @@ struct PckEphemeris {
  * @brief Compute angle,angleDot for a given frame
  * at a given time using an PckInfo structure.
  */
-void pck_calc(PckInfo *bpc, real epoch, int spiceId, bool inertialJ2000,
-              real *rotMat, real *rotMatDot);
-
-void euler313_to_rotmat(const real euler[6], real *rotMat, real *rotMatDot);
+void pck_calc(PckInfo *bpc, real epoch, int spiceId, real *rotMat,
+              real *rotMatDot);
 
 /**
- * @brief Using cspice to get the rotation matrix from one frame to another.
+ * @brief Compute angle,angleDot for a given frame
+ * at a given time using the IAU pole polynomials.
  */
-void get_pck_rotMat(const std::string &from, const std::string &to,
-                    const real &et, std::vector<std::vector<real>> &rotMat);
+void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler);
+
+/**
+ * @brief Convert a 313 Euler angle to a rotation matrix and its derivative.
+ */
+void euler313_to_rotMat(const real euler[6], real *rotMat, real *rotMatDot);
 
 /**
  * @brief Get the rotation matrix from one frame to another.
  */
-void get_pck_rotMat2(const std::string &from, const std::string &to,
-                    const real &et, PckInfo* bpc,// PckEphemeris &ephem,
+void get_pck_rotMat(const std::string &from, const std::string &to,
+                    const real &t0_mjd, PckEphemeris &ephem,
                     std::vector<std::vector<real>> &xformMat);
 
 #endif
