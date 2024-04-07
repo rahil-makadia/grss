@@ -10,7 +10,7 @@ keywords = [
     "asteroids",
     "comets",
     "orbit determination",
-    "orbit propagator"
+    "orbit propagation"
 ]
 authors = [
     {name = "Rahil Makadia"},
@@ -51,10 +51,6 @@ requires = ["setuptools>=43.0.0"]
 package-data = {"grss" = [
     "debias/get_debiasing_data.py",
     "kernels/get_kernels.py",
-    "kernels/*.log",
-    "kernels/*.tm",
-    "kernels/*.tpc",
-    "kernels/*.txt",
 ]}
 include-package-data = true
 

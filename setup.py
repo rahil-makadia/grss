@@ -40,9 +40,6 @@ class CMakeBuild(build_ext):
         os.system(f"cp {ext.sourcedir}/build/libgrss* {self.build_lib}/grss/")
         return
 
-# get version from version.txt
-with open("grss/version.txt", "r", encoding="utf-8") as f:
-    ver = f.read().strip()
 # run get_cspice in the extern folder if installing from source
 if (not os.path.exists("./extern/cspice/lib/cspice.a") or
     not os.path.exists("./extern/cspice/include/SpiceUsr.h") ):
