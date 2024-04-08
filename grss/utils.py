@@ -1,7 +1,7 @@
 """GRSS Python utilities subpackage"""
 import os
-import datetime
-from requests import request
+import time
+import gzip
 
 __all__ = [ 'default_kernel_path',
             'grss_path',
@@ -11,41 +11,48 @@ __all__ = [ 'default_kernel_path',
 grss_path = os.path.dirname(os.path.abspath(__file__))
 default_kernel_path = f'{grss_path}/kernels/'
 
-def _download_obs_codes_file():
+def _download_ades_files(file):
     """
     Download a text file of the observatory code info from the Minor Planet Center.
-    """
-    print("Downloading observatory codes file from the MPC...")
-    url = "https://www.minorplanetcenter.net/iau/lists/ObsCodes.html"
-    req = request("GET", url, timeout=30)
-    text = req.content.replace(b'<pre>',b'').replace(b'</pre>',b'')
 
-    with open(f'{grss_path}/fit/obs_codes.txt', "wb") as file:
-        now = datetime.datetime.now()
-        file.write((f'{now.year}, {now.month}, {now.day}, '
-                    f'{now.hour}, {now.minute}, {now.second}\n'.encode()))
-        file.write(text[1:-2])
+    Parameters
+    ----------
+    file : str
+        The name of the file to download from the Minor Planet Center.
+    """
+    print(f"Downloading ADES file {file} from the MPC...")
+    files = {
+        # "modes.json": "https://www.minorplanetcenter.net/iau/info/mode.json",
+        # "catalogs.json": "https://www.minorplanetcenter.net/iau/info/astCat_photCat.json",
+        "codes.json": "https://www.minorplanetcenter.net/Extended_Files/obscodes_extended.json.gz",
+    }
+    outname = f'{grss_path}/fit/{file}'
+    if file == "codes.json":
+        outname += ".gz"
+    cmd = f'curl --silent --show-error -o {outname} {files[file]}'
+    os.system(cmd)
+    if file == "codes.json":
+        with gzip.open(f'{outname}', 'rb') as f_in:
+            with open(f'{grss_path}/fit/codes.json', 'w', encoding='utf-8') as f_out:
+                f_out.write(f_in.read().decode('utf-8'))
+        os.remove(f'{outname}')
     return None
 
-def get_obs_codes_file():
-    # sourcery skip: extract-method
+def check_and_get_ades_files():
     """
-    Download a text file of the observatory code info from the Minor Planet
-    Center. If it already exists, update it if the last download was more than 1
-    week ago.
+    Download ADES JSON files from the Minor Planet Center.
     """
-    # check if file exists
-    if os.path.isfile(f'{grss_path}/fit/obs_codes.txt'):
-        with open(f'{grss_path}/fit/obs_codes.txt', 'r', encoding='utf-8') as file:
-            now = datetime.datetime.now()
-            data = file.read()
-            last_updated = data.split('\n')[0]
-            last_updated = datetime.datetime(*[int(i) for i in last_updated.split(',')])
-            diff_days = (now - last_updated).days
-            if diff_days >= 1.0:
-                _download_obs_codes_file()
-    else:
-        _download_obs_codes_file()
+    # check if all files exist
+    # files = ["modes.json", "catalogs.json", "codes.json"]
+    files = ["codes.json"]
+    for file in files:
+        if not os.path.exists(f'{grss_path}/fit/{file}'):
+            _download_ades_files(file)
+        else:
+            # check if file is older than 1 day
+            file_age = time.time() - os.path.getmtime(f'{grss_path}/fit/{file}')
+            if file_age > 86400:
+                _download_ades_files(file)
     return None
 
 def initialize():
@@ -64,7 +71,7 @@ def initialize():
     # run the get_kernels.py script
     os.system(f'python {grss_path}/kernels/get_kernels.py')
     # get the observatory codes file
-    get_obs_codes_file()
+    check_and_get_ades_files()
     # set openmp environment variable to number of cores
     os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
     return None
