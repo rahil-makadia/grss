@@ -58,7 +58,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.apply_debiasing_scheme';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_optical.apply_weights" href="grss.fit.fit_optical.apply_weights.html" />
+    <link rel="next" title="grss.fit.fit_optical.apply_weighting_scheme" href="grss.fit.fit_optical.apply_weighting_scheme.html" />
     <link rel="prev" title="grss.fit.fit_optical" href="grss.fit.fit_optical.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -176,7 +176,7 @@
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weighting_scheme.html">grss.fit.fit_optical.apply_weighting_scheme</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.deweight_obs.html">grss.fit.fit_optical.deweight_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.eliminate_obs.html">grss.fit.fit_optical.eliminate_obs</a></li>
@@ -184,8 +184,7 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_raw_data.html">grss.fit.fit_optical.get_mpc_raw_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_obs_data.html">grss.fit.fit_optical.get_optical_obs_data</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -272,7 +271,7 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="grss.utils.html">grss.utils</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="grss.utils.get_obs_codes_file.html">grss.utils.get_obs_codes_file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.check_and_get_ades_files.html">grss.utils.check_and_get_ades_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.utils.initialize.html">grss.utils.initialize</a></li>
 </ul>
 </li>
@@ -505,26 +504,22 @@ document.write(`
 <h1>grss.fit.fit_optical.apply_debiasing_scheme<a class="headerlink" href="#grss-fit-fit-optical-apply-debiasing-scheme" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.fit.fit_optical.apply_debiasing_scheme">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">apply_debiasing_scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">star_catalog_codes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.apply_debiasing_scheme" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">apply_debiasing_scheme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.apply_debiasing_scheme" title="Permalink to this definition">#</a></dt>
 <dd><p>Apply the Eggl et al. (2020) debiasing scheme to the observation array.
 (paper from <a class="reference external" href="https://doi.org/10.1016/j.icarus.2019.113596">https://doi.org/10.1016/j.icarus.2019.113596</a>)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obs_array_optical</strong> (<em>array</em>) – Optical observation data for the given body</p></li>
-<li><p><strong>star_catalog_codes</strong> (<em>tuple</em>) – Star catalog codes used for reducing each observation in obs_array_optical</p></li>
-<li><p><strong>observer_codes_optical</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array_optical</p></li>
-<li><p><strong>lowres</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to debias the observations using the low resolution scheme, by default False</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to print out information about the observations, by default False</p></li>
+<li><p><strong>obs_df</strong> (<em>pandas DataFrame</em>) – Optical observation data for the given body</p></li>
+<li><p><strong>lowres</strong> (<em>bool</em>) – Flag to debias the observations using the low resolution scheme</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Flag to print out information about the observations</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>obs_array_optical</strong> (<em>array</em>) – Optical observation data for the given body with debiasing applied</p></li>
-<li><p><strong>star_catalog_codes</strong> (<em>tuple</em>) – Star catalog codes used for reducing each observation in obs_array_optical</p></li>
-<li><p><strong>observer_codes_optical</strong> (<em>tuple</em>) – Observer locations for each observation in obs_array_optical</p></li>
-</ul>
-</p>
+<dd class="field-even"><p><strong>obs_df</strong> – Optical observation data for the given body with debiasing applied</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -552,11 +547,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_optical.apply_weights.html"
+       href="grss.fit.fit_optical.apply_weighting_scheme.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_optical.apply_weights</p>
+        <p class="prev-next-title">grss.fit.fit_optical.apply_weighting_scheme</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

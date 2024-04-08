@@ -15,7 +15,7 @@ grss.fit.fit\_optical
         :toctree:
     
         apply_debiasing_scheme
-        apply_weights
+        apply_weighting_scheme
         debias_obs
         deweight_obs
         eliminate_obs
@@ -23,8 +23,7 @@ grss.fit.fit\_optical
         get_gaia_optical_obs_array
         get_mpc_optical_obs_array
         get_mpc_raw_data
-        get_optical_data
-        get_space_based_observer_code
+        get_optical_obs_data
     
     
 

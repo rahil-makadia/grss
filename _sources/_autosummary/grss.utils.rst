@@ -14,7 +14,7 @@
     .. autosummary::
         :toctree:
     
-        get_obs_codes_file
+        check_and_get_ades_files
         initialize
     
     

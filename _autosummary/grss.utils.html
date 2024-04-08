@@ -58,7 +58,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.utils';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.utils.get_obs_codes_file" href="grss.utils.get_obs_codes_file.html" />
+    <link rel="next" title="grss.utils.check_and_get_ades_files" href="grss.utils.check_and_get_ades_files.html" />
     <link rel="prev" title="grss.prop.prop_utils.plot_solar_system" href="grss.prop.prop_utils.plot_solar_system.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -176,7 +176,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weights.html">grss.fit.fit_optical.apply_weights</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weighting_scheme.html">grss.fit.fit_optical.apply_weighting_scheme</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.deweight_obs.html">grss.fit.fit_optical.deweight_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.eliminate_obs.html">grss.fit.fit_optical.eliminate_obs</a></li>
@@ -184,8 +184,7 @@
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_raw_data.html">grss.fit.fit_optical.get_mpc_raw_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_data.html">grss.fit.fit_optical.get_optical_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_space_based_observer_code.html">grss.fit.fit_optical.get_space_based_observer_code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_obs_data.html">grss.fit.fit_optical.get_optical_obs_data</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -272,7 +271,7 @@
 </ul>
 </li>
 <li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">grss.utils</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-13"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="grss.utils.get_obs_codes_file.html">grss.utils.get_obs_codes_file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.utils.check_and_get_ades_files.html">grss.utils.check_and_get_ades_files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.utils.initialize.html">grss.utils.initialize</a></li>
 </ul>
 </li>
@@ -497,8 +496,8 @@ document.write(`
 <p class="rubric">Functions</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="grss.utils.get_obs_codes_file.html#grss.utils.get_obs_codes_file" title="grss.utils.get_obs_codes_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_obs_codes_file</span></code></a>()</p></td>
-<td><p>Download a text file of the observatory code info from the Minor Planet Center.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.utils.check_and_get_ades_files.html#grss.utils.check_and_get_ades_files" title="grss.utils.check_and_get_ades_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_and_get_ades_files</span></code></a>()</p></td>
+<td><p>Download ADES JSON files from the Minor Planet Center.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="grss.utils.initialize.html#grss.utils.initialize" title="grss.utils.initialize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize</span></code></a>()</p></td>
 <td><p>GRSS library initialization function.</p></td>
@@ -528,11 +527,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="grss.utils.get_obs_codes_file.html"
+       href="grss.utils.check_and_get_ades_files.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.utils.get_obs_codes_file</p>
+        <p class="prev-next-title">grss.utils.check_and_get_ades_files</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
