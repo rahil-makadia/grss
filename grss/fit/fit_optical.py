@@ -325,8 +325,8 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'dec'] = data['dec']
         cosdec = np.cos(data['dec']*np.pi/180)
         obs_df.loc[idx, 'cosDec'] = cosdec
-        ra_sig_sys = data['ra_error_systematic']/cosdec/1000
-        ra_sig_rand = data['ra_error_random']/cosdec/1000
+        ra_sig_sys = data['ra_error_systematic']/1000
+        ra_sig_rand = data['ra_error_random']/1000
         dec_sig_sys = data['dec_error_systematic']/1000
         dec_sig_rand = data['dec_error_random']/1000
         corr_sys = data['ra_dec_correlation_systematic']
@@ -339,7 +339,7 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         ra_sig = cov[0,0]**0.5
         dec_sig = cov[1,1]**0.5
         corr = cov[0,1]/ra_sig/dec_sig
-        obs_df.loc[idx, 'sigRA'] = ra_sig*cosdec
+        obs_df.loc[idx, 'sigRA'] = ra_sig
         obs_df.loc[idx, 'sigDec'] = dec_sig
         obs_df.loc[idx, 'sigCorr'] = corr
         obs_df.loc[idx, 'ctr'] = ctr
@@ -786,7 +786,6 @@ def apply_weighting_scheme(obs_df, verbose):
             # # if rmsRA and rmsDec are not nan, use them
             # subset_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec")
             # obs_df.loc[subset_rms.index, cols] = subset_rms[['rmsRA', 'rmsDec']].values
-            # obs_df.loc[subset_rms.index, 'sigRA'] /= obs_df.loc[subset_rms.index, 'cosDec']
             # if verbose:
             #     print(f"\tUsing {len(subset_rms)} {mode} observations with provided "
             #             "RA/Dec RMS values.")
@@ -795,7 +794,6 @@ def apply_weighting_scheme(obs_df, verbose):
             # if rmsRA and rmsDec are not nan, use them
             subset_occ_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec")
             obs_df.loc[subset_occ_rms.index, cols] = subset_occ_rms[['rmsRA', 'rmsDec']].values
-            obs_df.loc[subset_occ_rms.index, 'sigRA'] /= obs_df.loc[subset_occ_rms.index, 'cosDec']
             if verbose:
                 print(f"\tUsing {len(subset_occ_rms)} {mode} observations with provided "
                         "RA/Dec RMS values.")
@@ -811,8 +809,6 @@ def apply_weighting_scheme(obs_df, verbose):
             obs_df.loc[group.index, cols] = 1.5
         else:
             raise ValueError(f"Unknown mode: {mode}")
-    # multiply all sigRA values by cos(Dec)
-    obs_df['sigRA'] *= obs_df['cosDec']
     # check that none of the weights are zero or nan
     if (obs_df[cols] <= 0).any().any():
         raise ValueError("Some weights are zero after applying the weighting scheme.")

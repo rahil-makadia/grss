@@ -90,37 +90,20 @@ class IterationParams:
             None
         """
         # sourcery skip: extract-duplicate-method
-        ra_obs = self.obs['ra'].values.copy()
-        dec_obs = self.obs['dec'].values.copy()
-        ra_noise = self.obs['sigRA'].values.copy()/self.obs['cosDec'].values.copy()
-        dec_noise = self.obs['sigDec'].values.copy()
-        ra_res = self.obs['resRA'].values.copy()/self.obs['cosDec'].values.copy()
-        dec_res = self.obs['resDec'].values.copy()
-        delay_obs = self.obs['delay'].values.copy()
-        doppler_obs = self.obs['doppler'].values.copy()
-        delay_noise = self.obs['sigDelay'].values.copy()
-        doppler_noise = self.obs['sigDoppler'].values.copy()
-        delay_res = self.obs['resDelay'].values.copy()
-        doppler_res = self.obs['resDoppler'].values.copy()
         self.all_info = {
-            'ra_res': ra_res,
-            'dec_res': dec_res,
-            'ra_obs': ra_obs,
-            'dec_obs': dec_obs,
-            'ra_noise': ra_noise,
-            'dec_noise': dec_noise,
-            'ra_comp': ra_obs - ra_res,
-            'dec_comp': dec_obs - dec_res,
-            'delay_res': delay_res,
-            'doppler_res': doppler_res,
-            'delay_obs': delay_obs,
-            'doppler_obs': doppler_obs,
-            'delay_noise': delay_noise,
-            'doppler_noise': doppler_noise,
-            'delay_comp': delay_obs - delay_res/1.0e6,
-            'doppler_comp': doppler_obs - doppler_res,
+            'ra_res': self.obs['resRA'].values.copy(),
+            'dec_res': self.obs['resDec'].values.copy(),
+            'ra_obs': self.obs['ra'].values.copy(),
+            'dec_obs': self.obs['dec'].values.copy(),
+            'ra_noise': self.obs['sigRA'].values.copy(),
+            'dec_noise': self.obs['sigDec'].values.copy(),
+            'delay_res': self.obs['resDelay'].values.copy(),
+            'doppler_res': self.obs['resDoppler'].values.copy(),
+            'delay_obs': self.obs['delay'].values.copy(),
+            'doppler_obs': self.obs['doppler'].values.copy(),
+            'delay_noise': self.obs['sigDelay'].values.copy(),
+            'doppler_noise': self.obs['sigDoppler'].values.copy(),
         }
-        self.all_info['ra_cosdec_res'] = self.all_info['ra_res']*self.obs['cosDec'].values
         self.all_info['ra_chi'] = self.all_info['ra_res']/self.all_info['ra_noise']
         self.all_info['dec_chi'] = self.all_info['dec_res']/self.all_info['dec_noise']
         self.all_info['ra_chi_squared'] = self.all_info['ra_chi']**2
@@ -191,7 +174,7 @@ class IterationParams:
                         linewidth=0.75, fill=fill, histtype='step')
         return None
 
-    def _plot_residuals(self, t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals,
+    def _plot_residuals(self, t_arr, ra_residuals, dec_residuals,
                         delay_residuals, doppler_residuals, radar_scale, markersize,
                         show_logarithmic, title, savefig, figname, auto_close):
         """
@@ -205,8 +188,6 @@ class IterationParams:
             right ascension residuals
         dec_residuals : vector
             declination residuals
-        ra_cosdec_residuals : vector
-            right ascension residuals multiplied by the cosine of the declination
         delay_residuals : vector
             delay residuals
         doppler_residuals : vector
@@ -261,9 +242,9 @@ class IterationParams:
         ax2main = fig.add_subplot(ax2[1,0])
         ax2histx = fig.add_subplot(ax2[0,0], sharex=ax2main)
         ax2histy = fig.add_subplot(ax2[1,1], sharey=ax2main)
-        self._scatter_hist(ra_cosdec_residuals, dec_residuals, ax2main, ax2histx, ax2histy,
+        self._scatter_hist(ra_residuals, dec_residuals, ax2main, ax2histx, ax2histy,
                             markersize, show_logarithmic)
-        ax2main.plot(ra_cosdec_residuals[rejected_idx], dec_residuals[rejected_idx], 'ro',
+        ax2main.plot(ra_residuals[rejected_idx], dec_residuals[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
         ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
         ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
@@ -462,13 +443,11 @@ class IterationParams:
         if show_logarithmic:
             ra_residuals = np.abs(self.all_info['ra_res'])
             dec_residuals = np.abs(self.all_info['dec_res'])
-            ra_cosdec_residuals = np.abs(self.all_info['ra_cosdec_res'])
             ra_chi = np.abs(self.all_info['ra_chi'])
             dec_chi = np.abs(self.all_info['dec_chi'])
         else:
             ra_residuals = self.all_info['ra_res']
             dec_residuals = self.all_info['dec_res']
-            ra_cosdec_residuals = self.all_info['ra_cosdec_res']
             ra_chi = self.all_info['ra_chi']
             dec_chi = self.all_info['dec_chi']
         ra_chi_squared = self.all_info['ra_chi_squared']
@@ -485,9 +464,9 @@ class IterationParams:
             doppler_chi = self.all_info['doppler_chi']
         delay_chi_squared = self.all_info['delay_chi_squared']
         doppler_chi_squared = self.all_info['doppler_chi_squared']
-        self._plot_residuals(t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals,
-                            delay_residuals, doppler_residuals, radar_scale, markersize,
-                            show_logarithmic, title, savefig, figname, auto_close)
+        self._plot_residuals(t_arr, ra_residuals, dec_residuals, delay_residuals,
+                                doppler_residuals, radar_scale, markersize,
+                                show_logarithmic, title, savefig, figname, auto_close)
         self._plot_chi(t_arr, ra_chi, dec_chi, delay_chi, doppler_chi,
                         ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared,
                         plot_chi_squared, sigma_limit, radar_scale, markersize,
@@ -698,10 +677,9 @@ class FitSimulation:
         """
         self.obs_cov = []
         self.obs_weight = []
-        fields = ['mode', 'sigRA', 'sigDec', 'sigCorr', 'sigDelay', 'sigDoppler', 'cosDec']
+        fields = ['mode', 'sigRA', 'sigDec', 'sigCorr', 'sigDelay', 'sigDoppler']
         for info in zip(*[self.obs[field] for field in fields]):
-            mode, sig_ra, sig_dec, sig_corr, sig_delay, sig_doppler, cos_dec = info
-            sig_ra /= cos_dec
+            mode, sig_ra, sig_dec, sig_corr, sig_delay, sig_doppler = info
             if mode == 'RAD':
                 sig = sig_doppler if np.isfinite(sig_doppler) else sig_delay
                 if sig == 0.0 or np.isnan(sig):
@@ -1166,9 +1144,11 @@ class FitSimulation:
             optical_obs = prop_sim_future.opticalObs
             radar_obs = prop_sim_future.radarObs
         computed_obs = np.nan*np.ones((len(self.obs), 2))
+        cos_dec = self.obs.cosDec.values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 computed_obs[i, :] = optical_obs[i][2*integ_body_idx:2*integ_body_idx+2]
+                computed_obs[i, 0] *= cos_dec[i]
             elif obs_info_len == 9: # delay measurement
                 computed_obs[i, 0] = radar_obs[i][integ_body_idx]
             elif obs_info_len == 10: # dopper measurement
@@ -1205,6 +1185,7 @@ class FitSimulation:
             future_radar_partials = np.array(prop_sim_future.radarPartials)
             future_light_time = np.array(prop_sim_future.lightTimeEval)
         t_eval_tdb = Time(self.obs['obsTimeMJD'].values, format='mjd', scale='utc').tdb.mjd
+        cos_dec = self.obs.cosDec.values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 is_optical = True
@@ -1231,7 +1212,7 @@ class FitSimulation:
             t_eval -= light_time[sim_idx, 0]
             stm = self._get_analytic_stm(t_eval, prop_sim)
             if is_optical:
-                part[0, :6] = optical_partials[sim_idx, :6]
+                part[0, :6] = optical_partials[sim_idx, :6]*cos_dec[i]
                 part[1, :6] = optical_partials[sim_idx, 6:12]
             else:
                 part[0, :6] = radar_partials[sim_idx, :6]
@@ -1337,10 +1318,10 @@ class FitSimulation:
                     doppler_res[i] = doppler - computed_obs[i, 1]
                     residuals[i] = np.array([doppler_res[i]])
             else:
-                ra_res[i] = ra*3600 - bias_ra/cos_dec - computed_obs[i, 0]
+                ra_res[i] = ra*3600*cos_dec - bias_ra - computed_obs[i, 0]
                 dec_res[i] = dec*3600 - bias_dec - computed_obs[i, 1]
                 residuals[i] = np.array([ra_res[i], dec_res[i]])
-        self.obs['resRA'] = ra_res*self.obs['cosDec'].values
+        self.obs['resRA'] = ra_res
         self.obs['resDec'] = dec_res
         self.obs['resDelay'] = delay_res
         self.obs['resDoppler'] = doppler_res
