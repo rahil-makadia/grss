@@ -1,5 +1,7 @@
 """Simulation classes for the Python GRSS orbit determination code"""
 # pylint: disable=no-name-in-module, no-member, too-many-lines, useless-return
+import sys
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.time import Time
@@ -506,6 +508,10 @@ class FitSimulation:
         None : NoneType
             None
         """
+        perm_id = obs_df['permID'][0]
+        prov_id = obs_df['provID'][0]
+        body_id = perm_id if isinstance(perm_id, str) else prov_id
+        self.name = body_id
         self.t_sol = None
         self.t_sol_utc = None
         self.x_init = None
@@ -774,7 +780,7 @@ class FitSimulation:
         prop_sim_future.evalMeasurements = True
         return prop_sim_future
 
-    def _get_prop_sims(self, name):
+    def _get_prop_sims(self):
         """
         Get propSim objects for the past and future observations.
 
@@ -799,11 +805,11 @@ class FitSimulation:
         prop_sim_past = None
         prop_sim_future = None
         if self.past_obs_exist:
-            prop_sim_past = self._get_prop_sim_past(f"{name}_past", t_eval_utc,
+            prop_sim_past = self._get_prop_sim_past(f"{self.name}_past", t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info_past)
         if self.future_obs_exist:
-            prop_sim_future = self._get_prop_sim_future(f"{name}_future", t_eval_utc,
+            prop_sim_future = self._get_prop_sim_future(f"{self.name}_future", t_eval_utc,
                                                         eval_apparent_state, converged_light_time,
                                                         observer_info_future)
         return prop_sim_past, prop_sim_future
@@ -1036,7 +1042,7 @@ class FitSimulation:
         # sourcery skip: low-code-quality
         # pylint: disable=no-member
         # get propagated states
-        prop_sim_past, prop_sim_future = self._get_prop_sims("orbit_fit_sim")
+        prop_sim_past, prop_sim_future = self._get_prop_sims()
         # create nominal integ_body object
         state_nom = self._x_dict_to_state(self.x_nom)
         ng_params_nom = self._x_dict_to_nongrav_params(self.x_nom)
@@ -1569,7 +1575,7 @@ class FitSimulation:
             print("WARNING: Maximum number of iterations reached without converging.")
         return None
 
-    def print_summary(self, iter_idx=-1):
+    def print_summary(self, iter_idx=-1, out_stream=sys.stdout):
         """
         Prints a summary of the orbit fit calculations at a given iteration.
 
@@ -1585,21 +1591,36 @@ class FitSimulation:
         """
         data = self.iters[iter_idx]
         arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
-        print("Summary of the orbit fit calculations at iteration",
-                    f"{data.iter_number} (of {self.n_iter}):")
-        print("==============================================================")
-        print(f"RMS unweighted: {data.unweighted_rms}")
-        print(f"RMS weighted: {data.weighted_rms}")
-        print(f"chi-squared: {data.chi_squared}")
-        print(f"reduced chi-squared: {data.reduced_chi_squared}")
-        print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
-        print("--------------------------------------------------------------")
-        print(f"Solution Time: MJD {self.t_sol:0.3f} TDB =",
-                f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
-        print(f"Solution Observation Arc: {arc:0.2f} days ({arc/365.25:0.2f} years)")
-        print("--------------------------------------------------------------")
-        print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
-                "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
+        # print("Summary of the orbit fit calculations at iteration",
+        #             f"{data.iter_number} (of {self.n_iter}):")
+        # print("==============================================================")
+        # print(f"RMS unweighted: {data.unweighted_rms}")
+        # print(f"RMS weighted: {data.weighted_rms}")
+        # print(f"chi-squared: {data.chi_squared}")
+        # print(f"reduced chi-squared: {data.reduced_chi_squared}")
+        # print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
+        # print("--------------------------------------------------------------")
+        # print(f"Solution Time: MJD {self.t_sol:0.3f} TDB =",
+        #         f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
+        # print(f"Solution Observation Arc: {arc:0.2f} days ({arc/365.25:0.2f} years)")
+        # print("--------------------------------------------------------------")
+        # print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
+        #         "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
+        str_to_print = "Summary of the orbit fit calculations at iteration "
+        str_to_print += f"{data.iter_number} (of {self.n_iter}):\n"
+        str_to_print += "==============================================================\n"
+        str_to_print += f"RMS unweighted: {data.unweighted_rms}\n"
+        str_to_print += f"RMS weighted: {data.weighted_rms}\n"
+        str_to_print += f"chi-squared: {data.chi_squared}\n"
+        str_to_print += f"reduced chi-squared: {data.reduced_chi_squared}\n"
+        str_to_print += f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}\n"
+        str_to_print += "--------------------------------------------------------------\n"
+        str_to_print += f"Solution Time: MJD {self.t_sol:0.3f} TDB = "
+        str_to_print += f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB\n"
+        str_to_print += f"Solution Observation Arc: {arc:0.2f} days ({arc/365.25:0.2f} years)\n"
+        str_to_print += "--------------------------------------------------------------\n"
+        str_to_print += "Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value"
+        str_to_print += "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)\n"
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
         init_sol = self.iters[0].x_nom
@@ -1615,10 +1636,15 @@ class FitSimulation:
                     init_unc *= 180/np.pi
                     final_val *= 180/np.pi
                     final_unc *= 180/np.pi
-                print(f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}",
-                        f"\t\t{final_val:.11e}\t\t{final_unc:.11e}",
-                        f"\t\t{final_val-init_val:+.11e}"
-                        f"\t\t{(final_val-init_val)/init_unc:+.3f}")
+                # print(f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}",
+                #         f"\t\t{final_val:.11e}\t\t{final_unc:.11e}",
+                #         f"\t\t{final_val-init_val:+.11e}"
+                #         f"\t\t{(final_val-init_val)/init_unc:+.3f}")
+                str_to_print += f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}"
+                str_to_print += f"\t\t{final_val:.11e}\t\t{final_unc:.11e}"
+                str_to_print += f"\t\t{final_val-init_val:+.11e}"
+                str_to_print += f"\t\t{(final_val-init_val)/init_unc:+.3f}\n"
+        print(str_to_print, file=out_stream)
         return None
 
     def plot_summary(self, auto_close=False):
@@ -1704,10 +1730,113 @@ class FitSimulation:
                 version = f.read().strip()
         except FileNotFoundError:
             version = "INFTY"
+        units_dict = {
+            'e': '', 'q': 'AU', 'tp': 'MJD [TDB]', 'om': 'deg',
+            'w': 'deg', 'i': 'deg', 'x': 'AU', 'y': 'AU', 'z': 'AU',
+            'vx': 'AU/day', 'vy': 'AU/day', 'vz': 'AU/day'
+        }
         with open(filename, 'x', encoding='utf-8') as f:
-            # print header
             f.write(section_full + '\n')
             f.write(f"{header_section_half} GRSS v{version} {header_section_half}" + '\n')
+            f.write(section_full + '\n')
+            dt = datetime.datetime.now()
+            time_str = dt.strftime("%a %b %d %Y %H:%M:%S UTC")
+            time_buff = " "*int((max_chars-len(time_str))/2)
+            f.write(f'{time_buff}{time_str}{time_buff}\n\n')
+            name_buff = "-"*int((max_chars-len(self.name))/2)
+            f.write(f'{name_buff}{self.name}{name_buff}\n')
+            f.write(subsection_full + '\n')
+            obs_min = self.obs.obsTimeMJD.min()
+            obs_max = self.obs.obsTimeMJD.max()
+            f.write(f"Observation data arc from MJD {obs_min:.8f} to MJD {obs_max:.8f} [UTC]\n")
+            f.write(f"DE kernel version: {self.de_kernel}\n\n")
+            init_state_str = "Initial Nominal State"
+            init_state_buff = "-"*int((max_chars-len(init_state_str))/2)
+            f.write(f'{init_state_buff}{init_state_str}{init_state_buff}\n')
+            f.write(subsection_full + '\n')
+            f.write(f"T: {self.t_sol:.8f} MJD [TDB]\n")
+            keys = list(self.x_init.keys())
+            init_variance = np.sqrt(np.diag(self.covariance_init))
+            for i, key in enumerate(keys):
+                val = self.x_init[key]
+                sig = init_variance[i]
+                if key in ['om', 'w', 'i']:
+                    val *= 180/np.pi
+                    sig *= 180/np.pi
+                f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f} {units_dict[key]}\n")
+            f.write("\n")
+            f.write("Initial Covariance Matrix:\n")
+            for row in self.covariance_init:
+                f.write(half_tab.join([f"{val:18.11e}" for val in row]) + '\n')
+            f.write("\n")
+
+            final_state_str = "Final Nominal State"
+            final_state_buff = "-"*int((max_chars-len(final_state_str))/2)
+            f.write(f'{final_state_buff}{final_state_str}{final_state_buff}\n')
+            f.write(subsection_full + '\n')
+            f.write(f"T: {self.t_sol:.8f} MJD [TDB]\n")
+            keys = list(self.x_nom.keys())
+            final_variance = np.sqrt(np.diag(self.covariance))
+            for i, key in enumerate(keys):
+                val = self.x_nom[key]
+                sig = final_variance[i]
+                if key in ['om', 'w', 'i']:
+                    val *= 180/np.pi
+                    sig *= 180/np.pi
+                f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f} {units_dict[key]}\n")
+            f.write("\n")
+            f.write("Final Covariance Matrix:\n")
+            for row in self.covariance:
+                f.write(half_tab.join([f"{val:18.11e}" for val in row]) + '\n')
+            f.write("\n")
+
+            postfit_summary_str = "Postfit Summary"
+            postfit_summary_buff = "-"*int((max_chars-len(postfit_summary_str))/2)
+            f.write(f'{postfit_summary_buff}{postfit_summary_str}{postfit_summary_buff}\n')
+            f.write(subsection_full + '\n')
+            f.write('***postfit summary will be added here***\n\n')
+
+            iter_summary_str = "Iteration Summary"
+            iter_summary_buff = "-"*int((max_chars-len(iter_summary_str))/2)
+            f.write(f'{iter_summary_buff}{iter_summary_str}{iter_summary_buff}\n')
+            f.write(subsection_full + '\n')
+            for itrn in self.iters[1:]:
+                f.write("Summary of the orbit fit calculations at iteration")
+                f.write(f" {itrn.iter_number} (of {self.n_iter}):\n")
+                f.write(f"RMS unweighted: {itrn.unweighted_rms}\n")
+                f.write(f"RMS weighted: {itrn.weighted_rms}\n")
+                f.write(f"chi-squared: {itrn.chi_squared}\n")
+                f.write(f"reduced chi-squared: {itrn.reduced_chi_squared}\n")
+                f.write(f"square root of reduced chi-squared: {itrn.reduced_chi_squared**0.5}\n\n")
+                f.write(f'{"Variable":<8}{"Initial Value":>20}')
+                f.write(f'{"Uncertainty":>20}{"Fitted Value":>20}')
+                f.write(f'{"Uncertainty":>20}{"Change":>20}{"Change":>8}'+' (\u03C3)\n')
+                init_sol = self.iters[0].x_nom
+                final_sol = itrn.x_nom
+                with np.errstate(divide='ignore'):
+                    for i, key in enumerate(init_sol.keys()):
+                        init_val = init_sol[key]
+                        init_unc = init_variance[i]
+                        final_val = final_sol[key]
+                        final_unc = final_variance[i]
+                        if key in ['om', 'w', 'i']:
+                            init_val *= 180/np.pi
+                            init_unc *= 180/np.pi
+                            final_val *= 180/np.pi
+                            final_unc *= 180/np.pi
+                        f.write(f'{key.upper():<8}{half_tab}')
+                        f.write(f'{init_val:18.11e}{half_tab}')
+                        f.write(f'{init_unc:18.11e}{half_tab}')
+                        f.write(f'{final_val:18.11e}{half_tab}')
+                        f.write(f'{final_unc:18.11e}{half_tab}')
+                        f.write(f'{final_val-init_val:+18.11e}{half_tab}')
+                        f.write(f'{(final_val-init_val)/init_unc:+10.3f}\n')
+                f.write("\n")
+                if itrn.iter_number != self.n_iter:
+                    f.write(subsection_full + '\n')
+
+            f.write(section_full + '\n')
+            f.write(f"{header_section_half} END OF FILE {header_section_half}" + '\n')
             f.write(section_full + '\n')
         return None
 

@@ -301,7 +301,7 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
     if verbose:
         print(f"Read in {len(res)} Gaia observations from {gaia_dr}")
     sys = 'ICRF_AU'
-    ctr = 399
+    ctr = 500
     curr_transit = int(-1e6)
     gaia_add_counter = 0
     for i, data in enumerate(res):
@@ -347,7 +347,6 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']
         obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']
         obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']
-        # observer_codes.append(('258', pos_x, pos_y, pos_z, 0, 0, 0))
     if verbose:
         print(f"\tFiltered to {gaia_add_counter} observations that",
                 "satisfy the time range constraints.")
