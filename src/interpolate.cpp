@@ -220,38 +220,30 @@ void get_interpIdxInWindow(const PropSimulation *propSim,
     bool bwInWindow, bwInWindowMarginStart, bwInWindowMarginEnd;
     fwInWindow =
         (forwardProp && propSim->tEval[interpIdx] >= tWindowStart &&
-         propSim->tEval[interpIdx] <= tNext);
+         propSim->tEval[interpIdx] < tNext);
     fwInWindowMarginStart =
         (forwardProp &&
          propSim->tEval[interpIdx] <= propSim->integParams.t0 &&
          propSim->tEval[interpIdx] + propSim->tEvalMargin >=
-             propSim->integParams.t0 &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin >= tWindowStart &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin <= tNext);
+             propSim->integParams.t0);
     fwInWindowMarginEnd =
         (forwardProp &&
          propSim->tEval[interpIdx] >= propSim->integParams.tf &&
          propSim->tEval[interpIdx] - propSim->tEvalMargin <=
-             propSim->integParams.tf &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin >= tWindowStart &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin <= tNext);
+             propSim->integParams.tf);
     bwInWindow =
         (backwardProp && propSim->tEval[interpIdx] <= tWindowStart &&
-         propSim->tEval[interpIdx] >= tNext);
+         propSim->tEval[interpIdx] > tNext);
     bwInWindowMarginStart =
         (backwardProp &&
          propSim->tEval[interpIdx] >= propSim->integParams.t0 &&
          propSim->tEval[interpIdx] - propSim->tEvalMargin <=
-             propSim->integParams.t0 &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin <= tWindowStart &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin >= tNext);
+             propSim->integParams.t0);
     bwInWindowMarginEnd =
         (backwardProp &&
          propSim->tEval[interpIdx] <= propSim->integParams.tf &&
          propSim->tEval[interpIdx] + propSim->tEvalMargin >=
-             propSim->integParams.tf &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin <= tWindowStart &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin >= tNext);
+             propSim->integParams.tf);
     interpIdxInWindow = fwInWindow || fwInWindowMarginStart ||
         fwInWindowMarginEnd || bwInWindow || bwInWindowMarginStart ||
         bwInWindowMarginEnd;
@@ -275,10 +267,10 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
                                  std::vector<real> &xInterpApparent) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
-    bool bouncePointAtLeadingEdge = false;
+    bool bouncePointAtCenterOfMass = true;
     if (propSim->observerInfo[interpIdx].size() == 9 ||
         propSim->observerInfo[interpIdx].size() == 10) {
-        bouncePointAtLeadingEdge = propSim->observerInfo[interpIdx][8] == 1.0;
+        bouncePointAtCenterOfMass = propSim->observerInfo[interpIdx][8] == 1.0;
     }
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
@@ -286,7 +278,7 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
         std::vector<real> xInterpApparentTemp(numStates, 0.0);
         std::vector<real> xInterpApparentBary(6, 0.0);
         get_lightTimeOneBody(propSim, i, tInterpGeom, xInterpGeom, xObserver,
-                             bouncePointAtLeadingEdge, t, dt,
+                             bouncePointAtCenterOfMass, t, dt,
                              lightTimeTemp);
         evaluate_one_interpolation(propSim, t, dt, tInterpGeom-lightTimeTemp, xInterpApparentTemp);
         lightTime[i] = lightTimeTemp;
@@ -307,8 +299,8 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
  * @param[in] tInterpGeom Time to interpolate to.
  * @param[in] xInterpGeom Geometric state vector of the target body.
  * @param[in] xObserver State vector of the observer.
- * @param[in] bouncePointAtLeadingEdge Flag to indicate whether the bounce point
- * is at the leading edge (as opposed to center of mass)
+ * @param[in] bouncePointAtCenterOfMass Flag to indicate whether the bounce point
+ * is at the center of mass (as opposed to leading edge).
  * @param[in] t Time at the beginning of the time step.
  * @param[in] dt Completed time step size.
  * @param[out] lightTimeOneBody Light time to the target body.
@@ -316,7 +308,7 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
 void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           const real tInterpGeom, std::vector<real> xInterpGeom,
                           std::vector<real> xObserver,
-                          const bool bouncePointAtLeadingEdge, const real &t,
+                          const bool bouncePointAtCenterOfMass, const real &t,
                           const real &dt, real &lightTimeOneBody) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xInterpApparentFull(numStates, 0.0);
@@ -333,7 +325,7 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
     }
     vnorm({xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]},
           distRelativeOneBody);
-    if (bouncePointAtLeadingEdge) {
+    if (!bouncePointAtCenterOfMass) {
         distRelativeOneBody -= propSim->integBodies[i].radius;
     }
     lightTimeOneBody = distRelativeOneBody / propSim->consts.clight;
@@ -356,7 +348,7 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
             vnorm(
                 {xRelativeOneBody[0], xRelativeOneBody[1], xRelativeOneBody[2]},
                 distRelativeOneBody);
-            if (bouncePointAtLeadingEdge) {
+            if (!bouncePointAtCenterOfMass) {
                 distRelativeOneBody -= propSim->integBodies[i].radius;
             }
             lightTimeOneBodyPrev = lightTimeOneBody;
@@ -578,7 +570,7 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
     std::vector<real> xObsBaryTx(6, 0.0);
     real transmitFreq = 0.0;
     if (propSim->radarObserver[interpIdx] == 2) {
-        transmitFreq = propSim->observerInfo[interpIdx][9];
+        transmitFreq = propSim->observerInfo[interpIdx][9]*1.0e6L;
     }
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         std::fill(radarPartials.begin()+6*i, radarPartials.begin()+6*(i+1), 0.0);
@@ -635,7 +627,7 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
                                          propSim->observerInfo[interpIdx][5],
                                          propSim->observerInfo[interpIdx][6],
                                          propSim->observerInfo[interpIdx][7]};
-    bool bouncePointAtLeadingEdge = propSim->observerInfo[interpIdx][8] == 1.0;
+    bool bouncePointAtCenterOfMass = propSim->observerInfo[interpIdx][8] == 1.0;
     real delayDownleg;
     real bounceTimeTDB;
     real delayUpleg;
@@ -672,7 +664,7 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
             vnorm({xRelativeOneBody[0], xRelativeOneBody[1],
                     xRelativeOneBody[2]},
                     distRelativeUpleg);
-            if (bouncePointAtLeadingEdge) {
+            if (!bouncePointAtCenterOfMass) {
                 distRelativeUpleg -= propSim->integBodies[i].radius;
             }
             delayUplegPrev = delayUpleg;

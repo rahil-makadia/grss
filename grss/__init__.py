@@ -4,6 +4,7 @@ from . import prop
 from . import utils
 
 # get version from version.txt
-__version__ = open(f'{utils.grss_path}/version.txt', 'r', encoding='utf-8').read().strip()
+with open(f'{utils.grss_path}/version.txt', 'r', encoding='utf-8') as f:
+    __version__ = f.read().strip()
 
 utils.initialize()
