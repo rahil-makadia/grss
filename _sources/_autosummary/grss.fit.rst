@@ -28,6 +28,7 @@
     :template: custom-module.rst
     :recursive:
 
+    grss.fit.fit_ades
     grss.fit.fit_optical
     grss.fit.fit_radar
     grss.fit.fit_simulation

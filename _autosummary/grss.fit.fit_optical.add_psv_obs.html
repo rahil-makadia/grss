@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.fit.fit_optical.get_optical_obs_data &#8212; GRSS 3.9.1 documentation</title>
+    <title>grss.fit.fit_optical.add_psv_obs &#8212; GRSS 3.9.1 documentation</title>
   
   
   
@@ -55,14 +55,14 @@
     <script src="../_static/copybutton.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.get_optical_obs_data';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/grss.fit.fit_optical.add_psv_obs';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="grss.fit.fit_radar" href="grss.fit.fit_radar.html" />
-    <link rel="prev" title="grss.fit.fit_optical.get_mpc_raw_data" href="grss.fit.fit_optical.get_mpc_raw_data.html" />
+    <link rel="next" title="grss.fit.fit_optical.apply_debiasing_scheme" href="grss.fit.fit_optical.apply_debiasing_scheme.html" />
+    <link rel="prev" title="grss.fit.fit_optical.add_gaia_obs" href="grss.fit.fit_optical.add_gaia_obs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 08, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 20, 2024"/>
   </head>
   
   
@@ -174,21 +174,25 @@
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api_py.html">Python API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="grss.fit.fit_ades.html">grss.fit.fit_ades</a></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.add_gaia_obs.html">grss.fit.fit_optical.add_gaia_obs</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.add_psv_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_station_weight_rules.html">grss.fit.fit_optical.apply_station_weight_rules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weighting_scheme.html">grss.fit.fit_optical.apply_weighting_scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.create_optical_obs_df.html">grss.fit.fit_optical.create_optical_obs_df</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.deweight_obs.html">grss.fit.fit_optical.deweight_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.eliminate_obs.html">grss.fit.fit_optical.eliminate_obs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_ades_optical_obs_array.html">grss.fit.fit_optical.get_ades_optical_obs_array</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_raw_data.html">grss.fit.fit_optical.get_mpc_raw_data</a></li>
-<li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_optical.get_optical_obs_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_obs.html">grss.fit.fit_optical.get_optical_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_packed_prog_id.html">grss.fit.fit_optical.get_packed_prog_id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_unpacked_prog_id.html">grss.fit.fit_optical.get_unpacked_prog_id</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_obs_array.html">grss.fit.fit_radar.get_radar_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.add_radar_obs.html">grss.fit.fit_radar.add_radar_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_raw_data.html">grss.fit.fit_radar.get_radar_raw_data</a></li>
 </ul>
 </li>
@@ -201,20 +205,15 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_utils.html">grss.fit.fit_utils</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.et2mjd.html">grss.fit.fit_utils.et2mjd</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_codes_dict.html">grss.fit.fit_utils.get_codes_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_dec_from_dms.html">grss.fit.fit_utils.get_dec_from_dms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_mpc_observatory_info.html">grss.fit.fit_utils.get_mpc_observatory_info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_observer_info.html">grss.fit.fit_utils.get_observer_info</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_ra_from_hms.html">grss.fit.fit_utils.get_ra_from_hms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_radar_codes_dict.html">grss.fit.fit_utils.get_radar_codes_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_radec.html">grss.fit.fit_utils.get_radec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_elems.html">grss.fit.fit_utils.get_sbdb_elems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_info.html">grss.fit.fit_utils.get_sbdb_info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_raw_data.html">grss.fit.fit_utils.get_sbdb_raw_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_similarity_stats.html">grss.fit.fit_utils.get_similarity_stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.icrf2radec.html">grss.fit.fit_utils.icrf2radec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.mjd2et.html">grss.fit.fit_utils.mjd2et</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.parallax_constants_to_lat_lon_alt.html">grss.fit.fit_utils.parallax_constants_to_lat_lon_alt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.radec2icrf.html">grss.fit.fit_utils.radec2icrf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.parallax_to_lat_lon_alt.html">grss.fit.fit_utils.parallax_to_lat_lon_alt</a></li>
 </ul>
 </li>
 </ul>
@@ -364,7 +363,7 @@
       
       
       
-      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_optical.get_optical_obs_data.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/rahil-makadia/grss/issues/new?title=Issue%20on%20page%20%2F_autosummary/grss.fit.fit_optical.add_psv_obs.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -394,7 +393,7 @@
       
       
       
-      <li><a href="../_sources/_autosummary/grss.fit.fit_optical.get_optical_obs_data.rst" target="_blank"
+      <li><a href="../_sources/_autosummary/grss.fit.fit_optical.add_psv_obs.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -478,7 +477,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>grss.fit.fit_optical.get_optical_obs_data</h1>
+    <h1>grss.fit.fit_optical.add_psv_obs</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -488,7 +487,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_optical_obs_data"><code class="docutils literal notranslate"><span class="pre">get_optical_obs_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.add_psv_obs"><code class="docutils literal notranslate"><span class="pre">add_psv_obs()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -500,25 +499,25 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="grss-fit-fit-optical-get-optical-obs-data">
-<h1>grss.fit.fit_optical.get_optical_obs_data<a class="headerlink" href="#grss-fit-fit-optical-get-optical-obs-data" title="Permalink to this heading">#</a></h1>
+  <section id="grss-fit-fit-optical-add-psv-obs">
+<h1>grss.fit.fit_optical.add_psv_obs<a class="headerlink" href="#grss-fit-fit-optical-add-psv-obs" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="grss.fit.fit_optical.get_optical_obs_data">
-<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">get_optical_obs_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optical_obs_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.get_optical_obs_data" title="Permalink to this definition">#</a></dt>
-<dd><p>Get optical observation data from the Minor Planet Center for a desired small body
-and assemble the optical observations for the given body into an array for an orbit fit.</p>
+<dt class="sig sig-object py" id="grss.fit.fit_optical.add_psv_obs">
+<span class="sig-prename descclassname"><span class="pre">grss.fit.fit_optical.</span></span><span class="sig-name descname"><span class="pre">add_psv_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">psv_obs_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_min_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max_tdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_optical.add_psv_obs" title="Permalink to this definition">#</a></dt>
+<dd><p>Assemble the optical observations for a given body into an array for an orbit fit,
+from the ADES PSV observation file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>body_id</strong> (<em>str</em>) – Small body designation (any value accepted by the MPC)</p></li>
-<li><p><strong>optical_obs_file</strong> (<em>str</em><em>, </em><em>optional</em>) – Filepath to the optical observations file, by default None</p></li>
+<li><p><strong>psv_obs_file</strong> (<em>str</em>) – Path to the ADES PSV observation file</p></li>
+<li><p><strong>obs_df</strong> (<em>pandas DataFrame</em>) – Optical observation data for the given body</p></li>
 <li><p><strong>t_min_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Minimum time (MJD TDB) for observations to be included, by default None</p></li>
 <li><p><strong>t_max_tdb</strong> (<em>float</em><em>, </em><em>optional</em>) – Maximum time (MJD TDB) for observations to be included, by default None</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to print out information about the observations, by default False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>obs_df</strong> – Optical observation data for the given body</p>
+<dd class="field-even"><p><strong>obs_df</strong> – Optical observation data for the given body with the PSV observations added</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>pandas DataFrame</p>
@@ -540,20 +539,20 @@ and assemble the optical observations for the given body into an array for an or
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit.fit_optical.get_mpc_raw_data.html"
+       href="grss.fit.fit_optical.add_gaia_obs.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit.fit_optical.get_mpc_raw_data</p>
+        <p class="prev-next-title">grss.fit.fit_optical.add_gaia_obs</p>
       </div>
     </a>
     <a class="right-next"
-       href="grss.fit.fit_radar.html"
+       href="grss.fit.fit_optical.apply_debiasing_scheme.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">grss.fit.fit_radar</p>
+        <p class="prev-next-title">grss.fit.fit_optical.apply_debiasing_scheme</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -573,7 +572,7 @@ and assemble the optical observations for the given body into an array for an or
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.get_optical_obs_data"><code class="docutils literal notranslate"><span class="pre">get_optical_obs_data()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_optical.add_psv_obs"><code class="docutils literal notranslate"><span class="pre">add_psv_obs()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -607,7 +606,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 08, 2024.
+  Last updated on Apr 20, 2024.
   <br/>
 </p>
   </div>

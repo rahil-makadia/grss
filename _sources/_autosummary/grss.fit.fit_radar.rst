@@ -14,7 +14,7 @@ grss.fit.fit\_radar
     .. autosummary::
         :toctree:
     
-        get_radar_obs_array
+        add_radar_obs
         get_radar_raw_data
     
     

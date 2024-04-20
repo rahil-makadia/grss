@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.fit.fit_simulation.create_simulated_obs_arrays" href="grss.fit.fit_simulation.create_simulated_obs_arrays.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 08, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 20, 2024"/>
   </head>
   
   
@@ -174,21 +174,25 @@
 </li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api_py.html">Python API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="grss.fit.html">grss.fit</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="grss.fit.fit_ades.html">grss.fit.fit_ades</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_optical.html">grss.fit.fit_optical</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.add_gaia_obs.html">grss.fit.fit_optical.add_gaia_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.add_psv_obs.html">grss.fit.fit_optical.add_psv_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_debiasing_scheme.html">grss.fit.fit_optical.apply_debiasing_scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_station_weight_rules.html">grss.fit.fit_optical.apply_station_weight_rules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.apply_weighting_scheme.html">grss.fit.fit_optical.apply_weighting_scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.create_optical_obs_df.html">grss.fit.fit_optical.create_optical_obs_df</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.debias_obs.html">grss.fit.fit_optical.debias_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.deweight_obs.html">grss.fit.fit_optical.deweight_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.eliminate_obs.html">grss.fit.fit_optical.eliminate_obs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_ades_optical_obs_array.html">grss.fit.fit_optical.get_ades_optical_obs_array</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_gaia_optical_obs_array.html">grss.fit.fit_optical.get_gaia_optical_obs_array</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_optical_obs_array.html">grss.fit.fit_optical.get_mpc_optical_obs_array</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_mpc_raw_data.html">grss.fit.fit_optical.get_mpc_raw_data</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_obs_data.html">grss.fit.fit_optical.get_optical_obs_data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_optical_obs.html">grss.fit.fit_optical.get_optical_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_packed_prog_id.html">grss.fit.fit_optical.get_packed_prog_id</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_optical.get_unpacked_prog_id.html">grss.fit.fit_optical.get_unpacked_prog_id</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_radar.html">grss.fit.fit_radar</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_obs_array.html">grss.fit.fit_radar.get_radar_obs_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.add_radar_obs.html">grss.fit.fit_radar.add_radar_obs</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_radar.get_radar_raw_data.html">grss.fit.fit_radar.get_radar_raw_data</a></li>
 </ul>
 </li>
@@ -201,20 +205,15 @@
 <li class="toctree-l3 has-children"><a class="reference internal" href="grss.fit.fit_utils.html">grss.fit.fit_utils</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.et2mjd.html">grss.fit.fit_utils.et2mjd</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_codes_dict.html">grss.fit.fit_utils.get_codes_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_dec_from_dms.html">grss.fit.fit_utils.get_dec_from_dms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_mpc_observatory_info.html">grss.fit.fit_utils.get_mpc_observatory_info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_observer_info.html">grss.fit.fit_utils.get_observer_info</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_ra_from_hms.html">grss.fit.fit_utils.get_ra_from_hms</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_radar_codes_dict.html">grss.fit.fit_utils.get_radar_codes_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_radec.html">grss.fit.fit_utils.get_radec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_elems.html">grss.fit.fit_utils.get_sbdb_elems</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_info.html">grss.fit.fit_utils.get_sbdb_info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_sbdb_raw_data.html">grss.fit.fit_utils.get_sbdb_raw_data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.get_similarity_stats.html">grss.fit.fit_utils.get_similarity_stats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.icrf2radec.html">grss.fit.fit_utils.icrf2radec</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.mjd2et.html">grss.fit.fit_utils.mjd2et</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.parallax_constants_to_lat_lon_alt.html">grss.fit.fit_utils.parallax_constants_to_lat_lon_alt</a></li>
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.radec2icrf.html">grss.fit.fit_utils.radec2icrf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_utils.parallax_to_lat_lon_alt.html">grss.fit.fit_utils.parallax_to_lat_lon_alt</a></li>
 </ul>
 </li>
 </ul>
@@ -493,6 +492,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.plot_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.plot_summary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.print_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.print_summary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.save"><code class="docutils literal notranslate"><span class="pre">FitSimulation.save()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -510,22 +510,19 @@ document.write(`
 <h1>grss.fit.fit_simulation.FitSimulation<a class="headerlink" href="#grss-fit-fit-simulation-fitsimulation" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to perform an orbit fit simulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_optical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_array_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observer_codes_radar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor of the FitSimulation class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x_init</strong> (<em>dict</em>) – Initial guess of the state vector.</p></li>
+<li><p><strong>obs_df</strong> (<em>pandas DataFrame</em>) – Observation data for the orbit fit</p></li>
 <li><p><strong>cov_init</strong> (<em>array</em><em>, </em><em>optional</em>) – Initial covariance matrix, by default None</p></li>
-<li><p><strong>obs_array_optical</strong> (<em>array</em><em>, </em><em>optional</em>) – Optical observation data for the orbit fit, by default None</p></li>
-<li><p><strong>observer_codes_optical</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Observer locations for each observation in obs_array_optical, by default None</p></li>
-<li><p><strong>obs_array_radar</strong> (<em>array</em><em>, </em><em>optional</em>) – Radar observation data for the orbit fit, by default None</p></li>
-<li><p><strong>observer_codes_radar</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Observer locations for each observation in obs_array_radar, by default None</p></li>
 <li><p><strong>n_iter_max</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of maximum iterations to correct the orbit estimate, by default 10</p></li>
 <li><p><strong>de_kernel</strong> (<em>int</em><em>, </em><em>optional</em>) – SPICE kernel version, by default 441</p></li>
 <li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the body, by default 0.0</p></li>
@@ -545,7 +542,7 @@ document.write(`
 <p class="rubric">Methods</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="grss.fit.fit_simulation.FitSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_init[, cov_init, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="grss.fit.fit_simulation.FitSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(x_init, obs_df[, cov_init, ...])</p></td>
 <td><p>Constructor of the FitSimulation class.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq" title="grss.fit.fit_simulation.FitSimulation.filter_lsq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_lsq</span></code></a>([verbose])</p></td>
@@ -556,6 +553,9 @@ document.write(`
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.print_summary" title="grss.fit.fit_simulation.FitSimulation.print_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_summary</span></code></a>([iter_idx])</p></td>
 <td><p>Prints a summary of the orbit fit calculations at a given iteration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.fit.fit_simulation.FitSimulation.save" title="grss.fit.fit_simulation.FitSimulation.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(filename)</p></td>
+<td><p>Saves the FitSimulation log to a file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -600,6 +600,23 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>iter_idx</strong> (<em>int</em><em>, </em><em>optional</em>) – The iteration number to print the summary for, by default -1.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NoneType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.save" title="Permalink to this definition">#</a></dt>
+<dd><p>Saves the FitSimulation log to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The filename to save the log to.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>None</strong> – None</p>
@@ -664,6 +681,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.filter_lsq"><code class="docutils literal notranslate"><span class="pre">FitSimulation.filter_lsq()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.plot_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.plot_summary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.print_summary"><code class="docutils literal notranslate"><span class="pre">FitSimulation.print_summary()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.fit.fit_simulation.FitSimulation.save"><code class="docutils literal notranslate"><span class="pre">FitSimulation.save()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -699,7 +717,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 08, 2024.
+  Last updated on Apr 20, 2024.
   <br/>
 </p>
   </div>

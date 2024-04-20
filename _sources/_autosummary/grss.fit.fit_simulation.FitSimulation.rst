@@ -20,6 +20,7 @@ grss.fit.fit\_simulation.FitSimulation
         ~FitSimulation.filter_lsq
         ~FitSimulation.plot_summary
         ~FitSimulation.print_summary
+        ~FitSimulation.save
     
     
 
