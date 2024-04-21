@@ -1591,21 +1591,6 @@ class FitSimulation:
         """
         data = self.iters[iter_idx]
         arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
-        # print("Summary of the orbit fit calculations at iteration",
-        #             f"{data.iter_number} (of {self.n_iter}):")
-        # print("==============================================================")
-        # print(f"RMS unweighted: {data.unweighted_rms}")
-        # print(f"RMS weighted: {data.weighted_rms}")
-        # print(f"chi-squared: {data.chi_squared}")
-        # print(f"reduced chi-squared: {data.reduced_chi_squared}")
-        # print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
-        # print("--------------------------------------------------------------")
-        # print(f"Solution Time: MJD {self.t_sol:0.3f} TDB =",
-        #         f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
-        # print(f"Solution Observation Arc: {arc:0.2f} days ({arc/365.25:0.2f} years)")
-        # print("--------------------------------------------------------------")
-        # print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
-        #         "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
         str_to_print = "Summary of the orbit fit calculations at iteration "
         str_to_print += f"{data.iter_number} (of {self.n_iter}):\n"
         str_to_print += "==============================================================\n"
@@ -1636,10 +1621,6 @@ class FitSimulation:
                     init_unc *= 180/np.pi
                     final_val *= 180/np.pi
                     final_unc *= 180/np.pi
-                # print(f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}",
-                #         f"\t\t{final_val:.11e}\t\t{final_unc:.11e}",
-                #         f"\t\t{final_val-init_val:+.11e}"
-                #         f"\t\t{(final_val-init_val)/init_unc:+.3f}")
                 str_to_print += f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}"
                 str_to_print += f"\t\t{final_val:.11e}\t\t{final_unc:.11e}"
                 str_to_print += f"\t\t{final_val-init_val:+.11e}"
@@ -1700,6 +1681,7 @@ class FitSimulation:
         plt.xlabel("Iteration #")
         plt.ylabel(r"Reduced $\chi^2$")
         plt.legend()
+        plt.tight_layout()
         block = not auto_close
         plt.show(block=block)
         if auto_close:
@@ -1720,7 +1702,7 @@ class FitSimulation:
         None : NoneType
             None
         """
-        max_chars = 121
+        max_chars = 135
         half_tab = "  "
         subsection_full = "-"*max_chars
         section_full = "="*max_chars
@@ -1733,12 +1715,14 @@ class FitSimulation:
         units_dict = {
             'e': '', 'q': 'AU', 'tp': 'MJD [TDB]', 'om': 'deg',
             'w': 'deg', 'i': 'deg', 'x': 'AU', 'y': 'AU', 'z': 'AU',
-            'vx': 'AU/day', 'vy': 'AU/day', 'vz': 'AU/day'
+            'vx': 'AU/day', 'vy': 'AU/day', 'vz': 'AU/day',
+            'a1': 'AU/day^2', 'a2': 'AU/day^2', 'a3': 'AU/day^2',
         }
         with open(filename, 'x', encoding='utf-8') as f:
             f.write(section_full + '\n')
             f.write(f"{header_section_half} GRSS v{version} {header_section_half}" + '\n')
             f.write(section_full + '\n')
+
             dt = datetime.datetime.now()
             time_str = dt.strftime("%a %b %d %Y %H:%M:%S UTC")
             time_buff = " "*int((max_chars-len(time_str))/2)
@@ -1763,7 +1747,10 @@ class FitSimulation:
                 if key in ['om', 'w', 'i']:
                     val *= 180/np.pi
                     sig *= 180/np.pi
-                f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f} {units_dict[key]}\n")
+                if key in ['a1', 'a2', 'a3']:
+                    f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e} {units_dict[key]}\n")
+                else:
+                    f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f} {units_dict[key]}\n")
             f.write("\n")
             f.write("Initial Covariance Matrix:\n")
             for row in self.covariance_init:
@@ -1783,7 +1770,10 @@ class FitSimulation:
                 if key in ['om', 'w', 'i']:
                     val *= 180/np.pi
                     sig *= 180/np.pi
-                f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f} {units_dict[key]}\n")
+                if key in ['a1', 'a2', 'a3']:
+                    f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e} {units_dict[key]}\n")
+                else:
+                    f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f} {units_dict[key]}\n")
             f.write("\n")
             f.write("Final Covariance Matrix:\n")
             for row in self.covariance:
@@ -1794,7 +1784,45 @@ class FitSimulation:
             postfit_summary_buff = "-"*int((max_chars-len(postfit_summary_str))/2)
             f.write(f'{postfit_summary_buff}{postfit_summary_str}{postfit_summary_buff}\n')
             f.write(subsection_full + '\n')
-            f.write('***postfit summary will be added here***\n\n')
+            widths = {
+                'obsTime': 29, 'stn': 7, 'ra': 16, 'dec': 18,
+                'sigRA': 16, 'sigDec': 17, 'resRA': 16, 'resDec': 15,
+            }
+            f.write(f'|{"Observations".center(69)}|')
+            f.write(f'{"Sigmas".center(32)}|')
+            f.write(f'{"Residuals".center(29)}|')
+            f.write("\n")
+            f.write(f'{"Time [MJD UTC]".center(widths["obsTime"])}')
+            f.write(f'{"Obs".center(widths["stn"])}')
+            f.write(f'{"RA[deg]/Del[s]".center(widths["ra"])}')
+            f.write(f'{"Dec[deg]/Dop[Hz]".center(widths["dec"])}')
+            f.write(f'{f"RA[as]/Del[{chr(0x00b5)}s]".center(widths["sigRA"])}')
+            f.write(f'{"Dec[as]/Dop[Hz]".center(widths["sigDec"])}')
+            f.write(f'{f"RA[as]/Del[{chr(0x00b5)}s]".center(widths["resRA"])}')
+            f.write(f'{"Dec[as]/Dop[Hz]".center(widths["resDec"])}')
+            f.write("\n")
+            for i, obs in self.obs[::-1].iterrows():
+                f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
+                if obs['mode'] == 'RAD':
+                    f.write(f'{obs["trx"]+"/"+obs["rcv"]:^{widths["stn"]}}')
+                    f.write(f'{obs["delay"]:^{widths["ra"]}.9f}')
+                    sign = "+" if obs["doppler"] >= 0 else ""
+                    f.write(f'{sign+str(obs["doppler"]):^{widths["dec"]}}')
+                    f.write(f'{obs["sigDelay"]:^{widths["sigRA"]}.4f}')
+                    f.write(f'{obs["sigDoppler"]:^{widths["sigDec"]}.4f}')
+                    f.write(f'{obs["resDelay"]:^+{widths["resRA"]}.7f}')
+                    f.write(f'{obs["resDoppler"]:^+{widths["resDec"]}.7f}')
+                else:
+                    f.write(f'{obs["stn"]:^{widths["stn"]}}')
+                    f.write(f'{obs["ra"]:^{widths["ra"]}}')
+                    sign = "+" if obs["dec"] >= 0 else ""
+                    f.write(f'{sign+str(obs["dec"]):^{widths["dec"]}}')
+                    f.write(f'{obs["sigRA"]:^{widths["sigRA"]}.4f}')
+                    f.write(f'{obs["sigDec"]:^{widths["sigDec"]}.4f}')
+                    f.write(f'{obs["resRA"]:^+{widths["resRA"]}.7f}')
+                    f.write(f'{obs["resDec"]:^+{widths["resDec"]}.7f}')
+                f.write("\n")
+            f.write("\n")
 
             iter_summary_str = "Iteration Summary"
             iter_summary_buff = "-"*int((max_chars-len(iter_summary_str))/2)
