@@ -235,36 +235,70 @@ def get_observer_info(obs_df):
         geocentric latitude, and altitude). Shape of each entry changes on type
         of observation: 4 (optical), 8 (radar), or 9 (doppler).
     """
-    codes_dict = get_codes_dict()
+    stn_codes_dict = get_codes_dict()
     observer_info = []
     gaia = ['258']
     occultation = ['275']
     spacecraft = [ 'S/C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
                     'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', ]
+    roving = ['247', '270']
     conv_to_m = {
         'ICRF_AU': 1.49597870700e11,
         'ICRF_KM': 1.0e3,
     }
     fields = ['stn', 'mode', 'sys', 'pos1', 'pos2', 'pos3', 'trx', 'rcv', 'com', 'frq', 'doppler']
     for obs_info in zip(*[obs_df[field] for field in fields]):
-        code, mode, sys, pos1, pos2, pos3, trx, rcv, com, freq, doppler = obs_info
+        stn, mode, sys, pos1, pos2, pos3, trx, rcv, com, freq, doppler = obs_info
         info_list = []
-        if code in gaia+occultation+spacecraft:
+        if stn in gaia+occultation+spacecraft:
             c = conv_to_m[sys]
             info_list.extend((500, pos1*c, pos2*c, pos3*c, 0, 0, 0))
         elif mode == 'RAD':
-            tx_info = codes_dict[trx]
-            rx_info = codes_dict[rcv]
+            rx_lon, rx_lat, rx_rho = stn_codes_dict[rcv]
+            tx_lon, tx_lat, tx_rho = stn_codes_dict[trx]
             info_list.extend((
-                399, rx_info[0], rx_info[1], rx_info[2],
-                399, tx_info[0], tx_info[1], tx_info[2],
+                399, rx_lon, rx_lat, rx_rho,
+                399, tx_lon, tx_lat, tx_rho,
                 com
             ))
             if np.isfinite(doppler):
                 info_list.append(freq)
+        elif stn in roving:
+            lon = pos1*np.pi/180
+            if sys == 'WGS84':
+                lat = pos2*np.pi/180
+                rho = pos3+6378137.0
+            elif sys == 'ITRF':
+                lat = np.arctan2(pos2, pos3)
+                rho = np.sqrt(pos2**2 + pos3**2)*1.0e3
+            else:
+                raise ValueError(f"Invalid system {sys}")
+            info_list.extend((399, lon, lat, rho))
+        elif mode.startswith('SIM'):
+            lon = pos1*np.pi/180
+            lat = np.arctan2(pos2, pos3)
+            rho = np.sqrt(pos2**2 + pos3**2)*1.0e3
+            if mode in {'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
+                info_list.extend((
+                    399, lon, lat, rho,
+                    399, lon, lat, rho,
+                    com
+                ))
+                if np.isfinite(doppler):
+                    info_list.append(freq)
+            else:
+                if sys == 'WGS84':
+                    lat = pos2*np.pi/180
+                    rho = pos3+6378137.0
+                elif sys == 'ITRF':
+                    lat = np.arctan2(pos2, pos3)
+                    rho = np.sqrt(pos2**2 + pos3**2)*1.0e3
+                else:
+                    raise ValueError(f"Invalid system {sys}")
+                info_list.extend((399, lon, lat, rho))
         else:
-            info = codes_dict[code]
-            info_list.extend((399, info[0], info[1], info[2]))
+            lon, lat, rho = stn_codes_dict[stn]
+            info_list.extend((399, lon, lat, rho))
         observer_info.append(info_list)
     return observer_info
 

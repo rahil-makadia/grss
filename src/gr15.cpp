@@ -221,7 +221,7 @@ void check_and_apply_events(PropSimulation *propSim, const real &t,
         }
         propSim->events[nextEventIdx].apply(t, xInteg, propDir);
         // update next event index and time
-        nextEventIdx += 1;
+        nextEventIdx++;
         if (nextEventIdx < propSim->events.size()) {
             tNextEvent = propSim->events[nextEventIdx].t;
         } else {
@@ -338,8 +338,6 @@ void gr15(PropSimulation *propSim) {
     size_t dim = propSim->integParams.n2Derivs;
     real dt = get_initial_timestep(propSim);
     propSim->integParams.timestepCounter = 0;
-    std::vector<real> accInteg0 = get_state_der(t, xInteg0, propSim);
-    std::vector<real> accIntegNext = std::vector<real>(accInteg0.size(), 0.0);
     std::vector<real> xInteg(propSim->xInteg.size(), 0.0);
     std::vector<real> xIntegCompCoeffs(propSim->xInteg.size(), 0.0);
     std::vector<std::vector<real> > bOld(7, std::vector<real>(dim, 0.0));
@@ -357,7 +355,7 @@ void gr15(PropSimulation *propSim) {
     real b6TildeMax, accIntegArr7Max;
     real dtReq;
     real tNextEvent = propSim->integParams.tf;
-    static size_t nextEventIdx = 0;
+    size_t nextEventIdx = 0;
     if (t == propSim->integParams.t0) {
         nextEventIdx = 0;
     }
@@ -371,6 +369,10 @@ void gr15(PropSimulation *propSim) {
          t + dt < tNextEvent)) {
         dt = tNextEvent - t;
     }
+    std::vector<real> accInteg0 = get_state_der(t, xInteg0, propSim);
+    std::vector<real> accIntegNext = std::vector<real>(accInteg0.size(), 0.0);
+    propSim->interpParams.tStack.push_back(t);
+    propSim->interpParams.xIntegStack.push_back(xInteg0);
     size_t PCmaxIter = 12;
     int keepStepping = 1;
     int oneStepDone = 0;

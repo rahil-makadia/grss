@@ -148,9 +148,9 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     _ades_ast_cat_check(obs_df)
     # filter the data based on the time range
     obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
-    # filter the data based on the observation station
-    stn_to_remove = ('247', '270') # roving observatories
-    obs_df.query(f"stn not in {stn_to_remove}", inplace=True)
+    # # filter the data based on the observation station
+    # stn_to_remove = ('247', '270') # roving observatories
+    # obs_df.query(f"stn not in {stn_to_remove}", inplace=True)
     # reindex the data frame
     obs_df.reset_index(drop=True, inplace=True)
     # for all indices with OCC mode compute ra and dec as raStar+deltaRA and decStar+deltaDec
@@ -206,6 +206,7 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
     psv_df['cosDec'] = np.cos(psv_df['dec']*np.pi/180)
     psv_df['sigRA'] = psv_df['rmsRA']
     psv_df['sigDec'] = psv_df['rmsDec']
+    psv_df['sigCorr'] = psv_df['rmsCorr']
     times = Time(psv_df['obsTime'].to_list(), format='isot', scale='utc')
     psv_df['obsTimeMJD'] = times.utc.mjd
     add_counter = 0
@@ -538,7 +539,7 @@ def apply_station_weight_rules(group, obs_df, cols, verbose):
         i, time, stn, cat, prog = info
         # star catalog and program code need to be switched back to old 80-column format
         cat = ades_catalog_map[cat]
-        if prog is not None:
+        if isinstance(prog, str):
             prog = get_packed_prog_id(prog)
         if stn in {'F51', 'F52'}:
             obs_df.loc[i, cols] = 0.2
@@ -760,41 +761,40 @@ def apply_weighting_scheme(obs_df, verbose):
     # weighting scheme from vereš et al. 2017, obswgt_veres2017.inp
     if verbose:
         print("Applying Vereš et al. (2017) weighting scheme to the observations.")
-    # all non-nan correlations are used, others are 0
-    obs_df['sigCorr'] = 0.0
-    subset_corr = obs_df.query("rmsCorr == rmsCorr")
-    if verbose:
-        print(f"\tUsing {len(subset_corr)} observations with provided RA/Dec correlation values.")
-    obs_df.loc[subset_corr.index, 'sigCorr'] = subset_corr['rmsCorr'].values
+    # all correlations are 0 by default
+    non_radar = obs_df.query("mode != 'RAD'")
+    obs_df.loc[non_radar.index, 'sigCorr'] = 0.0
     cols = ['sigRA', 'sigDec']
     mode_grp = obs_df.groupby('mode')
     for mode, group in mode_grp:
         if mode in {'PHO', 'PHA', 'NOR', 'UNK'}:
-            subset_1890 = group.query("obsTimeMJD <= 11368.0") # until 1890-01-01
-            subset_1950 = group.query("11368.0 < obsTimeMJD <= 33282.0") # until 1950-01-01
-            subset_present = group.query("33282.0 < obsTimeMJD") # 1950-01-01 to present
-            obs_df.loc[subset_1890.index, cols] = 10.0
-            obs_df.loc[subset_1950.index, cols] = 5.0
-            obs_df.loc[subset_present.index, cols] = 2.5
+            date_1890 = group.query("obsTimeMJD <= 11368.0") # until 1890-01-01
+            date_1950 = group.query("11368.0 < obsTimeMJD <= 33282.0") # until 1950-01-01
+            date_present = group.query("33282.0 < obsTimeMJD") # 1950-01-01 to present
+            obs_df.loc[date_1890.index, cols] = 10.0
+            obs_df.loc[date_1950.index, cols] = 5.0
+            obs_df.loc[date_present.index, cols] = 2.5
         elif mode in {'CCD', 'VID', 'CMO'}: # CCD, Video, CMOS
             obs_df.loc[group.index, cols] = 1.0
-            subset_unk_cat = group.query("astCat == 'UNK'") # unknown star catalog
-            obs_df.loc[subset_unk_cat.index, cols] = 1.5
+            unknown_cat = group.query("astCat == 'UNK'") # unknown star catalog
+            obs_df.loc[unknown_cat.index, cols] = 1.5
             if mode in {'CCD'}:
                 apply_station_weight_rules(group, obs_df, cols, verbose)
             # # if rmsRA and rmsDec are not nan, use them
-            # subset_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec")
-            # obs_df.loc[subset_rms.index, cols] = subset_rms[['rmsRA', 'rmsDec']].values
+            # ccd_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec and rmsCorr == rmsCorr")
+            # obs_df.loc[ccd_rms.index, cols] = ccd_rms[['rmsRA', 'rmsDec']].values
+            # obs_df.loc[ccd_rms.index, 'sigCorr'] = ccd_rms['rmsCorr'].values
             # if verbose:
-            #     print(f"\tUsing {len(subset_rms)} {mode} observations with provided "
-            #             "RA/Dec RMS values.")
+            #     print(f"\tUsing {len(ccd_rms)} {mode} observations with provided "
+            #             "RA/Dec RMS and correlation values.")
         elif mode in {'OCC'}: # Occultations
             obs_df.loc[group.index, cols] = 0.01
             # if rmsRA and rmsDec are not nan, use them
-            subset_occ_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec")
-            obs_df.loc[subset_occ_rms.index, cols] = subset_occ_rms[['rmsRA', 'rmsDec']].values
+            occ_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec and rmsCorr == rmsCorr")
+            obs_df.loc[occ_rms.index, cols] = occ_rms[['rmsRA', 'rmsDec']].values
+            obs_df.loc[occ_rms.index, 'sigCorr'] = occ_rms['rmsCorr'].values
             if verbose:
-                print(f"\tUsing {len(subset_occ_rms)} {mode} observations with provided "
+                print(f"\tUsing {len(occ_rms)} {mode} observations with provided "
                         "RA/Dec RMS values.")
         elif mode in {'PMT'}: # Hipparcos
             obs_df.loc[group.index, cols] = 0.2
