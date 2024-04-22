@@ -59,10 +59,10 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="grss.fit.fit_simulation.IterationParams" href="grss.fit.fit_simulation.IterationParams.html" />
-    <link rel="prev" title="grss.fit.fit_simulation.create_simulated_obs_arrays" href="grss.fit.fit_simulation.create_simulated_obs_arrays.html" />
+    <link rel="prev" title="grss.fit.fit_simulation" href="grss.fit.fit_simulation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 21, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 22, 2024"/>
   </head>
   
   
@@ -197,7 +197,6 @@
 </ul>
 </li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="grss.fit.fit_simulation.html">grss.fit.fit_simulation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.create_simulated_obs_arrays.html">grss.fit.fit_simulation.create_simulated_obs_arrays</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">grss.fit.fit_simulation.FitSimulation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="grss.fit.fit_simulation.IterationParams.html">grss.fit.fit_simulation.IterationParams</a></li>
 </ul>
@@ -510,12 +509,12 @@ document.write(`
 <h1>grss.fit.fit_simulation.FitSimulation<a class="headerlink" href="#grss-fit-fit-simulation-fitsimulation" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grss.fit.fit_simulation.</span></span><span class="sig-name descname"><span class="pre">FitSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulated_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class to perform an orbit fit simulation.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.fit.fit_simulation.FitSimulation.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_init</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cov_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">de_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">441</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nongrav_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulated_obs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.fit.fit_simulation.FitSimulation.__init__" title="Permalink to this definition">#</a></dt>
 <dd><p>Constructor of the FitSimulation class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -528,6 +527,7 @@ document.write(`
 <li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – Radius of the body, by default 0.0</p></li>
 <li><p><strong>nongrav_info</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing the non-gravitational parameters, by default None</p></li>
 <li><p><strong>events</strong> (<em>list</em><em>, </em><em>optional</em>) – List of lists containing impulsive maneuvers, by default None</p></li>
+<li><p><strong>simulated_obs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing simulated observation data, by default None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -643,12 +643,12 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="grss.fit.fit_simulation.create_simulated_obs_arrays.html"
+       href="grss.fit.fit_simulation.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">grss.fit.fit_simulation.create_simulated_obs_arrays</p>
+        <p class="prev-next-title">grss.fit.fit_simulation</p>
       </div>
     </a>
     <a class="right-next"
@@ -717,7 +717,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 21, 2024.
+  Last updated on Apr 22, 2024.
   <br/>
 </p>
   </div>

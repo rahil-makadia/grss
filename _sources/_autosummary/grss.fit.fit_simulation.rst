@@ -9,13 +9,6 @@ grss.fit.fit\_simulation
 
     
     
-    .. rubric:: Functions
-
-    .. autosummary::
-        :toctree:
-    
-        create_simulated_obs_arrays
-    
     
 
     
