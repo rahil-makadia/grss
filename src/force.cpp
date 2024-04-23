@@ -421,7 +421,7 @@ void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
     forceFile.open("cpp.11", std::ios::app);
     #endif
     const real G = propSim->consts.G;
-    const real smoothing_threshold = 100.0e3L/propSim->consts.du2m;
+    const real smoothing_threshold = 10.0e3L/propSim->consts.du2m;
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         const real x = propSim->integBodies[i].pos[0];

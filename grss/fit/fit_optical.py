@@ -31,7 +31,7 @@ def get_mpc_raw_data(tdes):
     """
     response = requests.get("https://data.minorplanetcenter.net/api/get-obs",
                             json={"desigs": [f"{tdes}"], "output_format":["XML"]},
-                            timeout=60)
+                            timeout=30)
     if response.ok:
         obs_data = response.json()[0]["XML"]
     else:

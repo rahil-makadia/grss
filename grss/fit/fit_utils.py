@@ -339,7 +339,7 @@ def get_sbdb_elems(tdes, cov_elems=True):
         Dictionary containing desired cometary elements for the small body
     """
     response = requests.get("https://data.minorplanetcenter.net/api/query-identifier",
-                            data=tdes, timeout=60)
+                            data=tdes, timeout=30)
     if response.ok:
         tdes = response.json()['unpacked_primary_provisional_designation']
     else:

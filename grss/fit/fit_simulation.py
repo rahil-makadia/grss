@@ -1891,7 +1891,7 @@ class FitSimulation:
             f.write("\n")
             for i, obs in self.obs[::-1].iterrows():
                 f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
-                if obs['mode'] == 'RAD':
+                if obs['mode'] in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                     f.write(f'{obs["trx"]+"/"+obs["rcv"]:^{widths["stn"]}}')
                     f.write(f'{obs["delay"]:^{widths["ra"]}.9f}')
                     sign = "+" if obs["doppler"] >= 0 else ""
