@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(12104) Chesley orbit determination test &#8212; GRSS 3.9.2 documentation</title>
+    <title>(12104) Chesley orbit determination test &#8212; GRSS 4.0.0 documentation</title>
   
   
   
@@ -154,7 +154,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v3.9.2 documentation</p>
+    <p class="title logo__title">GRSS v4.0.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -528,23 +528,20 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">add_gaia_obs</span> <span class="o">=</span> <span class="kc">True</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">add_gaia_obs</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">optical_obs_file</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">t_min_tdb</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">t_max_tdb</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">debias_hires</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">debias_lowres</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">deweight</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">eliminate</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">max_obs_per_night</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">num_obs_per_night</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">obs_array_optical</span><span class="p">,</span> <span class="n">observer_codes_optical</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_mpc_optical_obs_array</span><span class="p">(</span><span class="n">body_id</span><span class="p">,</span> <span class="n">optical_obs_file</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">debias_hires</span><span class="p">,</span> <span class="n">debias_lowres</span><span class="p">,</span> <span class="n">deweight</span><span class="p">,</span> <span class="n">eliminate</span><span class="p">,</span> <span class="n">max_obs_per_night</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-<span class="n">obs_array_radar</span><span class="p">,</span> <span class="n">observer_codes_radar</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_radar_obs_array</span><span class="p">(</span><span class="n">body_id</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+<span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_optical_obs</span><span class="p">(</span><span class="n">body_id</span><span class="p">,</span> <span class="n">optical_obs_file</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">debias_lowres</span><span class="p">,</span> <span class="n">deweight</span><span class="p">,</span> <span class="n">eliminate</span><span class="p">,</span> <span class="n">num_obs_per_night</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+<span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">add_radar_obs</span><span class="p">(</span><span class="n">obs_df</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">add_gaia_obs</span><span class="p">:</span>
     <span class="n">gaia_dr</span> <span class="o">=</span> <span class="s1">&#39;gaiafpr&#39;</span>
-    <span class="n">obs_array_gaia</span><span class="p">,</span> <span class="n">observer_codes_gaia</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_gaia_optical_obs_array</span><span class="p">(</span><span class="n">body_id</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">gaia_dr</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
-    <span class="n">obs_array_optical</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">obs_array_optical</span><span class="p">,</span> <span class="n">obs_array_gaia</span><span class="p">))</span>
-    <span class="n">observer_codes_optical</span> <span class="o">=</span> <span class="n">observer_codes_optical</span> <span class="o">+</span> <span class="n">observer_codes_gaia</span>
+    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">add_gaia_obs</span><span class="p">(</span><span class="n">obs_df</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">gaia_dr</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -553,14 +550,19 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Skipped 0 observations
-         0 were either roving or radar observations (radar is handled separately),
-         0 of which were outside the specified time range.
-No debiasing needed for 3969 observations. Debiased 1301 observations. No biasing information for 10 observations.
-Applied default weight of 1 arcsec to 248 CCD observations
-Deweighted 867 observations as part of deweighting scheme.
-Found 459 observations from gaiafpr
-         Added 459 of those observations.
+Read in 5319 observations from the MPC.
+        WARNING: At least one unknown observation mode in the data.
+        WARNING: At least one deprecated star catalog in the data.
+        Filtered to 5319 observations that satisfy the time range and accepted observatory constraints.
+Applying Eggl et al. (2020) debiasing scheme to the observations.
+        Unknown star catalog: UNK
+        No debiasing needed for 4008 observations.
+        Debiased 1289 observations.
+        No bias information for 22 observations.
+Applying Vereš et al. (2017) weighting scheme to the observations.
+        Using 3165 CCD observations with station-specific weight rules.
+Applying sqrt(N/4) deweighting scheme.
+        Deweighted 2618 observations.
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -568,7 +570,7 @@ Found 459 observations from gaiafpr
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_iter_max</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">fit_sim</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">FitSimulation</span><span class="p">(</span><span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">obs_array_optical</span><span class="p">,</span> <span class="n">observer_codes_optical</span><span class="p">,</span> <span class="n">obs_array_radar</span><span class="p">,</span> <span class="n">observer_codes_radar</span><span class="p">,</span> <span class="n">n_iter_max</span><span class="o">=</span><span class="n">n_iter_max</span><span class="p">,</span> <span class="n">de_kernel</span><span class="o">=</span><span class="n">de_kernel</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">body_radius</span><span class="p">,</span> <span class="n">nongrav_info</span><span class="o">=</span><span class="n">nongrav_info</span><span class="p">)</span>
+<span class="n">fit_sim</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">FitSimulation</span><span class="p">(</span><span class="n">init_sol</span><span class="p">,</span> <span class="n">obs_df</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">n_iter_max</span><span class="o">=</span><span class="n">n_iter_max</span><span class="p">,</span> <span class="n">de_kernel</span><span class="o">=</span><span class="n">de_kernel</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">body_radius</span><span class="p">,</span> <span class="n">nongrav_info</span><span class="o">=</span><span class="n">nongrav_info</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -586,12 +588,14 @@ Found 459 observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.787                   16.249                  1997.045                        0.174
-2                        0.785                   16.117                  2038.279                        0.178
-3                        0.785                   16.117                  2038.354                        0.178
+1                        0.788                   0.468                   2334.438                        0.220
+2                        0.784                   0.467                   2315.867                        0.218
+3                        0.784                   0.467                   2315.867                        0.218
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.759                   16.117                  1702.389                        0.149
-Converged after rejecting outliers. Rejected 23 out of 5739 optical observations.
+4                        0.748                   0.423                   1901.855                        0.180
+5                        0.748                   0.423                   1901.395                        0.180
+6                        0.748                   0.423                   1901.395                        0.180
+Converged after rejecting outliers. Rejected 28 out of 5319 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -607,24 +611,25 @@ Converged after rejecting outliers. Rejected 23 out of 5739 optical observations
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Summary of the orbit fit calculations at iteration 4 (of 4):
+Summary of the orbit fit calculations at iteration 6 (of 6):
 ==============================================================
-RMS unweighted: 0.7586404230627457
-RMS weighted: 16.116532196321796
-chi-squared: 1702.389221066087
-reduced chi-squared: 0.14899258017382172
-square root of reduced chi-squared: 0.385995570147925
+RMS unweighted: 0.7481667735697954
+RMS weighted: 0.42277192297930816
+chi-squared: 1901.394619668658
+reduced chi-squared: 0.1797839088188973
+square root of reduced chi-squared: 0.42400932633480753
 --------------------------------------------------------------
-Solution Time: MJD 57879.000 TDB = 2017-05-06 00:00:00.000 TDB
-Solution Observation Arc: 17566.98 days (48.10 years)
+Solution Time: MJD 57961.000 TDB = 2017-07-27 00:00:00.000 TDB
+Solution Observation Arc: 17583.93 days (48.14 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.43306273471e-02               7.47205583241e-10               2.43306273948e-02               5.33228610256e-10               +4.76554490314e-11              +0.064
-q                       2.93727002330e+00               3.47578290213e-09               2.93727006923e+00               2.55441184115e-09               +4.59287186061e-08              +13.214
-tp                      5.87280740290e+04               6.89942006350e-06               5.87280742724e+04               5.37489066028e-06               +2.43452581344e-04              +35.286
-om                      7.80628592736e+01               1.29528319322e-07               7.80628677697e+01               8.15521945290e-08               +8.49604717246e-06              +65.592
-w                       1.82992320015e+02               1.36450315328e-06               1.82992353997e+02               1.08214580987e-06               +3.39821777686e-05              +24.904
-i                       1.11523475743e+01               3.04628748160e-08               1.11523475953e+01               2.20292746642e-08               +2.10052437666e-08              +0.690
+e                       2.43913904678e-02               7.35286146464e-10               2.43913859584e-02               2.80490108289e-08               -4.50941458827e-09              -6.133
+q                       2.93690461742e+00               3.42303981575e-09               2.93690463284e+00               8.63757056101e-08               +1.54155999077e-08              +4.503
+tp                      5.87282599431e+04               6.77315762978e-06               5.87282596506e+04               3.47479276756e-04               -2.92481527140e-04              -43.182
+om                      7.80633002818e+01               1.26172827208e-07               7.80632701064e+01               1.56290802237e-05               -3.01754227365e-05              -239.159
+w                       1.83042107662e+02               1.34053726889e-06               1.83042076972e+02               6.70580987462e-05               -3.06899059126e-05              -22.894
+i                       1.11525115179e+01               2.98481831671e-08               1.11525047668e+01               3.17305323488e-06               -6.75116805127e-06              -226.184
+
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -686,10 +691,10 @@ i                       1.11523475743e+01               3.04628748160e-08       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 105.06
-Mahalonobis distance between GRSS and JPL solution: 211.12
-Bhattacharya distance between JPL and GRSS solution: 0.2864
-Bhattacharya coefficient between JPL and GRSS solution: 0.7510
+Mahalonobis distance between JPL and GRSS solution: 387.04
+Mahalonobis distance between GRSS and JPL solution: 4.09
+Bhattacharya distance between JPL and GRSS solution: 9.8648
+Bhattacharya coefficient between JPL and GRSS solution: 0.0001
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
