@@ -61,7 +61,7 @@ struct SpkCache {
 /**
  * @brief Length of a record in an SPK file.
  */
-#define RECORD_LEN 1024
+#define SPK_RECORD_LEN 1024
 
 /**
  * @brief Structure to hold the data for a single body in an SPK file.
