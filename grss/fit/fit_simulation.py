@@ -1,15 +1,16 @@
 """Simulation classes for the Python GRSS orbit determination code"""
 # pylint: disable=no-name-in-module, no-member, too-many-lines, useless-return
+import sys
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.time import Time
 
 from .. import libgrss
-from ..utils import default_kernel_path
+from ..utils import default_kernel_path, grss_path
 from .fit_utils import get_observer_info
 
 __all__ = [ 'FitSimulation',
-            'create_simulated_obs_arrays',
 ]
 
 class IterationParams:
@@ -18,8 +19,7 @@ class IterationParams:
     orbit determination process. It is also used for plotting the residuals
     and chi-squared values for each iteration.
     """
-    def __init__(self, iter_number, residuals, rms_u, rms_w, residual_chi_squared,
-                    x_nom, covariance, obs_array, rejection_flags):
+    def __init__(self, iter_number, x_nom, covariance, obs, rms_u, rms_w):
         """
         Constructor for the IterationParams class
 
@@ -39,51 +39,26 @@ class IterationParams:
             Dictionary of nominal state vector values at the current iteration
         covariance : array
             Covariance matrix at the current iteration
-        obs_array : array
-            Observation array for the orbit fit
+        obs : pandas DataFrame
+            Observation data for the orbit fit
         rejection_flags : list
-            List of rejection flags for each observation in obs_array
+            List of rejection flags for each observation in obs
         """
         self.iter_number = iter_number
         self.x_nom = x_nom
         self.covariance = covariance
         variance = np.sqrt(np.diag(self.covariance))
         self.variance = dict(zip([f'var_{k}' for k in self.x_nom.keys()], variance))
-        self.residuals = residuals
-        self.obs_array = obs_array
-        self.is_accepted = np.where(np.logical_not(rejection_flags))[0]
-        self.is_rejected = np.where(rejection_flags)[0]
-        # optical_idx is where neither the RA nor dec residuals are NaN
-        self.optical_idx = np.where(~np.isnan(self.residuals[:, 0]) &
-                                ~np.isnan(self.residuals[:, 1]))[0]
-        # radar_idx is where either the RA or dec residuals are NaN
-        self.radar_idx = np.where(np.isnan(self.residuals[:, 0]) |
-                                np.isnan(self.residuals[:, 1]))[0]
-        self.sigmas = obs_array[:, 3:5]
+        self.obs = obs
+        force_del_idx = self.obs[self.obs['selAst'] == 'd'].index
+        auto_del_idx = self.obs[self.obs['selAst'] == 'D'].index
+        self.rejected_idx = np.concatenate((force_del_idx, auto_del_idx))
+        self.accepted_idx = np.setdiff1d(np.arange(len(self.obs)), self.rejected_idx)
         self.unweighted_rms = rms_u
         self.weighted_rms = rms_w
-        self.residual_chi_squared = residual_chi_squared
-        self._calculate_chis()
         self._assemble_info()
+        self._calculate_chis()
         return None
-
-    def _flatten_and_clean(self, arr):
-        """
-        Flatten an array and remove NaNs
-
-        Parameters
-        ----------
-        arr : array
-            Array to be flattened and cleaned
-
-        Returns
-        -------
-        arr : array
-            Flattened and cleaned array
-        """
-        arr = arr.flatten()
-        arr = arr[~np.isnan(arr)]
-        return arr
 
     def _calculate_chis(self):
         """
@@ -94,12 +69,15 @@ class IterationParams:
         None : NoneType
             None
         """
-        resid_arr = self._flatten_and_clean(self.residuals[self.is_accepted])
-        n_obs = len(resid_arr)
-        n_fit = len(self.x_nom)
-        sigmas = self._flatten_and_clean(self.sigmas[self.is_accepted])
-        self.chi = resid_arr/sigmas
-        self.chi_squared = np.sum(self.chi**2)
+        chi = np.zeros((len(self.obs), 4))
+        chi[:, 0] = self.all_info['ra_chi']
+        chi[:, 1] = self.all_info['dec_chi']
+        chi[:, 2] = self.all_info['delay_chi']
+        chi[:, 3] = self.all_info['doppler_chi']
+        # n_obs is number of non-nan entries in self.chi
+        n_obs = np.sum(~np.isnan(chi[self.accepted_idx, :]))
+        n_fit = self.covariance.shape[0]
+        self.chi_squared = np.nansum(chi[self.accepted_idx, :]**2)
         self.reduced_chi_squared = self.chi_squared/(n_obs-n_fit)
         return None
 
@@ -113,43 +91,20 @@ class IterationParams:
             None
         """
         # sourcery skip: extract-duplicate-method
-        optical_idx = self.optical_idx
-        radar_idx = self.radar_idx
-        optical_info = self.obs_array.copy()
-        optical_info[radar_idx, :] = np.nan
-        ra_obs = optical_info[:, 1]
-        dec_obs = optical_info[:, 2]
-        ra_noise = optical_info[:, 3]
-        dec_noise = optical_info[:, 4]
-        optical_residuals = self.residuals.copy()
-        optical_residuals[radar_idx, :] = np.nan
-        radar_info = self.obs_array.copy()
-        radar_info[optical_idx, :] = np.nan
-        delay_obs = radar_info[:, 1]
-        doppler_obs = radar_info[:, 2]
-        delay_noise = radar_info[:, 3]
-        doppler_noise = radar_info[:, 4]
-        radar_residuals = self.residuals.copy()
-        radar_residuals[optical_idx, :] = np.nan
         self.all_info = {
-            'ra_res': optical_residuals[:, 0],
-            'dec_res': optical_residuals[:, 1],
-            'ra_obs': ra_obs,
-            'dec_obs': dec_obs,
-            'ra_noise': ra_noise,
-            'dec_noise': dec_noise,
-            'ra_comp': ra_obs - optical_residuals[:, 0],
-            'dec_comp': dec_obs - optical_residuals[:, 1],
-            'delay_res': radar_residuals[:, 0],
-            'doppler_res': radar_residuals[:, 1],
-            'delay_obs': delay_obs,
-            'doppler_obs': doppler_obs,
-            'delay_noise': delay_noise,
-            'doppler_noise': doppler_noise,
-            'delay_comp': delay_obs - radar_residuals[:, 0],
-            'doppler_comp': doppler_obs - radar_residuals[:, 1],
+            'ra_res': self.obs['resRA'].values.copy(),
+            'dec_res': self.obs['resDec'].values.copy(),
+            'ra_obs': self.obs['ra'].values.copy(),
+            'dec_obs': self.obs['dec'].values.copy(),
+            'ra_noise': self.obs['sigRA'].values.copy(),
+            'dec_noise': self.obs['sigDec'].values.copy(),
+            'delay_res': self.obs['resDelay'].values.copy(),
+            'doppler_res': self.obs['resDoppler'].values.copy(),
+            'delay_obs': self.obs['delay'].values.copy(),
+            'doppler_obs': self.obs['doppler'].values.copy(),
+            'delay_noise': self.obs['sigDelay'].values.copy(),
+            'doppler_noise': self.obs['sigDoppler'].values.copy(),
         }
-        self.all_info['ra_cosdec_res'] = self.all_info['ra_res']*np.cos(dec_obs/3600*np.pi/180)
         self.all_info['ra_chi'] = self.all_info['ra_res']/self.all_info['ra_noise']
         self.all_info['dec_chi'] = self.all_info['dec_res']/self.all_info['dec_noise']
         self.all_info['ra_chi_squared'] = self.all_info['ra_chi']**2
@@ -220,7 +175,7 @@ class IterationParams:
                         linewidth=0.75, fill=fill, histtype='step')
         return None
 
-    def _plot_residuals(self, t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals,
+    def _plot_residuals(self, t_arr, ra_residuals, dec_residuals,
                         delay_residuals, doppler_residuals, radar_scale, markersize,
                         show_logarithmic, title, savefig, figname, auto_close):
         """
@@ -234,8 +189,6 @@ class IterationParams:
             right ascension residuals
         dec_residuals : vector
             declination residuals
-        ra_cosdec_residuals : vector
-            right ascension residuals multiplied by the cosine of the declination
         delay_residuals : vector
             delay residuals
         doppler_residuals : vector
@@ -261,7 +214,7 @@ class IterationParams:
             None
         """
         # sourcery skip: extract-duplicate-method
-        is_rejected = self.is_rejected
+        rejected_idx = self.rejected_idx
         fig = plt.figure(figsize=(21,6), dpi=150)
         if self.iter_number == 0:
             iter_string = f'Iteration {self.iter_number} (prefit)'
@@ -275,9 +228,9 @@ class IterationParams:
                     color='C1', alpha=0.5)
         ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize,
                     color='C0', alpha=0.5)
-        ax1.plot(t_arr[is_rejected], ra_residuals[is_rejected], 'ro',
+        ax1.plot(t_arr[rejected_idx], ra_residuals[rejected_idx], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
-        ax1.plot(t_arr[is_rejected], dec_residuals[is_rejected], 'ro',
+        ax1.plot(t_arr[rejected_idx], dec_residuals[rejected_idx], 'ro',
                     markersize=2*markersize, markerfacecolor='none')
         ax1.legend()
         ax1.set_xlabel('Time [UTC]')
@@ -290,9 +243,9 @@ class IterationParams:
         ax2main = fig.add_subplot(ax2[1,0])
         ax2histx = fig.add_subplot(ax2[0,0], sharex=ax2main)
         ax2histy = fig.add_subplot(ax2[1,1], sharey=ax2main)
-        self._scatter_hist(ra_cosdec_residuals, dec_residuals, ax2main, ax2histx, ax2histy,
+        self._scatter_hist(ra_residuals, dec_residuals, ax2main, ax2histx, ax2histy,
                             markersize, show_logarithmic)
-        ax2main.plot(ra_cosdec_residuals[is_rejected], dec_residuals[is_rejected], 'ro',
+        ax2main.plot(ra_residuals[rejected_idx], dec_residuals[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
         ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
         ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
@@ -374,10 +327,8 @@ class IterationParams:
         None : NoneType
             None
         """
-        is_rejected = self.is_rejected
-        is_accepted = self.is_accepted
-        optical_idx = self.optical_idx
-        radar_idx = self.radar_idx
+        rejected_idx = self.rejected_idx
+        accepted_idx = self.accepted_idx
         # plot chi values
         factor = 3 if plot_chi_squared else 1
         plt.figure(figsize=(factor*7,6), dpi=150)
@@ -390,22 +341,22 @@ class IterationParams:
         if plot_chi_squared:
             msg += ('. Chi Squared: '
                 'RA='
-                f'{np.sum(ra_chi_squared[np.intersect1d(is_accepted, optical_idx)]):.2f}, '
+                f'{np.nansum(self.all_info["ra_chi_squared"][accepted_idx]):.2f}, '
                 'Dec='
-                f'{np.sum(dec_chi_squared[np.intersect1d(is_accepted, optical_idx)]):.2f}, '
+                f'{np.nansum(self.all_info["dec_chi_squared"][accepted_idx]):.2f}, '
                 'Delay='
-                f'{np.nansum(delay_chi_squared[np.intersect1d(is_accepted, radar_idx)]):.2f}, '
+                f'{np.nansum(self.all_info["delay_chi_squared"][accepted_idx]):.2f}, '
                 'Doppler='
-                f'{np.nansum(doppler_chi_squared[np.intersect1d(is_accepted, radar_idx)]):.2f}')
+                f'{np.nansum(self.all_info["doppler_chi_squared"][accepted_idx]):.2f}')
         plt.suptitle(msg, y=0.95)
         if plot_chi_squared:
             plt.subplot(1,2,1)
         if not np.all(np.isnan(ra_chi)) and not np.all(np.isnan(dec_chi)):
             plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA', color='C1', alpha=0.5)
             plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec', color='C0', alpha=0.5)
-            plt.plot(t_arr[is_rejected], ra_chi[is_rejected], 'ro',
+            plt.plot(t_arr[rejected_idx], ra_chi[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none', label='Rejected')
-            plt.plot(t_arr[is_rejected], dec_chi[is_rejected], 'ro',
+            plt.plot(t_arr[rejected_idx], dec_chi[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
         if not np.all(np.isnan(doppler_chi)):
             plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
@@ -432,9 +383,9 @@ class IterationParams:
                         label='RA', color='C1', alpha=0.5)
             plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize,
                         label='Dec', color='C0', alpha=0.5)
-            plt.plot(t_arr[is_rejected], ra_chi_squared[is_rejected], 'ro',
+            plt.plot(t_arr[rejected_idx], ra_chi_squared[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
-            plt.plot(t_arr[is_rejected], dec_chi_squared[is_rejected], 'ro',
+            plt.plot(t_arr[rejected_idx], dec_chi_squared[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none')
             plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
@@ -488,18 +439,16 @@ class IterationParams:
         radar_scale = 3
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
-        t_arr = self.obs_array[:, 0]
+        t_arr = self.obs['obsTimeMJD'].values
         t_arr = Time(t_arr, format='mjd', scale='utc').utc.datetime
         if show_logarithmic:
             ra_residuals = np.abs(self.all_info['ra_res'])
             dec_residuals = np.abs(self.all_info['dec_res'])
-            ra_cosdec_residuals = np.abs(self.all_info['ra_cosdec_res'])
             ra_chi = np.abs(self.all_info['ra_chi'])
             dec_chi = np.abs(self.all_info['dec_chi'])
         else:
             ra_residuals = self.all_info['ra_res']
             dec_residuals = self.all_info['dec_res']
-            ra_cosdec_residuals = self.all_info['ra_cosdec_res']
             ra_chi = self.all_info['ra_chi']
             dec_chi = self.all_info['dec_chi']
         ra_chi_squared = self.all_info['ra_chi_squared']
@@ -516,9 +465,9 @@ class IterationParams:
             doppler_chi = self.all_info['doppler_chi']
         delay_chi_squared = self.all_info['delay_chi_squared']
         doppler_chi_squared = self.all_info['doppler_chi_squared']
-        self._plot_residuals(t_arr, ra_residuals, dec_residuals, ra_cosdec_residuals,
-                            delay_residuals, doppler_residuals, radar_scale, markersize,
-                            show_logarithmic, title, savefig, figname, auto_close)
+        self._plot_residuals(t_arr, ra_residuals, dec_residuals, delay_residuals,
+                                doppler_residuals, radar_scale, markersize,
+                                show_logarithmic, title, savefig, figname, auto_close)
         self._plot_chi(t_arr, ra_chi, dec_chi, delay_chi, doppler_chi,
                         ra_chi_squared, dec_chi_squared, delay_chi_squared, doppler_chi_squared,
                         plot_chi_squared, sigma_limit, radar_scale, markersize,
@@ -529,9 +478,9 @@ class FitSimulation:
     """
     Class to perform an orbit fit simulation.
     """
-    def __init__(self, x_init, cov_init=None, obs_array_optical=None, observer_codes_optical=None,
-                    obs_array_radar=None, observer_codes_radar=None, n_iter_max=10,
-                    de_kernel=441, radius=0.0, nongrav_info=None, events=None):
+    def __init__(self, x_init, obs_df, cov_init=None, n_iter_max=10,
+                    de_kernel=441, radius=0.0, nongrav_info=None, events=None,
+                    simulated_obs=None):
         """
         Constructor of the FitSimulation class.
 
@@ -539,16 +488,10 @@ class FitSimulation:
         ----------
         x_init : dict
             Initial guess of the state vector.
+        obs_df : pandas DataFrame
+            Observation data for the orbit fit
         cov_init : array, optional
             Initial covariance matrix, by default None
-        obs_array_optical : array, optional
-            Optical observation data for the orbit fit, by default None
-        observer_codes_optical : tuple, optional
-            Observer locations for each observation in obs_array_optical, by default None
-        obs_array_radar : array, optional
-            Radar observation data for the orbit fit, by default None
-        observer_codes_radar : tuple, optional
-            Observer locations for each observation in obs_array_radar, by default None
         n_iter_max : int, optional
             Number of maximum iterations to correct the orbit estimate, by default 10
         de_kernel : int, optional
@@ -559,24 +502,45 @@ class FitSimulation:
             Dictionary containing the non-gravitational parameters, by default None
         events : list, optional
             List of lists containing impulsive maneuvers, by default None
+        simulated_obs : dict, optional
+            Dictionary containing simulated observation data, by default None
 
         Returns
         -------
         None : NoneType
             None
         """
+        perm_id = obs_df['permID'][0]
+        prov_id = obs_df['provID'][0]
+        body_id = perm_id if isinstance(perm_id, str) else prov_id
+        self.name = body_id
+        self.t_sol = None
+        self.t_sol_utc = None
+        self.x_init = None
         self.x_nom = None
+        self.covariance_init = cov_init
         self.covariance = None
-        self.obs_array = None
-        self.observer_codes = None
-        self.observer_info = None
+        self.fit_cartesian = False
+        self.fit_cometary = False
+        self.fit_nongrav = True
+        self.n_fit = None
         self._check_initial_solution(x_init, cov_init)
-        self._check_input_observation_arrays(obs_array_optical, observer_codes_optical,
-                                            obs_array_radar, observer_codes_radar)
-        self.sigmas = None
+        self.obs = None
+        self.observer_info = None
+        self.optical_idx = None
+        self.delay_idx = None
+        self.doppler_idx = None
+        self.radar_idx = None
+        self.n_obs = None
+        self.past_obs_idx = None
+        self.past_obs_exist = None
+        self.future_obs_idx = None
+        self.future_obs_exist = None
+        self.simulated_obs = simulated_obs
+        self._parse_observation_arrays(obs_df)
         self.obs_cov = None
         self.obs_weight = None
-        self._assemble_observation_arrays()
+        self._compute_obs_weights()
         self.n_iter = 0
         self.n_iter_max = n_iter_max
         self.iters = []
@@ -646,88 +610,15 @@ class FitSimulation:
             if key in x_init and x_init[key] != 0.0:
                 self.fit_nongrav = True
         self.t_sol = x_init['t']
-        self.x_init = x_init
-        self.x_nom = {key: x_init[key] for key in x_init if key != 't'} # remove t for self.x_nom
+        self.t_sol_utc = Time(self.t_sol, format='mjd', scale='tdb').utc.mjd
+        self.x_init = {key: x_init[key] for key in x_init if key != 't'}
+        self.x_nom = self.x_init.copy()
         self.n_fit = len(self.x_nom)
         if cov_init.shape != (self.n_fit, self.n_fit):
             msg = ("Covariance matrix must be the same size "
                     "as the number of fitted parameters.")
             raise ValueError(msg)
-        self.covariance_init = cov_init
         self.covariance = cov_init
-        return None
-
-    def _check_input_observation_arrays(self, obs_array_optical, observer_codes_optical,
-                                        obs_array_radar, observer_codes_radar):
-        """
-        Check the input observation arrays provided by the user and
-        make sure they are valid.
-
-        Parameters
-        ----------
-        obs_array_optical : array
-            Optical observation data for the orbit fit.
-        observer_codes_optical : tuple
-            Observer locations for each observation in obs_array_optical.
-        obs_array_radar : array
-            Radar observation data for the orbit fit.
-        observer_codes_radar : tuple
-            Observer locations for each observation in obs_array_radar.
-
-        Returns
-        -------
-        None : NoneType
-            None
-
-        Raises
-        ------
-        ValueError
-            If no observation arrays are provided.
-        ValueError
-            If optical observations are provided but no observer codes.
-        ValueError
-            If observer codes are provided but no optical observations.
-        ValueError
-            If the length of the optical observation array and observer
-            code array are not the same.
-        ValueError
-            If radar observations are provided but no observer codes.
-        ValueError
-            If observer codes are provided but no radar observations.
-        ValueError
-            If the length of the radar observation array and observer
-            code array are not the same.
-        """
-        self.fit_optical = False
-        self.fit_radar = False
-        if obs_array_optical is None and obs_array_radar is None:
-            raise ValueError("Must provide at least one observation array (optical or radar).")
-        if obs_array_optical is not None and observer_codes_optical is None:
-            raise ValueError("Must provide observer codes for optical observations.")
-        if obs_array_optical is None and observer_codes_optical is not None:
-            raise ValueError("Must provide optical observations for observer codes.")
-        if obs_array_optical is not None and observer_codes_optical is not None:
-            if len(obs_array_optical) != len(observer_codes_optical):
-                msg = ("Optical observation array and observer "
-                        "code array must be the same length.")
-                raise ValueError(msg)
-            else:
-                self.fit_optical = True
-        if obs_array_radar is not None and observer_codes_radar is None:
-            raise ValueError("Must provide observer codes for radar observations.")
-        if obs_array_radar is None and observer_codes_radar is not None:
-            raise ValueError("Must provide radar observations for observer codes.")
-        if obs_array_radar is not None and observer_codes_radar is not None:
-            if len(obs_array_radar) != len(observer_codes_radar):
-                msg = ("Radar observation array and observer "
-                        "code array must be the same length.")
-                raise ValueError(msg)
-            else:
-                self.fit_radar = True
-        self.obs_array_optical = obs_array_optical
-        self.observer_codes_optical = observer_codes_optical
-        self.obs_array_radar = obs_array_radar
-        self.observer_codes_radar = observer_codes_radar
         return None
 
     def _flatten_and_clean(self, arr):
@@ -748,41 +639,107 @@ class FitSimulation:
         arr = arr[~np.isnan(arr)]
         return arr
 
-    def _assemble_observation_arrays(self):
+    def _add_simulated_obs(self):
         """
-        Assemble the optical and/or radar observation arrays into a
-        single array for orbit fitting.
+        Add the simulated observation data to the observation data.
 
         Returns
         -------
         None : NoneType
             None
         """
-        if self.fit_optical and self.fit_radar:
-            self._merge_observation_arrays()
-        elif self.fit_optical:
-            self.obs_array, sort_idx = self._sort_array_by_another(self.obs_array_optical,
-                                                                    self.obs_array_optical[:, 0])
-            self.observer_codes = tuple(np.array(self.observer_codes_optical,
-                                                    dtype=tuple)[sort_idx])
-        elif self.fit_radar:
-            self.obs_array, sort_idx = self._sort_array_by_another(self.obs_array_radar,
-                                                                    self.obs_array_radar[:, 0])
-            self.observer_codes = tuple(np.array(self.observer_codes_radar,
-                                                    dtype=tuple)[sort_idx])
-        self.observer_info = get_observer_info(self.observer_codes)
-        # number of observations is the number of non-nan values
-        # in the second and third columns of the observation array
-        self.n_obs = np.count_nonzero(~np.isnan(self.obs_array[:, 1:3]))
-        self.rejection_flag = [False]*len(self.obs_array)
-        self._create_obs_weight()
-        self.past_obs_idx = np.where(self.obs_array[:, 0] < self.t_sol)[0]
+        times = self.simulated_obs['times']
+        modes = self.simulated_obs['modes']
+        weights = self.simulated_obs['weights']
+        if not len(times) == len(modes) == len(weights):
+            raise ValueError("Simulated observation data must have the same length.")
+        for i, time in enumerate(times):
+            idx = len(self.obs)
+            mode = modes[i]
+            if mode not in {'SIM_CCD', 'SIM_OCC', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
+                raise ValueError(f"Unknown simulated observation mode {mode}.")
+            weight = weights[i]
+            self.obs.loc[idx, 'permID'] = 'SIM_'+str(self.obs['permID'][0])
+            self.obs.loc[idx, 'provID'] = 'SIM_'+str(self.obs['provID'][0])
+            self.obs.loc[idx, 'obsTime'] = f'{time.utc.isot}Z'
+            self.obs.loc[idx, 'obsTimeMJD'] = time.utc.mjd
+            self.obs.loc[idx, 'mode'] = mode
+            if mode in {'SIM_CCD', 'SIM_OCC'}:
+                self.obs.loc[idx, 'stn'] = 'SIM'
+                self.obs.loc[idx, 'ra'] = np.nan
+                self.obs.loc[idx, 'rmsRA'] = weight[0]
+                self.obs.loc[idx, 'sigRA'] = weight[0]
+                self.obs.loc[idx, 'dec'] = np.nan
+                self.obs.loc[idx, 'rmsDec'] = weight[1]
+                self.obs.loc[idx, 'sigDec'] = weight[1]
+                self.obs.loc[idx, 'rmsCorr'] = weight[2]
+                self.obs.loc[idx, 'sigCorr'] = weight[2]
+                self.obs.loc[idx, 'cosDec'] = 1.0
+            elif mode in {'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
+                self.obs.loc[idx, 'trx'] = 'SIM'
+                self.obs.loc[idx, 'rcv'] = 'SIM'
+                self.obs.loc[idx, 'com'] = 1
+                if mode == 'SIM_RAD_DEL':
+                    self.obs.loc[idx, 'delay'] = np.nan
+                    self.obs.loc[idx, 'rmsDelay'] = weight[0]
+                    self.obs.loc[idx, 'sigDelay'] = weight[0]
+                    self.obs.loc[idx, 'doppler'] = np.nan
+                    self.obs.loc[idx, 'rmsDoppler'] = np.nan
+                    self.obs.loc[idx, 'sigDoppler'] = np.nan
+                else:
+                    self.obs.loc[idx, 'delay'] = np.nan
+                    self.obs.loc[idx, 'rmsDelay'] = np.nan
+                    self.obs.loc[idx, 'sigDelay'] = np.nan
+                    self.obs.loc[idx, 'doppler'] = np.nan
+                    self.obs.loc[idx, 'rmsDoppler'] = weight[0]
+                    self.obs.loc[idx, 'sigDoppler'] = weight[0]
+                    self.obs.loc[idx, 'frq'] = 8560.0
+            self.obs.loc[idx, 'ctr'] = 399
+            self.obs.loc[idx, 'sys'] = 'ITRF'
+            self.obs.loc[idx, 'pos1'] = 0.0
+            self.obs.loc[idx, 'pos2'] = 0.0
+            self.obs.loc[idx, 'pos3'] = 0.0
+            self.obs.loc[idx, 'selAst'] = 'a'
+        return None
+
+    def _parse_observation_arrays(self, obs_df):
+        """
+        Parse the observation data for the orbit fit.
+
+        Returns
+        -------
+        None : NoneType
+            None
+        """
+        self.obs = obs_df
+        self.obs['selAst'].fillna('A', inplace=True)
+        if self.simulated_obs is not None:
+            self._add_simulated_obs()
+        self.obs.sort_values(by='obsTimeMJD', inplace=True, ignore_index=True)
+        self.observer_info = get_observer_info(self.obs)
+        self.optical_idx = []
+        self.delay_idx = []
+        self.doppler_idx = []
+        self.observer_info_lengths = [len(info) for info in self.observer_info]
+        for i, length in enumerate(self.observer_info_lengths):
+            if length in {4,7}: # optical
+                self.optical_idx.append(i)
+            elif length == 9: # delay
+                self.delay_idx.append(i)
+            elif length == 10: # doppler
+                self.doppler_idx.append(i)
+            else:
+                raise ValueError('Unknown observer type')
+        self.radar_idx = self.delay_idx + self.doppler_idx
+        self.n_obs = 2*len(self.optical_idx)+len(self.radar_idx)
+
+        self.past_obs_idx = self.obs.query('obsTimeMJD < @self.t_sol_utc').index
         self.past_obs_exist = len(self.past_obs_idx) > 0
-        self.future_obs_idx = np.where(self.obs_array[:, 0] >= self.t_sol)[0]
+        self.future_obs_idx = self.obs.query('obsTimeMJD >= @self.t_sol_utc').index
         self.future_obs_exist = len(self.future_obs_idx) > 0
         return None
 
-    def _create_obs_weight(self):
+    def _compute_obs_weights(self):
         """
         Assembles the weight matrix for the orbit fit based
         on observation uncertainties and correlations.
@@ -792,87 +749,30 @@ class FitSimulation:
         None : NoneType
             None
         """
-        self.sigmas = self.obs_array[:, 3:5]
-        sigma_corr = self.obs_array[:, 5]
-        obs_cov = np.zeros((self.sigmas.size, self.sigmas.size))
-        obs_wgt = np.zeros((self.sigmas.size, self.sigmas.size))
-        idx_to_keep = []
-        for i in range(self.obs_array.shape[0]):
-            obs_info_len = len(self.observer_info[i])
-            if obs_info_len in {4, 7}:
-                is_optical = True
-            elif obs_info_len in {9, 10}:
-                is_optical = False
+        self.obs_cov = []
+        self.obs_weight = []
+        fields = ['mode', 'sigRA', 'sigDec', 'sigCorr', 'sigDelay', 'sigDoppler']
+        for info in zip(*[self.obs[field] for field in fields]):
+            mode, sig_ra, sig_dec, sig_corr, sig_delay, sig_doppler = info
+            if mode in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
+                sig = sig_doppler if np.isfinite(sig_doppler) else sig_delay
+                if sig == 0.0 or np.isnan(sig):
+                    raise ValueError("Radar uncertainty is 0 or NaN.")
+                self.obs_cov.append([[sig**2]])
+                self.obs_weight.append([[1.0/sig**2]])
             else:
-                raise ValueError("Observer info length not recognized.")
-            sig_1, sig_2 = self.sigmas[i]
-            sig_1_nan = np.isnan(sig_1)
-            sig_2_nan = np.isnan(sig_2)
-            sig_corr = sigma_corr[i]
-            sig_corr_nan = np.isnan(sig_corr)
-            off_diag = 0.0 if (sig_1_nan or sig_2_nan or sig_corr_nan) else sig_corr*sig_1*sig_2
-            sub_cov = np.array([[sig_1**2, off_diag],
-                                [off_diag, sig_2**2]])
-            obs_cov[2*i:2*i+2, 2*i:2*i+2] = sub_cov
-            if is_optical:
-                obs_wgt[2*i:2*i+2, 2*i:2*i+2] = np.linalg.inv(sub_cov)
-            else:
-                obs_wgt[2*i:2*i+2, 2*i:2*i+2] = np.diag([1.0/sig_1**2, 1.0/sig_2**2])
-            if not sig_1_nan:
-                idx_to_keep.append(2*i)
-            if not sig_2_nan:
-                idx_to_keep.append(2*i+1)
-            if sig_1_nan and sig_2_nan:
-                raise ValueError("Both sigmas cannot be NaN.")
-        # these next two lines were VERY VERY slow, needed to find a better way
-        # self.obs_cov = obs_cov[idx_to_keep, :][:, idx_to_keep]
-        # self.obs_weight = obs_wgt[idx_to_keep, :][:, idx_to_keep]
-        cov_post = np.zeros((len(idx_to_keep), len(idx_to_keep)))
-        wgt_post = np.zeros((len(idx_to_keep), len(idx_to_keep)))
-        for i, idx in enumerate(idx_to_keep):
-            cov_post[i, i:i+2] = obs_cov[idx, idx:idx+2]
-            wgt_post[i, i:i+2] = obs_wgt[idx, idx:idx+2]
-        self.obs_cov = cov_post
-        self.obs_weight = wgt_post
-        return None
-
-    def _sort_array_by_another(self, array, sort_by):
-        """
-        Sort an array by another array.
-
-        Parameters
-        ----------
-        array : array
-            Array to sort.
-        sort_by : array
-            Array to sort by.
-
-        Returns
-        -------
-        array : array
-            Sorted array.
-        sort_idx : vector
-            Indices of the sorted array.
-        """
-        sort_idx = np.argsort(sort_by)
-        return array[sort_idx], sort_idx
-
-    def _merge_observation_arrays(self):
-        """
-        Merge the optical and radar observation arrays into a single
-        array for orbit fitting.
-
-        Returns
-        -------
-        None : NoneType
-            None
-        """
-        # merge optical and radar arrays
-        obs_array = np.vstack((self.obs_array_optical, self.obs_array_radar))
-        observer_codes = self.observer_codes_optical + self.observer_codes_radar
-        # sort by time
-        self.obs_array, sort_idx = self._sort_array_by_another(obs_array, obs_array[:, 0])
-        self.observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
+                sig_corr_nan = np.isnan(sig_corr)
+                off_diag = 0.0 if sig_corr_nan else sig_corr*sig_ra*sig_dec
+                sub_cov = np.array([[sig_ra**2, off_diag],
+                                    [off_diag, sig_dec**2]])
+                det = sub_cov[0, 0]*sub_cov[1, 1] - sub_cov[0, 1]*sub_cov[1, 0]
+                if det == 0.0:
+                    print(sub_cov)
+                    raise ValueError("Optical covariance matrix is singular.")
+                inv = np.array([[sub_cov[1, 1], -sub_cov[0, 1]],
+                                [-sub_cov[1, 0], sub_cov[0, 0]]])/det
+                self.obs_cov.append(sub_cov)
+                self.obs_weight.append(inv)
         return None
 
     def _get_prop_sim_past(self, name, t_eval_utc, eval_apparent_state,
@@ -899,14 +799,14 @@ class FitSimulation:
             propSim object for the past observations.
         """
         # pylint: disable=no-member
-        t_eval_past = self.obs_array[self.past_obs_idx, 0]
+        t_eval_past = self.obs.obsTimeMJD.values[self.past_obs_idx]
         tf_past = np.min(t_eval_past)
         prop_sim_past = libgrss.PropSimulation(name, self.t_sol,
                                                 self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
         # flip t_eval_past and observer_info to go in reverse time order
         t_eval_past = t_eval_past[::-1]
-        observer_info = tuple(observer_info[::-1])
+        observer_info = observer_info[::-1]
         prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info)
@@ -937,7 +837,7 @@ class FitSimulation:
             propSim object for the future observations.
         """
         # pylint: disable=no-member
-        t_eval_future = self.obs_array[self.future_obs_idx, 0]
+        t_eval_future = self.obs.obsTimeMJD.values[self.future_obs_idx]
         tf_future = np.max(t_eval_future)
         prop_sim_future = libgrss.PropSimulation(name, self.t_sol,
                                                     self.de_kernel, self.de_kernel_path)
@@ -948,7 +848,7 @@ class FitSimulation:
         prop_sim_future.evalMeasurements = True
         return prop_sim_future
 
-    def _get_prop_sims(self, name):
+    def _get_prop_sims(self):
         """
         Get propSim objects for the past and future observations.
 
@@ -969,15 +869,15 @@ class FitSimulation:
         converged_light_time = True
         observer_info = np.array(self.observer_info, dtype=tuple)
         observer_info_past = observer_info[self.past_obs_idx]
-        observer_info_future = tuple(observer_info[self.future_obs_idx])
+        observer_info_future = observer_info[self.future_obs_idx]
         prop_sim_past = None
         prop_sim_future = None
         if self.past_obs_exist:
-            prop_sim_past = self._get_prop_sim_past(f"{name}_past", t_eval_utc,
+            prop_sim_past = self._get_prop_sim_past(f"{self.name}_past", t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info_past)
         if self.future_obs_exist:
-            prop_sim_future = self._get_prop_sim_future(f"{name}_future", t_eval_utc,
+            prop_sim_future = self._get_prop_sim_future(f"{self.name}_future", t_eval_utc,
                                                         eval_apparent_state, converged_light_time,
                                                         observer_info_future)
         return prop_sim_past, prop_sim_future
@@ -1210,7 +1110,7 @@ class FitSimulation:
         # sourcery skip: low-code-quality
         # pylint: disable=no-member
         # get propagated states
-        prop_sim_past, prop_sim_future = self._get_prop_sims("orbit_fit_sim")
+        prop_sim_past, prop_sim_future = self._get_prop_sims()
         # create nominal integ_body object
         state_nom = self._x_dict_to_state(self.x_nom)
         ng_params_nom = self._x_dict_to_nongrav_params(self.x_nom)
@@ -1307,20 +1207,22 @@ class FitSimulation:
             If the observer information is not well-defined.
         """
         if self.past_obs_exist and self.future_obs_exist:
-            optical_obs = np.vstack((prop_sim_past.opticalObs, prop_sim_future.opticalObs))
-            radar_obs = np.vstack((prop_sim_past.radarObs, prop_sim_future.radarObs))
+            # optical_obs = np.vstack((prop_sim_past.opticalObs, prop_sim_future.opticalObs))
+            # radar_obs = np.vstack((prop_sim_past.radarObs, prop_sim_future.radarObs))
+            optical_obs = prop_sim_past.opticalObs + prop_sim_future.opticalObs
+            radar_obs = prop_sim_past.radarObs + prop_sim_future.radarObs
         elif self.past_obs_exist:
             optical_obs = prop_sim_past.opticalObs
             radar_obs = prop_sim_past.radarObs
         elif self.future_obs_exist:
             optical_obs = prop_sim_future.opticalObs
             radar_obs = prop_sim_future.radarObs
-        measured_obs = self.obs_array[:, 1:3]
-        computed_obs = np.nan*np.ones_like(measured_obs)
-        for i in range(len(self.obs_array)):
-            obs_info_len = len(self.observer_info[i])
+        computed_obs = np.nan*np.ones((len(self.obs), 2))
+        cos_dec = self.obs.cosDec.values
+        for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 computed_obs[i, :] = optical_obs[i][2*integ_body_idx:2*integ_body_idx+2]
+                computed_obs[i, 0] *= cos_dec[i]
             elif obs_info_len == 9: # delay measurement
                 computed_obs[i, 0] = radar_obs[i][integ_body_idx]
             elif obs_info_len == 10: # dopper measurement
@@ -1356,9 +1258,9 @@ class FitSimulation:
             future_optical_partials = np.array(prop_sim_future.opticalPartials)
             future_radar_partials = np.array(prop_sim_future.radarPartials)
             future_light_time = np.array(prop_sim_future.lightTimeEval)
-        t_eval_tdb = Time(self.obs_array[:, 0], format='mjd', scale='utc').tdb.mjd
-        for i in range(self.obs_array.shape[0]):
-            obs_info_len = len(self.observer_info[i])
+        t_eval_tdb = Time(self.obs['obsTimeMJD'].values, format='mjd', scale='utc').tdb.mjd
+        cos_dec = self.obs.cosDec.values
+        for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 is_optical = True
                 size = 2
@@ -1384,7 +1286,7 @@ class FitSimulation:
             t_eval -= light_time[sim_idx, 0]
             stm = self._get_analytic_stm(t_eval, prop_sim)
             if is_optical:
-                part[0, :6] = optical_partials[sim_idx, :6]
+                part[0, :6] = optical_partials[sim_idx, :6]*cos_dec[i]
                 part[1, :6] = optical_partials[sim_idx, 6:12]
             else:
                 part[0, :6] = radar_partials[sim_idx, :6]
@@ -1470,11 +1372,38 @@ class FitSimulation:
         perturbation_info = None if self.analytic_partials else self._get_perturbation_info()
         prop_sim_past, prop_sim_future = self._assemble_and_propagate_bodies(perturbation_info)
         self.prop_sims = (prop_sim_past, prop_sim_future)
-        # get residuals
-        computed_obs = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
-        residuals = self.obs_array[:, 1:3] - computed_obs
         # get partials
         partials = self._get_partials(prop_sim_past, prop_sim_future, perturbation_info)
+        # get residuals
+        computed_obs = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
+        residuals = [None]*len(self.obs)
+        ra_res = self.obs['resRA'].values
+        dec_res = self.obs['resDec'].values
+        delay_res = self.obs['resDelay'].values
+        doppler_res = self.obs['resDoppler'].values
+        fields = ['mode', 'ra', 'dec', 'cosDec', 'biasRA', 'biasDec', 'delay', 'doppler']
+        for info in self.obs[fields].itertuples():
+            i, mode, ra, dec, cos_dec, bias_ra, bias_dec, delay, doppler = info
+            if mode.startswith('SIM'):
+                if mode in {'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
+                    residuals[i] = np.array([0.0])
+                else:
+                    residuals[i] = np.array([0.0, 0.0])
+            elif mode == 'RAD':
+                if i in self.delay_idx:
+                    delay_res[i] = delay*1e6 - computed_obs[i, 0]
+                    residuals[i] = np.array([delay_res[i]])
+                else:
+                    doppler_res[i] = doppler - computed_obs[i, 1]
+                    residuals[i] = np.array([doppler_res[i]])
+            else:
+                ra_res[i] = ra*3600*cos_dec - bias_ra - computed_obs[i, 0]
+                dec_res[i] = dec*3600 - bias_dec - computed_obs[i, 1]
+                residuals[i] = np.array([ra_res[i], dec_res[i]])
+        self.obs['resRA'] = ra_res
+        self.obs['resDec'] = dec_res
+        self.obs['resDelay'] = delay_res
+        self.obs['resDoppler'] = doppler_res
         return residuals, partials
 
     def _get_rms_and_reject_outliers(self, partials, residuals, start_rejecting):
@@ -1516,49 +1445,56 @@ class FitSimulation:
                                 "Default values are chi_reject=3.0 and chi_recover=2.8 "
                                 "(Implemented as FitSimulation.reject_criteria=[3.0, 2.8])")
         full_cov = self.covariance
-        residual_chi_squared = [None]*len(self.obs_array)
+        residual_chi_squared = [None]*len(self.obs)
         self.num_rejected = 0
         rms_u = 0
         rms_w = 0
         j = 0
-        for i in range(len(self.obs_array)):
-            obs_info_len = len(self.observer_info[i])
+        sel_ast = self.obs['selAst'].values
+        for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
             elif obs_info_len in {9, 10}:
                 size = 1
             else:
                 raise ValueError("Observer info length not recognized.")
-            resid = residuals[j:j+size].reshape((1, size))
+            resid = residuals[i]
             # calculate chi-squared for each residual
-            obs_cov = self.obs_cov[j:j+size, j:j+size]
+            obs_cov = self.obs_cov[i]
             obs_partials = partials[j:j+size, :]
-            if self.rejection_flag[i]:
+            if sel_ast[i] in {'D', 'd'}:
                 resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
             else:
                 resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
-            residual_chi_squared[i] = (resid @ np.linalg.inv(resid_cov) @ resid.T)[0,0]
+            if size == 1:
+                resid_cov_inv = 1.0/resid_cov
+            else:
+                resid_cov_det = resid_cov[0, 0]*resid_cov[1, 1] - resid_cov[0, 1]*resid_cov[1, 0]
+                resid_cov_inv = np.array([  [resid_cov[1, 1], -resid_cov[0, 1]],
+                                            [-resid_cov[1, 0], resid_cov[0, 0]]])/resid_cov_det
+            residual_chi_squared[i] = resid @ resid_cov_inv @ resid.T
             # outlier rejection, only reject RA/Dec measurements
             if start_rejecting and size == 2:
-                if residual_chi_squared[i] > chi_reject**2:
-                    self.rejection_flag[i] = True
+                if residual_chi_squared[i] > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                    sel_ast[i] = 'D'
                     self.num_rejected += 1
-                elif self.rejection_flag[i] and residual_chi_squared[i] < chi_recover**2:
-                    self.rejection_flag[i] = False
+                elif sel_ast[i] == 'D' and residual_chi_squared[i] < chi_recover**2:
+                    sel_ast[i] = 'A'
                     self.num_rejected -= 1
-            if not self.rejection_flag[i]:
-                rms_u += (resid @ resid.T)[0,0]
-                rms_w += (resid @ self.obs_weight[j:j+size, j:j+size] @ resid.T)[0,0]
+            if sel_ast[i] not in {'D', 'd'}:
+                rms_u += resid @ resid.T
+                rms_w += resid @ self.obs_weight[i] @ resid.T
             j += size
-        rejected_fraction = self.num_rejected/len(self.obs_array)
+        self.obs['selAst'] = sel_ast
+        rejected_fraction = self.num_rejected/len(self.obs)
         if rejected_fraction > 0.25:
-            print("WARNING: More than 25% of observations rejected. Consider changing chi_reject",
-                    "and chi_recover values, or turning off outlier rejection altogether.")
+            print("WARNING: More than 25% of observations rejected. Consider changing the",
+                    "rejection criteria, or turning off outlier rejection altogether.")
         rms_u = np.sqrt(rms_u/self.n_obs)
         rms_w = np.sqrt(rms_w/self.n_obs)
-        return rms_u, rms_w, residual_chi_squared
+        return rms_u, rms_w
 
-    def _add_iteration(self, iter_number, residuals, rms_u, rms_w, residual_chi_squared):
+    def _add_iteration(self, iter_number, rms_u, rms_w):
         """
         Adds an iteration to the list of iterations in the FitSimulation object.
 
@@ -1580,10 +1516,8 @@ class FitSimulation:
         None : NoneType
             None
         """
-        self.iters.append(IterationParams(iter_number, residuals, rms_u, rms_w,
-                                            residual_chi_squared, self.x_nom,
-                                            self.covariance, self.obs_array,
-                                            self.rejection_flag))
+        self.iters.append(IterationParams(iter_number, self.x_nom, self.covariance,
+                                            self.obs, rms_u, rms_w))
         return None
 
     def _check_convergence(self):
@@ -1622,26 +1556,24 @@ class FitSimulation:
             The state correction.
         """
         atwa = np.zeros((self.n_fit, self.n_fit))
-        atwb = np.zeros((self.n_fit, 1))
+        atwb = np.zeros(self.n_fit)
         j = 0
-        for i in range(len(self.obs_array)):
-            obs_info_len = len(self.observer_info[i])
+        sel_ast = self.obs['selAst'].values
+        for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
             elif obs_info_len in {9, 10}:
                 size = 1
             else:
                 raise ValueError("Observer info length not recognized.")
-            if self.rejection_flag[i]:
+            if sel_ast[i] in {'D', 'd'}:
                 j += size
                 continue
-            atwa += (partials[j:j+size, :].T @ self.obs_weight[j:j+size, j:j+size]
-                        @ partials[j:j+size, :])
-            atwb += (partials[j:j+size, :].T @ self.obs_weight[j:j+size, j:j+size]
-                        @ residuals[j:j+size].reshape((size, 1)))
+            atwa += partials[j:j+size, :].T @ self.obs_weight[i] @ partials[j:j+size, :]
+            atwb += partials[j:j+size, :].T @ self.obs_weight[i] @ residuals[i]
             j += size
         # use pseudo-inverse if the data arc is less than 7 days
-        if self.obs_array[-1,0]-self.obs_array[0,0] < 7.0:
+        if self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min() < 7.0:
             cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         else:
             cov = np.array(libgrss.matrix_inverse(atwa))
@@ -1670,17 +1602,17 @@ class FitSimulation:
             self.n_iter = i+1
             # get residuals and partials
             residuals, partials = self._get_residuals_and_partials()
-            clean_residuals = self._flatten_and_clean(residuals)
+            # clean_residuals = self._flatten_and_clean(residuals)
             # calculate rms and reject outliers here if desired
-            rms_u, rms_w, res_chi_sq = self._get_rms_and_reject_outliers(partials, clean_residuals,
+            rms_u, rms_w = self._get_rms_and_reject_outliers(partials, residuals,
                                                                             start_rejecting)
             if i == 0:
                 # add prefit iteration
-                self._add_iteration(0, residuals, rms_u, rms_w, res_chi_sq)
+                self._add_iteration(0, rms_u, rms_w)
             # get initial guess
             curr_state = np.array(list(self.x_nom.values()))
             # get state correction
-            delta_x, cov = self._get_lsq_state_correction(partials, clean_residuals)
+            delta_x, cov = self._get_lsq_state_correction(partials, residuals)
             # get new state
             next_state = curr_state + delta_x
             if self.fit_cometary and next_state[0] < 0.0:
@@ -1691,7 +1623,7 @@ class FitSimulation:
             # get new covariance
             self.covariance = cov
             # add iteration
-            self._add_iteration(i+1, residuals, rms_u, rms_w, res_chi_sq)
+            self._add_iteration(i+1, rms_u, rms_w)
             if verbose:
                 print(f"{self.iters[-1].iter_number}\t\t\t",
                         f"{self.iters[-1].unweighted_rms:.3f}\t\t\t",
@@ -1702,7 +1634,7 @@ class FitSimulation:
             if self.converged:
                 if self.reject_outliers and start_rejecting:
                     print(f"Converged after rejecting outliers. Rejected {self.num_rejected} out",
-                            f"of {len(self.obs_array_optical)} optical observations.")
+                            f"of {len(self.optical_idx)} optical observations.")
                     break
                 msg = "Converged without rejecting outliers."
                 if self.reject_outliers:
@@ -1716,7 +1648,7 @@ class FitSimulation:
             print("WARNING: Maximum number of iterations reached without converging.")
         return None
 
-    def print_summary(self, iter_idx=-1):
+    def print_summary(self, iter_idx=-1, out_stream=sys.stdout):
         """
         Prints a summary of the orbit fit calculations at a given iteration.
 
@@ -1731,22 +1663,22 @@ class FitSimulation:
             None
         """
         data = self.iters[iter_idx]
-        arc = self.obs_array[-1, 0] - self.obs_array[0, 0]
-        print("Summary of the orbit fit calculations at iteration",
-                    f"{data.iter_number} (of {self.n_iter}):")
-        print("==============================================================")
-        print(f"RMS unweighted: {data.unweighted_rms}")
-        print(f"RMS weighted: {data.weighted_rms}")
-        print(f"chi-squared: {data.chi_squared}")
-        print(f"reduced chi-squared: {data.reduced_chi_squared}")
-        print(f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}")
-        print("--------------------------------------------------------------")
-        print(f"Solution Time: MJD {self.t_sol:0.3f} TDB =",
-                f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB")
-        print(f"Solution Observation Arc: {arc:0.2f} days ({arc/365.25:0.2f} years)")
-        print("--------------------------------------------------------------")
-        print("Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value",
-                "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)")
+        arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
+        str_to_print = "Summary of the orbit fit calculations at iteration "
+        str_to_print += f"{data.iter_number} (of {self.n_iter}):\n"
+        str_to_print += "==============================================================\n"
+        str_to_print += f"RMS unweighted: {data.unweighted_rms}\n"
+        str_to_print += f"RMS weighted: {data.weighted_rms}\n"
+        str_to_print += f"chi-squared: {data.chi_squared}\n"
+        str_to_print += f"reduced chi-squared: {data.reduced_chi_squared}\n"
+        str_to_print += f"square root of reduced chi-squared: {np.sqrt(data.reduced_chi_squared)}\n"
+        str_to_print += "--------------------------------------------------------------\n"
+        str_to_print += f"Solution Time: MJD {self.t_sol:0.3f} TDB = "
+        str_to_print += f"{Time(self.t_sol, format='mjd', scale='tdb').iso} TDB\n"
+        str_to_print += f"Solution Observation Arc: {arc:0.2f} days ({arc/365.25:0.2f} years)\n"
+        str_to_print += "--------------------------------------------------------------\n"
+        str_to_print += "Fitted Variable\t\tInitial Value\t\t\tUncertainty\t\t\tFitted Value"
+        str_to_print += "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)\n"
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
         init_sol = self.iters[0].x_nom
@@ -1762,10 +1694,11 @@ class FitSimulation:
                     init_unc *= 180/np.pi
                     final_val *= 180/np.pi
                     final_unc *= 180/np.pi
-                print(f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}",
-                        f"\t\t{final_val:.11e}\t\t{final_unc:.11e}",
-                        f"\t\t{final_val-init_val:+.11e}"
-                        f"\t\t{(final_val-init_val)/init_unc:+.3f}")
+                str_to_print += f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}"
+                str_to_print += f"\t\t{final_val:.11e}\t\t{final_unc:.11e}"
+                str_to_print += f"\t\t{final_val-init_val:+.11e}"
+                str_to_print += f"\t\t{(final_val-init_val)/init_unc:+.3f}\n"
+        print(str_to_print, file=out_stream)
         return None
 
     def plot_summary(self, auto_close=False):
@@ -1821,371 +1754,204 @@ class FitSimulation:
         plt.xlabel("Iteration #")
         plt.ylabel(r"Reduced $\chi^2$")
         plt.legend()
+        plt.tight_layout()
         block = not auto_close
         plt.show(block=block)
         if auto_close:
             plt.close()
         return None
 
-def _generate_simulated_obs(ref_sol, ref_ng_info, events, modified_obs_arrays,
-                            simulated_optical_obs_idx, optical_obs_types,
-                            simulated_radar_obs_idx, radar_obs_types, de_kernel, noise):
-    """
-    Generates simulated observations for a given reference solution.
+    def save(self, filename):
+        """
+        Saves the FitSimulation log to a file.
 
-    Parameters
-    ----------
-    ref_sol : dict
-        Dictionary containing the reference solution.
-    ref_ng_info : dict
-        Dictionary containing the reference non-gravitational acceleration information.
-    events : list
-        List of lists containing the event information.
-    modified_obs_arrays : tuple
-        Tuple containing the modified optical and radar observation arrays and observer codes.
-    simulated_optical_obs_idx : vector
-        Vector containing the indices of the simulated optical observations.
-    optical_obs_types : list
-        List of optical observation types.
-    simulated_radar_obs_idx : vector
-        Vector containing the indices of the simulated radar observations.
-    radar_obs_types : list
-        List of radar observation types.
-    de_kernel : int
-        SPICE kernel version.
-    noise : bool
-        Flag to add noise to the simulated observations.
+        Parameters
+        ----------
+        filename : str
+            The filename to save the log to.
 
-    Returns
-    -------
-    obs_array_optical : array
-        Simulated optical observation data for the given reference solution.
-    observer_codes_optical : tuple
-        Observer locations for each observation in sim_obs_array_optical
-    obs_array_radar : array
-        Simulated radar observation data for the given reference solution.
-    observer_codes_radar : tuple
-        Observer locations for each observation in sim_obs_array_radar
+        Returns
+        -------
+        None : NoneType
+            None
+        """
+        max_chars = 135
+        half_tab = "  "
+        subsection_full = "-"*max_chars
+        section_full = "="*max_chars
+        header_section_half = "="*((max_chars-13)//2)
+        try:
+            with open(f'{grss_path}/version.txt', 'r', encoding='utf-8') as f:
+                version = f.read().strip()
+        except FileNotFoundError:
+            version = "INFTY"
+        units_dict = {
+            'e': '', 'q': 'AU', 'tp': 'MJD [TDB]', 'om': 'deg',
+            'w': 'deg', 'i': 'deg', 'x': 'AU', 'y': 'AU', 'z': 'AU',
+            'vx': 'AU/day', 'vy': 'AU/day', 'vz': 'AU/day',
+            'a1': 'AU/day^2', 'a2': 'AU/day^2', 'a3': 'AU/day^2',
+        }
+        with open(filename, 'x', encoding='utf-8') as f:
+            f.write(section_full + '\n')
+            f.write(f"{header_section_half} GRSS v{version} {header_section_half}" + '\n')
+            f.write(section_full + '\n')
 
-    Raises
-    ------
-    ValueError
-        If the length of simulated optical and radar observation times are both zero.
-    ValueError
-        If the length of simulated optical observation times and
-        observation types are not the same.
-    ValueError
-        If the length of simulated radar observation times and
-        observation types are not the same.
-    ValueError
-        If the reference solution does not contain the time.
-    ValueError
-        If the reference solution does not contain a full cartesian
-        or cometary state.
-    """
-    # pylint: disable=no-member
-    obs_sigma_dict = {  'astrometry': 1, # arcsec
-                        'occultation': 0.25, # fraction of body angular diameter
-                        'delay': 2, # microseconds
-                        # 15 meter (conservative since it is 1m random + 10m systematic)
-                        'delay_hera': 15*2 /299792458*1e6, # microseconds
-                        'doppler': 0.5, # Hz
-                        # 'doppler_hera': 0.1 mm/s to Hz
-    }
-    # check length of times is not zero
-    (obs_array_optical, observer_codes_optical,
-                    obs_array_radar, observer_codes_radar) = modified_obs_arrays
-    optical_times = tuple(obs_array_optical[:, 0])
-    radar_times = tuple(obs_array_radar[:, 0])
-    if len(simulated_optical_obs_idx) == 0 and len(simulated_radar_obs_idx) == 0:
-        raise ValueError("Must provide at least one observation time.")
-    # check length of times and obs_types are the same
-    if len(optical_times) != len(optical_obs_types):
-        raise ValueError("Must provide the same number of optical",
-                            "observation times and observation types.")
-    if len(radar_times) != len(radar_obs_types):
-        raise ValueError("Must provide the same number of radar",
-                            "observation times and observation types.")
-    # check that the reference solution has the requisite information and create integration body
-    if 't' not in ref_sol:
-        raise ValueError("Must provide a time for the initial solution.")
-    nongrav_params = libgrss.NongravParameters()
-    nongrav_params.a1 = ref_ng_info['a1']
-    nongrav_params.a2 = ref_ng_info['a2']
-    nongrav_params.a3 = ref_ng_info['a3']
-    nongrav_params.alpha = ref_ng_info['alpha']
-    nongrav_params.k = ref_ng_info['k']
-    nongrav_params.m = ref_ng_info['m']
-    nongrav_params.n = ref_ng_info['n']
-    nongrav_params.r0_au = ref_ng_info['r0_au']
-    if all(key in ref_sol for key in ("x", "y", "z", "vx", "vy", "vz")):
-        pos = [ref_sol['x'], ref_sol['y'], ref_sol['z']]
-        vel = [ref_sol['vx'], ref_sol['vy'], ref_sol['vz']]
-        target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'], ref_sol['mass'],
-                                        ref_sol['radius'], pos, vel, nongrav_params)
-    elif all(key in ref_sol for key in ("e", "q", "tp", "om", "w", "i")):
-        ecc = ref_sol['e']
-        peri_dist = ref_sol['q']
-        time_peri = ref_sol['tp']
-        omega = ref_sol['om']
-        arg_peri = ref_sol['w']
-        inc = ref_sol['i']
-        cometary_elements = [ecc, peri_dist, time_peri,
-                                omega, arg_peri, inc]
-        target_body = libgrss.IntegBody("body_simulated_obs", ref_sol['t'],
-                                        ref_sol['mass'], ref_sol['radius'],
-                                        cometary_elements, nongrav_params)
-    else:
-        raise ValueError("Must provide either a full cartesian or cometary",
-                                "state for the initial solution.")
-    # initialize past and future times and observer codes
-    obs_times = np.array(optical_times + radar_times)
-    observer_codes = observer_codes_optical + observer_codes_radar
-    obs_types = tuple(optical_obs_types + radar_obs_types)
-    sort_idx = np.argsort(obs_times)
-    obs_times = obs_times[sort_idx]
-    observer_codes = tuple(np.array(observer_codes, dtype=tuple)[sort_idx])
-    obs_types = tuple(np.array(obs_types, dtype=tuple)[sort_idx])
-    past_obs_idx = np.where(obs_times < ref_sol['t'])[0]
-    future_obs_idx = np.where(obs_times > ref_sol['t'])[0]
-    past_obs_exist = len(past_obs_idx) > 0
-    future_obs_exist = len(future_obs_idx) > 0
-    observer_info = get_observer_info(observer_codes)
-    if past_obs_exist:
-        t_eval_past = obs_times[past_obs_idx]
-        tf_past = np.min(t_eval_past)
-        observer_info_past = tuple(np.array(observer_info, dtype=tuple)[past_obs_idx])
-    if future_obs_exist:
-        t_eval_future = obs_times[future_obs_idx]
-        tf_future = np.max(t_eval_future)
-        observer_info_future = tuple(np.array(observer_info, dtype=tuple)[future_obs_idx])
-    # initialize the propagator
-    t_eval_utc = True
-    eval_apparent_state = True
-    converged_light_time = True
-    de_kernel_path = default_kernel_path
-    prop_sim_past = libgrss.PropSimulation("simulated_obs_past", ref_sol['t'],
-                                        de_kernel, de_kernel_path)
-    prop_sim_past.tEvalMargin = 1.0
-    prop_sim_future = libgrss.PropSimulation("simulated_obs_future", ref_sol['t'],
-                                        de_kernel, de_kernel_path)
-    prop_sim_future.tEvalMargin = 1.0
-    if past_obs_exist:
-        prop_sim_past.set_integration_parameters(tf_past, t_eval_past, t_eval_utc,
-                                                eval_apparent_state, converged_light_time,
-                                                observer_info_past)
-        prop_sim_past.evalMeasurements = True
-        prop_sim_past.add_integ_body(target_body)
-    if future_obs_exist:
-        prop_sim_future.set_integration_parameters(tf_future, t_eval_future, t_eval_utc,
-                                                    eval_apparent_state, converged_light_time,
-                                                    observer_info_future)
-        prop_sim_future.evalMeasurements = True
-        prop_sim_future.add_integ_body(target_body)
-    # add events
-    if events is not None:
-        for event in events:
-            t_event = event[0]
-            dvx = event[1]
-            dvy = event[2]
-            dvz = event[3]
-            multiplier = event[4]
-            if t_event < ref_sol['t']:
-                prop_sim_past.add_event(target_body, t_event, [dvx, dvy, dvz], multiplier)
-            else:
-                prop_sim_future.add_event(target_body, t_event, [dvx, dvy, dvz], multiplier)
-    # propagate
-    if past_obs_exist:
-        prop_sim_past.integrate()
-    if future_obs_exist:
-        prop_sim_future.integrate()
-    # get the propagated solution
-    if past_obs_exist and future_obs_exist:
-        apparent_states_past = np.array(prop_sim_past.xIntegEval)
-        apparent_states_future = np.array(prop_sim_future.xIntegEval)
-        apparent_states = np.vstack((apparent_states_past, apparent_states_future))
-        optical_obs_past = np.array(prop_sim_past.opticalObs)
-        optical_obs_future = np.array(prop_sim_future.opticalObs)
-        optical_obs = np.vstack((optical_obs_past, optical_obs_future))
-        radar_obs_past = np.array(prop_sim_past.radarObs)
-        radar_obs_future = np.array(prop_sim_future.radarObs)
-        radar_obs = np.vstack((radar_obs_past, radar_obs_future))
-    elif past_obs_exist:
-        apparent_states = np.array(prop_sim_past.xIntegEval)
-        optical_obs = np.array(prop_sim_past.opticalObs)
-        radar_obs = np.array(prop_sim_past.radarObs)
-    elif future_obs_exist:
-        apparent_states = np.array(prop_sim_future.xIntegEval)
-        optical_obs = np.array(prop_sim_future.opticalObs)
-        radar_obs = np.array(prop_sim_future.radarObs)
-    optical_idx = 0
-    radar_idx = 0
-    for idx in range(len(obs_times)):
-        typ = obs_types[idx]
-        info_len = len(observer_info[idx])
-        if info_len in {4, 7}:
-            if typ != 'actual_obs_optical':
-                obs_array_optical[optical_idx, 1] = optical_obs[idx, 0]
-                obs_array_optical[optical_idx, 2] = optical_obs[idx, 1]
-                if typ != 'actual_obs_to_sim_optical':
-                    obs_array_optical[optical_idx, 3] = obs_sigma_dict[typ]
-                    obs_array_optical[optical_idx, 4] = obs_sigma_dict[typ]
-                    if typ == 'occultation':
-                        dist = np.linalg.norm(apparent_states[idx, :3])*1.495978707e11
-                        ang_diam = 2*np.arctan(ref_sol['radius'] / dist)
-                        ang_diam *= 180/np.pi*3600
-                        obs_array_optical[optical_idx, 3] *= ang_diam
-                        obs_array_optical[optical_idx, 4] *= ang_diam
-                    obs_array_optical[optical_idx, 5] = 0.0
-                if noise:
-                    ra_noise = np.random.normal(0, obs_array_optical[optical_idx, 3])
-                    obs_array_optical[optical_idx, 1] += ra_noise
-                    dec_noise = np.random.normal(0, obs_array_optical[optical_idx, 4])
-                    obs_array_optical[optical_idx, 2] += dec_noise
-            optical_idx += 1
-        elif info_len in {9, 10}:
-            if typ != 'actual_obs_radar':
-                if typ == 'actual_obs_to_sim_radar':
-                    if info_len == 9:
-                        obs_array_radar[radar_idx, 1] = radar_obs[idx]
-                    elif info_len == 10:
-                        obs_array_radar[radar_idx, 2] = radar_obs[idx]
+            dt = datetime.datetime.now(datetime.timezone.utc)
+            time_str = dt.strftime("%a %b %d %Y %H:%M:%S UTC")
+            time_buff = " "*int((max_chars-len(time_str))/2)
+            f.write(f'{time_buff}{time_str}{time_buff}\n\n')
+            name_buff = "-"*int((max_chars-len(self.name))/2)
+            f.write(f'{name_buff}{self.name}{name_buff}\n')
+            f.write(subsection_full + '\n')
+            obs_min = self.obs.obsTimeMJD.argmin()
+            obs_max = self.obs.obsTimeMJD.argmax()
+            f.write(f"Observation data arc from {self.obs.loc[obs_min, 'obsTime']} to ")
+            f.write(f"{self.obs.loc[obs_max, 'obsTime']} [UTC] ")
+            range_mjd = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
+            f.write(f"({range_mjd:.2f} days, {range_mjd/365.25:.2f} years)\n")
+            f.write(f"{len(self.obs)} observations ")
+            f.write(f"({len(self.optical_idx)} optical, {len(self.delay_idx)} delay, ")
+            f.write(f"{len(self.doppler_idx)} doppler)\n")
+            f.write(f"DE kernel version: {self.de_kernel}\n")
+            f.write("\n")
+            init_state_str = "Initial Nominal State"
+            init_state_buff = "-"*int((max_chars-len(init_state_str))/2)
+            f.write(f'{init_state_buff}{init_state_str}{init_state_buff}\n')
+            f.write(subsection_full + '\n')
+            f.write(f"T: {Time(self.t_sol, format='mjd', scale='tdb').iso} ")
+            f.write(f"({self.t_sol:.8f} MJD) [TDB]\n")
+            keys = list(self.x_init.keys())
+            init_variance = np.sqrt(np.diag(self.covariance_init))
+            for i, key in enumerate(keys):
+                val = self.x_init[key]
+                sig = init_variance[i]
+                if key in ['om', 'w', 'i']:
+                    val *= 180/np.pi
+                    sig *= 180/np.pi
+                if key in ['a1', 'a2', 'a3']:
+                    f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e}")
                 else:
-                    if info_len == 9:
-                        obs_array_radar[radar_idx, 1] = radar_obs[idx]
-                        obs_array_radar[radar_idx, 3] = obs_sigma_dict[typ]
-                        obs_array_radar[radar_idx, 5] = np.nan
-                    elif info_len == 10:
-                        obs_array_radar[radar_idx, 2] = radar_obs[idx]
-                        obs_array_radar[radar_idx, 4] = obs_sigma_dict[typ]
-                        obs_array_radar[radar_idx, 5] = np.nan
-                if noise:
-                    if info_len == 9:
-                        delay_noise = np.random.normal(0, obs_array_radar[radar_idx, 3])
-                        obs_array_radar[radar_idx, 1] += delay_noise
-                    elif info_len == 10:
-                        doppler_noise = np.random.normal(0, obs_array_radar[radar_idx, 4])
-                        obs_array_radar[radar_idx, 2] += doppler_noise
-            radar_idx += 1
-    return obs_array_optical, observer_codes_optical, obs_array_radar, observer_codes_radar
+                    f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
+                if key in units_dict:
+                    f.write(f" {units_dict[key]}")
+                f.write("\n")
+            f.write("\n")
+            f.write("Initial Covariance Matrix:\n")
+            for row in self.covariance_init:
+                f.write(half_tab.join([f"{val:18.11e}" for val in row]) + '\n')
+            f.write("\n")
 
-def create_simulated_obs_arrays(simulated_traj_info, real_obs_arrays, simulated_obs_start_time,
-                                add_extra_simulated_obs, extra_simulated_obs_info, noise):
-    """
-    Creates observation arrays with simulated observations added to the real observations.
+            final_state_str = "Final Nominal State"
+            final_state_buff = "-"*int((max_chars-len(final_state_str))/2)
+            f.write(f'{final_state_buff}{final_state_str}{final_state_buff}\n')
+            f.write(subsection_full + '\n')
+            f.write(f"T: {Time(self.t_sol, format='mjd', scale='tdb').iso} ")
+            f.write(f"({self.t_sol:.8f} MJD) [TDB]\n")
+            keys = list(self.x_nom.keys())
+            final_variance = np.sqrt(np.diag(self.covariance))
+            for i, key in enumerate(keys):
+                val = self.x_nom[key]
+                sig = final_variance[i]
+                if key in ['om', 'w', 'i']:
+                    val *= 180/np.pi
+                    sig *= 180/np.pi
+                if key in ['a1', 'a2', 'a3']:
+                    f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e}")
+                else:
+                    f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
+                if key in units_dict:
+                    f.write(f" {units_dict[key]}")
+                f.write("\n")
+            f.write("\n")
+            f.write("Final Covariance Matrix:\n")
+            for row in self.covariance:
+                f.write(half_tab.join([f"{val:18.11e}" for val in row]) + '\n')
+            f.write("\n")
 
-    Parameters
-    ----------
-    simulated_traj_info : tuple
-        Tuple containing the nominal trajectory, covariance matrix, events, target radius,
-        non-gravitational acceleration information, DE kernel, and DE kernel path.
-    real_obs_arrays : tuple
-        Tuple containing the real optical and radar observation arrays and observer codes.
-    simulated_obs_start_time : float
-        Time at which to start simulating observations.
-    add_extra_simulated_obs : bool
-        Flag indicating whether to add extra simulated observations.
-    extra_simulated_obs_info : tuple
-        Tuple containing the extra simulated optical and radar observation times and types.
-    noise : bool
-        Flag to add noise to the simulated observations.
+            postfit_summary_str = "Postfit Summary"
+            postfit_summary_buff = "-"*int((max_chars-len(postfit_summary_str))/2)
+            f.write(f'{postfit_summary_buff}{postfit_summary_str}{postfit_summary_buff}\n')
+            f.write(subsection_full + '\n')
+            widths = {
+                'obsTime': 29, 'stn': 7, 'ra': 16, 'dec': 18,
+                'sigRA': 16, 'sigDec': 17, 'resRA': 16, 'resDec': 15,
+            }
+            f.write(f'|{"Observations".center(69)}|')
+            f.write(f'{"Sigmas".center(32)}|')
+            f.write(f'{"Residuals".center(29)}|')
+            f.write("\n")
+            f.write(f'{"Time [UTC]".center(widths["obsTime"])}')
+            f.write(f'{"Obs".center(widths["stn"])}')
+            f.write(f'{"RA[deg]/Del[s]".center(widths["ra"])}')
+            f.write(f'{"Dec[deg]/Dop[Hz]".center(widths["dec"])}')
+            f.write(f'{f"RA[as]/Del[{chr(0x00b5)}s]".center(widths["sigRA"])}')
+            f.write(f'{"Dec[as]/Dop[Hz]".center(widths["sigDec"])}')
+            f.write(f'{f"RA[as]/Del[{chr(0x00b5)}s]".center(widths["resRA"])}')
+            f.write(f'{"Dec[as]/Dop[Hz]".center(widths["resDec"])}')
+            f.write("\n")
+            for i, obs in self.obs[::-1].iterrows():
+                f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
+                if obs['mode'] in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
+                    f.write(f'{obs["trx"]+"/"+obs["rcv"]:^{widths["stn"]}}')
+                    f.write(f'{obs["delay"]:^{widths["ra"]}.9f}')
+                    sign = "+" if obs["doppler"] >= 0 else ""
+                    f.write(f'{sign+str(obs["doppler"]):^{widths["dec"]}}')
+                    f.write(f'{obs["sigDelay"]:^{widths["sigRA"]}.4f}')
+                    f.write(f'{obs["sigDoppler"]:^{widths["sigDec"]}.4f}')
+                    f.write(f'{obs["resDelay"]:^+{widths["resRA"]}.7f}')
+                    f.write(f'{obs["resDoppler"]:^+{widths["resDec"]}.7f}')
+                else:
+                    f.write(f'{obs["stn"]:^{widths["stn"]}}')
+                    f.write(f'{obs["ra"]:^{widths["ra"]}}')
+                    sign = "+" if obs["dec"] >= 0 else ""
+                    f.write(f'{sign+str(obs["dec"]):^{widths["dec"]}}')
+                    f.write(f'{obs["sigRA"]:^{widths["sigRA"]}.4f}')
+                    f.write(f'{obs["sigDec"]:^{widths["sigDec"]}.4f}')
+                    f.write(f'{obs["resRA"]:^+{widths["resRA"]}.7f}')
+                    f.write(f'{obs["resDec"]:^+{widths["resDec"]}.7f}')
+                f.write("\n")
+            f.write("\n")
 
-    Returns
-    -------
-    obs_array_optical : array
-        Real and simulated optical observation data for the given body
-    observer_codes_optical : tuple
-        Real and simulated observer locations for each observation in obs_array_optical
-    obs_array_radar : array
-        Real and simulated radar observation data for the given body
-    observer_codes_radar : tuple
-        Real and simulated observer locations for each observation in obs_array_radar
-    """
-    (x_nom, events, target_radius, nongrav_info,
-        de_kernel) = simulated_traj_info
-    (obs_array_optical, observer_codes_optical,
-        obs_array_radar, observer_codes_radar) = real_obs_arrays
-    if add_extra_simulated_obs:
-        (extra_simulated_optical_obs_times, extra_simulated_optical_obs_types,
-            extra_simulated_radar_obs_times,
-            extra_simulated_radar_obs_types) = extra_simulated_obs_info
-    optical_obs_times = obs_array_optical[:,0]
-    radar_obs_times = obs_array_radar[:,0]
-    simulated_optical_obs_idx = np.where(optical_obs_times >= simulated_obs_start_time)[0]
-    simulated_optical_obs_times = tuple(optical_obs_times[simulated_optical_obs_idx])
-    optical_obs_types = ['actual_obs_optical']*(len(optical_obs_times)-
-                                                len(simulated_optical_obs_times))
-    optical_obs_types += ['actual_obs_to_sim_optical']*len(simulated_optical_obs_times)
-    if (add_extra_simulated_obs and extra_simulated_optical_obs_times is not None
-            and extra_simulated_optical_obs_types is not None
-            and len(extra_simulated_optical_obs_times) == len(extra_simulated_optical_obs_types)):
-        num_extra_optical_obs = len(extra_simulated_optical_obs_times)
-        # add extra simulated optical obs times and types
-        simulated_optical_obs_times = simulated_optical_obs_times+extra_simulated_optical_obs_times
-        optical_obs_types += extra_simulated_optical_obs_types
-        # add extra rows to obs_array_optical
-        extra_simulated_optical_obs_array = np.nan*np.ones((num_extra_optical_obs, 6))
-        extra_simulated_optical_obs_array[:,0] = extra_simulated_optical_obs_times
-        obs_array_optical = np.vstack((obs_array_optical, extra_simulated_optical_obs_array))
-        # add indices to simulated_optical_obs_idx
-        simulated_optical_obs_idx = np.hstack((simulated_optical_obs_idx,
-                                                np.arange(len(optical_obs_times),
-                                                len(optical_obs_times)+
-                                                num_extra_optical_obs)))
-        # add extra rows to observer_codes_optical
-        extra_simulated_optical_observer_codes = tuple(['500']*num_extra_optical_obs)
-        observer_codes_optical = observer_codes_optical + extra_simulated_optical_observer_codes
-    # sort optical observations by time
-    sort_idx = np.argsort(obs_array_optical[:,0])
-    obs_array_optical = obs_array_optical[sort_idx]
-    observer_codes_optical = tuple(observer_codes_optical[i] for i in sort_idx)
-    optical_obs_types = tuple(optical_obs_types[i] for i in sort_idx)
-    simulated_optical_obs_idx = [i for i, typ in enumerate(optical_obs_types)
-                                    if typ != 'actual_obs_optical']
-    simulated_radar_obs_idx = np.where(radar_obs_times >= simulated_obs_start_time)[0]
-    simulated_radar_obs_times = tuple(radar_obs_times[simulated_radar_obs_idx])
-    radar_obs_types = ['actual_obs_radar']*(len(radar_obs_times)-len(simulated_radar_obs_times))
-    radar_obs_types += ['actual_obs_to_sim_radar']*len(simulated_radar_obs_times)
-    if (add_extra_simulated_obs and extra_simulated_radar_obs_times is not None
-            and extra_simulated_radar_obs_types is not None
-            and len(extra_simulated_radar_obs_times) == len(extra_simulated_radar_obs_types)):
-        num_extra_radar_obs = len(extra_simulated_radar_obs_times)
-        # add extra simulated radar obs times and types
-        simulated_radar_obs_times = simulated_radar_obs_times + extra_simulated_radar_obs_times
-        radar_obs_types += extra_simulated_radar_obs_types
-        # add extra rows to obs_array_radar
-        extra_simulated_radar_obs_array = np.nan*np.ones((num_extra_radar_obs, 6))
-        extra_simulated_radar_obs_array[:,0] = extra_simulated_radar_obs_times
-        obs_array_radar = np.vstack((obs_array_radar, extra_simulated_radar_obs_array))
-        # add indices to simulated_radar_obs_idx
-        simulated_radar_obs_idx = np.hstack((simulated_radar_obs_idx,
-                                                np.arange(len(radar_obs_times),
-                                                len(radar_obs_times)+
-                                                num_extra_radar_obs)))
-        # add extra rows to observer_codes_radar
-        extra_simulated_radar_observer_codes = []
-        for typ in extra_simulated_radar_obs_types:
-            if typ == 'doppler':
-                extra_simulated_radar_observer_codes.append((('-14','-14'),0,8560e6))
-            else:
-                extra_simulated_radar_observer_codes.append((('-14','-14'),0))
-        extra_simulated_radar_observer_codes = tuple(extra_simulated_radar_observer_codes)
-        observer_codes_radar = observer_codes_radar + extra_simulated_radar_observer_codes
-    # sort radar observations by time
-    sort_idx = np.argsort(obs_array_radar[:,0])
-    obs_array_radar = obs_array_radar[sort_idx]
-    observer_codes_radar = tuple(observer_codes_radar[i] for i in sort_idx)
-    radar_obs_types = tuple(radar_obs_types[i] for i in sort_idx)
-    simulated_radar_obs_idx = [i for i, typ in enumerate(radar_obs_types)
-                                    if typ != 'actual_obs_radar']
-    simulated_obs_ref_sol = x_nom.copy()
-    simulated_obs_ref_sol['mass'] = 0.0
-    simulated_obs_ref_sol['radius'] = target_radius
-    simulated_obs_event = events if events is not None else None
-    modified_obs_arrays = (obs_array_optical, observer_codes_optical,
-                            obs_array_radar, observer_codes_radar)
-    return _generate_simulated_obs(simulated_obs_ref_sol, nongrav_info,
-                                    simulated_obs_event, modified_obs_arrays,
-                                    simulated_optical_obs_idx, optical_obs_types,
-                                    simulated_radar_obs_idx, radar_obs_types,
-                                    de_kernel, noise)
+            iter_summary_str = "Iteration Summary"
+            iter_summary_buff = "-"*int((max_chars-len(iter_summary_str))/2)
+            f.write(f'{iter_summary_buff}{iter_summary_str}{iter_summary_buff}\n')
+            f.write(subsection_full + '\n')
+            for itrn in self.iters[1:]:
+                f.write("Summary of the orbit fit calculations at iteration")
+                f.write(f" {itrn.iter_number} (of {self.n_iter}):\n")
+                f.write(f"RMS unweighted: {itrn.unweighted_rms}\n")
+                f.write(f"RMS weighted: {itrn.weighted_rms}\n")
+                f.write(f"chi-squared: {itrn.chi_squared}\n")
+                f.write(f"reduced chi-squared: {itrn.reduced_chi_squared}\n")
+                f.write(f"square root of reduced chi-squared: {itrn.reduced_chi_squared**0.5}\n\n")
+                f.write(f'{"Variable":<8}{"Initial Value":>20}')
+                f.write(f'{"Uncertainty":>20}{"Fitted Value":>20}')
+                f.write(f'{"Uncertainty":>20}{"Change":>20}{"Change":>8}'+' (\u03C3)\n')
+                init_sol = self.iters[0].x_nom
+                final_sol = itrn.x_nom
+                with np.errstate(divide='ignore'):
+                    for i, key in enumerate(init_sol.keys()):
+                        init_val = init_sol[key]
+                        init_unc = init_variance[i]
+                        final_val = final_sol[key]
+                        final_unc = final_variance[i]
+                        if key in ['om', 'w', 'i']:
+                            init_val *= 180/np.pi
+                            init_unc *= 180/np.pi
+                            final_val *= 180/np.pi
+                            final_unc *= 180/np.pi
+                        f.write(f'{key.upper():<8}{half_tab}')
+                        f.write(f'{init_val:18.11e}{half_tab}')
+                        f.write(f'{init_unc:18.11e}{half_tab}')
+                        f.write(f'{final_val:18.11e}{half_tab}')
+                        f.write(f'{final_unc:18.11e}{half_tab}')
+                        f.write(f'{final_val-init_val:+18.11e}{half_tab}')
+                        f.write(f'{(final_val-init_val)/init_unc:+10.3f}\n')
+                f.write("\n")
+                if itrn.iter_number != self.n_iter:
+                    f.write(subsection_full + '\n')
+
+            f.write(section_full + '\n')
+            f.write(f"{header_section_half} END OF FILE {header_section_half}" + '\n')
+            f.write(section_full + '\n')
+        return None

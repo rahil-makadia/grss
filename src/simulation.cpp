@@ -1132,8 +1132,6 @@ void PropSimulation::preprocess() {
                 }
             }
         }
-        this->interpParams.tStack.push_back(t);
-        this->interpParams.xIntegStack.push_back(xInteg);
         bool backwardProp = this->integParams.t0 > this->integParams.tf;
         if (backwardProp) {
             std::reverse(this->events.begin(), this->events.end());
@@ -1174,8 +1172,6 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
 
     // first prepare for integration and then integrate
     this->integParams.t0 = this->t;
-    this->interpParams.tStack.push_back(this->t);
-    this->interpParams.xIntegStack.push_back(this->xInteg);
     this->set_integration_parameters(tf, tEvalNew, this->tEvalUTC,
                                      this->evalApparentState,
                                      this->convergedLightTime, xObserverNew);
@@ -1206,13 +1202,13 @@ void PropSimulation::save(std::string filename) {
     std::string headerSectionHalf = std::string((int)(maxChars-13)/2, '=');
     std::ofstream file(filename, std::ios::out);
     // print header
-    file << std::string(maxChars, '=') << std::endl;
+    file << sectionFull << std::endl;
     #if defined(GRSS_VERSION)
         file << headerSectionHalf << " GRSS v" << GRSS_VERSION <<" " << headerSectionHalf << std::endl;
     #else
         file << headerSectionHalf << " GRSS vINFTY " << headerSectionHalf << std::endl;
     #endif
-    file << std::string(maxChars, '=') << std::endl;
+    file << sectionFull << std::endl;
 
     time_t now = time(nullptr);
     tm *utc = gmtime(&now);
@@ -1515,8 +1511,8 @@ void PropSimulation::save(std::string filename) {
     }
 
     file << std::endl;
-    file << std::string(maxChars, '=') << std::endl;
+    file << sectionFull << std::endl;
     file << headerSectionHalf << " END OF FILE " << headerSectionHalf << std::endl;
-    file << std::string(maxChars, '=') << std::endl;
+    file << sectionFull << std::endl;
     file.close();
 }

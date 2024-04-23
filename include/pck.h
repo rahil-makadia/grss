@@ -6,7 +6,7 @@
 /**
  * @brief Length of a record in an PCK file.
  */
-#define RECORD_LEN 1024
+#define PCK_RECORD_LEN 1024
 
 /**
  * @brief Structure to hold the data for a single frame in an PCK file.

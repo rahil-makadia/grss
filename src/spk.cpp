@@ -50,7 +50,7 @@ SpkInfo* spk_init(const std::string &path) {
 
     // File is split into records. We read one record at a time.
     union {
-        char buf[RECORD_LEN];
+        char buf[SPK_RECORD_LEN];
         struct {
             double next;    // The record number of the next summary record in the file. Zero if this is the final summary record.
             double prev;    // The record number of the previous summary record in the file. Zero if this is the initial summary record.
@@ -74,7 +74,7 @@ SpkInfo* spk_init(const std::string &path) {
     }
 
     // Read the file record.
-    read(fd, &record, RECORD_LEN);
+    read(fd, &record, SPK_RECORD_LEN);
     // Check if the file is a valid double Precision Array File
     std::string full_file_type = "DAF/SPK";
     if (strncmp(record.file.locidw, full_file_type.c_str(), 7) != 0) {
@@ -96,8 +96,8 @@ SpkInfo* spk_init(const std::string &path) {
 
     // Seek until the first summary record using the file record's fward pointer.
     // Record numbers start from 1 not 0 so we subtract 1 to get to the correct record.
-    lseek(fd, (record.file.fward - 1) * RECORD_LEN, SEEK_SET);
-    read(fd, record.buf, RECORD_LEN);
+    lseek(fd, (record.file.fward - 1) * SPK_RECORD_LEN, SEEK_SET);
+    read(fd, record.buf, SPK_RECORD_LEN);
 
     // We are at the first summary block, validate
     if ((int64_t)record.buf[8] != 0) {
@@ -151,8 +151,8 @@ SpkInfo* spk_init(const std::string &path) {
             break;
         } else {
             // Find and read next record
-            lseek(fd, n * RECORD_LEN, SEEK_SET);
-            read(fd, record.buf, RECORD_LEN);
+            lseek(fd, n * SPK_RECORD_LEN, SEEK_SET);
+            read(fd, record.buf, SPK_RECORD_LEN);
         }
     }
 

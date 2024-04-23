@@ -77,7 +77,7 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
 void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           const real tInterpGeom, std::vector<real> xInterpGeom,
                           std::vector<real> xObserver,
-                          const bool bouncePointAtLeadingEdge, const real &t,
+                          const bool bouncePointAtCenterOfMass, const real &t,
                           const real &dt, real &lightTimeOneBody);
 
 /**
