@@ -606,9 +606,11 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         # t_dev computed in partials_to_ellipse
         t_map_mean = ca_list[0].tMap
     else:
-        t_mean = np.nan
-        t_dev = np.nan
-        t_map_mean = np.nan
+        print("WARNING: No sigma points, analytic info, or enough data",
+                "to reliably compute mean time")
+        t_mean = np.mean(times)
+        t_dev = np.std(times)
+        t_map_mean = np.mean(map_times)
     if impact_any:
         t_mean_str = Time(t_mean, format='mjd', scale='tdb').utc.iso
         t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').utc.iso

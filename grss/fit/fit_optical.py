@@ -487,9 +487,8 @@ def get_packed_prog_id(code):
         raise RuntimeError ("Illegal packed prog ID " + code + " in xml")
     try:
         index = unpack_letters[code[1]]
-        if code[0] == 1:
-            index += 52
-        packed = prog_codes[index]
+        index += 62*unpack_letters[code[0]]
+        packed = prog_codes[index] if index <= 93 else ' '
     except Exception as exc:
         raise RuntimeError ("Illegal packed prog ID " + code + " in xml") from exc
     return packed
@@ -514,8 +513,8 @@ def get_unpacked_prog_id(code):
         index = prog_codes.index(code)
     except Exception as exc:
         raise RuntimeError("Illegal program code " + code) from exc
-    first = '1' if index > 51 else '0'
-    second = pack_letters[index%52]
+    first = '1' if index > 61 else '0'
+    second = pack_letters[index%62]
     return first + second
 
 def apply_station_weight_rules(group, obs_df, cols, verbose):

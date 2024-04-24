@@ -311,6 +311,8 @@ def _reconstruct_impact_params(row):
     impact = libgrss.ImpactParameters()
     impact.t = row['t']
     impact.xRel = row['xRel']
+    impact.tMap = row['tMap']
+    impact.xRelMap = row['xRelMap']
     impact.dist = row['dist']
     impact.vel = row['vel']
     impact.vInf = row['vInf']
