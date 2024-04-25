@@ -128,7 +128,10 @@ def get_scale_factor(body_id):
     units : str
         units of the scale factor
     """
-    if body_id in {1,199,"Mercury Barycenter"}:
+    if body_id in {10,"Sun"}:
+        scale_factor = 696000.0
+        units = r"R$_\odot$"
+    elif body_id in {1,199,"Mercury Barycenter"}:
         scale_factor = 2440.53
         units = "R$_{Mercury}$"
     elif body_id in {2,299,"Venus Barycenter"}:
@@ -137,6 +140,9 @@ def get_scale_factor(body_id):
     elif body_id in {399,"Earth"}:
         scale_factor = 6378.137
         units = r"R$_\oplus$"
+    elif body_id in {301,"Moon"}:
+        scale_factor = 1737.4
+        units = "R$_{Moon}$"
     elif body_id in {4,499,"Mars Barycenter"}:
         scale_factor = 3396.19
         units = "R$_{Mars}$"
