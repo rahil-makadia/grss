@@ -343,6 +343,8 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'sigRA'] = ra_sig
         obs_df.loc[idx, 'sigDec'] = dec_sig
         obs_df.loc[idx, 'sigCorr'] = corr
+        obs_df.loc[idx, 'biasRA'] = 0.0
+        obs_df.loc[idx, 'biasDec'] = 0.0
         obs_df.loc[idx, 'ctr'] = ctr
         obs_df.loc[idx, 'sys'] = sys
         obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']
