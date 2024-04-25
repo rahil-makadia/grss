@@ -8,7 +8,7 @@ from astropy.time import Time
 
 from .. import libgrss
 from ..utils import default_kernel_path, grss_path
-from .fit_utils import get_observer_info
+from .fit_utils import get_observer_info, get_similarity_stats
 
 __all__ = [ 'FitSimulation',
 ]
@@ -1893,18 +1893,16 @@ class FitSimulation:
                 f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
                 if obs['mode'] in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                     f.write(f'{obs["trx"]+"/"+obs["rcv"]:^{widths["stn"]}}')
-                    f.write(f'{obs["delay"]:^{widths["ra"]}.9f}')
-                    sign = "+" if obs["doppler"] >= 0 else ""
-                    f.write(f'{sign+str(obs["doppler"]):^{widths["dec"]}}')
+                    f.write(f'{obs["delay"]:^{widths["ra"]}.13g}')
+                    f.write(f'{obs["doppler"]:^+{widths["dec"]}.12g}')
                     f.write(f'{obs["sigDelay"]:^{widths["sigRA"]}.4f}')
                     f.write(f'{obs["sigDoppler"]:^{widths["sigDec"]}.4f}')
                     f.write(f'{obs["resDelay"]:^+{widths["resRA"]}.7f}')
                     f.write(f'{obs["resDoppler"]:^+{widths["resDec"]}.7f}')
                 else:
                     f.write(f'{obs["stn"]:^{widths["stn"]}}')
-                    f.write(f'{obs["ra"]:^{widths["ra"]}}')
-                    sign = "+" if obs["dec"] >= 0 else ""
-                    f.write(f'{sign+str(obs["dec"]):^{widths["dec"]}}')
+                    f.write(f'{obs["ra"]:^{widths["ra"]}.13g}')
+                    f.write(f'{obs["dec"]:^+{widths["dec"]}.12g}')
                     f.write(f'{obs["sigRA"]:^{widths["sigRA"]}.4f}')
                     f.write(f'{obs["sigDec"]:^{widths["sigDec"]}.4f}')
                     f.write(f'{obs["resRA"]:^+{widths["resRA"]}.7f}')
@@ -1950,6 +1948,21 @@ class FitSimulation:
                 f.write("\n")
                 if itrn.iter_number != self.n_iter:
                     f.write(subsection_full + '\n')
+
+            mean_0 = np.array(list(self.x_init.values()))
+            cov_0 = self.covariance_init
+            mean_f = np.array(list(self.x_nom.values()))
+            cov_f = self.covariance
+            md_f, md_0, b_dist, b_coeff = get_similarity_stats(mean_0, cov_0, mean_f, cov_f)
+            f.write(f'Mahalonobis distance between initial and final solution: {md_f:0.2f}')
+            f.write("\n")
+            f.write(f'Mahalonobis distance between final and initial solution: {md_0:0.2f}')
+            f.write("\n")
+            f.write(f'Bhattacharya distance between initial and final solution: {b_dist:0.4f}')
+            f.write("\n")
+            f.write(f'Bhattacharya coefficient between initial and final solution: {b_coeff:0.4f}')
+            f.write("\n")
+            f.write(subsection_full + '\n')
 
             f.write(section_full + '\n')
             f.write(f"{header_section_half} END OF FILE {header_section_half}" + '\n')
