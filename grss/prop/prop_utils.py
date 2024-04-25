@@ -128,7 +128,10 @@ def get_scale_factor(body_id):
     units : str
         units of the scale factor
     """
-    if body_id in {1,199,"Mercury Barycenter"}:
+    if body_id in {10,"Sun"}:
+        scale_factor = 696000.0
+        units = r"R$_\odot$"
+    elif body_id in {1,199,"Mercury Barycenter"}:
         scale_factor = 2440.53
         units = "R$_{Mercury}$"
     elif body_id in {2,299,"Venus Barycenter"}:
@@ -137,6 +140,9 @@ def get_scale_factor(body_id):
     elif body_id in {399,"Earth"}:
         scale_factor = 6378.137
         units = r"R$_\oplus$"
+    elif body_id in {301,"Moon"}:
+        scale_factor = 1737.4
+        units = "R$_{Moon}$"
     elif body_id in {4,499,"Mars Barycenter"}:
         scale_factor = 3396.19
         units = "R$_{Mars}$"
@@ -606,9 +612,11 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         # t_dev computed in partials_to_ellipse
         t_map_mean = ca_list[0].tMap
     else:
-        t_mean = np.nan
-        t_dev = np.nan
-        t_map_mean = np.nan
+        print("WARNING: No sigma points, analytic info, or enough data",
+                "to reliably compute mean time")
+        t_mean = np.mean(times)
+        t_dev = np.std(times)
+        t_map_mean = np.mean(map_times)
     if impact_any:
         t_mean_str = Time(t_mean, format='mjd', scale='tdb').utc.iso
         t_map_mean = Time(t_map_mean, format='mjd', scale='tdb').utc.iso
