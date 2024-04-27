@@ -1,5 +1,6 @@
 """Optical observation handling for the GRSS orbit determination code"""
 import os
+from io import StringIO
 from astropy.time import Time
 import requests
 from astroquery.gaia import Gaia
@@ -36,7 +37,7 @@ def get_mpc_raw_data(tdes):
         obs_data = response.json()[0]["XML"]
     else:
         print("Error getting MPC XML data: ", response.status_code, response.content)
-    return obs_data
+    return StringIO(obs_data)
 
 def _ades_mode_check(df):
     """
@@ -137,20 +138,23 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     # read in the data and add extra columns if not present
     obs_df = (
         pd.read_xml(obs_data, dtype=ades_column_types)
-        # add columns if they are not present
-        .reindex(columns=ades_column_types.keys(), fill_value=np.nan)
         # compute the obsTimeMJD time from obsTime
         .assign(obsTimeMJD=lambda x:Time(x['obsTime'].to_list(),format='isot',scale='utc').utc.mjd)
     )
+    # add columns if they are not present
+    str_cols = ['trx', 'rcv', 'sys', 'selAst']
+    for col in str_cols:
+        if col not in obs_df:
+            obs_df[col] = str(np.nan)
+    for col in ades_column_types:
+        if col not in obs_df:
+            obs_df[col] = np.nan
     if verbose:
         print(f"Read in {len(obs_df)} observations from the MPC.")
     _ades_mode_check(obs_df)
     _ades_ast_cat_check(obs_df)
     # filter the data based on the time range
     obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
-    # # filter the data based on the observation station
-    # stn_to_remove = ('247', '270') # roving observatories
-    # obs_df.query(f"stn not in {stn_to_remove}", inplace=True)
     # reindex the data frame
     obs_df.reset_index(drop=True, inplace=True)
     # for all indices with OCC mode compute ra and dec as raStar+deltaRA and decStar+deltaDec
