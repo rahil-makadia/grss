@@ -958,7 +958,13 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
                 "for observations during the same night.")
     obs_df = create_optical_obs_df(body_id, optical_obs_file,
                                     t_min_tdb, t_max_tdb, verbose)
-    obs_df = apply_debiasing_scheme(obs_df, debias_lowres, verbose)
+    if debias_lowres is not None:
+        obs_df = apply_debiasing_scheme(obs_df, debias_lowres, verbose)
+    else:
+        print("WARNING: No debiasing scheme applied to the observations.",
+                "Setting biases to zero.")
+        opt_idx = obs_df.query("mode != 'RAD'").index
+        obs_df.loc[opt_idx, ['biasRA', 'biasDec']] = 0.0
     obs_df = apply_weighting_scheme(obs_df, verbose)
     if deweight:
         obs_df = deweight_obs(obs_df, num_obs_per_night, verbose)

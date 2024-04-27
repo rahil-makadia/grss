@@ -1,6 +1,27 @@
 #include "approach.h"
 
 /**
+ * @brief Get the atmosphere thickness offset for the central body.
+ * 
+ * @param[in] centralBodySpiceId SPICE ID of the central body.
+ * @return atm_offset Offset for the atmosphere of the central body.
+ */
+static real get_atm_offset(const int &centralBodySpiceId){
+    real atm_offset = 0;
+    real au2km = 149597870.7;
+    switch (centralBodySpiceId)
+    {
+    case 399:
+        atm_offset = 100.0/au2km;
+        break;
+    default:
+        atm_offset = 0;
+        break;
+    }
+    return atm_offset;
+}
+
+/**
  * @param[inout] propSim PropSimulation object for the integration.
  * @param[in] tOld Time at the previous integrator epoch.
  * @param[in] xIntegOld State at the previous integrator epoch.
@@ -17,14 +38,16 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
     const bool forwardProp = propSim->integParams.t0 < propSim->integParams.tf;
     const bool backwardProp = propSim->integParams.t0 > propSim->integParams.tf;
     size_t starti = 0;
-    real relPosOld[3], relPos[3], relVelOld[3], relVel[3];
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+        if (!propSim->integBodies[i].logCA) {
+            continue;
+        }
         const real flybyBodyRadius = propSim->integBodies[i].radius;
         real centralBodyRadius, caTol;
         size_t startj = 0;
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
             if (i != j) {
-                real relDistOld, relDist;
+                real relPosOld[3], relPos[3], relVelOld[3], relVel[3];
                 if (j < propSim->integParams.nInteg) {
                     centralBodyRadius = propSim->integBodies[j].radius;
                     caTol = propSim->integBodies[j].caTol;
@@ -36,10 +59,8 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     }
                 } else {
                     SpiceBody bodyj = propSim->spiceBodies[j - propSim->integParams.nInteg];
-                    centralBodyRadius = bodyj.radius;
+                    centralBodyRadius = bodyj.radius + get_atm_offset(bodyj.spiceId);
                     caTol = bodyj.caTol;
-                    const real atm_offset = 100.0e3/propSim->consts.du2m;
-                    centralBodyRadius += atm_offset;
                     double xSpice[9], xSpiceOld[9];
                     get_spk_state(bodyj.spiceId, t, propSim->spkEphem, xSpice);
                     get_spk_state(bodyj.spiceId, tOld, propSim->spkEphem, xSpiceOld);
@@ -50,54 +71,47 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                         relVel[k] = xInteg[starti + 3 + k] - xSpice[3 + k];
                     }
                 }
-                relDistOld = sqrt(relPosOld[0] * relPosOld[0] +
-                                  relPosOld[1] * relPosOld[1] +
-                                  relPosOld[2] * relPosOld[2]);
-                relDist = sqrt(relPos[0] * relPos[0] + relPos[1] * relPos[1] +
-                               relPos[2] * relPos[2]);
-                // check impacts with spiceBodies first
-                if (j > propSim->integParams.nInteg &&
-                    relDist <= flybyBodyRadius + centralBodyRadius &&
-                    relDistOld > flybyBodyRadius + centralBodyRadius) {
-                    ImpactParameters impact;
-                    get_ca_or_impact_time(propSim, i, j, tOld, t, impact.t, impact_r_calc);
-                    impact.xRel = get_rel_state(propSim, i, j, impact.t);
-                    impact.flybyBodyIdx = i;
-                    impact.centralBodyIdx = j;
-                    impact.get_ca_parameters(propSim, impact.t);
-                    impact.get_impact_parameters(propSim);
-                    impact.impact = true;
-                    propSim->impactParams.push_back(impact);
-                    // std::cout << "Impact detected at MJD " << impact.t
-                    //             << " TDB. " << impact.flybyBody
-                    //             << " collided with " << impact.centralBody
-                    //             << "!" << std::endl;
-                }
+                const real relDistOld = sqrt(relPosOld[0] * relPosOld[0] +
+                                             relPosOld[1] * relPosOld[1] +
+                                             relPosOld[2] * relPosOld[2]);
+                const real relDist =
+                    sqrt(relPos[0] * relPos[0] + relPos[1] * relPos[1] +
+                         relPos[2] * relPos[2]);
                 // check close approach
-                real radialVel, radialVelOld;
-                radialVelOld =
+                const real radialVelOld =
                     (relPosOld[0] * relVelOld[0] + relPosOld[1] * relVelOld[1] +
                      relPosOld[2] * relVelOld[2]) /
                     relDistOld;
-                radialVel = (relPos[0] * relVel[0] + relPos[1] * relVel[1] +
-                             relPos[2] * relVel[2]) /
+                const real radialVel =
+                    (relPos[0] * relVel[0] + relPos[1] * relVel[1] +
+                     relPos[2] * relVel[2]) /
                     relDist;
                 const bool relDistMinimum = (forwardProp && radialVelOld < 0.0 && radialVel >= 0.0) ||
                                             (backwardProp && radialVelOld > 0.0 && radialVel <= 0.0);
-                if (j < propSim->integParams.nInteg) {
-                    caTol = propSim->integBodies[j].caTol;
-                } else {
-                    caTol = propSim->spiceBodies[j - propSim->integParams.nInteg].caTol;
-                }
                 const bool relDistWithinTol = relDist <= caTol || relDistOld <= caTol;
                 if (relDistMinimum && relDistWithinTol) {
                     CloseApproachParameters ca;
                     get_ca_or_impact_time(propSim, i, j, tOld, t, ca.t, ca_rdot_calc);
                     ca.xRel = get_rel_state(propSim, i, j, ca.t);
+                    ca.tCA = ca.t;
+                    ca.xRelCA = ca.xRel;
                     ca.flybyBodyIdx = i;
                     ca.centralBodyIdx = j;
                     ca.get_ca_parameters(propSim, ca.t);
                     propSim->caParams.push_back(ca);
+                    if (ca.impact){
+                        ImpactParameters impact;
+                        get_ca_or_impact_time(propSim, i, j, tOld-1, ca.t, impact.t, impact_r_calc);
+                        impact.xRel = get_rel_state(propSim, i, j, impact.t);
+                        impact.tCA = ca.t;
+                        impact.xRelCA = ca.xRel;
+                        impact.flybyBodyIdx = i;
+                        impact.centralBodyIdx = j;
+                        impact.get_ca_parameters(propSim, impact.t);
+                        impact.get_impact_parameters(propSim);
+                        propSim->impactParams.push_back(impact);
+                        propSim->integBodies[i].logCA = false;
+                    }
                 }
             }
             if (j < propSim->integParams.nInteg) {
@@ -145,9 +159,8 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
     if (j < propSim->integParams.nInteg) {
         centralBodyRadius = propSim->integBodies[j].radius;
     } else {
-        centralBodyRadius = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
-        const real atm_offset = 100.0e3/propSim->consts.du2m;
-        centralBodyRadius += atm_offset;
+        const SpiceBody bodyj = propSim->spiceBodies[j - propSim->integParams.nInteg];
+        centralBodyRadius = bodyj.radius + get_atm_offset(bodyj.spiceId);
     }
     r = relDist - flybyBodyRadius - centralBodyRadius;
 }
@@ -207,6 +220,11 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
                                              real &)) {
     // Brent's method for root finding, from Numerical Recipes in C/C++, 3rd
     // edition, p. 454
+    // make sure x1 and x2 are not nan
+    if (std::isnan(x1) || std::isnan(x2)) {
+        std::cout << "x1: " << x1 << " x2: " << x2 << std::endl;
+        throw std::runtime_error("get_ca_or_impact_time: One of the interval points is nan.");
+    }
     const real tol = 1.0e-6 / 86400.0;  // 1 microsecond
     const size_t maxIter = 100;
     const real eps = std::numeric_limits<real>::epsilon();
@@ -221,7 +239,7 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
     zero_func(propSim, i, j, b, fb);
     if ((fa > 0.0 && fb > 0.0) || (fa < 0.0 && fb < 0.0)) {
         std::cout << "t1: " << x1 << " t2: " << x2 << " f1: " << fa << " f2: " << fb << std::endl;
-        throw std::runtime_error("Root must be bracketed in get_ca_or_impact_time");
+        throw std::runtime_error("get_ca_or_impact_time: Root must be bracketed.");
     }
     fc = fb;
     size_t iter;
@@ -283,7 +301,8 @@ void get_ca_or_impact_time(PropSimulation *propSim, const size_t &i,
         zero_func(propSim, i, j, b, fb);
     }
     std::cout << "WARNING: Maximum number of iterations exceeded in "
-                 "get_ca_or_impact_time!!! Impact/CA time may not be accurate.";
+                 "get_ca_or_impact_time!!! Impact/CA time may not be accurate."
+                << std::endl;
 }
 
 /**
@@ -312,6 +331,7 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         mu = propSim->spiceBodies[j - propSim->integParams.nInteg].mass *
             propSim->consts.G;
         radius = propSim->spiceBodies[j - propSim->integParams.nInteg].radius;
+        radius += get_atm_offset(this->centralBodySpiceId);
     }
     // calculate B-plane parameters (Kizner B.R, B.T formulation)
     const real r = sqrt(xRelMap[0] * xRelMap[0] + xRelMap[1] * xRelMap[1] +
@@ -348,14 +368,13 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     for (size_t k = 0; k < 3; k++) {
         sHat[k] = fac1 * pHat[k] + fac1 * fac2 * qHat[k];
     }
-    real sHatCrossHVec[3], bVec[3], b;
+    real sHatCrossHVec[3], bVec[3];
     vcross(sHat, hVec, sHatCrossHVec);
     for (size_t k = 0; k < 3; k++) {
         bVec[k] = sHatCrossHVec[k] / vInf;
         this->bVec[k] = bVec[k];
     }
-    vnorm(bVec, 3, b);
-    this->bMag = b;
+    vnorm(bVec, 3, this->bMag);
     real vVec[3];
     vVec[0] = 0;
     vVec[1] = 0;
@@ -368,7 +387,14 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     vdot(bVec, tHat, 3, this->kizner.y);
     vdot(bVec, sHat, 3, this->kizner.z);
     this->gravFocusFactor = sqrt(1.0 + 2 * mu / radius / vInf / vInf);
-    this->impact = b <= radius * this->gravFocusFactor;
+    this->impact = this->bMag <= radius * this->gravFocusFactor;
+    // if vInf is nan, compute distance at CA and check for impact
+    if (std::isnan(vInf)) {
+        const real distCA = sqrt(this->xRelCA[0] * this->xRelCA[0] +
+                                 this->xRelCA[1] * this->xRelCA[1] +
+                                 this->xRelCA[2] * this->xRelCA[2]);
+        this->impact = distCA <= radius;
+    }
     this->scaled.x = this->kizner.x / this->gravFocusFactor;
     this->scaled.y = this->kizner.y / this->gravFocusFactor;
     this->scaled.z = this->kizner.z / this->gravFocusFactor;
@@ -377,7 +403,7 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     const real sinhF = vInf*posDotVel/mu/e;
     const real F = asinh(sinhF); // or F = -log(2*r/a/e);
     const real n = sqrt(-mu / a / a / a);
-    this->tPeri = tMap + (F - e*sinhF)/n;
+    this->tPeri = tMap - (e*sinhF - F)/n;
     this->tLin = this->tPeri - log(e) / n;
     // calculate B-plane parameters (Öpik xi, zeta formulation)
     double xCentralBody[9];
@@ -399,12 +425,12 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     vdot(bVec, zetaHat, 3, this->opik.y);
     vdot(bVec, sHat, 3, this->opik.z);
     real posCA[3], velCA[3];
-    posCA[0] = this->xRel[0];
-    posCA[1] = this->xRel[1];
-    posCA[2] = this->xRel[2];
-    velCA[0] = this->xRel[3];
-    velCA[1] = this->xRel[4];
-    velCA[2] = this->xRel[5];
+    posCA[0] = this->xRelCA[0];
+    posCA[1] = this->xRelCA[1];
+    posCA[2] = this->xRelCA[2];
+    velCA[0] = this->xRelCA[3];
+    velCA[1] = this->xRelCA[4];
+    velCA[2] = this->xRelCA[5];
     real eHatX[3], eHatY[3], eHatZ[3], vVecCrosseHatZ[3];
     vunit(velCA, 3, eHatZ);
     vcross(vVec, eHatZ, vVecCrosseHatZ);
@@ -414,7 +440,7 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     vdot(posCA, eHatY, 3, this->mtp.y);
     vdot(posCA, eHatZ, 3, this->mtp.z);
 
-    if (tMap == this->t && propSim->integBodies[i].propStm == true){
+    if (tMap == this->tCA && propSim->integBodies[i].propStm == true){
         real **partial_r_vec = new real*[6];
         real **partial_v_vec = new real*[6];
         for (size_t k = 0; k < 6; k++) {
