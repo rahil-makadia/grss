@@ -712,7 +712,8 @@ class FitSimulation:
             None
         """
         self.obs = obs_df
-        self.obs['selAst'] = self.obs['selAst'].fillna('A')
+        sel_ast_map = {'': 'A', ' ': 'A', np.nan: 'A', 'nan': 'A'}
+        self.obs['selAst'] = self.obs['selAst'].replace(sel_ast_map)
         if self.simulated_obs is not None:
             self._add_simulated_obs()
         self.obs.sort_values(by='obsTimeMJD', inplace=True, ignore_index=True)
