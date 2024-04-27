@@ -545,8 +545,13 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
     mtp_y = np.array([approach.mtp.y*au2units for approach in ca_list])
     mtp_nan = np.any(np.isnan(mtp_x)) or np.any(np.isnan(mtp_y))
     focus_factor = np.nanmean([approach.gravFocusFactor for approach in ca_list])
-    impact_bool = np.array([approach.impact for approach in ca_list])
-    impact_any = np.any(impact_bool)
+    try:
+        lon = np.array([approach.lon for approach in ca_list])
+        lat = np.array([approach.lat for approach in ca_list])
+    except AttributeError:
+        lon = None
+        lat = None
+    impact_any = lon is not None and lat is not None
     if len(ca_list) >= 100 or sigma_points is not None:
         if not kizner_nan:
             kizner_data = data_to_ellipse(kizner_x, kizner_y, n_std, 'kizner',

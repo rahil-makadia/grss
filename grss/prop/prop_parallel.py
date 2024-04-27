@@ -364,6 +364,7 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
         A tuple of close approach clusters (each cluster is a list of
         close approaches).
     """
+    start_time = time.time()
     all_clusters = []
     full_list = [ca_or_impact for ca_or_impact in full_list
                     if ca_or_impact.centralBodySpiceId == central_body]
@@ -387,4 +388,9 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
             cluster.append(full_list[idx])
             cluster_bodies.append(bodies[idx])
     all_clusters.append(cluster)
+    end_time = time.time()
+    duration = end_time - start_time
+    mm = int(duration / 60)
+    ss = duration % 60
+    print(f'Clustering took {mm:02d} minute(s) and {ss:.6f} seconds')
     return tuple(all_clusters)

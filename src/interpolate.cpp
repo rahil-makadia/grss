@@ -107,7 +107,7 @@ std::vector<real> PropSimulation::interpolate(const real t) {
         if (t+this->tEvalMargin < this->integParams.t0 || t-this->tEvalMargin > this->integParams.tf) {
             throw std::runtime_error("The interpolation time is outside the integration time window");
         }
-        while (idx < this->interpParams.tStack.size()-1 &&
+        while (idx < this->interpParams.bStack.size()-1 &&
                this->interpParams.tStack[idx+1] < t) {
             idx++;
         }
@@ -115,7 +115,7 @@ std::vector<real> PropSimulation::interpolate(const real t) {
         if (t-this->tEvalMargin > this->integParams.t0 || t+this->tEvalMargin < this->integParams.tf) {
             throw std::runtime_error("The interpolation time is outside the integration time window");
         }
-        while (idx < this->interpParams.tStack.size()-1 &&
+        while (idx < this->interpParams.bStack.size()-1 &&
                this->interpParams.tStack[idx+1] > t) {
             idx++;
         }

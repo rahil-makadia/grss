@@ -174,6 +174,7 @@ struct NongravParameters {
  * @brief Class for integrated bodies in a PropSimulation.
  * 
  * @param spiceId SPICE ID of the body.
+ * @param logCA Flag to indicate if close approaches are logged (default: true).
  * @param isCometary Flag to indicate if the body is initialized with a cometary state (as opposed to Cartesian state).
  * @param initState Initial state of the body.
  * @param isInteg Flag to indicate if the body is integrated.
@@ -188,6 +189,7 @@ class IntegBody : public Body {
    private:
    public:
     int spiceId = -99999;
+    bool logCA = true;
     bool isCometary = false;
     std::vector<real> initState;
     std::vector<real> initCart;
@@ -272,8 +274,10 @@ struct BPlaneParameters {
 /**
  * @brief Class for close approach parameters in a PropSimulation.
  * 
- * @param t Time of the close approach.
- * @param xRel Relative state at the close approach.
+ * @param t Time of the close approach or impact (from child class).
+ * @param xRel Relative state at the close approach or impact (from child class).
+ * @param tCA Time of the close approach.
+ * @param xRelCA Relative state at the close approach.
  * @param tMap Time of the B-plane map.
  * @param xRelMap Relative state at the B-plane map time.
  * @param dist Distance at the close approach.
@@ -302,6 +306,8 @@ class CloseApproachParameters {
    public:
     real t;
     std::vector<real> xRel;
+    real tCA;
+    std::vector<real> xRelCA;
     real tMap;
     std::vector<real> xRelMap;
     real dist;
@@ -513,7 +519,7 @@ class PropSimulation {
         std::vector<std::vector<real>> observerInfo =
             std::vector<std::vector<real>>(),
         bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 21.0L,
-        real dtMin = 5.0e-3L, real dtChangeFactor = 0.25L,
+        real dtMin = 1.0e-4L, real dtChangeFactor = 0.25L,
         real tolInteg = 1.0e-11L, real tolPC = 1.0e-16L);
     /**
      * @brief Get the constants used in the simulation.
