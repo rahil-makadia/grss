@@ -5,6 +5,7 @@ on:
       - main
       - dev
     paths:
+      - '.github/workflows/cpp_tests.yml'
       - 'include/**'
       - 'src/**'
       - 'tests/cpp/**'

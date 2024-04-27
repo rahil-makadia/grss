@@ -5,6 +5,7 @@ on:
       - main
       - dev
     paths:
+      - '.github/workflows/joss.yml'
       - 'joss/**'
 
 jobs:
