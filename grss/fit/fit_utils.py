@@ -475,7 +475,13 @@ def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
     det_2 = np.linalg.det(cov_2)
     det_big = np.linalg.det(big_cov)
     term_1 = 1/8 * (sol_1-sol_2) @ big_cov @ (sol_1-sol_2).T
-    term_2 = 1/2 * np.log(det_big/np.sqrt(det_1*det_2))
+    # simplify the natural log in term_2 because sometimes the determinant
+    # is too small and the product of the two determinants is beyond the lower
+    # limit of the float64 type
+    # term_2 = 1/2 * np.log(det_big/np.sqrt(det_1*det_2))
+    # term_2 = 1/2 * (np.log(det_big) - np.log(np.sqrt(det_1*det_2)))
+    # term_2 = 1/2 * (np.log(det_big) - 1/2 * np.log(det_1*det_2))
+    term_2 = 1/2 * np.log(det_big) - 1/4 * (np.log(det_1) + np.log(det_2))
     bhattacharya = term_1 + term_2
     bhatt_coeff = np.exp(-bhattacharya)
     return maha_dist_1, maha_dist_2, bhattacharya, bhatt_coeff

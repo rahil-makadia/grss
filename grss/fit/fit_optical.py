@@ -141,6 +141,8 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
         # compute the obsTimeMJD time from obsTime
         .assign(obsTimeMJD=lambda x:Time(x['obsTime'].to_list(),format='isot',scale='utc').utc.mjd)
     )
+    # drop rows with deprecated discovery observations
+    obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
     # add columns if they are not present
     str_cols = ['trx', 'rcv', 'sys', 'selAst']
     for col in str_cols:
@@ -149,6 +151,8 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     for col in ades_column_types:
         if col not in obs_df:
             obs_df[col] = np.nan
+    # remove any columns that are not in ades_column_types
+    obs_df = obs_df[ades_column_types.keys()]
     if verbose:
         print(f"Read in {len(obs_df)} observations from the MPC.")
     _ades_mode_check(obs_df)
