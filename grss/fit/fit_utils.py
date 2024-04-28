@@ -427,6 +427,17 @@ def get_sbdb_info(tdes):
             nongrav_params[nongrav_key_map[key]] = nongrav_default_dict[key]
         if key in cov_keys:
             elements[nongrav_key_map[key]] = nongrav_data_dict[key]
+    abs_mag = 0
+    albedo = 0.125
+    for par in raw_data['phys_par']:
+        if par['name'] == 'H':
+            abs_mag = float(par['value'])
+        if par['name'] == 'albedo':
+            albedo = float(par['value'])
+    body_radius = 1329*10**(-0.2*abs_mag)/(2*albedo**0.5)*1e3
+    if abs_mag == 0:
+        body_radius = 0
+    nongrav_params['radius'] = body_radius
     return [elements, cov_mat, nongrav_params]
 
 def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
