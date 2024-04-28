@@ -96,25 +96,18 @@ void get_observer_state(const real &tObsMjd,
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
-    real bodyFixedX = rho * cos(lat) * cos(lon) / 1.0e3L;
-    real bodyFixedY = rho * cos(lat) * sin(lon) / 1.0e3L;
-    real bodyFixedZ = rho * sin(lat) / 1.0e3L;
+    real bodyFixedX = rho * cos(lat) * cos(lon) / propSim->consts.du2m;
+    real bodyFixedY = rho * cos(lat) * sin(lon) / propSim->consts.du2m;
+    real bodyFixedZ = rho * sin(lat) / propSim->consts.du2m;
     std::vector<real> bodyFixedState = {bodyFixedX, bodyFixedY, bodyFixedZ,
                                             0.0,        0.0,        0.0};
-    std::vector<real> observerStateInertial(6);
-    mat_vec_mul(rotMat, bodyFixedState, observerStateInertial);
-    observerStateInertial[0] *= 1.0e3L / propSim->consts.du2m;
-    observerStateInertial[1] *= 1.0e3L / propSim->consts.du2m;
-    observerStateInertial[2] *= 1.0e3L / propSim->consts.du2m;
-    observerStateInertial[3] *= 1.0e3L / propSim->consts.duptu2mps;
-    observerStateInertial[4] *= 1.0e3L / propSim->consts.duptu2mps;
-    observerStateInertial[5] *= 1.0e3L / propSim->consts.duptu2mps;
-    observerState[0] = baseBodyState[0] + observerStateInertial[0];
-    observerState[1] = baseBodyState[1] + observerStateInertial[1];
-    observerState[2] = baseBodyState[2] + observerStateInertial[2];
-    observerState[3] = baseBodyState[3] + observerStateInertial[3];
-    observerState[4] = baseBodyState[4] + observerStateInertial[4];
-    observerState[5] = baseBodyState[5] + observerStateInertial[5];
+    mat_vec_mul(rotMat, bodyFixedState, observerState);
+    observerState[0] += baseBodyState[0];
+    observerState[1] += baseBodyState[1];
+    observerState[2] += baseBodyState[2];
+    observerState[3] += baseBodyState[3];
+    observerState[4] += baseBodyState[4];
+    observerState[5] += baseBodyState[5];
 }
 
 /** 

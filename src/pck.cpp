@@ -679,7 +679,8 @@ void euler313_to_rotMat(const real euler[6], real *rotMat, real *rotMatDot){
     for (int i = 0; i < 3; i++){
         domega[i] = 0.0;
         for (int j = 0; j < 3; j++){
-            domega[i] += solutn[i][j] * euler[j+3];
+            // domega is in per second, convert to per day
+            domega[i] += solutn[i][j] * euler[j+3] * 86400.0;
         }
     }
     real rotDotTimesRotTranspose[3][3] = {
