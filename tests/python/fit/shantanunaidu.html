@@ -509,7 +509,6 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
 </div>
@@ -519,7 +518,7 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;11468&#39;</span>
 <span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">nongrav_info</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_sbdb_info</span><span class="p">(</span><span class="n">body_id</span><span class="p">)</span>
-<span class="n">body_radius</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">body_radius</span> <span class="o">=</span> <span class="n">nongrav_info</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
 <span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">441</span>
 </pre></div>
 </div>
@@ -589,12 +588,12 @@ Applying sqrt(N/4) deweighting scheme.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.452                   0.511                   903.490                         0.261
-2                        0.452                   0.509                   897.383                         0.259
-3                        0.452                   0.509                   897.383                         0.259
+1                        0.452                   0.511                   903.491                         0.261
+2                        0.452                   0.509                   897.382                         0.259
+3                        0.452                   0.509                   897.382                         0.259
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.414                   0.483                   809.782                         0.235
-5                        0.414                   0.483                   809.760                         0.235
+4                        0.414                   0.483                   809.781                         0.235
+5                        0.414                   0.483                   809.759                         0.235
 Converged after rejecting outliers. Rejected 5 out of 1733 optical observations.
 </pre></div></div>
 </div>
@@ -613,22 +612,22 @@ Converged after rejecting outliers. Rejected 5 out of 1733 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.4137564360110658
-RMS weighted: 0.4833523156410466
-chi-squared: 809.7597119492584
-reduced chi-squared: 0.2347129599852923
-square root of reduced chi-squared: 0.4844718361115456
+RMS unweighted: 0.41375604584436365
+RMS weighted: 0.4833521441842396
+chi-squared: 809.759137466482
+reduced chi-squared: 0.2347127934685455
+square root of reduced chi-squared: 0.48447166425761734
 --------------------------------------------------------------
 Solution Time: MJD 57630.000 TDB = 2016-08-30 00:00:00.000 TDB
 Solution Observation Arc: 15746.60 days (43.11 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.66668735292e-01               2.26411771512e-09               1.66668698515e-01               3.10404775848e-08               -3.67768838994e-08              -16.243
-q                       2.56499149688e+00               2.93037414574e-09               2.56499160226e+00               9.71550286626e-08               +1.05378074267e-07              +35.961
-tp                      5.75112709974e+04               4.23197432606e-06               5.75112710102e+04               4.66114157030e-05               +1.28302708617e-05              +3.032
-om                      2.06374342935e+02               6.73526438176e-06               2.06374243394e+02               2.17638501989e-04               -9.95401110231e-05              -14.779
-w                       1.54003747199e+02               6.80726108007e-06               1.54003846864e+02               2.17822530930e-04               +9.96646898557e-05              +14.641
-i                       7.88927857038e-01               8.48528064961e-08               7.88933281682e-01               3.46526035553e-06               +5.42464452136e-06              +63.930
+e                       1.66668735292e-01               2.26411771512e-09               1.66668698515e-01               3.10404728834e-08               -3.67773176913e-08              -16.244
+q                       2.56499149688e+00               2.93037414574e-09               2.56499160226e+00               9.71550152850e-08               +1.05374469594e-07              +35.959
+tp                      5.75112709974e+04               4.23197432606e-06               5.75112710102e+04               4.66114823008e-05               +1.28371320898e-05              +3.033
+om                      2.06374342935e+02               6.73526438176e-06               2.06374243392e+02               2.17638040849e-04               -9.95429144268e-05              -14.779
+w                       1.54003747199e+02               6.80726108007e-06               1.54003846868e+02               2.17821816325e-04               +9.96681288825e-05              +14.641
+i                       7.88927857038e-01               8.48528064961e-08               7.88933281729e-01               3.46526105205e-06               +5.42469121123e-06              +63.931
 
 </pre></div></div>
 </div>
@@ -691,7 +690,7 @@ i                       7.88927857038e-01               8.48528064961e-08       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 87.84
+Mahalonobis distance between JPL and GRSS solution: 87.85
 Mahalonobis distance between GRSS and JPL solution: 2.38
 Bhattacharya distance between JPL and GRSS solution: 6.8480
 Bhattacharya coefficient between JPL and GRSS solution: 0.0011

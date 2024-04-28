@@ -509,7 +509,6 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
 </div>
@@ -519,7 +518,7 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;12104&#39;</span>
 <span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">nongrav_info</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_sbdb_info</span><span class="p">(</span><span class="n">body_id</span><span class="p">)</span>
-<span class="n">body_radius</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">body_radius</span> <span class="o">=</span> <span class="n">nongrav_info</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
 <span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">441</span>
 </pre></div>
 </div>
@@ -550,17 +549,17 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Read in 5319 observations from the MPC.
+Read in 5327 observations from the MPC.
         WARNING: At least one unknown observation mode in the data.
         WARNING: At least one deprecated star catalog in the data.
-        Filtered to 5319 observations that satisfy the time range and accepted observatory constraints.
+        Filtered to 5327 observations that satisfy the time range and accepted observatory constraints.
 Applying Eggl et al. (2020) debiasing scheme to the observations.
         Unknown star catalog: UNK
-        No debiasing needed for 4008 observations.
+        No debiasing needed for 4016 observations.
         Debiased 1289 observations.
         No bias information for 22 observations.
 Applying Vereš et al. (2017) weighting scheme to the observations.
-        Using 3165 CCD observations with station-specific weight rules.
+        Using 3169 CCD observations with station-specific weight rules.
 Applying sqrt(N/4) deweighting scheme.
         Deweighted 2618 observations.
 </pre></div></div>
@@ -588,14 +587,14 @@ Applying sqrt(N/4) deweighting scheme.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.788                   0.468                   2334.438                        0.220
-2                        0.784                   0.467                   2315.867                        0.218
-3                        0.784                   0.467                   2315.867                        0.218
+1                        0.788                   0.468                   2335.633                        0.219
+2                        0.783                   0.466                   2317.224                        0.218
+3                        0.783                   0.466                   2317.224                        0.218
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.748                   0.423                   1901.855                        0.180
-5                        0.748                   0.423                   1901.395                        0.180
-6                        0.748                   0.423                   1901.395                        0.180
-Converged after rejecting outliers. Rejected 28 out of 5319 optical observations.
+4                        0.748                   0.423                   1903.205                        0.180
+5                        0.748                   0.423                   1902.745                        0.180
+6                        0.748                   0.423                   1902.745                        0.180
+Converged after rejecting outliers. Rejected 28 out of 5327 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -613,22 +612,22 @@ Converged after rejecting outliers. Rejected 28 out of 5319 optical observations
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 6 (of 6):
 ==============================================================
-RMS unweighted: 0.7481667735697954
-RMS weighted: 0.42277192297930816
-chi-squared: 1901.394619668658
-reduced chi-squared: 0.1797839088188973
-square root of reduced chi-squared: 0.42400932633480753
+RMS unweighted: 0.7477080362515084
+RMS weighted: 0.4226043341679304
+chi-squared: 1902.7449853856226
+reduced chi-squared: 0.1796398211277967
+square root of reduced chi-squared: 0.4238393812846993
 --------------------------------------------------------------
 Solution Time: MJD 57961.000 TDB = 2017-07-27 00:00:00.000 TDB
-Solution Observation Arc: 17583.93 days (48.14 years)
+Solution Observation Arc: 17590.37 days (48.16 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.43913904678e-02               7.35286146464e-10               2.43913859584e-02               2.80490108289e-08               -4.50941458827e-09              -6.133
-q                       2.93690461742e+00               3.42303981575e-09               2.93690463284e+00               8.63757056101e-08               +1.54155999077e-08              +4.503
-tp                      5.87282599431e+04               6.77315762978e-06               5.87282596506e+04               3.47479276756e-04               -2.92481527140e-04              -43.182
-om                      7.80633002818e+01               1.26172827208e-07               7.80632701064e+01               1.56290802237e-05               -3.01754227365e-05              -239.159
-w                       1.83042107662e+02               1.34053726889e-06               1.83042076972e+02               6.70580987462e-05               -3.06899059126e-05              -22.894
-i                       1.11525115179e+01               2.98481831671e-08               1.11525047668e+01               3.17305323488e-06               -6.75116805127e-06              -226.184
+e                       2.43913904678e-02               7.35286146464e-10               2.43913859494e-02               2.80414737495e-08               -4.51844577726e-09              -6.145
+q                       2.93690461742e+00               3.42303981575e-09               2.93690463284e+00               8.63619761811e-08               +1.54216976966e-08              +4.505
+tp                      5.87282599431e+04               6.77315762978e-06               5.87282596495e+04               3.47147996919e-04               -2.93640943710e-04              -43.354
+om                      7.80633002818e+01               1.26172827208e-07               7.80632704210e+01               1.56196030566e-05               -2.98608339335e-05              -236.666
+w                       1.83042107662e+02               1.34053726889e-06               1.83042076453e+02               6.69989013506e-05               -3.12088978376e-05              -23.281
+i                       1.11525115179e+01               2.98481831671e-08               1.11525048164e+01               3.17193108365e-06               -6.70158082983e-06              -224.522
 
 </pre></div></div>
 </div>
@@ -691,9 +690,9 @@ i                       1.11525115179e+01               2.98481831671e-08       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 387.04
-Mahalonobis distance between GRSS and JPL solution: 4.09
-Bhattacharya distance between JPL and GRSS solution: 9.8648
+Mahalonobis distance between JPL and GRSS solution: 384.05
+Mahalonobis distance between GRSS and JPL solution: 4.07
+Bhattacharya distance between JPL and GRSS solution: 9.8626
 Bhattacharya coefficient between JPL and GRSS solution: 0.0001
 </pre></div></div>
 </div>

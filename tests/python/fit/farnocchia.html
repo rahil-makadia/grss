@@ -509,7 +509,6 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
 </div>
@@ -519,7 +518,7 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;84100&#39;</span>
 <span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">nongrav_info</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_sbdb_info</span><span class="p">(</span><span class="n">body_id</span><span class="p">)</span>
-<span class="n">body_radius</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">body_radius</span> <span class="o">=</span> <span class="n">nongrav_info</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
 <span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">441</span>
 </pre></div>
 </div>
@@ -611,22 +610,22 @@ Converged after rejecting outliers. Rejected 3 out of 943 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.40439104525229463
-RMS weighted: 0.4995528619447612
-chi-squared: 470.6570747004012
-reduced chi-squared: 0.2511510537355396
-square root of reduced chi-squared: 0.5011497318522076
+RMS unweighted: 0.40439104667967135
+RMS weighted: 0.49955286426108997
+chi-squared: 470.65707906509175
+reduced chi-squared: 0.25115105606461674
+square root of reduced chi-squared: 0.5011497341759414
 --------------------------------------------------------------
 Solution Time: MJD 58042.000 TDB = 2017-10-16 00:00:00.000 TDB
 Solution Observation Arc: 10342.85 days (28.32 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02839420821e-01               1.41072497409e-09               2.02839395940e-01               3.51124429693e-08               -2.48811404535e-08              -17.637
-q                       2.17602309556e+00               5.02213641990e-09               2.17602316556e+00               9.42358286126e-08               +7.00035087675e-08              +13.939
-tp                      5.74182713236e+04               7.41859215578e-06               5.74182713063e+04               3.56858358677e-05               -1.73063526745e-05              -2.333
-om                      1.52357305306e+02               1.14596100392e-06               1.52357325384e+02               3.59574908009e-05               +2.00777197676e-05              +17.520
-w                       2.08338776381e+02               2.36706895048e-06               2.08338748739e+02               3.68268085680e-05               -2.76427850565e-05              -11.678
-i                       5.81853647038e+00               1.30273571989e-07               5.81853630869e+00               3.51188319644e-06               -1.61688518574e-07              -1.241
+e                       2.02839420821e-01               1.41072497409e-09               2.02839395940e-01               3.51124905251e-08               -2.48812566661e-08              -17.637
+q                       2.17602309556e+00               5.02213641990e-09               2.17602316556e+00               9.42359491328e-08               +7.00038054191e-08              +13.939
+tp                      5.74182713236e+04               7.41859215578e-06               5.74182713063e+04               3.56858319889e-05               -1.73064254341e-05              -2.333
+om                      1.52357305306e+02               1.14596100392e-06               1.52357325384e+02               3.59575002992e-05               +2.00779847432e-05              +17.521
+w                       2.08338776381e+02               2.36706895048e-06               2.08338748738e+02               3.68268427285e-05               -2.76430712347e-05              -11.678
+i                       5.81853647038e+00               1.30273571989e-07               5.81853630869e+00               3.51188293824e-06               -1.61689135858e-07              -1.241
 
 </pre></div></div>
 </div>
