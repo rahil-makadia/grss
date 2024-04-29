@@ -65,7 +65,7 @@
     <link rel="prev" title="(12104) Chesley orbit determination test" href="chesley.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Apr 28, 2024"/>
+    <meta name="docbuild:last-update" content="Apr 29, 2024"/>
   </head>
   
   
@@ -527,7 +527,7 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">add_gaia_obs</span> <span class="o">=</span> <span class="kc">False</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">add_gaia_obs</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">optical_obs_file</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">t_min_tdb</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">t_max_tdb</span> <span class="o">=</span> <span class="kc">None</span>
@@ -549,19 +549,21 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Read in 1489 observations from the MPC.
+Read in 1493 observations from the MPC.
         WARNING: At least one deprecated star catalog in the data.
-        Filtered to 1489 observations that satisfy the time range and accepted observatory constraints.
+        Filtered to 1493 observations that satisfy the time range and accepted observatory constraints.
 Applying Eggl et al. (2020) debiasing scheme to the observations.
         Unknown star catalog: GSC
         Unknown star catalog: UNK
-        No debiasing needed for 583 observations.
+        No debiasing needed for 587 observations.
         Debiased 891 observations.
         No bias information for 15 observations.
 Applying Vereš et al. (2017) weighting scheme to the observations.
-        Using 1391 CCD observations with station-specific weight rules.
+        Using 1395 CCD observations with station-specific weight rules.
 Applying sqrt(N/4) deweighting scheme.
         Deweighted 297 observations.
+Read in 273 Gaia observations from gaiafpr
+        Filtered to 273 observations that satisfy the time range constraints.
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -587,14 +589,13 @@ Applying sqrt(N/4) deweighting scheme.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.412                   0.518                   797.982                         0.268
-2                        0.410                   0.515                   790.159                         0.266
-3                        0.410                   0.515                   790.159                         0.266
+1                        0.383                   0.556                   854.180                         0.242
+2                        0.383                   0.555                   854.605                         0.242
+3                        0.383                   0.555                   854.604                         0.242
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.399                   0.497                   734.392                         0.248
-5                        0.400                   0.496                   734.037                         0.248
-6                        0.400                   0.496                   734.037                         0.248
-Converged after rejecting outliers. Rejected 4 out of 1489 optical observations.
+4                        0.373                   0.541                   798.531                         0.227
+5                        0.373                   0.541                   798.463                         0.227
+Converged after rejecting outliers. Rejected 4 out of 1766 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -610,24 +611,24 @@ Converged after rejecting outliers. Rejected 4 out of 1489 optical observations.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Summary of the orbit fit calculations at iteration 6 (of 6):
+Summary of the orbit fit calculations at iteration 5 (of 5):
 ==============================================================
-RMS unweighted: 0.39959917193653666
-RMS weighted: 0.4964741896668083
-chi-squared: 734.0371573538255
-reduced chi-squared: 0.24765086280493437
-square root of reduced chi-squared: 0.49764531827892683
+RMS unweighted: 0.37303613897493515
+RMS weighted: 0.5406495741717109
+chi-squared: 798.4634828283107
+reduced chi-squared: 0.226965174197928
+square root of reduced chi-squared: 0.4764086210365299
 --------------------------------------------------------------
 Solution Time: MJD 57771.000 TDB = 2017-01-18 00:00:00.000 TDB
-Solution Observation Arc: 10730.61 days (29.38 years)
+Solution Observation Arc: 10741.82 days (29.41 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.13401656354e-01               2.69371758805e-09               1.13401636331e-01               3.73764258348e-08               -2.00231222852e-08              -7.433
-q                       2.23466547248e+00               5.19199077579e-09               2.23466552068e+00               9.44845527146e-08               +4.81918314144e-08              +9.282
-tp                      5.79393028847e+04               3.10452200867e-06               5.79393029125e+04               5.34754713992e-05               +2.77940562228e-05              +8.953
-om                      2.76278186645e+02               2.72949155643e-06               2.76277978966e+02               1.36295516842e-04               -2.07678657375e-04              -76.087
-w                       4.93529979858e+01               2.91407820604e-06               4.93532104786e+01               1.36867451012e-04               +2.12492853720e-04              +72.919
-i                       1.74618545297e+00               7.18381116697e-08               1.74618782700e+00               2.46170533126e-06               +2.37402240777e-06              +33.047
+e                       1.13401656354e-01               2.69371758805e-09               1.13401658336e-01               2.68369136463e-09               +1.98204716528e-09              +0.736
+q                       2.23466547248e+00               5.19199077579e-09               2.23466546815e+00               5.17339067675e-09               -4.33048352733e-09              -0.834
+tp                      5.79393028847e+04               3.10452200867e-06               5.79393028873e+04               3.09808365654e-06               +2.61717650574e-06              +0.843
+om                      2.76278186645e+02               2.72949155643e-06               2.76278188210e+02               2.72408540069e-06               +1.56520303563e-06              +0.573
+w                       4.93529979858e+01               2.91407820604e-06               4.93529971049e+01               2.90690584348e-06               -8.80851082741e-07              -0.302
+i                       1.74618545297e+00               7.18381116697e-08               1.74618534135e+00               7.13034522896e-08               -1.11619538723e-07              -1.554
 
 </pre></div></div>
 </div>
@@ -690,13 +691,13 @@ i                       1.74618545297e+00               7.18381116697e-08       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 80.12
-Mahalonobis distance between GRSS and JPL solution: 2.80
-Bhattacharya distance between JPL and GRSS solution: 6.4573
-Bhattacharya coefficient between JPL and GRSS solution: 0.0016
+Mahalonobis distance between JPL and GRSS solution: 2.04
+Mahalonobis distance between GRSS and JPL solution: 2.04
+Bhattacharya distance between JPL and GRSS solution: 0.0001
+Bhattacharya coefficient between JPL and GRSS solution: 0.9999
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
@@ -706,21 +707,6 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.0016
 <span class="k">assert</span> <span class="n">bhatt_coeff</span> <span class="o">&gt;</span> <span class="mf">0.90</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[11], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_f <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
-<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_0 <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
-<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> bhattacharya <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">0.10</span>
-
-<span class="ansi-red-fg">AssertionError</span>:
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -798,7 +784,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Apr 28, 2024.
+  Last updated on Apr 29, 2024.
   <br/>
 </p>
   </div>
