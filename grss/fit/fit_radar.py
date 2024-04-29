@@ -93,6 +93,7 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         obs_df.loc[idx,'provID'] = prov_id
         obs_df.loc[idx,'obsTime'] = f'{date.utc.isot}Z'
         obs_df.loc[idx,'obsTimeMJD'] = date.utc.mjd
+        obs_df.loc[idx,'obsTimeMJDTDB'] = date.tdb.mjd
         obs_df.loc[idx,'mode'] = 'RAD'
         obs_df.loc[idx,'trx'] = tx_code
         obs_df.loc[idx,'rcv'] = rx_code
