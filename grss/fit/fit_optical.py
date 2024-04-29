@@ -141,8 +141,9 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
         # compute the obsTimeMJD time from obsTime
         .assign(obsTimeMJD=lambda x:Time(x['obsTime'].to_list(),format='isot',scale='utc').utc.mjd)
     )
-    # drop rows with deprecated discovery observations
-    obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
+    if 'deprecated' in obs_df:
+        # drop rows with deprecated discovery observations
+        obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
     # add columns if they are not present
     str_cols = ['trx', 'rcv', 'sys', 'selAst']
     for col in str_cols:
