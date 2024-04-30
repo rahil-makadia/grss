@@ -2,15 +2,16 @@
 
 /**
  * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
  * @param[in] tInterpGeom Time to interpolate to.
  * @param[out] xInterpApparentBary Apparent state vector of the target body.
  */
-void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
+void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
+                        const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
     double sunState[9];
-    double earthState[9];
     get_spk_state(10, tInterpGeom, propSim->spkEphem, sunState);
-    get_spk_state(399, tInterpGeom, propSim->spkEphem, earthState);
+    std::vector<real> earthState = propSim->xObserver[interpIdx];
 
     std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
                                      earthState[1] - sunState[1],
@@ -69,9 +70,16 @@ void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
     deltaP1Star[1] = g1 * (e[1] - eDotP * p[1]) / (1 + eDotP);
     deltaP1Star[2] = g1 * (e[2] - eDotP * p[2]) / (1 + eDotP);
 
-    p1[0] = p[0] - deltaP1Star[0] + deltaP1Targ[0];
-    p1[1] = p[1] - deltaP1Star[1] + deltaP1Targ[1];
-    p1[2] = p[2] - deltaP1Star[2] + deltaP1Targ[2];
+    // do absolute correction first
+    p1[0] = p[0] + deltaP1Targ[0];
+    p1[1] = p[1] + deltaP1Targ[1];
+    p1[2] = p[2] + deltaP1Targ[2];
+    // if not gaia obs, do full relative correction
+    if (propSim->obsType[interpIdx] != 3) {
+        p1[0] -= deltaP1Star[0];
+        p1[1] -= deltaP1Star[1];
+        p1[2] -= deltaP1Star[2];
+    }
 
     earthTargetPos[0] = earthTargetDist * p1[0];
     earthTargetPos[1] = earthTargetDist * p1[1];
@@ -99,14 +107,18 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                                        std::numeric_limits<real>::quiet_NaN());
     std::vector<real> opticalPartials(12*propSim->integParams.nInteg,
                                        std::numeric_limits<real>::quiet_NaN());
+    std::vector<real> photocenterCorr(2*propSim->integParams.nInteg,
+                                       std::numeric_limits<real>::quiet_NaN());
     std::vector<real> radarMeasurement(propSim->integParams.nInteg,
                                        std::numeric_limits<real>::quiet_NaN());
     std::vector<real> radarPartials(6*propSim->integParams.nInteg,
                                        std::numeric_limits<real>::quiet_NaN());
-    switch (propSim->radarObserver[interpIdx]) {
-    case 0:
+    switch (propSim->obsType[interpIdx]) {
+    case 0: case 3:
         get_optical_measurement(propSim, xInterpApparent, opticalMeasurement,
                                 opticalPartials);
+        get_photocenter_correction(propSim, interpIdx, tInterpGeom,
+                                    xInterpApparent, photocenterCorr);
         break;
     case 1: case 2:
         get_radar_measurement(propSim, interpIdx, t, dt, tInterpGeom,
@@ -114,11 +126,12 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
         break;
     default:
         throw std::runtime_error(
-            "get_measurement: radarObserver flag must be 0, 1, or 2");
+            "get_measurement: obsType flag must be 0, 1, 2, or 3");
         break;
     }
     propSim->opticalObs.push_back(opticalMeasurement);
     propSim->opticalPartials.push_back(opticalPartials);
+    propSim->opticalObsCorr.push_back(photocenterCorr);
     propSim->radarObs.push_back(radarMeasurement);
     propSim->radarPartials.push_back(radarPartials);
 }
@@ -135,27 +148,27 @@ void get_optical_measurement(PropSimulation *propSim,
                              std::vector<real> &opticalPartials) {
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        std::vector<real> xInterpApparentOneBody(6, 0.0);
-        for (size_t j = 0; j < 6; j++) {
-            xInterpApparentOneBody[j] = xInterpApparent[starti + j];
+        real rho[3], rhoHat[3];
+        for (size_t j = 0; j < 3; j++) {
+            rho[j] = xInterpApparent[starti + j];
         }
         real dist;
-        vnorm({xInterpApparentOneBody[0], xInterpApparentOneBody[1],
-                xInterpApparentOneBody[2]}, dist);
-        real r_asc = atan2(xInterpApparentOneBody[1],
-                           xInterpApparentOneBody[0]);
+        vnorm(rho, 3, dist);
+        for (size_t j = 0; j < 3; j++) {
+            rhoHat[j] = rho[j]/dist;
+        }
+        real r_asc = atan2(rhoHat[1], rhoHat[0]);
         if (r_asc < 0) {
             r_asc = r_asc + 2*PI;
         }
-        const real x2py2 = xInterpApparentOneBody[0]*xInterpApparentOneBody[0] +
-            xInterpApparentOneBody[1]*xInterpApparentOneBody[1];
-        const real dradx = -xInterpApparentOneBody[1]/x2py2;
-        const real drady = xInterpApparentOneBody[0]/x2py2;
-        real dec = asin(xInterpApparentOneBody[2]/dist);
-        const real r = sqrt(x2py2 + xInterpApparentOneBody[2]*xInterpApparentOneBody[2]);
-        const real ddecdx = -xInterpApparentOneBody[0]*xInterpApparentOneBody[2]/r/r/sqrt(x2py2);
-        const real ddecdy = -xInterpApparentOneBody[1]*xInterpApparentOneBody[2]/r/r/sqrt(x2py2);
-        const real ddecdz = sqrt(x2py2)/r/r;
+        const real x2py2 = rho[0]*rho[0] + rho[1]*rho[1];
+        const real dradx = -rho[1]/x2py2;
+        const real drady = rho[0]/x2py2;
+        real dec = asin(rhoHat[2]);
+        const real dist2 = dist*dist;
+        const real ddecdx = -rho[0]*rho[2]/dist2/sqrt(x2py2);
+        const real ddecdy = -rho[1]*rho[2]/dist2/sqrt(x2py2);
+        const real ddecdz = sqrt(x2py2)/dist2;
         const real conv = 180.0L/PI*3600.0L; // radians -> arcsec
         r_asc *= conv;
         dec *= conv;
@@ -168,6 +181,111 @@ void get_optical_measurement(PropSimulation *propSim,
         opticalPartials[12*i+7] = ddecdy*conv;
         opticalPartials[12*i+8] = ddecdz*conv;
         starti += 2*propSim->integBodies[i].n2Derivs;
+    }
+}
+
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
+ * @param[in] tInterpGeom Time to interpolate to.
+ * @param[in] xInterpApparent Apparent state vector of the target body.
+ * @param[out] photocenterCorr Photocenter-barycenter correction to the optical measurement.
+ */
+void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx,
+                                const real &tInterpGeom,
+                                const std::vector<real> &xInterpApparent,
+                                std::vector<real> &photocenterCorr){
+    const size_t obsType = propSim->obsType[interpIdx];
+    if (obsType == 1 || obsType == 2){
+        return;
+    }
+    if (obsType == 3) {
+        // // polynomial coefficients from JPL paper (fuentes-munoz et al. 2024)
+        // std::vector<real> polyCoeffs = {
+        //     -0.02384,
+        //     0.05579,
+        //     0.329,
+        //     0};
+        // polynomial coefficients from GRSS fit (backyard/random/grss_corr.ipynb)
+        std::vector<real> polyCoeffs = {
+            -0.02352667223191772,
+            0.05403589930067203,
+            0.3318343597581827,
+            -0.001233060221632019
+        };
+        size_t starti = 0;
+        std::vector<real> xObserver = propSim->xObserver[interpIdx];
+        for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+            std::vector<real> xInterpApparentBaryOneBody(6, 0.0);
+            for (size_t j = 0; j < 6; j++) {
+                xInterpApparentBaryOneBody[j] = xInterpApparent[starti+j] + xObserver[j];
+            }
+            const real tForSpice = tInterpGeom - propSim->lightTimeEval[interpIdx][i];
+            double sunState[9];
+            get_spk_state(10, tForSpice, propSim->spkEphem, sunState);
+            real rhoVec[3], rhoHat[3], rho, rVec[3], rHat[3];
+            for (size_t j = 0; j < 3; j++) {
+                rhoVec[j] = xInterpApparent[starti+j];
+                rVec[j] = xInterpApparentBaryOneBody[j] - sunState[j];
+            }
+            vnorm(rhoVec, 3, rho);
+            for (size_t j = 0; j < 3; j++) {
+                rhoHat[j] = rhoVec[j]/rho;
+            }
+            vunit(rVec, 3, rHat);
+            real rHatDotRhoHat;
+            vdot(rHat, rhoHat, 3, rHatDotRhoHat);
+            const real alpha = acos(rHatDotRhoHat);
+            const real radius = propSim->integBodies[i].radius;
+            real fval = 0.0;
+            for (size_t j = 0; j < polyCoeffs.size(); j++) {
+                fval = fval*alpha + polyCoeffs[j];
+            }
+            fval *= radius;
+            real tHat[3], tVec[3];
+            for (size_t j = 0; j < 3; j++) {
+                tHat[j] = (rHatDotRhoHat*rhoHat[j] - rHat[j])/sin(alpha);
+                tVec[j] = fval/rho*tHat[j];
+            }
+            const real conv = 180.0L/PI*3600.0L; // radians -> arcsec
+            const real raHatGetter[3] = {0, 0, 1};
+            real raDir[3], raHat[3], decHat[3];
+            vcross(raHatGetter, rhoHat, raDir);
+            vunit(raDir, 3, raHat);
+            vcross(rhoHat, raHat, decHat);
+            real raCosDecCorrection, decCorrection;
+            vdot(tVec, raHat, 3, raCosDecCorrection);
+            vdot(tVec, decHat, 3, decCorrection);
+            // if (i == 0){
+            //     std::ofstream file("photocenter_correction.txt", std::ios_base::app);
+            //     file.precision(15);
+            //     file    << "t: " << tInterpGeom+2400000.5
+            //             << ", alpha: " << alpha * 180.0L / PI
+            //             << ", fval: " << fval
+            //             << ", radius: " << radius
+            //             << ", rho: " << rho
+            //             << ", rHatDotRhoHat: " << rHatDotRhoHat
+            //             << ", rhoVec: [" << rhoVec[0] << ", " << rhoVec[1] << ", " << rhoVec[2] << "]"
+            //             << ", rVec: [" << rVec[0] << ", " << rVec[1] << ", " << rVec[2] << "]"
+            //             << ", rhoHat: [" << rhoHat[0] << ", " << rhoHat[1] << ", " << rhoHat[2] << "]"
+            //             << ", rHat: [" << rHat[0] << ", " << rHat[1] << ", " << rHat[2] << "]"
+            //             << ", raCosDecCorrection: " << raCosDecCorrection * conv
+            //             << ", decCorrection: " << decCorrection * conv
+            //             << ", tVec: [" << tVec[0] << ", " << tVec[1] << ", " << tVec[2] << "]"
+            //             << ", raHat: [" << raHat[0] << ", " << raHat[1] << ", " << raHat[2] << "]"
+            //             << ", decHat: [" << decHat[0] << ", " << decHat[1] << ", " << decHat[2] << "]"
+            //          << std::endl;
+            //     file.close();
+            // }
+            photocenterCorr[2*i] = raCosDecCorrection*conv;
+            photocenterCorr[2*i+1] = decCorrection*conv;
+            starti += 2*propSim->integBodies[i].n2Derivs;
+        }
+    } else if (obsType == 0) {
+        std::fill(photocenterCorr.begin(), photocenterCorr.end(), 0.0);
+    } else {
+        throw std::runtime_error(
+            "get_photocenter_correction: obsType flag must be 0, 1, 2, or 3");
     }
 }
 
@@ -200,7 +318,7 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
     std::vector<real> xTrgtBaryBounce(6, 0.0);
     std::vector<real> xObsBaryTx(6, 0.0);
     real transmitFreq = 0.0;
-    if (propSim->radarObserver[interpIdx] == 2) {
+    if (propSim->obsType[interpIdx] == 2) {
         transmitFreq = propSim->observerInfo[interpIdx][9]*1.0e6L;
     }
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
@@ -210,9 +328,9 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
                               xInterpGeom, receiveTimeTDB, transmitTimeTDB,
                               xObsBaryRcv, xTrgtBaryBounce, xObsBaryTx,
                               delayMeasurement, radarPartials);
-        if (propSim->radarObserver[interpIdx] == 1) {
+        if (propSim->obsType[interpIdx] == 1) {
             radarMeasurement[i] = delayMeasurement;
-        } else if (propSim->radarObserver[interpIdx] == 2) {
+        } else if (propSim->obsType[interpIdx] == 2) {
             real dopplerMeasurement;
             get_doppler_measurement(propSim, i, receiveTimeTDB, transmitTimeTDB,
                                     xObsBaryRcv, xTrgtBaryBounce, xObsBaryTx,

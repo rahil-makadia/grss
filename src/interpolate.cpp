@@ -289,7 +289,7 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
         for (size_t j = 0; j < 6; j++) {
             xInterpApparentBary[j] = xInterpApparentTemp[starti + j];
         }
-        get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
+        get_glb_correction(propSim, interpIdx, tInterpGeom, xInterpApparentBary);
         for (size_t j = 0; j < 6; j++) {
             xInterpApparent[starti + j] = xInterpApparentBary[j] - xObserver[j];
         }

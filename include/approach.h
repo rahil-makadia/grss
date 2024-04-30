@@ -25,8 +25,8 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
 /**
  * @brief Compute relative state of a body at a given time.
  */
-static std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
-                                       const size_t &j, const real &t);
+std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
+                                const size_t &j, const real &t);
 
 /**
  * @brief Compute the time of close approach or impact using Brent's method
