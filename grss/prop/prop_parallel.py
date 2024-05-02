@@ -188,14 +188,14 @@ def _reconstruct_ca_and_impact(lines):
         List of CloseApproachParameters (index 0) and ImpactParameters (index 1) objects.
     """
     delimiter = ' | '
-    str_cols = ['flybyBody', 'centralBody',]
-    list_cols = ['xRel', 'xRelMap', 'bVec', 'kizner_dx', 'kizner_dy', 'opik_dx', 'opik_dy',
-                    'scaled_dx', 'scaled_dy', 'mtp_dx', 'mtp_dy', 'xRelBodyFixed',]
-    bool_cols = ['impact',]
-    int_cols = ['flybyBodyIdx', 'centralBodyIdx', 'centralBodySpiceId']
-    float_cols = ['t', 'tMap', 'dist', 'vel', 'vInf', 'tPeri', 'tLin', 'bMag', 'gravFocusFactor',
+    str_cols = {'flybyBody', 'centralBody'}
+    list_cols = {'xRel', 'xRelMap', 'bVec', 'kizner_dx', 'kizner_dy', 'opik_dx', 'opik_dy',
+                    'scaled_dx', 'scaled_dy', 'mtp_dx', 'mtp_dy', 'xRelBodyFixed'}
+    bool_cols = {'impact'}
+    int_cols = {'flybyBodyIdx', 'centralBodyIdx', 'centralBodySpiceId'}
+    float_cols = {'t', 'tMap', 'dist', 'vel', 'vInf', 'tPeri', 'tLin', 'bMag', 'gravFocusFactor',
                     'kizner_x', 'kizner_y', 'kizner_z', 'opik_x', 'opik_y', 'opik_z', 'scaled_x',
-                    'scaled_y', 'scaled_z', 'mtp_x', 'mtp_y', 'mtp_z', 'lon', 'lat', 'alt']
+                    'scaled_y', 'scaled_z', 'mtp_x', 'mtp_y', 'mtp_z', 'lon', 'lat', 'alt'}
     out_list = [[],[]]
     for idx, typ in enumerate(['ca', 'impact']):
         if typ == 'ca':
@@ -370,23 +370,20 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
                     if ca_or_impact.centralBodySpiceId == central_body]
     if not full_list:
         return tuple(all_clusters)
-    times = [ca_or_impact.t for ca_or_impact in full_list]
-    bodies = [ca_or_impact.flybyBody for ca_or_impact in full_list]
 
-    sort_idx = np.argsort(times)
-    cluster = [full_list[sort_idx[0]]]
-    cluster_bodies = [bodies[sort_idx[0]]]
-    for i in range(1, len(sort_idx)):
-        idx = sort_idx[i]
-        time_condition = times[idx] - times[sort_idx[i-1]] > max_duration
-        body_condition = bodies[idx] in cluster_bodies
+    full_list.sort(key=lambda x: x.t)  # Sort the list based on time
+    cluster = [full_list[0]]
+    cluster_bodies = {full_list[0].flybyBody}
+    for ca_or_impact in full_list[1:]:
+        time_condition = ca_or_impact.t - cluster[-1].t > max_duration
+        body_condition = ca_or_impact.flybyBody in cluster_bodies
         if time_condition or body_condition:
             all_clusters.append(cluster)
-            cluster = [full_list[idx]]
-            cluster_bodies = [bodies[idx]]
+            cluster = [ca_or_impact]
+            cluster_bodies = {ca_or_impact.flybyBody}
         else:
-            cluster.append(full_list[idx])
-            cluster_bodies.append(bodies[idx])
+            cluster.append(ca_or_impact)
+            cluster_bodies.add(ca_or_impact.flybyBody)
     all_clusters.append(cluster)
     end_time = time.time()
     duration = end_time - start_time

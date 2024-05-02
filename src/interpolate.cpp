@@ -272,8 +272,8 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
     bool bouncePointAtCenterOfMass = true;
-    if (propSim->observerInfo[interpIdx].size() == 9 ||
-        propSim->observerInfo[interpIdx].size() == 10) {
+    if (propSim->obsType[interpIdx] == 1 ||  // delay
+        propSim->obsType[interpIdx] == 2) {  // doppler
         bouncePointAtCenterOfMass = propSim->observerInfo[interpIdx][8] == 1.0;
     }
     size_t starti = 0;

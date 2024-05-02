@@ -216,6 +216,12 @@ void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx
         size_t starti = 0;
         std::vector<real> xObserver = propSim->xObserver[interpIdx];
         for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+            const real radius = propSim->integBodies[i].radius;
+            if (radius == 0.0){
+                photocenterCorr[2*i] = 0.0;
+                photocenterCorr[2*i+1] = 0.0;
+                continue;
+            }
             std::vector<real> xInterpApparentBaryOneBody(6, 0.0);
             for (size_t j = 0; j < 6; j++) {
                 xInterpApparentBaryOneBody[j] = xInterpApparent[starti+j] + xObserver[j];
@@ -236,7 +242,6 @@ void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx
             real rHatDotRhoHat;
             vdot(rHat, rhoHat, 3, rHatDotRhoHat);
             const real alpha = acos(rHatDotRhoHat);
-            const real radius = propSim->integBodies[i].radius;
             real fval = 0.0;
             for (size_t j = 0; j < polyCoeffs.size(); j++) {
                 fval = fval*alpha + polyCoeffs[j];
@@ -256,27 +261,6 @@ void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx
             real raCosDecCorrection, decCorrection;
             vdot(tVec, raHat, 3, raCosDecCorrection);
             vdot(tVec, decHat, 3, decCorrection);
-            // if (i == 0){
-            //     std::ofstream file("photocenter_correction.txt", std::ios_base::app);
-            //     file.precision(15);
-            //     file    << "t: " << tInterpGeom+2400000.5
-            //             << ", alpha: " << alpha * 180.0L / PI
-            //             << ", fval: " << fval
-            //             << ", radius: " << radius
-            //             << ", rho: " << rho
-            //             << ", rHatDotRhoHat: " << rHatDotRhoHat
-            //             << ", rhoVec: [" << rhoVec[0] << ", " << rhoVec[1] << ", " << rhoVec[2] << "]"
-            //             << ", rVec: [" << rVec[0] << ", " << rVec[1] << ", " << rVec[2] << "]"
-            //             << ", rhoHat: [" << rhoHat[0] << ", " << rhoHat[1] << ", " << rhoHat[2] << "]"
-            //             << ", rHat: [" << rHat[0] << ", " << rHat[1] << ", " << rHat[2] << "]"
-            //             << ", raCosDecCorrection: " << raCosDecCorrection * conv
-            //             << ", decCorrection: " << decCorrection * conv
-            //             << ", tVec: [" << tVec[0] << ", " << tVec[1] << ", " << tVec[2] << "]"
-            //             << ", raHat: [" << raHat[0] << ", " << raHat[1] << ", " << raHat[2] << "]"
-            //             << ", decHat: [" << decHat[0] << ", " << decHat[1] << ", " << decHat[2] << "]"
-            //          << std::endl;
-            //     file.close();
-            // }
             photocenterCorr[2*i] = raCosDecCorrection*conv;
             photocenterCorr[2*i+1] = decCorrection*conv;
             starti += 2*propSim->integBodies[i].n2Derivs;
@@ -305,11 +289,10 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
                            const std::vector<real> &xInterpGeom,
                            std::vector<real> &radarMeasurement,
                            std::vector<real> &radarPartials) {
-    if (propSim->observerInfo[interpIdx].size() != 9 &&
-        propSim->observerInfo[interpIdx].size() != 10) {
+    if (propSim->obsType[interpIdx] != 1 && propSim->obsType[interpIdx] != 2) {
         throw std::runtime_error(
-            "Error: observerInfo must be a 9 or 10 "
-            "element vector for radar measurements");
+            "get_radar_measurement: obsType must be 1 or 2 for radar "
+            "measurements");
     }
     real receiveTimeTDB = tInterpGeom;
     real transmitTimeTDB;

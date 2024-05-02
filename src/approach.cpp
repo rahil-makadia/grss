@@ -97,7 +97,13 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     propSim->caParams.push_back(ca);
                     if (ca.impact){
                         ImpactParameters impact;
-                        get_ca_or_impact_time(propSim, i, j, tOld-1, ca.t, impact.t, impact_r_calc);
+                        real tImpStart;
+                        if (forwardProp){
+                            tImpStart = fmax(tOld-1, propSim->integParams.t0-propSim->tEvalMargin);
+                        } else {
+                            tImpStart = fmin(tOld+1, propSim->integParams.t0+propSim->tEvalMargin);
+                        }
+                        get_ca_or_impact_time(propSim, i, j, tImpStart, ca.t, impact.t, impact_r_calc);
                         impact.xRel = get_rel_state(propSim, i, j, impact.t);
                         impact.tCA = ca.t;
                         impact.xRelCA = ca.xRel;

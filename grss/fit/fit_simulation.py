@@ -19,7 +19,7 @@ class IterationParams:
     orbit determination process. It is also used for plotting the residuals
     and chi-squared values for each iteration.
     """
-    def __init__(self, iter_number, x_nom, covariance, obs, rms_u, rms_w):
+    def __init__(self, iter_number, x_nom, covariance, obs, rms_u, rms_w, chi_sq):
         """
         Constructor for the IterationParams class
 
@@ -27,22 +27,18 @@ class IterationParams:
         ----------
         iter_number : int
             Iteration number
-        residuals : array
-            Residuals at the current iteration
-        rms_u : float
-            Unweighted RMS of the residuals.
-        rms_w : float
-            Weighted RMS of the residuals.
-        residual_chi_squared : list
-            List of the residual chi-squared values for each observation.
         x_nom : dict
             Dictionary of nominal state vector values at the current iteration
         covariance : array
             Covariance matrix at the current iteration
         obs : pandas DataFrame
             Observation data for the orbit fit
-        rejection_flags : list
-            List of rejection flags for each observation in obs
+        rms_u : float
+            Unweighted RMS of the residuals.
+        rms_w : float
+            Weighted RMS of the residuals.
+        chi_sq : float
+            Chi-squared value for the residuals
         """
         self.iter_number = iter_number
         self.x_nom = x_nom
@@ -57,7 +53,17 @@ class IterationParams:
         self.unweighted_rms = rms_u
         self.weighted_rms = rms_w
         self._assemble_info()
-        self._calculate_chis()
+        accepted_obs = self.obs.iloc[self.accepted_idx]
+        all_obs = (
+            accepted_obs.ra.tolist() +
+            accepted_obs.dec.tolist() +
+            accepted_obs.delay.tolist() +
+            accepted_obs.doppler.tolist()
+        )
+        n_obs = np.sum(~np.isnan(all_obs))
+        n_fit = covariance.shape[0]
+        self.chi_squared = chi_sq
+        self.reduced_chi_squared = self.chi_squared/(n_obs-n_fit)
         return None
 
     def _calculate_chis(self):
@@ -224,7 +230,7 @@ class IterationParams:
         plt.suptitle(iter_string, y=0.95)
         grid_spec = fig.add_gridspec(1, 3, width_ratios=(1,1,1))
         ax1 = fig.add_subplot(grid_spec[0, 0])
-        ax1.plot(t_arr, ra_residuals, '.', label='RA', markersize=markersize,
+        ax1.plot(t_arr, ra_residuals, '.', label='RA cos(Dec)', markersize=markersize,
                     color='C1', alpha=0.5)
         ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize,
                     color='C0', alpha=0.5)
@@ -352,8 +358,10 @@ class IterationParams:
         if plot_chi_squared:
             plt.subplot(1,2,1)
         if not np.all(np.isnan(ra_chi)) and not np.all(np.isnan(dec_chi)):
-            plt.plot(t_arr, ra_chi, '.', markersize=markersize, label='RA', color='C1', alpha=0.5)
-            plt.plot(t_arr, dec_chi, '.', markersize=markersize, label='Dec', color='C0', alpha=0.5)
+            plt.plot(t_arr, ra_chi, '.', markersize=markersize,
+                        label='RA cos(Dec)', color='C1', alpha=0.5)
+            plt.plot(t_arr, dec_chi, '.', markersize=markersize,
+                        label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[rejected_idx], ra_chi[rejected_idx], 'ro',
                         markersize=2*markersize, markerfacecolor='none', label='Rejected')
             plt.plot(t_arr[rejected_idx], dec_chi[rejected_idx], 'ro',
@@ -380,7 +388,7 @@ class IterationParams:
         if plot_chi_squared:
             plt.subplot(1,2,2)
             plt.plot(t_arr, ra_chi_squared, '.', markersize=markersize,
-                        label='RA', color='C1', alpha=0.5)
+                        label='RA cos(Dec)', color='C1', alpha=0.5)
             plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize,
                         label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[rejected_idx], ra_chi_squared[rejected_idx], 'ro',
@@ -1489,8 +1497,8 @@ class FitSimulation:
             Unweighted RMS of the residuals.
         rms_w : float
             Weighted RMS of the residuals.
-        residual_chi_squared : list
-            List of the residual chi-squared values for each observation.
+        chi_sq : float
+            Chi-squared value of the residuals.
 
         Raises
         ------
@@ -1511,6 +1519,7 @@ class FitSimulation:
         self.num_rejected = 0
         rms_u = 0
         rms_w = 0
+        chi_sq = 0
         j = 0
         sel_ast = self.obs['selAst'].values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
@@ -1546,6 +1555,7 @@ class FitSimulation:
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
                 rms_w += resid @ self.obs_weight[i] @ resid.T
+                chi_sq += residual_chi_squared[i]
             j += size
         self.obs['selAst'] = sel_ast
         rejected_fraction = self.num_rejected/len(self.obs)
@@ -1554,9 +1564,9 @@ class FitSimulation:
                     "rejection criteria, or turning off outlier rejection altogether.")
         rms_u = np.sqrt(rms_u/self.n_obs)
         rms_w = np.sqrt(rms_w/self.n_obs)
-        return rms_u, rms_w
+        return rms_u, rms_w, chi_sq
 
-    def _add_iteration(self, iter_number, rms_u, rms_w):
+    def _add_iteration(self, iter_number, rms_u, rms_w, chi_sq):
         """
         Adds an iteration to the list of iterations in the FitSimulation object.
 
@@ -1564,14 +1574,12 @@ class FitSimulation:
         ----------
         iter_number : int
             Iteration number.
-        residuals : array
-            Residuals of the observations.
         rms_u : float
             Unweighted RMS of the residuals.
         rms_w : float
             Weighted RMS of the residuals.
-        residual_chi_squared : list
-            List of the residual chi-squared values for each observation.
+        chi_sq : float
+            Chi-squared value of the residuals.
 
         Returns
         -------
@@ -1579,7 +1587,7 @@ class FitSimulation:
             None
         """
         self.iters.append(IterationParams(iter_number, self.x_nom, self.covariance,
-                                            self.obs, rms_u, rms_w))
+                                            self.obs, rms_u, rms_w, chi_sq))
         return None
 
     def _check_convergence(self):
@@ -1666,11 +1674,11 @@ class FitSimulation:
             residuals, partials = self._get_residuals_and_partials()
             # clean_residuals = self._flatten_and_clean(residuals)
             # calculate rms and reject outliers here if desired
-            rms_u, rms_w = self._get_rms_and_reject_outliers(partials, residuals,
+            rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
                                                                             start_rejecting)
             if i == 0:
                 # add prefit iteration
-                self._add_iteration(0, rms_u, rms_w)
+                self._add_iteration(0, rms_u, rms_w, chi_sq)
             # get initial guess
             curr_state = np.array(list(self.x_nom.values()))
             # get state correction
@@ -1685,7 +1693,7 @@ class FitSimulation:
             # get new covariance
             self.covariance = cov
             # add iteration
-            self._add_iteration(i+1, rms_u, rms_w)
+            self._add_iteration(i+1, rms_u, rms_w, chi_sq)
             if verbose:
                 print(f"{self.iters[-1].iter_number}\t\t\t",
                         f"{self.iters[-1].unweighted_rms:.3f}\t\t\t",
