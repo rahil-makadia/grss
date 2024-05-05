@@ -336,7 +336,6 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
     if (propSim->convergedLightTime) {
         real lightTimeTol = 1e-10 / 86400.0L;
         real lightTimeOneBodyPrev = 0.0L;
-        real deltaLightTimeRelativistic;
         size_t maxIter = 20;
         size_t iter = 0;
         // keep iterating until max iterations or light time tolerance is met
@@ -356,13 +355,14 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                 distRelativeOneBody -= propSim->integBodies[i].radius;
             }
             lightTimeOneBodyPrev = lightTimeOneBody;
-            get_delta_delay_relativistic(
-                propSim, tInterpGeom - lightTimeOneBody, xInterpApparent,
-                deltaLightTimeRelativistic);
-            lightTimeOneBody = distRelativeOneBody / propSim->consts.clight +
-                deltaLightTimeRelativistic;
+            lightTimeOneBody = distRelativeOneBody / propSim->consts.clight;
             iter++;
         }
+        real deltaLightTimeRelativistic;
+        get_delta_delay_relativistic(
+            propSim, tInterpGeom, xInterpApparent,
+            deltaLightTimeRelativistic);
+        lightTimeOneBody += deltaLightTimeRelativistic;
         if (iter >= maxIter) {
             std::cout
                 << "Warning: Downleg light time did not converge for body "

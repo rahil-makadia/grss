@@ -382,7 +382,6 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
         real distRelativeUpleg;
         real lightTimeTol = 1e-10 / 86400.0L;
         real delayUplegPrev = 0.0L;
-        real deltaDelayUplegRelativistic;
         size_t maxIter = 20;
         size_t iter = 0;
         while (iter < maxIter &&
@@ -400,13 +399,14 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
                 distRelativeUpleg -= propSim->integBodies[i].radius;
             }
             delayUplegPrev = delayUpleg;
-            get_delta_delay_relativistic(
-                propSim, bounceTimeTDB - delayUpleg, xTrgtBaryBounce,
-                deltaDelayUplegRelativistic);
-            delayUpleg = distRelativeUpleg / propSim->consts.clight +
-                deltaDelayUplegRelativistic;
+            delayUpleg = distRelativeUpleg / propSim->consts.clight;
             iter++;
         }
+        real deltaDelayUplegRelativistic;
+        get_delta_delay_relativistic(
+            propSim, bounceTimeTDB - delayUpleg, xTrgtBaryBounce,
+            deltaDelayUplegRelativistic);
+        delayUpleg += deltaDelayUplegRelativistic;
         if (iter >= maxIter) {
             std::cout
                 << "Warning: Upleg light time did not converge for body "
