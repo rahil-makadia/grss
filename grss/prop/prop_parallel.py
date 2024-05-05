@@ -1,7 +1,7 @@
 """Parallel computing utilities for the GRSS orbit propagation code"""
 import os
 import time
-import numpy as np
+from tqdm.auto import tqdm
 # pylint: disable=no-name-in-module
 from .. import libgrss
 
@@ -133,12 +133,10 @@ def reconstruct_all_log_files(log_dir):
     impact_list = []
     files = os.listdir(log_dir)
     files.sort()
-    for file in files:
-        if file.endswith('.log'):
-            log_file = os.path.join(log_dir, file)
-            file_ca_list, file_impact_list = _reconstruct_one_log_file(log_file)
-            ca_list.append(file_ca_list)
-            impact_list.append(file_impact_list)
+    for i in tqdm(range(len(files))):
+        file_ca_list, file_impact_list = _reconstruct_one_log_file(f'{log_dir}/{files[i]}')
+        ca_list.append(file_ca_list)
+        impact_list.append(file_impact_list)
     end_time = time.time()
     duration = end_time - start_time
     mm = int(duration / 60)
@@ -164,13 +162,8 @@ def _reconstruct_one_log_file(log_file):
     """
     # first read the log file
     with open(log_file, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    try:
-        ca_list, impact_list = _reconstruct_ca_and_impact(lines)
-    except:
-        print(f'Error in reconstructing log file: {log_file}')
-        print(f'result: {_reconstruct_ca_and_impact(lines)}')
-        raise
+        lines = f.read().splitlines()
+    ca_list, impact_list = _reconstruct_ca_and_impact(lines)
     return ca_list, impact_list
 
 def _reconstruct_ca_and_impact(lines):
@@ -205,13 +198,15 @@ def _reconstruct_ca_and_impact(lines):
             start_key = '$$IMPACT_START'
             end_key = '$$IMPACT_END'
         # find the index of the line that starts with "$$IMPACT_START" and "$$IMPACT_END"
-        start = [i for i, line in enumerate(lines) if line.startswith(start_key)]
-        end = [i for i, line in enumerate(lines) if line.startswith(end_key)]
+        try:
+            start = lines.index(start_key)
+            end = lines.index(end_key)
+        except ValueError:
+            start = None
+            end = None
         # if start and end keys do not exist, return None
         if not start or not end:
             continue
-        start = start[0]
-        end = end[0]
         # first line is the header
         header = lines[start+1].strip().split(delimiter)
         # create dict wiht key as index and value as column name
@@ -227,7 +222,7 @@ def _reconstruct_ca_and_impact(lines):
                     # do nothing, data is already string
                     pass
                 elif col in list_cols:
-                    parsed_info = raw_info.replace('[','').replace(']','').split(',')
+                    parsed_info = raw_info[1:].split(',')[:-1]
                     data[i] = [float(num) for num in parsed_info if num]
                 elif col in bool_cols:
                     data[i] = raw_info == 'true'
