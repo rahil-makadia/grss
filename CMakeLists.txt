@@ -1,10 +1,10 @@
 # minimum required CMake version
 cmake_minimum_required(VERSION 3.18.0)
 
-# if on a Mac, use gnu compilers instead of clang for ease of use with OpenMP
+# if on a Mac, use brew llvm clang for OpenMP support
 if(APPLE)
-    set(CMAKE_C_COMPILER gcc-13)
-    set(CMAKE_CXX_COMPILER g++-13)
+    set(CMAKE_C_COMPILER "$ENV{HOMEBREW_PREFIX}/opt/llvm/bin/clang")
+    set(CMAKE_CXX_COMPILER "$ENV{HOMEBREW_PREFIX}/opt/llvm/bin/clang++")
 endif()
 
 # set the project name and get version from version.txt
