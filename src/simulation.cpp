@@ -532,6 +532,16 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 441: {
             kernel_sb = DEkernelPath + "sb441-n16s.bsp";
             kernel_mb = DEkernelPath + "de440.bsp";
+            if (defaultSpiceBodies == 441) {
+                std::cout
+                    << "WARNING Choosing DE441 will load long-term ephemeris "
+                       "with a significantly higher memory footprint. "
+                       "For almost all applications, DE440 is sufficient. "
+                       "Be sure that you need the coverage provided by DE441."
+                    << std::endl;
+                kernel_sb = DEkernelPath + "sb441-n16.bsp";
+                kernel_mb = DEkernelPath + "de441_part-2.bsp";
+            }
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
