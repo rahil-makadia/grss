@@ -515,7 +515,6 @@ class FitSimulation:
         body_id = perm_id if isinstance(perm_id, str) else prov_id
         self.name = body_id
         self.t_sol = None
-        self.t_sol_utc = None
         self.x_init = None
         self.x_nom = None
         self.covariance_init = cov_init
@@ -610,7 +609,6 @@ class FitSimulation:
             if key in x_init and x_init[key] != 0.0:
                 self.fit_nongrav = True
         self.t_sol = x_init['t']
-        self.t_sol_utc = Time(self.t_sol, format='mjd', scale='tdb').utc.mjd
         self.x_init = {key: x_init[key] for key in x_init if key != 't'}
         self.x_nom = self.x_init.copy()
         self.n_fit = len(self.x_nom)
@@ -663,6 +661,7 @@ class FitSimulation:
             self.obs.loc[idx, 'provID'] = 'SIM_'+str(self.obs['provID'][0])
             self.obs.loc[idx, 'obsTime'] = f'{time.utc.isot}Z'
             self.obs.loc[idx, 'obsTimeMJD'] = time.utc.mjd
+            self.obs.loc[idx, 'obsTimeMJDTDB'] = time.tdb.mjd
             self.obs.loc[idx, 'mode'] = mode
             if mode in {'SIM_CCD', 'SIM_OCC'}:
                 self.obs.loc[idx, 'stn'] = 'SIM'
@@ -734,9 +733,9 @@ class FitSimulation:
         self.radar_idx = self.delay_idx + self.doppler_idx
         self.n_obs = 2*len(self.optical_idx)+len(self.radar_idx)
 
-        self.past_obs_idx = self.obs.query('obsTimeMJD < @self.t_sol_utc').index
+        self.past_obs_idx = self.obs.query('obsTimeMJDTDB < @self.t_sol').index
         self.past_obs_exist = len(self.past_obs_idx) > 0
-        self.future_obs_idx = self.obs.query('obsTimeMJD >= @self.t_sol_utc').index
+        self.future_obs_idx = self.obs.query('obsTimeMJDTDB >= @self.t_sol').index
         self.future_obs_exist = len(self.future_obs_idx) > 0
         return None
 
@@ -1259,7 +1258,7 @@ class FitSimulation:
             future_optical_partials = np.array(prop_sim_future.opticalPartials)
             future_radar_partials = np.array(prop_sim_future.radarPartials)
             future_light_time = np.array(prop_sim_future.lightTimeEval)
-        t_eval_tdb = Time(self.obs['obsTimeMJD'].values, format='mjd', scale='utc').tdb.mjd
+        t_eval_tdb = self.obs.obsTimeMJDTDB.values
         cos_dec = self.obs.cosDec.values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:

@@ -30,7 +30,7 @@ ades_add_columns = {
     'sigDelay': 'float', 'sigDoppler': 'float',
 }
 ades_grss_columns = {
-    'obsTimeMJD': 'float', 'cosDec': 'float',
+    'obsTimeMJD': 'float', 'obsTimeMJDTDB': 'float', 'cosDec': 'float',
 }
 ades_column_types = ades_keep_columns | ades_add_columns | ades_grss_columns
 

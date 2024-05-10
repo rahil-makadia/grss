@@ -427,6 +427,17 @@ def get_sbdb_info(tdes):
             nongrav_params[nongrav_key_map[key]] = nongrav_default_dict[key]
         if key in cov_keys:
             elements[nongrav_key_map[key]] = nongrav_data_dict[key]
+    abs_mag = 0
+    albedo = 0.125
+    for par in raw_data['phys_par']:
+        if par['name'] == 'H':
+            abs_mag = float(par['value'])
+        if par['name'] == 'albedo':
+            albedo = float(par['value'])
+    body_radius = 1329*10**(-0.2*abs_mag)/(2*albedo**0.5)*1e3
+    if abs_mag == 0:
+        body_radius = 0
+    nongrav_params['radius'] = body_radius
     return [elements, cov_mat, nongrav_params]
 
 def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
@@ -464,7 +475,13 @@ def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
     det_2 = np.linalg.det(cov_2)
     det_big = np.linalg.det(big_cov)
     term_1 = 1/8 * (sol_1-sol_2) @ big_cov @ (sol_1-sol_2).T
-    term_2 = 1/2 * np.log(det_big/np.sqrt(det_1*det_2))
+    # simplify the natural log in term_2 because sometimes the determinant
+    # is too small and the product of the two determinants is beyond the lower
+    # limit of the float64 type
+    # term_2 = 1/2 * np.log(det_big/np.sqrt(det_1*det_2))
+    # term_2 = 1/2 * (np.log(det_big) - np.log(np.sqrt(det_1*det_2)))
+    # term_2 = 1/2 * (np.log(det_big) - 1/2 * np.log(det_1*det_2))
+    term_2 = 1/2 * np.log(det_big) - 1/4 * (np.log(det_1) + np.log(det_2))
     bhattacharya = term_1 + term_2
     bhatt_coeff = np.exp(-bhattacharya)
     return maha_dist_1, maha_dist_2, bhattacharya, bhatt_coeff

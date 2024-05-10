@@ -55,6 +55,12 @@ int main(){
     SpiceDouble spiceMat[6][6];
     sxform_c(from.c_str(), to.c_str(), et, spiceMat);
     kclear_c();
+    // convert SPICE frame so it rotates au, au/day instead of km, km/s
+    for (int i = 3; i < 6; i++){
+        for (int j = 0; j < 3; j++){
+            spiceMat[i][j] *= 86400.0;
+        }
+    }
 
     // // print both matrices
     // std::cout << "Spice Matrix:" << std::endl;

@@ -3,6 +3,7 @@ approach.cpp
 elements.cpp
 force.cpp
 gr15.cpp
+observe.cpp
 interpolate.cpp
 parallel.cpp
 pck.cpp

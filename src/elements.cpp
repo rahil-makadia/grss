@@ -84,9 +84,14 @@ void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
         kepler_solve_hyperbolic(M, cometaryState[0], E, tol, max_iter);
         nu = 2 * atan2(tanh(E / 2) * sqrt(e + 1), sqrt(e - 1));
     } else {
-        throw std::runtime_error(
-            "utilities.cpp: kepler_solve: Cannot handle e = 1 right "
-            "now!!!");
+        // Barker's equation from https://doi.org/10.1007/s10569-013-9476-9
+        const real q = cometaryState[1];
+        M = sqrt(GM / (2 * q*q*q)) * (epochMjD - cometaryState[2]);
+        E = std::numeric_limits<real>::quiet_NaN();
+        const real B = 1.5 * M;
+        const real A = pow(B+sqrt(B*B+1), 2.0L/3.0L);
+        const real D = 2*A*B/(1+A+A*A);
+        nu = 2*atan(D);
     }
 }
 
@@ -309,7 +314,10 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState,
     real nu = acos((eVec[0] * cartesianState[0] + eVec[1] * cartesianState[1] +
                     eVec[2] * cartesianState[2]) /
                    (e * r));
-    if (cartesianState[2] < 0) {
+    real rDotV = cartesianState[0] * cartesianState[3] +
+                 cartesianState[1] * cartesianState[4] +
+                 cartesianState[2] * cartesianState[5];
+    if (rDotV < 0) {
         nu = 2 * M_PI - nu;
     }
     // real E = 2*atan(tan(nu/2)*sqrt((1-e)/(1+e)));

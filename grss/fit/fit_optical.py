@@ -136,11 +136,13 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
         if not os.path.exists(obs_data):
             raise FileNotFoundError(f"File {obs_data} does not exist.")
     # read in the data and add extra columns if not present
-    obs_df = (
-        pd.read_xml(obs_data, dtype=ades_column_types)
-        # compute the obsTimeMJD time from obsTime
-        .assign(obsTimeMJD=lambda x:Time(x['obsTime'].to_list(),format='isot',scale='utc').utc.mjd)
-    )
+    obs_df = pd.read_xml(obs_data, dtype=ades_column_types)
+    obs_times = Time(obs_df['obsTime'].to_list(), format='isot', scale='utc')
+    obs_df['obsTimeMJD'] = obs_times.utc.mjd
+    obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
+    if 'deprecated' in obs_df:
+        # drop rows with deprecated discovery observations
+        obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
     # add columns if they are not present
     str_cols = ['trx', 'rcv', 'sys', 'selAst']
     for col in str_cols:
@@ -149,6 +151,8 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     for col in ades_column_types:
         if col not in obs_df:
             obs_df[col] = np.nan
+    # remove any columns that are not in ades_column_types
+    obs_df = obs_df[ades_column_types.keys()]
     if verbose:
         print(f"Read in {len(obs_df)} observations from the MPC.")
     _ades_mode_check(obs_df)
@@ -213,6 +217,7 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
     psv_df['sigCorr'] = psv_df['rmsCorr']
     times = Time(psv_df['obsTime'].to_list(), format='isot', scale='utc')
     psv_df['obsTimeMJD'] = times.utc.mjd
+    psv_df['obsTimeMJDTDB'] = times.tdb.mjd
     add_counter = 0
     if verbose:
         print(f"Read in {len(psv_df)} observations from the ADES PSV file.")
@@ -324,6 +329,7 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'provID'] = prov_id
         obs_df.loc[idx, 'obsTime'] = f'{obs_time.utc.iso}Z'
         obs_df.loc[idx, 'obsTimeMJD'] = data['epoch_utc'] + 55197.0
+        obs_df.loc[idx, 'obsTimeMJDTDB'] = obs_time.tdb.mjd
         obs_df.loc[idx, 'mode'] = 'CCD'
         obs_df.loc[idx, 'stn'] = '258'
         obs_df.loc[idx, 'ra'] = data['ra']
@@ -974,5 +980,4 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
         obs_df = deweight_obs(obs_df, num_obs_per_night, verbose)
     elif eliminate:
         obs_df = eliminate_obs(obs_df, num_obs_per_night, verbose)
-    # obs_df.sort_values(by='obsTimeMJD', inplace=True, ignore_index=True)
     return obs_df
