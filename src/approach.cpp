@@ -42,14 +42,11 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
         if (!propSim->integBodies[i].logCA) {
             continue;
         }
-        const real flybyBodyRadius = propSim->integBodies[i].radius;
-        real centralBodyRadius, caTol;
         size_t startj = 0;
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
             if (i != j) {
-                real relPosOld[3], relPos[3], relVelOld[3], relVel[3];
+                real caTol, relPosOld[3], relPos[3], relVelOld[3], relVel[3];
                 if (j < propSim->integParams.nInteg) {
-                    centralBodyRadius = propSim->integBodies[j].radius;
                     caTol = propSim->integBodies[j].caTol;
                     for (size_t k = 0; k < 3; k++) {
                         relPosOld[k] = xIntegOld[starti + k] - xIntegOld[startj + k];
@@ -59,7 +56,6 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     }
                 } else {
                     SpiceBody bodyj = propSim->spiceBodies[j - propSim->integParams.nInteg];
-                    centralBodyRadius = bodyj.radius + get_atm_offset(bodyj.spiceId);
                     caTol = bodyj.caTol;
                     double xSpice[9], xSpiceOld[9];
                     get_spk_state(bodyj.spiceId, t, propSim->spkEphem, xSpice);
@@ -101,7 +97,13 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     propSim->caParams.push_back(ca);
                     if (ca.impact){
                         ImpactParameters impact;
-                        get_ca_or_impact_time(propSim, i, j, tOld-1, ca.t, impact.t, impact_r_calc);
+                        real tImpStart;
+                        if (forwardProp){
+                            tImpStart = fmax(tOld-1, propSim->integParams.t0-propSim->tEvalMargin);
+                        } else {
+                            tImpStart = fmin(tOld+1, propSim->integParams.t0+propSim->tEvalMargin);
+                        }
+                        get_ca_or_impact_time(propSim, i, j, tImpStart, ca.t, impact.t, impact_r_calc);
                         impact.xRel = get_rel_state(propSim, i, j, impact.t);
                         impact.tCA = ca.t;
                         impact.xRelCA = ca.xRel;
@@ -172,8 +174,8 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
  * @param[in] t Time to compute the relative state.
  * @return xRel Relative state of the body.
  */
-static std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
-                                       const size_t &j, const real &t) {
+std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
+                                const size_t &j, const real &t) {
     std::vector<real> xInterp = propSim->interpolate(t);
     std::vector<real> xRel(2*propSim->integBodies[i].n2Derivs, std::numeric_limits<real>::quiet_NaN());
     size_t starti = 0;

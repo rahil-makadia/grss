@@ -63,6 +63,7 @@ int main(){
     }
 
     // // print both matrices
+    // std::cout.precision(16);
     // std::cout << "Spice Matrix:" << std::endl;
     // for (int i = 0; i < 6; i++){
     //     for (int j = 0; j < 6; j++){

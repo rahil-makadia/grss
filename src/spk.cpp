@@ -199,23 +199,26 @@ void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
     if (spiceId == 199) spiceId = 1;
     if (spiceId == 299) spiceId = 2;
     int m;
+    bool mFound = false;
     for (m = 0; m < bsp->num; m++) {
         if (bsp->targets[m].code == spiceId) {
-            break;
+            mFound = true;
+            if (epoch >= bsp->targets[m].beg && epoch <= bsp->targets[m].end){
+                break;
+            }
         }
         if (m == bsp->num - 1) {
-            throw std::invalid_argument("ERROR: Requested SPICE ID not found in SPK file");
+            if (!mFound) {
+                throw std::invalid_argument(
+                    "ERROR: Requested SPICE ID not found in SPK file");
+            } else {
+                throw std::runtime_error(
+                    "The requested time is outside the coverage provided by "
+                    "the ephemeris file.");
+            }
         }
     }
-    if (m < 0 || m >= bsp->num) {
-        throw std::runtime_error("The requested spice ID has not been found.");
-    }
     SpkTarget *target = &(bsp->targets[m]);
-    if (epoch < target->beg || epoch > target->end) {
-        throw std::runtime_error(
-            "The requested time is outside the coverage "
-            "provided by the ephemeris file.");
-    }
     *out_x = 0.0;
     *out_y = 0.0;
     *out_z = 0.0;

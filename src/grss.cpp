@@ -793,9 +793,9 @@ PYBIND11_MODULE(libgrss, m) {
             MJD Times to evaluate the states of the integrated bodies at.
             Can be TDB or UTC based on PropSimulation.tEvalUTC.
             )mydelimiter")
-        .def_readwrite("radarObserver", &PropSimulation::radarObserver,
+        .def_readwrite("obsType", &PropSimulation::obsType,
                        R"mydelimiter(
-            Whether the observer for each value in PropSimulation.tEval is for radar.
+            Observation type for each value in PropSimulation.tEval (0=optical, 1=delay, 2=doppler, 3=Gaia).
             )mydelimiter")
         .def_readwrite("lightTimeEval", &PropSimulation::lightTimeEval,
                        R"mydelimiter(
@@ -811,6 +811,10 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("opticalPartials", &PropSimulation::opticalPartials,
                        R"mydelimiter(
             Optical observation partials of each integration body in the simulation for each value in PropSimulation.tEval.
+            )mydelimiter")
+        .def_readwrite("opticalObsCorr", &PropSimulation::opticalObsCorr,
+                       R"mydelimiter(
+            Photocenter-barycenter correction for each optical observation for each integration body in the simulation.
             )mydelimiter")
         .def_readwrite("radarObs", &PropSimulation::radarObs,
                        R"mydelimiter(
@@ -953,7 +957,7 @@ PYBIND11_MODULE(libgrss, m) {
             observerInfo : list of list of real
                 Observer information. Each list at least contains the central body SPICE ID
                 (e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
-                This information might be repeated for bistatic radar observations.
+                This information should be repeated for radar observations.
             adaptiveTimestep : bool
                 Flag to use adaptive time step for the propagation.
             dt0 : real
@@ -1024,7 +1028,7 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def("extend", &PropSimulation::extend, py::arg("tf"),
              py::arg("tEvalNew") = std::vector<real>(),
-             py::arg("xObserverNew") = std::vector<std::vector<real>>(),
+             py::arg("observerInfoNew") = std::vector<std::vector<real>>(),
              R"mydelimiter(
             Extends the simulation to a new final time.
 
@@ -1035,10 +1039,10 @@ PYBIND11_MODULE(libgrss, m) {
             tEvalNew : list of real
                 Extra MJD Times to evaluate the states of the integrated bodies at.
                 Can be TDB or UTC based on tEvalUTC.
-            xObserverNew : list of list of real
-                Extra observer information. Each list at least contains the central body SPICE ID
+            observerInfoNew : list of list of real
+                New observer information. Each list at least contains the central body SPICE ID
                 (e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
-                This information might be repeated for bistatic radar observations.
+                This information should be repeated for radar observations.
             )mydelimiter")
         .def("save", &PropSimulation::save, py::arg("filename"),
              R"mydelimiter(

@@ -7,7 +7,8 @@
  * @brief Compute the correction to the apparent state of the body due to the
  * gravitational light bending.
  */
-void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
+void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
+                        const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary);
 
 /**
@@ -25,6 +26,14 @@ void get_optical_measurement(PropSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
                              std::vector<real> &opticalMeasurement,
                              std::vector<real> &opticalPartials);
+
+/**
+ * @brief Get the photocenter-barycenter correction for an optical measurement.
+ */
+void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx,
+                                const real &tInterpGeom,
+                                const std::vector<real> &xInterpApparent,
+                                std::vector<real> &photocenterCorr);
 
 /**
  * @brief Get the radar measurement and partials.

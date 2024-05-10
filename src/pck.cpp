@@ -224,7 +224,6 @@ void pck_calc(PckInfo *bpc, real epoch, int spiceId, real *rotMat,
     // set up Chebyshev polynomials
     double T[32];
     double S[32];
-    double U[32];
     T[0] = 1.0;
     T[1] = z;
     S[0] = 0.0;

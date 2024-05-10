@@ -272,8 +272,8 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
     size_t numStates = xInterpGeom.size();
     std::vector<real> xObserver = propSim->xObserver[interpIdx];
     bool bouncePointAtCenterOfMass = true;
-    if (propSim->observerInfo[interpIdx].size() == 9 ||
-        propSim->observerInfo[interpIdx].size() == 10) {
+    if (propSim->obsType[interpIdx] == 1 ||  // delay
+        propSim->obsType[interpIdx] == 2) {  // doppler
         bouncePointAtCenterOfMass = propSim->observerInfo[interpIdx][8] == 1.0;
     }
     size_t starti = 0;
@@ -289,7 +289,7 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
         for (size_t j = 0; j < 6; j++) {
             xInterpApparentBary[j] = xInterpApparentTemp[starti + j];
         }
-        get_glb_correction(propSim, tInterpGeom, xInterpApparentBary);
+        get_glb_correction(propSim, interpIdx, tInterpGeom, xInterpApparentBary);
         for (size_t j = 0; j < 6; j++) {
             xInterpApparent[starti + j] = xInterpApparentBary[j] - xObserver[j];
         }
@@ -336,7 +336,6 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
     if (propSim->convergedLightTime) {
         real lightTimeTol = 1e-10 / 86400.0L;
         real lightTimeOneBodyPrev = 0.0L;
-        real deltaLightTimeRelativistic;
         size_t maxIter = 20;
         size_t iter = 0;
         // keep iterating until max iterations or light time tolerance is met
@@ -356,13 +355,14 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                 distRelativeOneBody -= propSim->integBodies[i].radius;
             }
             lightTimeOneBodyPrev = lightTimeOneBody;
-            get_delta_delay_relativistic(
-                propSim, tInterpGeom - lightTimeOneBody, xInterpApparent,
-                deltaLightTimeRelativistic);
-            lightTimeOneBody = distRelativeOneBody / propSim->consts.clight +
-                deltaLightTimeRelativistic;
+            lightTimeOneBody = distRelativeOneBody / propSim->consts.clight;
             iter++;
         }
+        real deltaLightTimeRelativistic;
+        get_delta_delay_relativistic(
+            propSim, tInterpGeom, xInterpApparent,
+            deltaLightTimeRelativistic);
+        lightTimeOneBody += deltaLightTimeRelativistic;
         if (iter >= maxIter) {
             std::cout
                 << "Warning: Downleg light time did not converge for body "

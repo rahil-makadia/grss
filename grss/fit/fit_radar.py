@@ -71,6 +71,7 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         print(f"Read in {num_obs} radar observations from JPL radar API.")
     data = raw_data['data']
     time_range_count = 0
+    pre1972_count = 0
     for i in range(num_obs):
         obs = data[num_obs-i-1]
         date = Time(obs[1], format='iso', scale='utc')
@@ -84,10 +85,9 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         freq = float(obs[5])
         # transmitter and receiver codes, use radar_observer_map if you
         # want to use MPC station info (less accurate in my experience)
-        tx_code = obs[6]
-        rx_code = obs[7]
-        bounce_point = obs[8]
-        bounce_point_int = 1 if bounce_point == 'C' else 0
+        rx_code = obs[6]
+        tx_code = obs[7]
+        bounce_point_int = 1 if obs[8] == 'C' else 0
         idx = len(obs_df)
         obs_df.loc[idx,'permID'] = perm_id
         obs_df.loc[idx,'provID'] = prov_id
@@ -95,8 +95,8 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         obs_df.loc[idx,'obsTimeMJD'] = date.utc.mjd
         obs_df.loc[idx,'obsTimeMJDTDB'] = date.tdb.mjd
         obs_df.loc[idx,'mode'] = 'RAD'
-        obs_df.loc[idx,'trx'] = tx_code
         obs_df.loc[idx,'rcv'] = rx_code
+        obs_df.loc[idx,'trx'] = tx_code
         obs_df.loc[idx,'delay'] = obs_val/1.0e6 if delay else np.nan
         obs_df.loc[idx,'rmsDelay'] = obs_sigma if delay else np.nan
         obs_df.loc[idx,'doppler'] = obs_val if doppler else np.nan
@@ -105,6 +105,14 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         obs_df.loc[idx,'frq'] = freq
         obs_df.loc[idx,'sigDelay'] = obs_sigma if delay else np.nan
         obs_df.loc[idx,'sigDoppler'] = obs_sigma if doppler else np.nan
+        if date.utc.mjd < 41317:
+            pre1972_count += 1
+            obs_df.loc[idx,'selAst'] = 'd'
+    if pre1972_count > 0:
+        print(f"\tWARNING: {pre1972_count} radar observations were taken before 1972.\n"
+                "\t\tThese residuals cannot be reliably computed because high-accuracy Earth "
+                "orientation kernels are not available for this time period.\n"
+                "\t\tForce deleting them...")
     if verbose:
         print(f"\tFiltered to {num_obs-time_range_count} observations that satisfy the "
                 "time range constraints.")

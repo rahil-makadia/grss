@@ -17,7 +17,7 @@ int main() {
     gettimeofday(&t1, NULL);
     real tDiff;
 
-    int DEkernel = 441;
+    int DEkernel = 440;
     std::string DEkernelPath = "../../../grss/kernels/";
     real t0SimMjd = 2.4621385359989386E+06L - 2400000.5L;
     real tfSimMjd = 2.4625030372426095E+06L - 2400000.5L;
@@ -28,8 +28,7 @@ int main() {
     bool evalApparentState = false;
     bool convergedLightTime = false;
     simTest.set_integration_parameters(
-        tfSimMjd, tEval, tEvalUTC, evalApparentState, convergedLightTime,
-        std::vector<std::vector<real>>{}, true, 1e-3, 25, 5e-3);
+        tfSimMjd, tEval, tEvalUTC, evalApparentState, convergedLightTime);
     std::vector<real> pos = {-5.58232604283634858966e-01,
                              8.55200571132647247019e-01,
                              3.03631949052953764578e-01};
