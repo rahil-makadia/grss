@@ -303,9 +303,10 @@ void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
  * @param[in] t0_mjd Epoch to compute the state at (MJD ET).
  * @param[in] ephem Ephemeris data from the PropSimulation.
  * @param[out] state State+acceleration of the body at the requested epoch [AU, AU/day, AU/day^2].
+ * @param[in] writeCache If true, the state will be written to the cache.
  */
 void get_spk_state(const int &spiceId, const double &t0_mjd, SpkEphemeris &ephem,
-                   double state[9]) {
+                   double state[9], const bool &writeCache) {
     if (ephem.mb == nullptr || ephem.sb == nullptr){
         throw std::invalid_argument(
             "get_spk_state: Ephemeris kernels are not loaded. Memory map "
@@ -384,25 +385,27 @@ void get_spk_state(const int &spiceId, const double &t0_mjd, SpkEphemeris &ephem
         state[7] += aySun;
         state[8] += azSun;
     }
-    // and add it to the cache
-    if (!t0SomewhereInCache) {
-        ephem.nextIdxToWrite++;
-        if (ephem.nextIdxToWrite == SPK_CACHE_SIZE) {
-            ephem.nextIdxToWrite = 0;
+    if (writeCache) {
+        // and add it to the cache
+        if (!t0SomewhereInCache) {
+            ephem.nextIdxToWrite++;
+            if (ephem.nextIdxToWrite == SPK_CACHE_SIZE) {
+                ephem.nextIdxToWrite = 0;
+            }
         }
+        // std::cout << "Adding state for " << spiceId << " at " << t0_mjd << " to
+        // cache at slot" << ephem.nextIdxToWrite << std::endl;
+        ephem.cache[ephem.nextIdxToWrite].t = t0_mjd;
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].t = t0_mjd;
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].spiceId = spiceId;
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].x = state[0];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].y = state[1];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].z = state[2];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vx = state[3];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vy = state[4];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vz = state[5];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ax = state[6];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ay = state[7];
+        ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].az = state[8];
     }
-    // std::cout << "Adding state for " << spiceId << " at " << t0_mjd << " to
-    // cache at slot" << ephem.nextIdxToWrite << std::endl;
-    ephem.cache[ephem.nextIdxToWrite].t = t0_mjd;
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].t = t0_mjd;
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].spiceId = spiceId;
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].x = state[0];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].y = state[1];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].z = state[2];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vx = state[3];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vy = state[4];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].vz = state[5];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ax = state[6];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].ay = state[7];
-    ephem.cache[ephem.nextIdxToWrite].items[cacheIdx].az = state[8];
 }

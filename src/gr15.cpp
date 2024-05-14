@@ -43,14 +43,18 @@ void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim,
  * @param[out] bCompCoeffs Vector of compensated summation coefficients for computing the b-matrix.
  * @param[out] b Matrix of interpolation coefficients.
  * @param[in] dim Dimension of the system (number of 2nd derivatives).
+ * @param[out] PCerr Error in the predictor-corrector step (only for hIdx = 7)
  */
 void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                      const size_t &hIdx, real *g, real *bCompCoeffs,
-                     std::vector<std::vector<real>> &b, const size_t &dim) {
+                     std::vector<std::vector<real>> &b, const size_t &dim, real &PCerr) {
     switch (hIdx) {
         case 0:
+        {
             throw std::runtime_error("hIdx cannot be 0");
+        }
         case 1:
+        {
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[0*dim+i];
@@ -60,7 +64,9 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(g[0*dim+i]-temp, &(b[0][i]), &(bCompCoeffs[0*dim+i]));
             }
             break;
+        }
         case 2:
+        {
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[1*dim+i];
@@ -72,7 +78,9 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(temp        , &(b[1][i]), &(bCompCoeffs[1*dim+i]));
             }
             break;
+        }
         case 3:
+        {
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[2*dim+i];
@@ -85,7 +93,9 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(temp        , &(b[2][i]), &(bCompCoeffs[2*dim+i]));
             }
             break;
+        }
         case 4:
+        {
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[3*dim+i];
@@ -99,7 +109,9 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(temp        , &(b[3][i]), &(bCompCoeffs[3*dim+i]));
             }
             break;
+        }
         case 5:
+        {
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[4*dim+i];
@@ -114,7 +126,9 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(temp        , &(b[4][i]), &(bCompCoeffs[4*dim+i]));
             }
             break;
+        }
         case 6:
+        {
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[5*dim+i];
@@ -130,7 +144,11 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(temp         , &(b[5][i]), &(bCompCoeffs[5*dim+i]));
             }
             break;
+        }
         case 7:
+        {
+            real maxAccI = 0;
+            real maxB6Tilde = 0;
             for (size_t i = 0; i < dim; i++) {
                 real dummy = 0;
                 real temp = g[6*dim+i];
@@ -145,8 +163,18 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                 comp_sum(temp*cVec[19], &(b[4][i]), &(bCompCoeffs[4*dim+i]));
                 comp_sum(temp*cVec[20], &(b[5][i]), &(bCompCoeffs[5*dim+i]));
                 comp_sum(temp         , &(b[6][i]), &(bCompCoeffs[6*dim+i]));
+                const real accI = fabs(AccIntegArr[hIdx][i]);
+                if (std::isnormal(accI) && accI > maxAccI) {
+                    maxAccI = accI;
+                }
+                const real b6Tilde = fabs(temp);
+                if (std::isnormal(b6Tilde) && b6Tilde > maxB6Tilde) {
+                    maxB6Tilde = b6Tilde;
+                }
             }
+            PCerr = maxB6Tilde / maxAccI;
             break;
+        }
         default:
             throw std::runtime_error("hIdx is out of range");
     }
@@ -161,26 +189,23 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
 void refine_b(std::vector<std::vector<real>> &b,
               real *e, const real &dtRatio,
               const size_t &dim) {
-    std::vector<std::vector<real>> bDiff(7, std::vector<real>(dim, 0.0L));
+    const real q = dtRatio;
+    const real q2 = q * q;
+    const real q3 = q2 * q;
+    const real q4 = q2 * q2;
+    const real q5 = q2 * q3;
+    const real q6 = q3 * q3;
+    const real q7 = q2 * q5;
+
     for (size_t i = 0; i < dim; i++){
-        bDiff[0][i] = b[0][i] - e[0*dim+i];
-        bDiff[1][i] = b[1][i] - e[1*dim+i];
-        bDiff[2][i] = b[2][i] - e[2*dim+i];
-        bDiff[3][i] = b[3][i] - e[3*dim+i];
-        bDiff[4][i] = b[4][i] - e[4*dim+i];
-        bDiff[5][i] = b[5][i] - e[5*dim+i];
-        bDiff[6][i] = b[6][i] - e[6*dim+i];
-    }
+        const real bDiff0 = b[0][i] - e[0*dim+i];
+        const real bDiff1 = b[1][i] - e[1*dim+i];
+        const real bDiff2 = b[2][i] - e[2*dim+i];
+        const real bDiff3 = b[3][i] - e[3*dim+i];
+        const real bDiff4 = b[4][i] - e[4*dim+i];
+        const real bDiff5 = b[5][i] - e[5*dim+i];
+        const real bDiff6 = b[6][i] - e[6*dim+i];
 
-    real q = dtRatio;
-    real q2 = q * q;
-    real q3 = q2 * q;
-    real q4 = q2 * q2;
-    real q5 = q2 * q3;
-    real q6 = q3 * q3;
-    real q7 = q2 * q5;
-
-    for (size_t i = 0; i < dim; i++) {
         e[0*dim+i] = q  * (b[6][i] * 7.0  + b[5][i] * 6.0  + b[4][i] * 5.0  + b[3][i] * 4.0 + b[2][i] * 3.0 + b[1][i] * 2.0 + b[0][i]);
         e[1*dim+i] = q2 * (b[6][i] * 21.0 + b[5][i] * 15.0 + b[4][i] * 10.0 + b[3][i] * 6.0 + b[2][i] * 3.0 + b[1][i]);
         e[2*dim+i] = q3 * (b[6][i] * 35.0 + b[5][i] * 20.0 + b[4][i] * 10.0 + b[3][i] * 4.0 + b[2][i]);
@@ -188,16 +213,14 @@ void refine_b(std::vector<std::vector<real>> &b,
         e[4*dim+i] = q5 * (b[6][i] * 21.0 + b[5][i] * 6.0  + b[4][i]);
         e[5*dim+i] = q6 * (b[6][i] * 7.0  + b[5][i]);
         e[6*dim+i] = q7 * (b[6][i]);
-    }
 
-    for (size_t i = 0; i < dim; i++) {
-        b[0][i] = e[0*dim+i] + bDiff[0][i];
-        b[1][i] = e[1*dim+i] + bDiff[1][i];
-        b[2][i] = e[2*dim+i] + bDiff[2][i];
-        b[3][i] = e[3*dim+i] + bDiff[3][i];
-        b[4][i] = e[4*dim+i] + bDiff[4][i];
-        b[5][i] = e[5*dim+i] + bDiff[5][i];
-        b[6][i] = e[6*dim+i] + bDiff[6][i];
+        b[0][i] = e[0*dim+i] + bDiff0;
+        b[1][i] = e[1*dim+i] + bDiff1;
+        b[2][i] = e[2*dim+i] + bDiff2;
+        b[3][i] = e[3*dim+i] + bDiff3;
+        b[4][i] = e[4*dim+i] + bDiff4;
+        b[5][i] = e[5*dim+i] + bDiff5;
+        b[6][i] = e[6*dim+i] + bDiff6;
     }
 }
 
@@ -303,11 +326,12 @@ static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
             y3 += temp*temp;
             temp = 2.0L*b[1][k] + 6.0L*b[2][k] + 12.0L*b[3][k] + 20.0L*b[4][k] + 30.0L*b[5][k] + 42.0L*b[6][k];
             y4 += temp*temp;
-            real timescale2 = 2.0L*y2/(y3+sqrt(y4*y2));
-            if (std::isnormal(timescale2) && timescale2 < minTimescale2){
-                minTimescale2 = timescale2;
-            }
         }
+        const real timescale2 = 2.0L*y2/(y3+sqrt(y4*y2));
+        if (std::isnormal(timescale2) && timescale2 < minTimescale2){
+            minTimescale2 = timescale2;
+        }
+        startb += propSim->integParams.n2Derivs;
     }
     real dtReq;
     if (std::isnormal(minTimescale2)){
@@ -340,7 +364,6 @@ void gr15(PropSimulation *propSim) {
     propSim->integParams.timestepCounter = 0;
     std::vector<real> xInteg(propSim->xInteg.size(), 0.0);
     std::vector<real> xIntegCompCoeffs(propSim->xInteg.size(), 0.0);
-    std::vector<std::vector<real> > bOld(7, std::vector<real>(dim, 0.0));
     std::vector<std::vector<real> > b(7, std::vector<real>(dim, 0.0));
     real *bCompCoeffs = new real [7 * dim];
     memset(bCompCoeffs, 0.0, 7 * dim * sizeof(real));
@@ -406,15 +429,8 @@ void gr15(PropSimulation *propSim) {
                                   propSim->integBodies, xInteg, xIntegCompCoeffs);
                     accIntegArr[hIdx] = get_state_der(
                         t + hVec[hIdx] * dt, xInteg, propSim);
-                    compute_g_and_b(accIntegArr, hIdx, g, bCompCoeffs, b, dim);
+                    compute_g_and_b(accIntegArr, hIdx, g, bCompCoeffs, b, dim, PCerr);
                 }
-                for (size_t i = 0; i < dim; i++) {
-                    b6Tilde[i] = b[6][i] - bOld[6][i];
-                }
-                vabs_max(b6Tilde, dim, b6TildeMax);
-                vabs_max(accIntegArr[7], accIntegArr7Max);
-                PCerr = b6TildeMax / accIntegArr7Max;
-                bOld = b;
             }
             if (propSim->integParams.adaptiveTimestep) {
                 // dtReq = get_adaptive_timestep_old(propSim, dt, accIntegArr7Max, b);
@@ -452,9 +468,7 @@ void gr15(PropSimulation *propSim) {
             propSim->interpParams.tStack.push_back(t);
             propSim->interpParams.xIntegStack.push_back(xInteg);
             propSim->integParams.timestepCounter++;
-            if (propSim->integParams.timestepCounter > 1) {
-                refine_b(b, e, dtReq / dt, dim);
-            }
+            refine_b(b, e, dtReq/dt, dim);
             check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg);
             if ((propSim->integParams.tf > propSim->integParams.t0 &&
                     t >= propSim->integParams.tf) ||

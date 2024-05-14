@@ -62,9 +62,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("dt0", &IntegrationParameters::dt0, R"mydelimiter(
             Initial time step.
             )mydelimiter")
-        .def_readwrite("dtMax", &IntegrationParameters::dtMax, R"mydelimiter(
-            Maximum time step.
-            )mydelimiter")
         .def_readwrite("dtMin", &IntegrationParameters::dtMin, R"mydelimiter(
             Minimum time step.
             )mydelimiter")
@@ -935,9 +932,9 @@ PYBIND11_MODULE(libgrss, m) {
              py::arg("convergedLightTims") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
              py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
-             py::arg("dtMax") = 21.0L, py::arg("dtMin") = 1.0e-4L,
-             py::arg("dtChangeFactor") = 0.25L, py::arg("tolInteg") = 1.0e-11L,
-             py::arg("tolPC") = 1.0e-16L, R"mydelimiter(
+             py::arg("dtMin") = 1.0e-4L, py::arg("dtChangeFactor") = 0.25L,
+             py::arg("tolInteg") = 1.0e-11L, py::arg("tolPC") = 1.0e-16L,
+             R"mydelimiter(
             Sets the integration parameters.
 
             Parameters
@@ -962,8 +959,6 @@ PYBIND11_MODULE(libgrss, m) {
                 Flag to use adaptive time step for the propagation.
             dt0 : real
                 Initial time step.
-            dtMax : real
-                Maximum time step.
             dtMin : real
                 Minimum time step.
             dtChangeFactor : real
@@ -1012,8 +1007,6 @@ PYBIND11_MODULE(libgrss, m) {
                 Flag to use adaptive time step for the propagation.
             dt0 : real
                 Initial time step.
-            dtMax : real
-                Maximum time step.
             dtMin : real
                 Minimum time step.
             dtChangeFactor : real

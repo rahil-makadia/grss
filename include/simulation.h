@@ -57,7 +57,6 @@ struct Constants {
  * @param t0 Initial time.
  * @param tf Final time.
  * @param dt0 Initial timestep.
- * @param dtMax Maximum timestep.
  * @param dtMin Minimum timestep.
  * @param dtChangeFactor Maximum factor by which to change timestep.
  * @param adaptiveTimestep Flag to use adaptive timestep.
@@ -73,7 +72,6 @@ struct IntegrationParameters {
     real t0;
     real tf;
     real dt0;
-    real dtMax;
     real dtMin;
     real dtChangeFactor;
     bool adaptiveTimestep;
@@ -520,7 +518,7 @@ class PropSimulation {
         bool convergedLightTime = false,
         std::vector<std::vector<real>> observerInfo =
             std::vector<std::vector<real>>(),
-        bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 21.0L,
+        bool adaptiveTimestep = true, real dt0 = 0.0L,
         real dtMin = 1.0e-4L, real dtChangeFactor = 0.25L,
         real tolInteg = 1.0e-11L, real tolPC = 1.0e-16L);
     /**

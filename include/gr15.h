@@ -67,9 +67,10 @@ void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim,
 /**
  * @brief Compute the interpolation coefficients for the integration.
  */
-void compute_g_and_b(const std::vector<std::vector<real> > &AccIntegArr,
+void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                      const size_t &hIdx, real *g, real *bCompCoeffs,
-                     std::vector<std::vector<real> > &b, const size_t &dim);
+                     std::vector<std::vector<real>> &b, const size_t &dim,
+                     real &PCerr);
 
 /**
  * @brief Refine the b-matrix of interpolation coefficients for the next timestep.

@@ -145,6 +145,6 @@ void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
  * using the ephemeris data in a PropSimulation.
  */
 void get_spk_state(const int &spiceId, const double &t0_mjd, SpkEphemeris &ephem,
-                   double state[9]);
+                   double state[9], const bool &writeCache=false);
 
 #endif

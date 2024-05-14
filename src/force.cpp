@@ -2,6 +2,42 @@
 // #define PRINT_FORCES 1
 
 /**
+ * @brief Compute the acceleration of the system due to newtonian gravity.
+ */
+static void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
+                  std::vector<STMParameters> &allSTMs);
+
+/**
+ * @brief Compute the acceleration of the system due to the PPN relativistic correction (simple heliocentric model).
+ */
+static void force_ppn_simple(const PropSimulation *propSim,
+                      std::vector<real> &accInteg,
+                      std::vector<STMParameters> &allSTMs);
+
+/**
+ * @brief Compute the acceleration of the system due to the PPN relativistic correction (full Einstein-Infeld-Hoffmann model).
+ */
+static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
+                   std::vector<STMParameters> &allSTMs);
+
+/**
+ * @brief Compute the acceleration of the system due to the J2 zonal harmonic.
+ */
+static void force_J2(const PropSimulation *propSim,
+              std::vector<real> &accInteg, std::vector<STMParameters> &allSTMs);
+
+/**
+ * @brief Compute the acceleration of the system due to the nongravitational forces.
+ */
+static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
+                   std::vector<STMParameters> &allSTMs);
+
+/**
+ * @brief Compute the acceleration of the system due to a thruster in the velocity direction.
+ */
+static void force_thruster(const PropSimulation *propSim, std::vector<real> &accInteg);
+
+/**
  * @param[in] t Time [TDB MJD]
  * @param[in] xInteg State vector
  * @param[in] propSim PropSimulation object
@@ -46,7 +82,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
     double xSpice[9];
     for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
         get_spk_state(propSim->spiceBodies[i].spiceId, t, propSim->spkEphem,
-                      xSpice);
+                      xSpice, true);
         propSim->spiceBodies[i].pos[0] = xSpice[0];
         propSim->spiceBodies[i].pos[1] = xSpice[1];
         propSim->spiceBodies[i].pos[2] = xSpice[2];
@@ -111,7 +147,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
+static void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
                   std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -123,9 +159,6 @@ void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
     const real G = propSim->consts.G;
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        const real x = propSim->integBodies[i].pos[0];
-        const real y = propSim->integBodies[i].pos[1];
-        const real z = propSim->integBodies[i].pos[2];
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
             const Body *bodyj;
             if (j < propSim->integParams.nInteg) {
@@ -135,9 +168,9 @@ void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
             }
             const real massj = bodyj->mass;
             if (i != j && massj != 0.0) {
-                const real dx = x - bodyj->pos[0];
-                const real dy = y - bodyj->pos[1];
-                const real dz = z - bodyj->pos[2];
+                const real dx = propSim->integBodies[i].pos[0] - bodyj->pos[0];
+                const real dy = propSim->integBodies[i].pos[1] - bodyj->pos[1];
+                const real dz = propSim->integBodies[i].pos[2] - bodyj->pos[2];
                 const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
                 const real fac = -G * massj / (rRel * rRel * rRel);
                 accInteg[starti + 0] += fac * dx;
@@ -172,7 +205,7 @@ void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_ppn_simple(const PropSimulation *propSim,
+static void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
                       std::vector<STMParameters> &allSTMs) {
 #ifdef PRINT_FORCES
@@ -187,54 +220,44 @@ void force_ppn_simple(const PropSimulation *propSim,
     const real c2 = c * c;
     const real beta = 1.0L;
     const real gamma = 1.0L;
+    size_t sunIdx = 0;
+    for (sunIdx = 0; sunIdx < propSim->integParams.nSpice; sunIdx++) {
+        if (propSim->spiceBodies[sunIdx].spiceId == 10) {
+            break;
+        }
+    }
+    const Body* sun = &propSim->spiceBodies[sunIdx];
+    const real gm = G * sun->mass;
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        const real x = propSim->integBodies[i].pos[0];
-        const real y = propSim->integBodies[i].pos[1];
-        const real z = propSim->integBodies[i].pos[2];
-        const real vx = propSim->integBodies[i].vel[0];
-        const real vy = propSim->integBodies[i].vel[1];
-        const real vz = propSim->integBodies[i].vel[2];
-        for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
-            const Body *bodyj;
-            if (j < propSim->integParams.nInteg) {
-                bodyj = &propSim->integBodies[j];
-            } else {
-                bodyj = &propSim->spiceBodies[j - propSim->integParams.nInteg];
-            }
-            const real massj = bodyj->mass;
-            if (i != j && massj != 0.0 && bodyj->spiceId == 10) {
-                const real gm = G * massj;
-                const real dx = x - bodyj->pos[0];
-                const real dy = y - bodyj->pos[1];
-                const real dz = z - bodyj->pos[2];
-                const real dvx = vx - bodyj->vel[0];
-                const real dvy = vy - bodyj->vel[1];
-                const real dvz = vz - bodyj->vel[2];
-                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                const real dPosDotVel = dx * dvx + dy * dvy + dz * dvz;
-                const real dVelDotVel = dvx * dvx + dvy * dvy + dvz * dvz;
-                // 1st order PPN approximation, equation 4-61 from Moyer (2003),
-                // https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
-                const real fac1 = gm / (c2 * rRel * rRel * rRel);
-                const real fac2 =
-                    (2 * (beta + gamma) * gm / rRel - gamma * dVelDotVel);
-                const real fac3 = 2 * (1 + gamma) * dPosDotVel;
-                accInteg[starti + 0] += fac1 * (fac2 * dx + fac3 * dvx);
-                accInteg[starti + 1] += fac1 * (fac2 * dy + fac3 * dvy);
-                accInteg[starti + 2] += fac1 * (fac2 * dz + fac3 * dvz);
-                if (propSim->integBodies[i].propStm) {
-                    stm_ppn_simple(allSTMs[i], gm, c, beta, gamma, dx,
-                                   dy, dz, dvx, dvy, dvz);
-                }
-                #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << "PPN_" + std::to_string(bodyj->spiceId) << std::setw(25)
-                          << fac1 * (fac2 * dx + fac3 * dvx) << std::setw(25)
-                          << fac1 * (fac2 * dy + fac3 * dvy) << std::setw(25)
-                          << fac1 * (fac2 * dz + fac3 * dvz) << std::endl;
-                #endif
-            }
+        const real dx = propSim->integBodies[i].pos[0] - sun->pos[0];
+        const real dy = propSim->integBodies[i].pos[1] - sun->pos[1];
+        const real dz = propSim->integBodies[i].pos[2] - sun->pos[2];
+        const real dvx = propSim->integBodies[i].vel[0] - sun->vel[0];
+        const real dvy = propSim->integBodies[i].vel[1] - sun->vel[1];
+        const real dvz = propSim->integBodies[i].vel[2] - sun->vel[2];
+        const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+        const real dPosDotVel = dx * dvx + dy * dvy + dz * dvz;
+        const real dVelDotVel = dvx * dvx + dvy * dvy + dvz * dvz;
+        // 1st order PPN approximation, equation 4-61 from Moyer (2003),
+        // https://descanso.jpl.nasa.gov/monograph/series2/Descanso2_all.pdf
+        const real fac1 = gm / (c2 * rRel * rRel * rRel);
+        const real fac2 =
+            (2 * (beta + gamma) * gm / rRel - gamma * dVelDotVel);
+        const real fac3 = 2 * (1 + gamma) * dPosDotVel;
+        accInteg[starti + 0] += fac1 * (fac2 * dx + fac3 * dvx);
+        accInteg[starti + 1] += fac1 * (fac2 * dy + fac3 * dvy);
+        accInteg[starti + 2] += fac1 * (fac2 * dz + fac3 * dvz);
+        if (propSim->integBodies[i].propStm) {
+            stm_ppn_simple(allSTMs[i], gm, c, beta, gamma, dx,
+                            dy, dz, dvx, dvy, dvz);
         }
+        #ifdef PRINT_FORCES
+        forceFile << std::setw(10) << "PPN_" + std::to_string(bodyj->spiceId) << std::setw(25)
+                    << fac1 * (fac2 * dx + fac3 * dvx) << std::setw(25)
+                    << fac1 * (fac2 * dy + fac3 * dvy) << std::setw(25)
+                    << fac1 * (fac2 * dz + fac3 * dvz) << std::endl;
+        #endif
         starti += propSim->integBodies[i].n2Derivs;
     }
     #ifdef PRINT_FORCES
@@ -247,7 +270,7 @@ void force_ppn_simple(const PropSimulation *propSim,
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
+static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
                    std::vector<STMParameters> &allSTMs) {
 // calculate accelerations using the Einstein-Infeld-Hoffmann (EIH) PPN
 // formalism see eqn 27 in
@@ -411,7 +434,7 @@ void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
+static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
               std::vector<STMParameters> &allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -424,9 +447,6 @@ void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
     const real smoothing_threshold = 10.0e3L/propSim->consts.du2m;
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        const real x = propSim->integBodies[i].pos[0];
-        const real y = propSim->integBodies[i].pos[1];
-        const real z = propSim->integBodies[i].pos[2];
         for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
             const Body *bodyj;
             if (j < propSim->integParams.nInteg) {
@@ -436,9 +456,9 @@ void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
             }
             const real massj = bodyj->mass;
             if (i != j && massj != 0.0 && bodyj->isJ2) {
-                const real dx = x - bodyj->pos[0];
-                const real dy = y - bodyj->pos[1];
-                const real dz = z - bodyj->pos[2];
+                const real dx = propSim->integBodies[i].pos[0] - bodyj->pos[0];
+                const real dy = propSim->integBodies[i].pos[1] - bodyj->pos[1];
+                const real dz = propSim->integBodies[i].pos[2] - bodyj->pos[2];
                 const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
                 const real rRel2 = rRel * rRel;
                 const real rRel5 = rRel2 * rRel2 * rRel;
@@ -504,7 +524,7 @@ void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
+static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
                    std::vector<STMParameters> &allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -513,86 +533,60 @@ void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
     forceFile.setf(std::ios::right, std::ios::adjustfield);
     forceFile.open("cpp.11", std::ios::app);
     #endif
+    size_t sunIdx = 0;
+    for (sunIdx = 0; sunIdx < propSim->integParams.nSpice; sunIdx++) {
+        if (propSim->spiceBodies[sunIdx].spiceId == 10) {
+            break;
+        }
+    }
+    const Body* sun = &propSim->spiceBodies[sunIdx];
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
-            const Body *bodyj;
-            if (j < propSim->integParams.nInteg) {
-                bodyj = &propSim->integBodies[j];
-            } else {
-                bodyj = &propSim->spiceBodies[j - propSim->integParams.nInteg];
+        if (propSim->integBodies[i].isNongrav) {
+            const real a1 = propSim->integBodies[i].ngParams.a1;
+            const real a2 = propSim->integBodies[i].ngParams.a2;
+            const real a3 = propSim->integBodies[i].ngParams.a3;
+            const real alpha = propSim->integBodies[i].ngParams.alpha;
+            const real k = propSim->integBodies[i].ngParams.k;
+            const real m = propSim->integBodies[i].ngParams.m;
+            const real n = propSim->integBodies[i].ngParams.n;
+            const real r0 = propSim->integBodies[i].ngParams.r0_au;
+            const real dx = propSim->integBodies[i].pos[0] - sun->pos[0];
+            const real dy = propSim->integBodies[i].pos[1] - sun->pos[1];
+            const real dz = propSim->integBodies[i].pos[2] - sun->pos[2];
+            const real dvx = propSim->integBodies[i].vel[0] - sun->vel[0];
+            const real dvy = propSim->integBodies[i].vel[1] - sun->vel[1];
+            const real dvz = propSim->integBodies[i].vel[2] - sun->vel[2];
+            const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+            const real g =
+                alpha * pow(rRel / r0, -m) * pow(1 + pow(rRel / r0, n), -k);
+            real dpos[3] = {dx, dy, dz};
+            real dvel[3] = {dvx, dvy, dvz};
+            real hRelVec[3], eTHat[3], eNHat[3];
+            real eRHat[3] = {dx/rRel, dy/rRel, dz/rRel};
+            vcross(dpos, dvel, hRelVec);
+            vunit(hRelVec, 3, eNHat);
+            vcross(eNHat, eRHat, eTHat);
+            accInteg[starti + 0] +=
+                g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0]);
+            accInteg[starti + 1] +=
+                g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
+            accInteg[starti + 2] +=
+                g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
+            if (propSim->integBodies[i].propStm) {
+                stm_nongrav(allSTMs[i], g,
+                            propSim->integBodies[i].ngParams, dx, dy, dz,
+                            dvx, dvy, dvz, dpos, hRelVec);
             }
-            if (bodyj->spiceId == 10 && propSim->integBodies[i].isNongrav) {
-                const real x = propSim->integBodies[i].pos[0];
-                const real y = propSim->integBodies[i].pos[1];
-                const real z = propSim->integBodies[i].pos[2];
-                const real vx = propSim->integBodies[i].vel[0];
-                const real vy = propSim->integBodies[i].vel[1];
-                const real vz = propSim->integBodies[i].vel[2];
-                const real a1 = propSim->integBodies[i].ngParams.a1;
-                const real a2 = propSim->integBodies[i].ngParams.a2;
-                const real a3 = propSim->integBodies[i].ngParams.a3;
-                const real alpha = propSim->integBodies[i].ngParams.alpha;
-                const real k = propSim->integBodies[i].ngParams.k;
-                const real m = propSim->integBodies[i].ngParams.m;
-                const real n = propSim->integBodies[i].ngParams.n;
-                const real r0 = propSim->integBodies[i].ngParams.r0_au;
-                const real dx = x - bodyj->pos[0];
-                const real dy = y - bodyj->pos[1];
-                const real dz = z - bodyj->pos[2];
-                const real dvx = vx - bodyj->vel[0];
-                const real dvy = vy - bodyj->vel[1];
-                const real dvz = vz - bodyj->vel[2];
-                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
-                const real g =
-                    alpha * pow(rRel / r0, -m) * pow(1 + pow(rRel / r0, n), -k);
-                real *dpos = new real[3];
-                dpos[0] = dx;
-                dpos[1] = dy;
-                dpos[2] = dz;
-                real *dvel = new real[3];
-                dvel[0] = dvx;
-                dvel[1] = dvy;
-                dvel[2] = dvz;
-                real *hRelVec = new real[3];
-                memset(hRelVec, 0.0, 3 * sizeof(real));
-                real *eRHat = new real[3];
-                memset(eRHat, 0.0, 3 * sizeof(real));
-                real *eTHat = new real[3];
-                memset(eTHat, 0.0, 3 * sizeof(real));
-                real *eNHat = new real[3];
-                memset(eNHat, 0.0, 3 * sizeof(real));
-                vunit(dpos, (size_t)3, eRHat);
-                vcross(dpos, dvel, hRelVec);
-                vunit(hRelVec, (size_t)3, eNHat);
-                vcross(eNHat, eRHat, eTHat);
-                accInteg[starti + 0] +=
-                    g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0]);
-                accInteg[starti + 1] +=
-                    g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1]);
-                accInteg[starti + 2] +=
-                    g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2]);
-                if (propSim->integBodies[i].propStm) {
-                    stm_nongrav(allSTMs[i], g,
-                                propSim->integBodies[i].ngParams, dx, dy, dz,
-                                dvx, dvy, dvz, dpos, hRelVec);
-                }
-                #ifdef PRINT_FORCES
-                forceFile << std::setw(10) << "ng_" + std::to_string(bodyj->spiceId) << std::setw(25)
-                          << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])
-                          << std::setw(25)
-                          << g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1])
-                          << std::setw(25)
-                          << g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2])
-                          << std::endl;
-                #endif
-                delete[] dpos;
-                delete[] dvel;
-                delete[] hRelVec;
-                delete[] eRHat;
-                delete[] eTHat;
-                delete[] eNHat;
-            }
+            #ifdef PRINT_FORCES
+            forceFile << std::setw(10) << "ng_" + std::to_string(bodyj->spiceId) << std::setw(25)
+                        << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])
+                        << std::setw(25)
+                        << g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1])
+                        << std::setw(25)
+                        << g * (a1 * eRHat[2] + a2 * eTHat[2] + a3 * eNHat[2])
+                        << std::endl;
+            #endif
         }
         starti += propSim->integBodies[i].n2Derivs;
     }
@@ -605,7 +599,7 @@ void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
  * @param[in] propSim PropSimulation object.
  * @param[inout] accInteg State derivative vector.
  */
-void force_thruster(const PropSimulation *propSim,
+static void force_thruster(const PropSimulation *propSim,
                     std::vector<real> &accInteg) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;

@@ -534,7 +534,7 @@ PropSimulation::PropSimulation(std::string name, real t0,
             kernel_mb = DEkernelPath + "de440.bsp";
             if (defaultSpiceBodies == 441) {
                 std::cout
-                    << "WARNING Choosing DE441 will load long-term ephemeris "
+                    << "WARNING: Choosing DE441 will load long-term ephemeris "
                        "with a significantly higher memory footprint. "
                        "For almost all applications, DE440 is sufficient. "
                        "Be sure that you need the coverage provided by DE441."
@@ -1046,7 +1046,6 @@ void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
  * @param[in] observerInfo Observer information array (default: empty).
  * @param[in] adaptiveTimestep Flag to use adaptive timestep (default: true).
  * @param[in] dt0 Initial timestep (default: 0.0).
- * @param[in] dtMax Maximum timestep (default: 21.0).
  * @param[in] dtMin Minimum timestep (default: 0.005).
  * @param[in] dtChangeFactor Maximum factor by which to change timestep (default: 0.25).
  * @param[in] tolInteg Tolerance for integrator (default: 1e-11).
@@ -1055,7 +1054,7 @@ void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
 void PropSimulation::set_integration_parameters(
     real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState,
     bool convergedLightTime, std::vector<std::vector<real>> observerInfo,
-    bool adaptiveTimestep, real dt0, real dtMax, real dtMin,
+    bool adaptiveTimestep, real dt0, real dtMin,
     real dtChangeFactor, real tolInteg, real tolPC) {
     this->integParams.tf = tf;
     this->tEvalUTC = tEvalUTC;
@@ -1065,7 +1064,6 @@ void PropSimulation::set_integration_parameters(
         prepare_for_evaluation(tEval, observerInfo);
     }
     this->integParams.dt0 = dt0;
-    this->integParams.dtMax = dtMax;
     this->integParams.dtMin = dtMin;
     this->integParams.dtChangeFactor = dtChangeFactor;
     this->integParams.adaptiveTimestep = adaptiveTimestep;
@@ -1096,7 +1094,6 @@ std::vector<real> PropSimulation::get_integration_parameters() {
         this->integParams.tf,
         (real)this->integParams.adaptiveTimestep,
         this->integParams.dt0,
-        this->integParams.dtMax,
         this->integParams.dtMin,
         this->integParams.dtChangeFactor,
         this->integParams.tolInteg,
