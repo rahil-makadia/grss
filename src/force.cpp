@@ -10,7 +10,7 @@ static void force_newton(const PropSimulation *propSim, std::vector<real> &accIn
 /**
  * @brief Compute the acceleration of the system due to the PPN relativistic correction (simple heliocentric model).
  */
-static void force_ppn_simple(const PropSimulation *propSim,
+void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
                       std::vector<STMParameters> &allSTMs);
 
@@ -205,7 +205,7 @@ static void force_newton(const PropSimulation *propSim, std::vector<real> &accIn
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-static void force_ppn_simple(const PropSimulation *propSim,
+void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
                       std::vector<STMParameters> &allSTMs) {
 #ifdef PRINT_FORCES

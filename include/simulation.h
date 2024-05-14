@@ -374,7 +374,7 @@ class ImpactParameters : public CloseApproachParameters {
 struct InterpolationParameters {
     std::vector<real> tStack;
     std::vector<std::vector<real>> xIntegStack;
-    std::vector<std::vector<std::vector<real>>> bStack;
+    std::vector<real*> bStack;
     std::vector<std::vector<real>> accIntegStack;
 };
 

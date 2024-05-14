@@ -62,20 +62,20 @@ real get_initial_timestep(PropSimulation *propSim);
 /**
  * @brief Update the g-matrix of interpolation coefficients using the b-matrix.
  */
-void update_g_with_b(const std::vector<std::vector<real>> &b, const size_t &dim, real *g);
+void update_g_with_b(const real *b, const size_t &dim, real *g);
 
 /**
  * @brief Compute the interpolation coefficients for the integration.
  */
 void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
                      const size_t &hIdx, real *g, real *bCompCoeffs,
-                     std::vector<std::vector<real>> &b, const size_t &dim,
+                     real *b, const size_t &dim,
                      real &PCerr);
 
 /**
  * @brief Refine the b-matrix of interpolation coefficients for the next timestep.
  */
-void refine_b(std::vector<std::vector<real> > &b, real *e, const real &dtRatio,
+void refine_b(real *b, real *e, const real &dtRatio,
               const size_t &dim);
 
 /**

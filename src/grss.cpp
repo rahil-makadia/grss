@@ -138,10 +138,10 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.
             )mydelimiter")
-        .def_readwrite("bStack", &InterpolationParameters::bStack,
-                       R"mydelimiter(
-            Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.
-            )mydelimiter")
+        // .def_readwrite("bStack", &InterpolationParameters::bStack,
+        //                R"mydelimiter(
+        //     Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.
+        //     )mydelimiter")
         .def_readwrite("accIntegStack", &InterpolationParameters::accIntegStack,
                        R"mydelimiter(
             Stack of accelerations of the integrated bodies at steps taken by the integrator.

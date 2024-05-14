@@ -22,7 +22,7 @@ static inline void comp_sum(real num, real *sum, real *compCoeff) {
  */
 void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const std::vector<real> &accInteg0, const real &dt,
-                        const real &h, const std::vector<std::vector<real>> &b,
+                        const real &h, const real *b, const size_t &dim,
                         const size_t starti, const size_t startb,
                         const size_t &iterStep, std::vector<real> &xIntegNext,
                         std::vector<real> &xIntegCompCoeffs);
@@ -33,7 +33,7 @@ void approx_xInteg_math(const std::vector<real> &xInteg0,
  */
 void approx_xInteg(const std::vector<real> &xInteg0,
                    const std::vector<real> &accInteg0, const real &dt,
-                   const real &h, const std::vector<std::vector<real>> &b,
+                   const real &h, const real *b, const size_t &dim,
                    const std::vector<IntegBody> &integBodies,
                    std::vector<real> &xIntegNext,
                    std::vector<real> &xIntegCompCoeffs);
