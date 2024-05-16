@@ -314,8 +314,9 @@ def get_sbdb_elems(tdes, cov_elems=True):
     hdr = []
     val = []
     for ele in elem:
-        hdr.append(ele['name'])
-        val.append(float(ele['value']))
+        if ele['value'] is not None:
+            hdr.append(ele['name'])
+            val.append(float(ele['value']))
     full_elements_dict = dict(zip(hdr, val))
     # cometary elements
     # eccentricity, perihelion distance, time of periapse passage (JD),
