@@ -456,10 +456,6 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     }
     real e_mag;
     vnorm(e_vec, 3, e_mag);
-    // if (fabs(e_mag - e) > elemTol) {
-    //     std::cout << "get_elements_partials: WARNING: e_mag - e = " << e_mag - e
-    //               << std::endl;
-    // }
     e = e_mag;
 
     real **partial_r_vec = new real*[6];
@@ -648,10 +644,6 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     */ 
 
     // mean anomaly
-    // if (fabs(E - e * sin(E) - M) > elemTol) {
-    //     std::cout << "get_elements_partials: WARNING: E - e*sin(E) - M = " << E - e * sin(E) - M
-    //               << std::endl;
-    // }
     M = E - e * sin(E);
     real *partial_M = new real[6];
     for (size_t i = 0; i < 6; i++) {

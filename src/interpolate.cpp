@@ -6,6 +6,7 @@
  * @param[in] dt Integration time step.
  * @param[in] h Fraction of the time step to use for the approximation.
  * @param[in] b Interpolation coefficients for the Gauss-Radau polynomial.
+ * @param[in] dim Dimension of the system (number of 2nd derivatives).
  * @param[in] starti Starting index of the state vector to approximate.
  * @param[in] startb Starting index of the interpolation coefficients.
  * @param[in] iterStep Number of derivatives to evaluate.
@@ -14,7 +15,7 @@
  */
 void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const std::vector<real> &accInteg0, const real &dt,
-                        const real &h, const real *b, const size_t &dim,
+                        const real &h, const std::vector<real> &b, const size_t &dim,
                         const size_t starti, const size_t startb,
                         const size_t &iterStep, std::vector<real> &xIntegNext,
                         std::vector<real> &xIntegCompCoeffs) {
@@ -56,13 +57,14 @@ void approx_xInteg_math(const std::vector<real> &xInteg0,
  * @param[in] dt Integration time step.
  * @param[in] h Fraction of the time step to use for the approximation.
  * @param[in] b Interpolation coefficients for the Gauss-Radau polynomial.
+ * @param[in] dim Dimension of the system (number of 2nd derivatives).
  * @param[in] integBodies List of integrated bodies in the PropSimulation.
  * @param[out] xIntegNext Approximated state vector.
  * @param[out] xIntegCompCoeffs Compensation coefficients.
  */
 void approx_xInteg(const std::vector<real> &xInteg0,
                    const std::vector<real> &accInteg0, const real &dt,
-                   const real &h, const real *b, const size_t &dim,
+                   const real &h, const std::vector<real> &b, const size_t &dim,
                    const std::vector<IntegBody> &integBodies,
                    std::vector<real> &xIntegNext,
                    std::vector<real> &xIntegCompCoeffs) {
@@ -162,16 +164,17 @@ void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &
             tInterpGeom += delta_et_utc(tInterpGeom)/86400.0;
         }
         std::vector<real> xInterpGeom(propSim->xInteg.size(), 0.0);
-        evaluate_one_interpolation(propSim, t, dt, tInterpGeom, xInterpGeom);
+        evaluate_one_interpolation(propSim, tInterpGeom, xInterpGeom);
         if (propSim->evalApparentState) {
             std::vector<real> lightTime(propSim->integParams.nInteg, 0.0);
             std::vector<real> xInterpApparent(propSim->xInteg.size(), 0.0);
-            get_lightTime_and_xRelative(propSim, interpIdx, t, dt, tInterpGeom, xInterpGeom,
+            get_lightTime_and_xRelative(propSim, interpIdx, tInterpGeom, xInterpGeom,
                                         lightTime, xInterpApparent);
             propSim->lightTimeEval.push_back(lightTime);
             propSim->xIntegEval.push_back(xInterpApparent);
             if (propSim->evalMeasurements) {
-                get_measurement(propSim, interpIdx, t, dt, tInterpGeom, xInterpGeom, xInterpApparent);
+                get_measurement(propSim, interpIdx, tInterpGeom, xInterpGeom,
+                                xInterpApparent);
             }
         } else {
             propSim->xIntegEval.push_back(xInterpGeom);
@@ -184,21 +187,17 @@ void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &
 
 /**
  * @param[in] propSim PropSimulation object for the integration.
- * @param[in] t Time at the beginning of the time step.
- * @param[in] dt Completed time step size.
  * @param[in] tInterp Time to interpolate to.
  * @param[out] xInterp Interpolated state vector.
  */
-void evaluate_one_interpolation(const PropSimulation *propSim, const real &t,
-                                const real &dt, const real &tInterp,
+void evaluate_one_interpolation(const PropSimulation *propSim, const real &tInterp,
                                 std::vector<real> &xInterp) {
-    const real h = (tInterp - t) / dt;
-    const size_t idx = propSim->interpParams.bStack.size() - 1;
+    const real h = (tInterp - propSim->interpParams.t0) / propSim->interpParams.dt0;
     std::vector<real> dummyCompCoeffs = std::vector<real>(propSim->xInteg.size(), 0.0);
-    approx_xInteg(propSim->interpParams.xIntegStack[idx],
-                  propSim->interpParams.accIntegStack[idx], dt, h,
-                  propSim->interpParams.bStack[idx], propSim->integParams.n2Derivs, propSim->integBodies,
-                  xInterp, dummyCompCoeffs);
+    approx_xInteg(propSim->interpParams.xInteg0,
+                  propSim->interpParams.accInteg0, propSim->interpParams.dt0, h,
+                  propSim->interpParams.b0, propSim->integParams.n2Derivs,
+                  propSim->integBodies, xInterp, dummyCompCoeffs);
 }
 
 /**
@@ -257,16 +256,13 @@ void get_interpIdxInWindow(const PropSimulation *propSim,
 /**
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] interpIdx Index of the next interpolation time.
- * @param[in] t Time at the beginning of the time step.
- * @param[in] dt Completed time step size.
  * @param[in] tInterpGeom Time to interpolate to.
  * @param[in] xInterpGeom Geometric state vector of the target body.
  * @param[out] lightTime Light time to the target body.
  * @param[out] xInterpApparent Apparent state vector of the target body.
  */
 void get_lightTime_and_xRelative(PropSimulation *propSim,
-                                 const size_t interpIdx, const real &t,
-                                 const real &dt, const real tInterpGeom,
+                                 const size_t interpIdx, const real tInterpGeom,
                                  const std::vector<real> &xInterpGeom,
                                  std::vector<real> &lightTime,
                                  std::vector<real> &xInterpApparent) {
@@ -280,19 +276,21 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         real lightTimeTemp;
-        std::vector<real> xInterpApparentTemp(numStates, 0.0);
-        std::vector<real> xInterpApparentBary(6, 0.0);
+        std::vector<real> xInterpApparentBary(numStates, 0.0);
+        std::vector<real> xInterpApparentOneBody(2*propSim->integBodies[i].n2Derivs, 0.0);
         get_lightTimeOneBody(propSim, i, tInterpGeom, xInterpGeom, xObserver,
-                             bouncePointAtCenterOfMass, t, dt,
-                             lightTimeTemp);
-        evaluate_one_interpolation(propSim, t, dt, tInterpGeom-lightTimeTemp, xInterpApparentTemp);
+                             bouncePointAtCenterOfMass, lightTimeTemp);
+        evaluate_one_interpolation(propSim, tInterpGeom-lightTimeTemp, xInterpApparentBary);
         lightTime[i] = lightTimeTemp;
-        for (size_t j = 0; j < 6; j++) {
-            xInterpApparentBary[j] = xInterpApparentTemp[starti + j];
+        for (size_t j = 0; j < 2*propSim->integBodies[i].n2Derivs; j++) {
+            xInterpApparentOneBody[j] = xInterpApparentBary[starti + j];
         }
-        get_glb_correction(propSim, interpIdx, tInterpGeom, xInterpApparentBary);
+        get_glb_correction(propSim, interpIdx, tInterpGeom, xInterpApparentOneBody);
         for (size_t j = 0; j < 6; j++) {
-            xInterpApparent[starti + j] = xInterpApparentBary[j] - xObserver[j];
+            xInterpApparent[starti + j] = xInterpApparentOneBody[j] - xObserver[j];
+        }
+        for (size_t j = 6; j < 2*propSim->integBodies[i].n2Derivs; j++) {
+            xInterpApparent[starti + j] = xInterpApparentOneBody[j];
         }
         starti += 2*propSim->integBodies[i].n2Derivs;
     }
@@ -306,15 +304,13 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
  * @param[in] xObserver State vector of the observer.
  * @param[in] bouncePointAtCenterOfMass Flag to indicate whether the bounce point
  * is at the center of mass (as opposed to leading edge).
- * @param[in] t Time at the beginning of the time step.
- * @param[in] dt Completed time step size.
  * @param[out] lightTimeOneBody Light time to the target body.
  */
 void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           const real tInterpGeom, std::vector<real> xInterpGeom,
                           std::vector<real> xObserver,
-                          const bool bouncePointAtCenterOfMass, const real &t,
-                          const real &dt, real &lightTimeOneBody) {
+                          const bool bouncePointAtCenterOfMass,
+                          real &lightTimeOneBody) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> xInterpApparentFull(numStates, 0.0);
     std::vector<real> xInterpApparent(6, 0.0);
@@ -342,7 +338,7 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
         // keep iterating until max iterations or light time tolerance is met
         while (iter < maxIter &&
                fabs(lightTimeOneBody - lightTimeOneBodyPrev) > lightTimeTol) {
-            evaluate_one_interpolation(propSim, t, dt, tInterpGeom - lightTimeOneBody,
+            evaluate_one_interpolation(propSim, tInterpGeom - lightTimeOneBody,
                                        xInterpApparentFull);
             for (size_t j = 0; j < 6; j++) {
                 xRelativeOneBody[j] =

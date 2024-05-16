@@ -5,32 +5,32 @@
  * @brief Compute the acceleration of the system due to newtonian gravity.
  */
 static void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
-                  std::vector<STMParameters> &allSTMs);
+                  STMParameters* allSTMs);
 
 /**
  * @brief Compute the acceleration of the system due to the PPN relativistic correction (simple heliocentric model).
  */
 void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
-                      std::vector<STMParameters> &allSTMs);
+                      STMParameters* allSTMs);
 
 /**
  * @brief Compute the acceleration of the system due to the PPN relativistic correction (full Einstein-Infeld-Hoffmann model).
  */
 static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
-                   std::vector<STMParameters> &allSTMs);
+                   STMParameters* allSTMs);
 
 /**
  * @brief Compute the acceleration of the system due to the J2 zonal harmonic.
  */
 static void force_J2(const PropSimulation *propSim,
-              std::vector<real> &accInteg, std::vector<STMParameters> &allSTMs);
+              std::vector<real> &accInteg, STMParameters* allSTMs);
 
 /**
  * @brief Compute the acceleration of the system due to the nongravitational forces.
  */
 static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
-                   std::vector<STMParameters> &allSTMs);
+                   STMParameters* allSTMs);
 
 /**
  * @brief Compute the acceleration of the system due to a thruster in the velocity direction.
@@ -41,12 +41,14 @@ static void force_thruster(const PropSimulation *propSim, std::vector<real> &acc
  * @param[in] t Time [TDB MJD]
  * @param[in] xInteg State vector
  * @param[in] propSim PropSimulation object
- * @return std::vector<real> State derivative
+ * @param[out] accInteg State derivative vector
  */
-std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
-                                PropSimulation *propSim) {
-    std::vector<real> accInteg(propSim->integParams.n2Derivs, 0.0);
-    std::vector<STMParameters> allSTMs;
+void get_state_der(PropSimulation *propSim, const real &t,
+                   const std::vector<real> &xInteg,
+                   std::vector<real> &accInteg) {
+    // set everything in accInteg to zero
+    std::fill(accInteg.begin(), accInteg.end(), 0.0);
+    STMParameters* allSTMs = new STMParameters[propSim->integParams.nInteg];
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         propSim->integBodies[i].pos[0] = xInteg[starti];
@@ -76,7 +78,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
             memset(stmParams.dfdvel, 0.0, 9*sizeof(real));
             memset(stmParams.dfdpar, 0.0, 3*numParams*sizeof(real));
         }
-        allSTMs.push_back(stmParams);
+        allSTMs[i] = stmParams;
         starti += 2*propSim->integBodies[i].n2Derivs;
     }
     double xSpice[9];
@@ -139,7 +141,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
             delete[] allSTMs[i].dfdpar;
         }
     }
-    return accInteg;
+    delete[] allSTMs;
 }
 
 /**
@@ -148,7 +150,7 @@ std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
 static void force_newton(const PropSimulation *propSim, std::vector<real> &accInteg,
-                  std::vector<STMParameters> &allSTMs) {
+                  STMParameters* allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
     forceFile.precision(16);
@@ -207,7 +209,7 @@ static void force_newton(const PropSimulation *propSim, std::vector<real> &accIn
  */
 void force_ppn_simple(const PropSimulation *propSim,
                       std::vector<real> &accInteg,
-                      std::vector<STMParameters> &allSTMs) {
+                      STMParameters* allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;
     forceFile.precision(16);
@@ -271,7 +273,7 @@ void force_ppn_simple(const PropSimulation *propSim,
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
 static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accInteg,
-                   std::vector<STMParameters> &allSTMs) {
+                   STMParameters* allSTMs) {
 // calculate accelerations using the Einstein-Infeld-Hoffmann (EIH) PPN
 // formalism see eqn 27 in
 // https://iopscience.iop.org/article/10.3847/1538-3881/abd414/pdf (without
@@ -435,7 +437,7 @@ static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accI
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
 static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
-              std::vector<STMParameters> &allSTMs) {
+              STMParameters* allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;
     forceFile.precision(16);
@@ -525,7 +527,7 @@ static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
 static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
-                   std::vector<STMParameters> &allSTMs) {
+                   STMParameters* allSTMs) {
     #ifdef PRINT_FORCES
     std::ofstream forceFile;
     forceFile.precision(16);
@@ -611,15 +613,14 @@ static void force_thruster(const PropSimulation *propSim,
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         if (propSim->integBodies[i].isThrusting) {
-            real *vel = new real[3];
+            real vel[3];
             vel[0] = propSim->integBodies[i].vel[0];
             vel[1] = propSim->integBodies[i].vel[1];
             vel[2] = propSim->integBodies[i].vel[2];
-            real *vHat = new real[3];
-            memset(vHat, 0, 3 * sizeof(real));
+            real vHat[3];
+            vunit(vel, 3, vHat);
             const real acc_thruster =
                 1.0e7L / propSim->consts.du2m;  // m/day^2 -> au/day^2
-            vunit(vel, (size_t)3, vHat);
             accInteg[starti + 0] += acc_thruster * vHat[0];
             accInteg[starti + 1] += acc_thruster * vHat[1];
             accInteg[starti + 2] += acc_thruster * vHat[2];
@@ -628,8 +629,6 @@ static void force_thruster(const PropSimulation *propSim,
                       << acc_thruster * vHat[1] << std::setw(25)
                       << acc_thruster * vHat[2] << std::endl;
             #endif
-            delete[] vel;
-            delete[] vHat;
         }
         starti += propSim->integBodies[i].n2Derivs;
     }

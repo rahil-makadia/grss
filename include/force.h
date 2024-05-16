@@ -6,7 +6,8 @@
 /**
  * @brief Calculate the state derivative of the system.
  */
-std::vector<real> get_state_der(const real &t, const std::vector<real> &xInteg,
-                                PropSimulation *propSim);
+void get_state_der(PropSimulation *propSim, const real &t,
+                   const std::vector<real> &xInteg,
+                   std::vector<real> &accInteg);
 
 #endif

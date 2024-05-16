@@ -1156,6 +1156,11 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
 
     // empty existing vectors from previous integration
     this->caParams.clear();
+    this->interpParams.t0 = 0.0;
+    this->interpParams.dt0 = 0.0;
+    this->interpParams.xInteg0.clear();
+    this->interpParams.b0.clear();
+    this->interpParams.accInteg0.clear();
     this->interpParams.tStack.clear();
     this->interpParams.xIntegStack.clear();
     this->interpParams.bStack.clear();

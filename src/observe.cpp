@@ -93,14 +93,12 @@ void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
 /**
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] interpIdx Index of the next interpolation time.
- * @param[in] t Time at the beginning of the time step.
- * @param[in] dt Completed time step size.
  * @param[in] tInterpGeom Time to interpolate to.
  * @param[in] xInterpGeom Geometric state vector of the target body at the interpolation time.
  * @param[in] xInterpApparent Apparent state vector of the target body at the interpolation time.
  */
 void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
-                     const real &t, const real &dt, const real tInterpGeom,
+                     const real tInterpGeom,
                      const std::vector<real> &xInterpGeom,
                      const std::vector<real> &xInterpApparent) {
     std::vector<real> opticalMeasurement(2*propSim->integParams.nInteg,
@@ -121,7 +119,7 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                                     xInterpApparent, photocenterCorr);
         break;
     case 1: case 2:
-        get_radar_measurement(propSim, interpIdx, t, dt, tInterpGeom,
+        get_radar_measurement(propSim, interpIdx, tInterpGeom,
                                 xInterpGeom, radarMeasurement, radarPartials);
         break;
     default:
@@ -276,15 +274,12 @@ void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx
 /**
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] interpIdx Index of the next interpolation time.
- * @param[in] t Time at the beginning of the time step.
- * @param[in] dt Completed time step size.
  * @param[in] tInterpGeom Time to interpolate to.
  * @param[in] xInterpGeom Geometric state vector of the target body at the interpolation time.
  * @param[out] radarMeasurement Radar measurement (range/Doppler).
  * @param[out] radarPartials Partials of the radar measurement.
  */
 void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
-                           const real &t, const real &dt,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            std::vector<real> &radarMeasurement,
@@ -307,7 +302,7 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
         std::fill(radarPartials.begin()+6*i, radarPartials.begin()+6*(i+1), 0.0);
         real delayMeasurement;
-        get_delay_measurement(propSim, interpIdx, t, dt, i, tInterpGeom,
+        get_delay_measurement(propSim, interpIdx, i, tInterpGeom,
                               xInterpGeom, receiveTimeTDB, transmitTimeTDB,
                               xObsBaryRcv, xTrgtBaryBounce, xObsBaryTx,
                               delayMeasurement, radarPartials);
@@ -326,8 +321,6 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
 /**
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] interpIdx Index of the next interpolation time.
- * @param[in] t Time at the beginning of the time step.
- * @param[in] dt Completed time step size.
  * @param[in] i Index of the target body.
  * @param[in] tInterpGeom Time to interpolate to.
  * @param[in] xInterpGeom Geometric state vector of the target body at the interpolation time.
@@ -340,13 +333,13 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
  * @param[out] delayPartials Partials of the radar delay measurement.
  */
 void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
-                           const real &t, const real &dt, const size_t &i,
-                           const real tInterpGeom,
+                           const size_t &i, const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            const real &receiveTimeTDB, real &transmitTimeTDB,
                            std::vector<real> &xObsBaryRcv,
                            std::vector<real> &xTrgtBaryBounce,
-                           std::vector<real> &xObsBaryTx, real &delayMeasurement,
+                           std::vector<real> &xObsBaryTx,
+                           real &delayMeasurement,
                            std::vector<real> &delayPartials) {
     size_t numStates = xInterpGeom.size();
     std::vector<real> receiverInfo = {propSim->observerInfo[interpIdx][0],
@@ -367,7 +360,7 @@ void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
     // downleg delay is the already evaluated light time
     delayDownleg = propSim->lightTimeEval[interpIdx][i];
     bounceTimeTDB = receiveTimeTDB - delayDownleg;
-    evaluate_one_interpolation(propSim, t, dt, bounceTimeTDB,
+    evaluate_one_interpolation(propSim, bounceTimeTDB,
                                     xTrgtBaryBounceAllBody);
     size_t starti = 0;
     for (size_t j = 0; j < i; j++) {

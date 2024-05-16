@@ -622,7 +622,6 @@ class FitSimulation:
             msg = ("Covariance matrix must be the same size "
                     "as the number of fitted parameters.")
             raise ValueError(msg)
-        self.covariance = cov_init
         return None
 
     def _flatten_and_clean(self, arr):
@@ -1301,10 +1300,6 @@ class FitSimulation:
             self.obs_weight[idx] = inv
         return None
 
-    def _get_analytic_stm(self, t_eval, prop_sim):
-        stm = prop_sim.interpolate(t_eval)[6:]
-        return libgrss.reconstruct_stm(stm)
-
     def _get_analytic_partials(self, prop_sim_past, prop_sim_future):
         """
         Computes the analytic partials of the observations with respect to the
@@ -1323,12 +1318,11 @@ class FitSimulation:
         if self.past_obs_exist:
             past_optical_partials = np.array(prop_sim_past.opticalPartials)
             past_radar_partials = np.array(prop_sim_past.radarPartials)
-            past_light_time = np.array(prop_sim_past.lightTimeEval)
+            past_states = np.array(prop_sim_past.xIntegEval)
         if self.future_obs_exist:
             future_optical_partials = np.array(prop_sim_future.opticalPartials)
             future_radar_partials = np.array(prop_sim_future.radarPartials)
-            future_light_time = np.array(prop_sim_future.lightTimeEval)
-        t_eval_tdb = self.obs.obsTimeMJDTDB.values
+            future_states = np.array(prop_sim_future.xIntegEval)
         cos_dec = self.obs.cosDec.values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
@@ -1341,20 +1335,16 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
             part = np.zeros((size, self.n_fit))
             if self.past_obs_exist and i < len_past_idx:
-                prop_sim = prop_sim_past
                 sim_idx = i
-                light_time = past_light_time
                 optical_partials = past_optical_partials
                 radar_partials = past_radar_partials
+                state = past_states
             else:
-                prop_sim = prop_sim_future
                 sim_idx = i-len_past_idx
-                light_time = future_light_time
                 optical_partials = future_optical_partials
                 radar_partials = future_radar_partials
-            t_eval = t_eval_tdb[i]
-            t_eval -= light_time[sim_idx, 0]
-            stm = self._get_analytic_stm(t_eval, prop_sim)
+                state = future_states
+            stm = libgrss.reconstruct_stm(state[sim_idx][6:])
             if is_optical:
                 part[0, :6] = optical_partials[sim_idx, :6]*cos_dec[i]
                 part[1, :6] = optical_partials[sim_idx, 6:12]
@@ -1515,10 +1505,8 @@ class FitSimulation:
                                 "Default values are chi_reject=3.0 and chi_recover=2.8 "
                                 "(Implemented as FitSimulation.reject_criteria=[3.0, 2.8])")
         full_cov = self.covariance
-        residual_chi_squared = [None]*len(self.obs)
         self.num_rejected = 0
         rms_u = 0
-        rms_w = 0
         chi_sq = 0
         j = 0
         sel_ast = self.obs['selAst'].values
@@ -1531,31 +1519,31 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
             resid = residuals[i]
             # calculate chi-squared for each residual
-            obs_cov = self.obs_cov[i]
-            obs_partials = partials[j:j+size, :]
-            if sel_ast[i] in {'D', 'd'}:
-                resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
-            else:
-                resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
-            if size == 1:
-                resid_cov_inv = 1.0/resid_cov
-            else:
-                resid_cov_det = resid_cov[0, 0]*resid_cov[1, 1] - resid_cov[0, 1]*resid_cov[1, 0]
-                resid_cov_inv = np.array([  [resid_cov[1, 1], -resid_cov[0, 1]],
-                                            [-resid_cov[1, 0], resid_cov[0, 0]]])/resid_cov_det
-            residual_chi_squared[i] = resid @ resid_cov_inv @ resid.T
-            # outlier rejection, only reject RA/Dec measurements
-            if start_rejecting and size == 2:
-                if residual_chi_squared[i] > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
-                    sel_ast[i] = 'D'
-                    self.num_rejected += 1
-                elif sel_ast[i] == 'D' and residual_chi_squared[i] < chi_recover**2:
-                    sel_ast[i] = 'A'
-                    self.num_rejected -= 1
+            if start_rejecting:
+                obs_cov = self.obs_cov[i]
+                obs_partials = partials[j:j+size, :]
+                if sel_ast[i] in {'D', 'd'}:
+                    resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
+                else:
+                    resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
+                if size == 1:
+                    resid_cov_inv = 1.0/resid_cov
+                else:
+                    resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
+                    resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
+                                              [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
+                residual_chi_squared = resid @ resid_cov_inv @ resid.T
+                # outlier rejection, only reject RA/Dec measurements
+                if size == 2:
+                    if residual_chi_squared > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                        sel_ast[i] = 'D'
+                        self.num_rejected += 1
+                    elif sel_ast[i] == 'D' and residual_chi_squared < chi_recover**2:
+                        sel_ast[i] = 'A'
+                        self.num_rejected -= 1
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
-                rms_w += resid @ self.obs_weight[i] @ resid.T
-                chi_sq += residual_chi_squared[i]
+                chi_sq += resid @ self.obs_weight[i] @ resid.T
             j += size
         self.obs['selAst'] = sel_ast
         rejected_fraction = self.num_rejected/len(self.obs)
@@ -1563,7 +1551,7 @@ class FitSimulation:
             print("WARNING: More than 25% of observations rejected. Consider changing the",
                     "rejection criteria, or turning off outlier rejection altogether.")
         rms_u = np.sqrt(rms_u/self.n_obs)
-        rms_w = np.sqrt(rms_w/self.n_obs)
+        rms_w = np.sqrt(chi_sq/self.n_obs)
         return rms_u, rms_w, chi_sq
 
     def _add_iteration(self, iter_number, rms_u, rms_w, chi_sq):
@@ -1676,22 +1664,22 @@ class FitSimulation:
             # calculate rms and reject outliers here if desired
             rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
                                                                             start_rejecting)
-            if i == 0:
-                # add prefit iteration
-                self._add_iteration(0, rms_u, rms_w, chi_sq)
             # get initial guess
             curr_state = np.array(list(self.x_nom.values()))
             # get state correction
             delta_x, cov = self._get_lsq_state_correction(partials, residuals)
+            # get new covariance
+            self.covariance = cov
             # get new state
+            if i == 0:
+                # add prefit iteration
+                self._add_iteration(0, rms_u, rms_w, chi_sq)
             next_state = curr_state + delta_x
             if self.fit_cometary and next_state[0] < 0.0:
                 next_state[0] = 0.0
                 print("WARNING: Eccentricity is negative per least squares state correction. "
                         "Setting to 0.0. This solution may not be trustworthy.")
             self.x_nom = dict(zip(self.x_nom.keys(), next_state))
-            # get new covariance
-            self.covariance = cov
             # add iteration
             self._add_iteration(i+1, rms_u, rms_w, chi_sq)
             if verbose:

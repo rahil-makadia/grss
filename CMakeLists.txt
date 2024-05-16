@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.18.0)
 
 # if on a Mac, use brew llvm clang for OpenMP support
 if(APPLE)
-    set(CMAKE_C_COMPILER "$ENV{HOMEBREW_PREFIX}/opt/llvm/bin/clang")
-    set(CMAKE_CXX_COMPILER "$ENV{HOMEBREW_PREFIX}/opt/llvm/bin/clang++")
+    set(CMAKE_C_COMPILER gcc-14)
+    set(CMAKE_CXX_COMPILER g++-14)
 endif()
 
 # set the project name and get version from version.txt
@@ -16,7 +16,7 @@ project(grss VERSION ${ver})
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}") # operational flags
-# add_compile_options(-std=c++11 -g3 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}" -Werror -Wall -Wextra -pedantic) # debugging flags
+# add_compile_options(-std=c++11 -g2 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}" -Werror -Wall -Wextra -pedantic) # debugging flags
 
 # Set static library output directory
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)

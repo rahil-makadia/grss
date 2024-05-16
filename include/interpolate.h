@@ -22,7 +22,7 @@ static inline void comp_sum(real num, real *sum, real *compCoeff) {
  */
 void approx_xInteg_math(const std::vector<real> &xInteg0,
                         const std::vector<real> &accInteg0, const real &dt,
-                        const real &h, const real *b, const size_t &dim,
+                        const real &h, const std::vector<real> &b, const size_t &dim,
                         const size_t starti, const size_t startb,
                         const size_t &iterStep, std::vector<real> &xIntegNext,
                         std::vector<real> &xIntegCompCoeffs);
@@ -33,7 +33,7 @@ void approx_xInteg_math(const std::vector<real> &xInteg0,
  */
 void approx_xInteg(const std::vector<real> &xInteg0,
                    const std::vector<real> &accInteg0, const real &dt,
-                   const real &h, const real *b, const size_t &dim,
+                   const real &h, const std::vector<real> &b, const size_t &dim,
                    const std::vector<IntegBody> &integBodies,
                    std::vector<real> &xIntegNext,
                    std::vector<real> &xIntegCompCoeffs);
@@ -58,8 +58,7 @@ void get_interpIdxInWindow(const PropSimulation *propSim,
  * @brief Compute the light time and apparent position of the target body.
  */
 void get_lightTime_and_xRelative(PropSimulation *propSim,
-                                 const size_t interpIdx, const real &t,
-                                 const real &dt, const real tInterpGeom,
+                                 const size_t interpIdx, const real tInterpGeom,
                                  const std::vector<real> &xInterpGeom,
                                  std::vector<real> &lightTime,
                                  std::vector<real> &xInterpApparent);
@@ -70,7 +69,6 @@ void get_lightTime_and_xRelative(PropSimulation *propSim,
 void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           const real tInterpGeom, std::vector<real> xInterpGeom,
                           std::vector<real> xObserver,
-                          const bool bouncePointAtCenterOfMass, const real &t,
-                          const real &dt, real &lightTimeOneBody);
+                          const bool bouncePointAtCenterOfMass, real &lightTimeOneBody);
 
 #endif

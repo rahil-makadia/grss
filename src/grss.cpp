@@ -137,14 +137,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("xIntegStack", &InterpolationParameters::xIntegStack,
                        R"mydelimiter(
             Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.
-            )mydelimiter")
-        // .def_readwrite("bStack", &InterpolationParameters::bStack,
-        //                R"mydelimiter(
-        //     Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.
-        //     )mydelimiter")
-        .def_readwrite("accIntegStack", &InterpolationParameters::accIntegStack,
-                       R"mydelimiter(
-            Stack of accelerations of the integrated bodies at steps taken by the integrator.
             )mydelimiter");
 
     py::class_<BPlaneParameters>(m, "BPlaneParameters", R"mydelimiter(
@@ -833,7 +825,7 @@ PYBIND11_MODULE(libgrss, m) {
             Returns
             -------
             xIntegInterp : list of real
-                Interpolated states of the integration bodies.
+                Interpolated GEOMETRIC states of the integrated bodies.
             )mydelimiter")
         .def("add_spice_body", &PropSimulation::add_spice_body, py::arg("body"),
              R"mydelimiter(

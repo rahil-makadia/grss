@@ -372,9 +372,14 @@ class ImpactParameters : public CloseApproachParameters {
  * @param accIntegStack Stack of accelerations at integrator epochs.
  */
 struct InterpolationParameters {
+    real t0;
+    real dt0;
+    std::vector<real> b0;
+    std::vector<real> xInteg0;
+    std::vector<real> accInteg0;
     std::vector<real> tStack;
     std::vector<std::vector<real>> xIntegStack;
-    std::vector<real*> bStack;
+    std::vector<std::vector<real>> bStack;
     std::vector<std::vector<real>> accIntegStack;
 };
 

@@ -55,11 +55,11 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                         relVel[k] = xInteg[starti + 3 + k] - xInteg[startj + 3 + k];
                     }
                 } else {
-                    SpiceBody bodyj = propSim->spiceBodies[j - propSim->integParams.nInteg];
-                    caTol = bodyj.caTol;
+                    int spiceId = propSim->spiceBodies[j-propSim->integParams.nInteg].spiceId;
+                    caTol = propSim->spiceBodies[j-propSim->integParams.nInteg].caTol;
                     double xSpice[9], xSpiceOld[9];
-                    get_spk_state(bodyj.spiceId, t, propSim->spkEphem, xSpice);
-                    get_spk_state(bodyj.spiceId, tOld, propSim->spkEphem, xSpiceOld);
+                    get_spk_state(spiceId, t, propSim->spkEphem, xSpice);
+                    get_spk_state(spiceId, tOld, propSim->spkEphem, xSpiceOld);
                     for (size_t k = 0; k < 3; k++) {
                         relPosOld[k] = xIntegOld[starti + k] - xSpiceOld[k];
                         relPos[k] = xInteg[starti + k] - xSpice[k];
@@ -527,8 +527,8 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             vdot(velCA, partial_r_vec[k], 3, temp2);
             partial_F[k] = (posDotVel*partial_vInf[k]/mu + vInf*(temp1+temp2)/mu - partial_e[k]*sinhF)/e/cosh(F);
         }
-        std::vector<real> xCA = propSim->interpolate(tMap);
-        std::vector<real> accCA = get_state_der(tMap, xCA, propSim);
+        std::vector<real> accCA(propSim->integParams.n2Derivs, 0.0);
+        get_state_der(propSim, tMap, this->xRelCA, accCA);
         real accRel[3], accPlanet[3];
         if (j < propSim->integParams.nInteg) {
             accPlanet[0] = propSim->integBodies[j].acc[0];

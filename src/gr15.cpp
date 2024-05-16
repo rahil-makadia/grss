@@ -24,7 +24,7 @@ real get_initial_timestep(PropSimulation *propSim){
  * @param[in] dim Dimension of the system (number of 2nd derivatives).
  * @param[out] g Matrix of interpolation coefficients.
  */
-void update_g_with_b(const real *b, const size_t &dim, real *g) {
+void update_g_with_b(const std::vector<real> &b, const size_t &dim, std::vector<real> &g) {
     for (size_t i = 0; i < dim; i++) {
         g[0*dim+i] = b[6*dim+i]*dVec[15] + b[5*dim+i]*dVec[10] + b[4*dim+i]*dVec[6] + b[3*dim+i]*dVec[3] + b[2*dim+i]*dVec[1] + b[1*dim+i]*dVec[0] + b[0*dim+i];
         g[1*dim+i] = b[6*dim+i]*dVec[16] + b[5*dim+i]*dVec[11] + b[4*dim+i]*dVec[7] + b[3*dim+i]*dVec[4] + b[2*dim+i]*dVec[2] + b[1*dim+i];
@@ -46,8 +46,8 @@ void update_g_with_b(const real *b, const size_t &dim, real *g) {
  * @param[out] PCerr Error in the predictor-corrector step (only for hIdx = 7)
  */
 void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
-                     const size_t &hIdx, real *g, real *bCompCoeffs,
-                     real *b, const size_t &dim, real &PCerr) {
+                     const size_t &hIdx, std::vector<real> &g, std::vector<real> &bCompCoeffs,
+                     std::vector<real> &b, const size_t &dim, real &PCerr) {
     switch (hIdx) {
         case 0:
         {
@@ -186,7 +186,7 @@ void compute_g_and_b(const std::vector<std::vector<real>> &AccIntegArr,
  * @param[in] dtRatio Ratio of the required timestep to the previous timestep.
  * @param[in] dim Dimension of the system (number of 2nd derivatives).
  */
-void refine_b(real *b, real *e, const real &dtRatio, const size_t &dim) {
+void refine_b(std::vector<real> &b, std::vector<real> &e, const real &dtRatio, const size_t &dim) {
     const real q = dtRatio;
     const real q2 = q * q;
     const real q3 = q2 * q;
@@ -274,42 +274,19 @@ static real root7(real num){
     return fac*root;
 }
 
-// /**
-//  * @brief Get the next timestep based on the old IAS15 adaptive timestep criterion.
-//  * 
-//  * @param[in] propSim PropSimulation object for the integration.
-//  * @param[in] dt Current timestep.
-//  * @param[in] accIntegArr7Max Maximum acceleration value at the last node.
-//  * @param[in] b Matrix of interpolation coefficients.
-//  * @return real Next timestep.
-//  */
-// static real get_adaptive_timestep_old(PropSimulation *propSim, const real &dt,
-//                                       const real &accIntegArr7Max,
-//                                       const std::vector<std::vector<real>> &b) {
-//     real b6Max;
-//     vabs_max(b[6], b6Max);
-//     real relError = b6Max / accIntegArr7Max;
-//     real dtReq;
-//     if (std::isnormal(relError)) {
-//         dtReq = root7(propSim->integParams.tolInteg/relError)*dt;
-//     } else {
-//         dtReq = dt/propSim->integParams.dtChangeFactor;
-//     }
-//     return dtReq;
-// }
-
 /**
  * @brief Get the next timestep based on the new IAS15 adaptive timestep criterion.
  * 
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] dt Current timestep.
  * @param[in] accInteg0 Vector of acceleration values at the current timestep.
+ * @param[in] dim Dimension of the system (number of 2nd derivatives).
  * @param[in] b Matrix of interpolation coefficients.
  * @return real Next timestep.
  */
 static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
                                   const std::vector<real> &accInteg0,
-                                  const size_t &dim, const real *b) {
+                                  const size_t &dim, const std::vector<real> &b) {
     real minTimescale2 = 1e300L;
     size_t startb = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++){
@@ -329,7 +306,7 @@ static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
         if (std::isnormal(timescale2) && timescale2 < minTimescale2){
             minTimescale2 = timescale2;
         }
-        startb += propSim->integParams.n2Derivs;
+        startb += propSim->integBodies[i].n2Derivs;
     }
     real dtReq;
     if (std::isnormal(minTimescale2)){
@@ -362,16 +339,10 @@ void gr15(PropSimulation *propSim) {
     propSim->integParams.timestepCounter = 0;
     std::vector<real> xInteg(propSim->xInteg.size(), 0.0);
     std::vector<real> xIntegCompCoeffs(propSim->xInteg.size(), 0.0);
-    real *b = new real[7 * dim];
-    memset(b, 0.0, 7 * dim * sizeof(real));
-    real *bCompCoeffs = new real [7 * dim];
-    memset(bCompCoeffs, 0.0, 7 * dim * sizeof(real));
-    real *g = new real[7 * dim];
-    memset(g, 0.0, 7 * dim * sizeof(real));
-    real *e = new real[7 * dim];
-    memset(e, 0.0, 7 * dim * sizeof(real));
-    std::vector<std::vector<real> > accIntegArr(nh,
-                                                std::vector<real>(dim, 0.0));
+    std::vector<real> b(7 * dim, 0.0);
+    std::vector<real> bCompCoeffs(7 * dim, 0.0);
+    std::vector<real> g(7 * dim, 0.0);
+    std::vector<real> e(7 * dim, 0.0);
     real dtReq;
     real tNextEvent = propSim->integParams.tf;
     size_t nextEventIdx = 0;
@@ -388,10 +359,11 @@ void gr15(PropSimulation *propSim) {
          t + dt < tNextEvent)) {
         dt = tNextEvent - t;
     }
-    std::vector<real> accInteg0 = get_state_der(t, xInteg0, propSim);
-    std::vector<real> accIntegNext = std::vector<real>(accInteg0.size(), 0.0);
     propSim->interpParams.tStack.push_back(t);
     propSim->interpParams.xIntegStack.push_back(xInteg0);
+    std::vector<real> accInteg0(dim, 0.0);
+    get_state_der(propSim, t, xInteg0, accInteg0);
+    std::vector<std::vector<real>> accIntegArr(nh, std::vector<real>(dim, 0.0));
     size_t PCmaxIter = 12;
     int keepStepping = 1;
     int oneStepDone = 0;
@@ -423,13 +395,11 @@ void gr15(PropSimulation *propSim) {
                 for (size_t hIdx = 1; hIdx < nh; hIdx++) {
                     approx_xInteg(xInteg0, accInteg0, dt, hVec[hIdx], b, dim,
                                   propSim->integBodies, xInteg, xIntegCompCoeffs);
-                    accIntegArr[hIdx] = get_state_der(
-                        t + hVec[hIdx] * dt, xInteg, propSim);
+                    get_state_der(propSim, t + hVec[hIdx] * dt, xInteg, accIntegArr[hIdx]);
                     compute_g_and_b(accIntegArr, hIdx, g, bCompCoeffs, b, dim, PCerr);
                 }
             }
             if (propSim->integParams.adaptiveTimestep) {
-                // dtReq = get_adaptive_timestep_old(propSim, dt, accIntegArr7Max, b);
                 dtReq = get_adaptive_timestep(propSim, dt, accInteg0, dim, b);
             } else {
                 dtReq = dt;
@@ -448,6 +418,11 @@ void gr15(PropSimulation *propSim) {
             if (dtReq / dt > 1.0 / propSim->integParams.dtChangeFactor) {
                 dtReq = dt / propSim->integParams.dtChangeFactor;
             }
+            propSim->interpParams.t0 = t;
+            propSim->interpParams.dt0 = dt;
+            propSim->interpParams.xInteg0 = xInteg0;
+            propSim->interpParams.accInteg0 = accInteg0;
+            propSim->interpParams.b0 = b;
             propSim->interpParams.bStack.push_back(b);
             propSim->interpParams.accIntegStack.push_back(accInteg0);
             if (propSim->tEval.size() != propSim->xIntegEval.size()) {
@@ -457,7 +432,7 @@ void gr15(PropSimulation *propSim) {
                         propSim->integBodies, xInteg, xIntegCompCoeffs);
             t += dt;
             propSim->t = t;
-            accInteg0 = get_state_der(t, xInteg, propSim);
+            get_state_der(propSim, t, xInteg, accInteg0);
             check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
                                     xInteg);
             propSim->xInteg = xInteg;
@@ -484,8 +459,4 @@ void gr15(PropSimulation *propSim) {
     }
     propSim->interpParams.bStack.push_back(b);
     propSim->interpParams.accIntegStack.push_back(accInteg0);
-    delete[] bCompCoeffs;
-    delete[] g;
-    delete[] e;
-    delete[] b;
 }
