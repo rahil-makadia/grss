@@ -69,7 +69,7 @@ PckInfo* pck_init(const std::string &path) {
     // Try opening file.
     int fd = open(path.c_str(), O_RDONLY);
     if (fd < 0) {
-        throw std::runtime_error("Error opening "+path+".");
+        throw std::runtime_error("pck_init: Error opening "+path+".");
     }
 
     // Read the file record.
@@ -79,7 +79,7 @@ PckInfo* pck_init(const std::string &path) {
     if (strncmp(record.file.locidw, full_file_type.c_str(), 7) != 0) {
         close(fd);
         throw std::runtime_error(
-            "Error parsing "+full_file_type+". Incorrect "
+            "pck_init: Error parsing "+full_file_type+". Incorrect "
             "header.");
     }
 
@@ -89,7 +89,7 @@ PckInfo* pck_init(const std::string &path) {
     if (nc != sizeof(summary)) {
         close(fd);
         throw std::runtime_error(
-            "Error parsing "+full_file_type+". Wrong size of "
+            "pck_init: Error parsing "+full_file_type+". Wrong size of "
             "summary record.");
     }
 
@@ -102,7 +102,7 @@ PckInfo* pck_init(const std::string &path) {
     if ((int64_t)record.buf[8] != 0) {
         close(fd);
         throw std::runtime_error(
-            "Error parsing "+full_file_type+". Cannot find "
+            "pck_init: Error parsing "+full_file_type+". Cannot find "
             "summary block.");
     }
     // std::cout << "record.summaries.nsum: " << record.summaries.nsum << std::endl;
@@ -155,10 +155,17 @@ PckInfo* pck_init(const std::string &path) {
         }
     }
 
+    // Create a map of SPICE ID to index in the targets array
+    std::unordered_map<int, int> spiceIdToIdx;
+    for (int m = 0; m < bpc->num; m++) {
+        spiceIdToIdx[bpc->targets[m].code] = m;
+    }
+    bpc->spiceIdToIdx = spiceIdToIdx;
+
     // Get file size
     struct stat sb;
     if (fstat(fd, &sb) < 0) {
-        throw std::runtime_error("Error calculating size for "+full_file_type+".");
+        throw std::runtime_error("pck_init: Error calculating size for "+full_file_type+".");
     }
     bpc->len = sb.st_size;
 
@@ -166,12 +173,12 @@ PckInfo* pck_init(const std::string &path) {
     bpc->map = mmap(NULL, bpc->len, PROT_READ, MAP_SHARED, fd, 0);
     if (bpc->map == NULL) {
         // this will leak memory
-        throw std::runtime_error("Error creating memory map.");
+        throw std::runtime_error("pck_init: Error creating memory map.");
     }
     #if defined(MADV_RANDOM)
         if (madvise(bpc->map, bpc->len, MADV_RANDOM) < 0) {
             // this will leak memory
-            throw std::runtime_error("Error while calling madvise().");
+            throw std::runtime_error("pck_init: Error while calling madvise().");
         }
     #endif
     close(fd);
@@ -187,19 +194,7 @@ PckInfo* pck_init(const std::string &path) {
  */
 void pck_calc(PckInfo *bpc, real epoch, int spiceId, real *rotMat,
               real *rotMatDot) {
-    int m;
-    for (m = 0; m < bpc->num; m++) {
-        if (bpc->targets[m].code == spiceId) {
-            break;
-        }
-        if (m == bpc->num - 1) {
-            throw std::invalid_argument("ERROR: Requested SPICE frame ID not found in PCK file");
-        }
-    }
-    if (m < 0 || m >= bpc->num) {
-        throw std::runtime_error("The requested SPICE frame ID has not been found.");
-    }
-    PckTarget *target = &(bpc->targets[m]);
+    PckTarget *target = &(bpc->targets[bpc->spiceIdToIdx.at(spiceId)]);
     if (epoch < target->beg || epoch > target->end) {
         std::cout << "epoch: " << epoch << std::endl;
         std::cout << "target->beg: " << target->beg << std::endl;

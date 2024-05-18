@@ -1,4 +1,4 @@
-// code here is modified from
+// code here is heavily modified but taken from
 // https://github.com/matthewholman/assist/tree/main/src/spk
 #ifndef SPK_H
 #define SPK_H
@@ -23,15 +23,7 @@
 struct SpkCacheItem {
     int spiceId = -99999;
     double t;
-    double x;
-    double y;
-    double z;
-    double vx;
-    double vy;
-    double vz;
-    double ax;
-    double ay;
-    double az;
+    double state[9];
 };
 
 /**
@@ -56,7 +48,7 @@ struct SpkCache {
  * @brief Number of items in the cache.
  * This is the number of spk queries that are remembered.
  */
-#define SPK_CACHE_SIZE 16
+#define SPK_CACHE_SIZE 8
 
 /**
  * @brief Length of a record in an SPK file.
@@ -94,6 +86,7 @@ struct SpkTarget {
  * @param allocatedNum Number of allocated targets.
  * @param map Memory map of the SPK file.
  * @param len Length of the memory map.
+ * @param spiceIdToIdx Map of SPICE ID to index in the targets array.
  */
 struct SpkInfo {
     SpkTarget* targets;
@@ -101,6 +94,7 @@ struct SpkInfo {
     int allocatedNum;
     void *map;
     size_t len;
+    std::unordered_map<int, int> spiceIdToIdx;
 };
 
 /**
@@ -136,15 +130,13 @@ SpkInfo* spk_init(const std::string &path);
  * @brief Compute pos, vel, and acc for a given body
  * at a given time using an SpkInfo structure.
  */
-void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *out_x,
-             double *out_y, double *out_z, double *out_vx, double *out_vy,
-             double *out_vz, double *out_ax, double *out_ay, double *out_az);
+void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *state);
 
 /**
  * @brief Top level function to get the state of a body at a given time
  * using the ephemeris data in a PropSimulation.
  */
 void get_spk_state(const int &spiceId, const double &t0_mjd, SpkEphemeris &ephem,
-                   double state[9], const bool &writeCache=false);
+                   double *state, const bool &writeCache=false);
 
 #endif

@@ -2,6 +2,7 @@
 #define PCK_H
 
 #include "timeconvert.h"
+#include <unordered_map>
 
 /**
  * @brief Length of a record in an PCK file.
@@ -39,6 +40,7 @@ struct PckTarget {
  * @param allocatedNum Number of allocated targets.
  * @param map Memory map of the PCK file.
  * @param len Length of the memory map.
+ * @param spiceIdToIdx Map of SPICE ID to index in the targets array.
  */
 struct PckInfo {
     PckTarget* targets;
@@ -46,6 +48,7 @@ struct PckInfo {
     int allocatedNum;
     void *map;
     size_t len;
+    std::unordered_map<int, int> spiceIdToIdx;
 };
 
 /**
