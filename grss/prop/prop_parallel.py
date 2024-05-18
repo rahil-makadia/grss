@@ -62,7 +62,7 @@ def _handle_one_cloned_sim(sol, ref_nongrav):
         full_list = [sol['t'], mass, radius] + pos + vel + ng_list
     return full_list
 
-def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False):
+def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, num_threads, reconstruct=False):
     """
     Propagate multiple simulations in parallel using a reference simulation.
 
@@ -76,6 +76,10 @@ def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False)
         Reference simulation to use for propagating the orbits.
     clones : dict
         Dictionary of orbit solutions to propagate in parallel.
+    num_threads : int
+        Number of threads to use for parallel propagation.
+    reconstruct : bool
+        Whether to reconstruct the log files after propagation.
     """
     if all(key in ref_sol for key in ['e', 'q', 'tp', 'om', 'w', 'i']):
         is_cometary = True
@@ -96,7 +100,7 @@ def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False)
         for file in os.listdir(save_dir):
             os.remove(os.path.join(save_dir, file))
     start_time = time.time()
-    libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info)
+    libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info, num_threads)
     end_time = time.time()
     duration = end_time - start_time
     mm = int(duration / 60)

@@ -662,20 +662,23 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter");
 
     m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
-          py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
+          py::arg("isCometary"), py::arg("allBodies"),
+          py::arg("maxThreads") = 128, R"mydelimiter(
         Propagate a simulation in parallel using OpenMP.
 
         Parameters
         ----------
         refSim : PropSimulation
             Reference simulation to copy.
+        isCometary : bool
+            Whether the bodies are cometary bodies.
         allBodies : list of list of real
             List of all bodies to propagate. Each list contains the initial MJD TDB time,
             mass, radius, initial state, and list of non-gravitational parameters of the body.
             The initial state is either the initial Heliocentric Ecliptic Cometary state
             or the initial barycentric Cartesian state (position and velocity separated).
-        isCometary : bool
-            Whether the bodies are cometary bodies.
+        maxThreads : int, optional
+            Maximum number of threads to use, by default min(128, available_cores).
 
         Returns
         -------
