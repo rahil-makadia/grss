@@ -1,10 +1,15 @@
 # minimum required CMake version
 cmake_minimum_required(VERSION 3.18.0)
 
-# if on a Mac, use brew llvm clang for OpenMP support
+# if on a Mac, use any GNU compiler from Homebrew
 if(APPLE)
-    set(CMAKE_C_COMPILER gcc-14)
-    set(CMAKE_CXX_COMPILER g++-14)
+    # find the brew GNU compiler version
+    execute_process(COMMAND bash -c "ls $HOMEBREW_PREFIX/bin/g++*" OUTPUT_VARIABLE BREW_GXX OUTPUT_STRIP_TRAILING_WHITESPACE)
+    # number in BREW_GXX is the version of the GNU compiler
+    string(REGEX REPLACE "[^0-9]" "" BREW_GXX_VERSION "${BREW_GXX}")
+    # use any GNU g++ compiler in BREW_PREFIX/bin without specifying the version
+    set(CMAKE_C_COMPILER "$ENV{HOMEBREW_PREFIX}/bin/gcc-${BREW_GXX_VERSION}")
+    set(CMAKE_CXX_COMPILER "$ENV{HOMEBREW_PREFIX}/bin/g++-${BREW_GXX_VERSION}")
 endif()
 
 # set the project name and get version from version.txt
