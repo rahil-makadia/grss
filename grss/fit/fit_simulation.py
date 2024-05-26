@@ -527,9 +527,9 @@ class FitSimulation:
         self.covariance = None
         self.fit_cartesian = False
         self.fit_cometary = False
-        self.fit_nongrav = True
         self.n_fit = None
         self._check_initial_solution(x_init, cov_init)
+        self.constraint_dir = None
         self.obs = None
         self.observer_info = None
         self.optical_idx = None
@@ -611,9 +611,6 @@ class FitSimulation:
             msg = ("Must provide at least a full cartesian",
                     "or cometary state for the initial solution.")
             raise ValueError(msg)
-        for key in ["a1", "a2", "a3"]:
-            if key in x_init and x_init[key] != 0.0:
-                self.fit_nongrav = True
         self.t_sol = x_init['t']
         self.x_init = {key: x_init[key] for key in x_init if key != 't'}
         self.x_nom = self.x_init.copy()
@@ -1674,6 +1671,9 @@ class FitSimulation:
             if i == 0:
                 # add prefit iteration
                 self._add_iteration(0, rms_u, rms_w, chi_sq)
+            if self.constraint_dir is not None:
+                constr_hat = self.constraint_dir/np.linalg.norm(self.constraint_dir)
+                delta_x -= np.dot(delta_x, constr_hat)*constr_hat
             next_state = curr_state + delta_x
             if self.fit_cometary and next_state[0] < 0.0:
                 next_state[0] = 0.0
