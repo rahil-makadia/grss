@@ -516,8 +516,8 @@ class FitSimulation:
         None : NoneType
             None
         """
-        perm_id = obs_df['permID'][0]
-        prov_id = obs_df['provID'][0]
+        perm_id = obs_df.iloc[-1]['permID']
+        prov_id = obs_df.iloc[-1]['provID']
         body_id = perm_id if isinstance(perm_id, str) else prov_id
         self.name = body_id
         self.t_sol = None
@@ -559,12 +559,7 @@ class FitSimulation:
         if nongrav_info is not None:
             for key in nongrav_info:
                 self.fixed_propsim_params[key] = nongrav_info[key]
-        if events is not None:
-            self.fixed_propsim_params['events'] = events
-            self.fit_events = True
-        else:
-            self.fixed_propsim_params['events'] = []
-            self.fit_events = False
+        self.fixed_propsim_params['events'] = events if events is not None else []
         self.reject_outliers = True
         self.reject_criteria = [3.0, 2.8]
         self.num_rejected = 0
@@ -986,11 +981,13 @@ class FitSimulation:
         """
         events = []
         for i in range(len(self.fixed_propsim_params['events'])):
-            event = self.fixed_propsim_params['events'][i]
-            event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else event[1]
-            event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else event[2]
-            event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else event[3]
-            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else event[4]
+            fixed_event = tuple(self.fixed_propsim_params['events'][i])
+            event = [None]*5
+            event[0] = fixed_event[0]
+            event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
+            event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
+            event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
+            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
             events.append(tuple(event))
         return events
 

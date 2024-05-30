@@ -312,8 +312,8 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
     if t_max_tdb is None:
         t_max_tdb = np.inf
     # get gaia query results
-    perm_id = obs_df['permID'][0]
-    prov_id = obs_df['provID'][0]
+    perm_id = obs_df.iloc[-1]['permID']
+    prov_id = obs_df.iloc[-1]['provID']
     body_id = perm_id if isinstance(perm_id, str) else prov_id
     res = _get_gaia_query_results(body_id, release=gaia_dr)
     if verbose:

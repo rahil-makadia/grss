@@ -323,22 +323,20 @@ static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
  * @param[inout] propSim PropSimulation object for the integration.
  */
 void gr15(PropSimulation *propSim) {
-    if (!std::isfinite(propSim->t)) {
+    real t = propSim->t;
+    std::vector<real> xInteg = propSim->xInteg;
+    if (!std::isfinite(t)) {
         throw std::runtime_error("t is not finite");
     }
-    for (size_t i = 0; i < propSim->xInteg.size(); i++) {
-        if (!std::isfinite(propSim->xInteg[i])) {
+    for (size_t i = 0; i < xInteg.size(); i++) {
+        if (!std::isfinite(xInteg[i])) {
             throw std::runtime_error("xInteg is not finite");
         }
     }
-    real t = propSim->t;
-    std::vector<real> xInteg0 = propSim->xInteg;
     const size_t nh = 8;
     const size_t dim = propSim->integParams.n2Derivs;
     real dt = get_initial_timestep(propSim);
     propSim->integParams.timestepCounter = 0;
-    std::vector<real> xInteg(propSim->xInteg.size(), 0.0);
-    std::vector<real> xIntegCompCoeffs(propSim->xInteg.size(), 0.0);
     std::vector<real> b(7 * dim, 0.0);
     std::vector<real> bCompCoeffs(7 * dim, 0.0);
     std::vector<real> g(7 * dim, 0.0);
@@ -352,7 +350,7 @@ void gr15(PropSimulation *propSim) {
     if (propSim->events.size() != 0) {
         tNextEvent = propSim->events[0].t;
     }
-    check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg0);
+    check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg);
     if ((propSim->integParams.tf > propSim->integParams.t0 &&
          t + dt > tNextEvent) ||
         (propSim->integParams.tf < propSim->integParams.t0 &&
@@ -360,9 +358,9 @@ void gr15(PropSimulation *propSim) {
         dt = tNextEvent - t;
     }
     propSim->interpParams.tStack.push_back(t);
-    propSim->interpParams.xIntegStack.push_back(xInteg0);
+    propSim->interpParams.xIntegStack.push_back(xInteg);
     std::vector<real> accInteg0(dim, 0.0);
-    get_state_der(propSim, t, xInteg0, accInteg0);
+    get_state_der(propSim, t, xInteg, accInteg0);
     std::vector<std::vector<real>> accIntegArr(nh, std::vector<real>(dim, 0.0));
     size_t PCmaxIter = 12;
     int keepStepping = 1;
@@ -370,9 +368,10 @@ void gr15(PropSimulation *propSim) {
     if (propSim->integParams.t0 == propSim->integParams.tf) {
         keepStepping = 0;
     }
+    std::vector<real> xInteg0(xInteg.size(), 0.0);
+    std::vector<real> xIntegCompCoeffs(xInteg.size(), 0.0);
     while (keepStepping) {
-        t = propSim->t;
-        xInteg0 = propSim->xInteg;
+        xInteg0 = xInteg;
         oneStepDone = 0;
         update_g_with_b(b, dim, g);
         while (!oneStepDone) {
@@ -431,11 +430,9 @@ void gr15(PropSimulation *propSim) {
             approx_xInteg(xInteg0, accInteg0, dt, 1.0, b, dim,
                         propSim->integBodies, xInteg, xIntegCompCoeffs);
             t += dt;
-            propSim->t = t;
             get_state_der(propSim, t, xInteg, accInteg0);
             check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
                                     xInteg);
-            propSim->xInteg = xInteg;
             propSim->interpParams.tStack.push_back(t);
             propSim->interpParams.xIntegStack.push_back(xInteg);
             propSim->integParams.timestepCounter++;
@@ -454,6 +451,8 @@ void gr15(PropSimulation *propSim) {
                  t + dt < tNextEvent)) {
                 dt = tNextEvent - t;
             }
+            propSim->t = t;
+            propSim->xInteg = xInteg;
             oneStepDone = 1;
         }
     }

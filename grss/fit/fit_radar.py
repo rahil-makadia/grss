@@ -52,8 +52,8 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
     ValueError
         If the observation type is not recognized
     """
-    perm_id = obs_df['permID'][0]
-    prov_id = obs_df['provID'][0]
+    perm_id = obs_df.iloc[-1]['permID']
+    prov_id = obs_df.iloc[-1]['provID']
     if t_min_tdb is None:
         t_min_utc = -np.inf
     else:
