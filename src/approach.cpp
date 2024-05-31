@@ -22,6 +22,37 @@ static real get_atm_offset(const int &centralBodySpiceId){
 }
 
 /**
+ * @brief Convert body-fixed rectangular coordinates to geodetic coordinates for a spheroid.
+ * 
+ * @param[in] x X-coordinate in body-fixed frame.
+ * @param[in] y Y-coordinate in body-fixed frame.
+ * @param[in] z Z-coordinate in body-fixed frame.
+ * @param[in] a Semi-major axis of the body.
+ * @param[in] f Flattening of the body.
+ * @param[out] lon Longitude in geodetic frame.
+ * @param[out] lat Latitude in geodetic frame.
+ * @param[out] h Height above spheroid in geodetic frame.
+ */
+static void rec_to_geodetic(const real &x, const real &y, const real &z,
+                            const real &a, const real &f, real &lon, real &lat,
+                            real &h) {
+    const real xy = sqrt(x*x + y*y);
+    const real e2 = 2*f - f*f;
+    real phi = atan(z/(xy*(1-e2)));
+    real N;
+    for (size_t k = 0; k < 5; k++) {
+        N = a/sqrt(1-e2*sin(phi)*sin(phi));
+        h = xy/cos(phi) - N;
+        phi = atan(z*(N+h)/(xy*(N*(1-e2)+h)));
+    }
+    lat = phi;
+    lon = atan2(y, x);
+    if (lon < 0.0) {
+        lon += 2 * PI;
+    }
+}
+
+/**
  * @param[inout] propSim PropSimulation object for the integration.
  * @param[in] tOld Time at the previous integrator epoch.
  * @param[in] xIntegOld State at the previous integrator epoch.
@@ -97,11 +128,12 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     propSim->caParams.push_back(ca);
                     if (ca.impact){
                         ImpactParameters impact;
+                        const real maxImpactCaTDiff = 600.0/86400.0; // 10 minutes
                         real tImpStart;
                         if (forwardProp){
-                            tImpStart = fmax(tOld-1, propSim->integParams.t0-propSim->tEvalMargin);
+                            tImpStart = fmax(tOld-maxImpactCaTDiff, propSim->integParams.t0-propSim->tEvalMargin);
                         } else {
-                            tImpStart = fmin(tOld+1, propSim->integParams.t0+propSim->tEvalMargin);
+                            tImpStart = fmin(tOld+maxImpactCaTDiff, propSim->integParams.t0+propSim->tEvalMargin);
                         }
                         get_ca_or_impact_time(propSim, i, j, tImpStart, ca.t, impact.t, impact_r_calc);
                         impact.xRel = get_rel_state(propSim, i, j, impact.t);
@@ -154,17 +186,37 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
     // Calculate the distance between two bodies at a given time, accounting for
     // the radius of the bodies
     std::vector<real> xRel = get_rel_state(propSim, i, j, t);
-    real relDist =
-        sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
-    real flybyBodyRadius, centralBodyRadius;
-    flybyBodyRadius = propSim->integBodies[i].radius;
     if (j < propSim->integParams.nInteg) {
-        centralBodyRadius = propSim->integBodies[j].radius;
+        const real relDist =
+            sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
+        r = relDist - propSim->integBodies[i].radius - propSim->integBodies[j].radius;
+        return;
     } else {
-        const SpiceBody bodyj = propSim->spiceBodies[j - propSim->integParams.nInteg];
-        centralBodyRadius = bodyj.radius + get_atm_offset(bodyj.spiceId);
+        std::string baseBodyFrame;
+        const int spiceId = propSim->spiceBodies[j - propSim->integParams.nInteg].spiceId;
+        const real atmOffset = get_atm_offset(spiceId);
+        if (spiceId == 399){
+            get_baseBodyFrame(spiceId, t, baseBodyFrame);
+            std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
+            get_pck_rotMat("J2000", baseBodyFrame, t, propSim->pckEphem, rotMat);
+            std::vector<real> xBody(6);
+            mat_vec_mul(rotMat, xRel, xBody);
+            const real x = xBody[0];
+            const real y = xBody[1];
+            const real z = xBody[2];
+            const real a = 6378137.0/propSim->consts.du2m;
+            const real f = 1/298.257223563;
+            real lon, lat, h;
+            rec_to_geodetic(x, y, z, a, f, lon, lat, h);
+            r = h - atmOffset;
+            return;
+        } else {
+            const real relDist =
+                sqrt(xRel[0] * xRel[0] + xRel[1] * xRel[1] + xRel[2] * xRel[2]);
+            r = relDist - propSim->integBodies[i].radius - propSim->spiceBodies[j - propSim->integParams.nInteg].radius - atmOffset;
+            return;
+        }
     }
-    r = relDist - flybyBodyRadius - centralBodyRadius;
 }
 
 /**
@@ -715,25 +767,32 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
     get_pck_rotMat("J2000", baseBodyFrame, this->t, propSim->pckEphem, rotMat);
     mat_vec_mul(rotMat, this->xRel, this->xRelBodyFixed);
-    real x, y, z, lon, lat, dist;
+    real x, y, z, lon, lat, alt;
     x = this->xRelBodyFixed[0];
     y = this->xRelBodyFixed[1];
     z = this->xRelBodyFixed[2];
-    dist = sqrt(x*x + y*y + z*z);
-    lat = atan2(z, sqrt(x*x + y*y));
-    lon = atan2(y, x);
-    if (lon < 0.0) {
-        lon += 2 * PI;
-    }
-    real centralBodyRadius;
-    if ((size_t) this->centralBodyIdx < propSim->integParams.nInteg) {
-        centralBodyRadius = propSim->integBodies[this->centralBodyIdx].radius;
+    if (this->centralBodySpiceId == 399){
+        const real a = 6378137.0/propSim->consts.du2m;
+        const real f = 1/298.257223563;
+        rec_to_geodetic(x, y, z, a, f, lon, lat, alt);
     } else {
-        centralBodyRadius = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
+        const real dist = sqrt(x*x + y*y + z*z);
+        lat = atan2(z, sqrt(x*x + y*y));
+        lon = atan2(y, x);
+        if (lon < 0.0) {
+            lon += 2 * PI;
+        }
+        real centralBodyRadius;
+        if ((size_t) this->centralBodyIdx < propSim->integParams.nInteg) {
+            centralBodyRadius = propSim->integBodies[this->centralBodyIdx].radius;
+        } else {
+            centralBodyRadius = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
+        }
+        alt = (dist-centralBodyRadius)*propSim->consts.du2m/1.0e3L;
     }
     this->lon = lon;
     this->lat = lat;
-    this->alt = (dist-centralBodyRadius)*propSim->consts.du2m/1.0e3L;
+    this->alt = alt;
 }
 
 /**
