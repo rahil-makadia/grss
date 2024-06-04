@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 4.0.3 documentation</title>
+    <title>(84100) Farnocchia orbit determination test &#8212; GRSS 4.1.0 documentation</title>
   
   
   
@@ -154,7 +154,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.0.3 documentation</p>
+    <p class="title logo__title">GRSS v4.1.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -549,16 +549,16 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Read in 943 observations from the MPC.
+Read in 952 observations from the MPC.
         WARNING: At least one deprecated star catalog in the data.
-        Filtered to 943 observations that satisfy the time range and accepted observatory constraints.
+        Filtered to 952 observations that satisfy the time range and accepted observatory constraints.
 Applying Eggl et al. (2020) debiasing scheme to the observations.
         Unknown star catalog: UNK
-        No debiasing needed for 505 observations.
+        No debiasing needed for 514 observations.
         Debiased 416 observations.
         No bias information for 22 observations.
 Applying Vereš et al. (2017) weighting scheme to the observations.
-        Using 884 CCD observations with station-specific weight rules.
+        Using 891 CCD observations with station-specific weight rules.
 Applying sqrt(N/4) deweighting scheme.
         Deweighted 158 observations.
 Read in 191 Gaia observations from gaiafpr
@@ -588,14 +588,12 @@ Read in 191 Gaia observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.398                   0.576                   590.386                         0.261
-2                        0.398                   0.575                   590.402                         0.261
-3                        0.398                   0.575                   590.402                         0.261
+1                        0.397                   0.574                   753.676                         0.331
+2                        0.397                   0.574                   753.104                         0.330
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.376                   0.544                   530.058                         0.235
-5                        0.376                   0.544                   530.002                         0.235
-6                        0.376                   0.544                   530.002                         0.235
-Converged after rejecting outliers. Rejected 5 out of 1134 optical observations.
+3                        0.375                   0.543                   673.935                         0.297
+4                        0.375                   0.543                   673.121                         0.297
+Converged after rejecting outliers. Rejected 5 out of 1143 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -611,24 +609,24 @@ Converged after rejecting outliers. Rejected 5 out of 1134 optical observations.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Summary of the orbit fit calculations at iteration 6 (of 6):
+Summary of the orbit fit calculations at iteration 4 (of 4):
 ==============================================================
-RMS unweighted: 0.37593885140575173
-RMS weighted: 0.5438948509419494
-chi-squared: 530.0021432285334
-reduced chi-squared: 0.23534731049224397
-square root of reduced chi-squared: 0.4851260769039776
+RMS unweighted: 0.37493551138108694
+RMS weighted: 0.5426357087873455
+chi-squared: 673.120729463317
+reduced chi-squared: 0.29652895571071236
+square root of reduced chi-squared: 0.5445447233338253
 --------------------------------------------------------------
-Solution Time: MJD 58042.000 TDB = 2017-10-16 00:00:00.000 TDB
-Solution Observation Arc: 10342.85 days (28.32 years)
+Solution Time: MJD 58043.000 TDB = 2017-10-17 00:00:00.000 TDB
+Solution Observation Arc: 10684.27 days (29.25 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02839420821e-01               1.41072497409e-09               2.02839420883e-01               1.41733520795e-09               +6.19374551647e-11              +0.044
-q                       2.17602309556e+00               5.02213641990e-09               2.17602309687e+00               5.05576653353e-09               +1.30667832110e-09              +0.260
-tp                      5.74182713236e+04               7.41859215578e-06               5.74182713260e+04               7.47254795434e-06               +2.34495382756e-06              +0.316
-om                      1.52357305306e+02               1.14596100392e-06               1.52357305316e+02               1.16857627643e-06               +9.93051685327e-09              +0.009
-w                       2.08338776381e+02               2.36706895048e-06               2.08338777013e+02               2.38369101339e-06               +6.31239032600e-07              +0.267
-i                       5.81853647038e+00               1.30273571989e-07               5.81853649980e+00               1.31073957270e-07               +2.94233908349e-08              +0.226
+e                       2.02838509699e-01               1.41072648892e-09               2.02838509757e-01               1.41697345831e-09               +5.82234538360e-11              +0.041
+q                       2.17602654905e+00               5.02228898087e-09               2.17602655030e+00               5.04403934853e-09               +1.24894672382e-09              +0.249
+tp                      5.74182702247e+04               7.41870099620e-06               5.74182702269e+04               7.43793349862e-06               +2.22800008487e-06              +0.300
+om                      1.52357306072e+02               1.14599831206e-06               1.52357306084e+02               1.16856904768e-06               +1.17686909107e-08              +0.010
+w                       2.08338717436e+02               2.36710467579e-06               2.08338718033e+02               2.37546020970e-06               +5.97824055149e-07              +0.253
+i                       5.81853404653e+00               1.30274489599e-07               5.81853407497e+00               1.30874307774e-07               +2.84439867215e-08              +0.218
 
 </pre></div></div>
 </div>
@@ -691,8 +689,8 @@ i                       5.81853647038e+00               1.30273571989e-07       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 0.37
-Mahalonobis distance between GRSS and JPL solution: 0.37
+Mahalonobis distance between JPL and GRSS solution: 0.36
+Mahalonobis distance between GRSS and JPL solution: 0.36
 Bhattacharya distance between JPL and GRSS solution: 0.0004
 Bhattacharya coefficient between JPL and GRSS solution: 0.9996
 </pre></div></div>
