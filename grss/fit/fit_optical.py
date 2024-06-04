@@ -368,6 +368,9 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']
         obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']
         obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']
+        obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']
+        obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']
+        obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']
     if verbose:
         print(f"\tFiltered to {gaia_add_counter} observations that",
                 "satisfy the time range constraints.")

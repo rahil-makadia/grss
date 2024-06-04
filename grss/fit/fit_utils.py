@@ -76,7 +76,7 @@ def parallax_to_lat_lon_alt(lon, rho_cos_lat, rho_sin_lat):
         distance from the geocenter to the observer, m
     """
     # WGS84 ellipsoid parameters
-    r_eq = 6378137.0 # m
+    r_eq = 6378.137/1.495978707e8 # equatorial radius in AU
     lat = np.arctan2(rho_sin_lat, rho_cos_lat)
     rho = np.sqrt(rho_cos_lat**2 + rho_sin_lat**2)*r_eq
     return lon*np.pi/180, lat, rho
@@ -113,40 +113,21 @@ def get_radar_codes_dict():
         geocentric latitude, and distance from the geocenter
     """
     # from JPL radar API
+    m2au = 1.0/1.495978707e11
     radar_site_loc = {
-        '-13': (4.244737449544063, 0.6120174701461084, 6372125.10051922),
-        '-1': (5.1181310262659565, 0.31816602936555305, 6376488.108593255),
-        '-2': (5.035481521533785, 0.7405709918867184, 6368491.961110464),
-        '-14': (4.2430780044539, 0.6151299903972761, 6371993.266933192),
-        '-47': (2.6101423188745216, -0.5261379198959515, 6372960.260589986),
-        '-9': (4.889717249348727, 0.6675169909800179, 6370740.389143447),
-        '-43': (2.600213638178763, -0.6147210003517548, 6371689.000848973),
-        '-73': (0.33555473306040223, 1.2123123239363724, 6359490.218520948),
-        '-38': (0.5792216160079022, 0.7853411225947086, 6367487.942395174),
-        '-36': (2.6001661111179013, -0.6145934819355463, 6371688.2123778965),
-        '-35': (2.6002169281244027, -0.6146055679274739, 6371697.3584917635),
-        '-25': (4.24332540487537, 0.6135924747227121, 6371982.53410041)
+        '-13': (4.244737449544063, 0.6120174701461084, 6372125.10051922*m2au),
+        '-1': (5.1181310262659565, 0.31816602936555305, 6376488.108593255*m2au),
+        '-2': (5.035481521533785, 0.7405709918867184, 6368491.961110464*m2au),
+        '-14': (4.2430780044539, 0.6151299903972761, 6371993.266933192*m2au),
+        '-47': (2.6101423188745216, -0.5261379198959515, 6372960.260589986*m2au),
+        '-9': (4.889717249348727, 0.6675169909800179, 6370740.389143447*m2au),
+        '-43': (2.600213638178763, -0.6147210003517548, 6371689.000848973*m2au),
+        '-73': (0.33555473306040223, 1.2123123239363724, 6359490.218520948*m2au),
+        '-38': (0.5792216160079022, 0.7853411225947086, 6367487.942395174*m2au),
+        '-36': (2.6001661111179013, -0.6145934819355463, 6371688.2123778965*m2au),
+        '-35': (2.6002169281244027, -0.6146055679274739, 6371697.3584917635*m2au),
+        '-25': (4.24332540487537, 0.6135924747227121, 6371982.53410041*m2au),
     }
-    # # # add this when ingesting radar data from ADES file not JPL API
-    # # map to MPC code for radar observatories if it exists (otherwise use JPL code)
-    # code_map = {
-    #     '-1': '251', # Arecibo (300-m, 1963 to 2020)
-    #     '-2': '254', # Haystack (37-m)
-    #     '-9': '256', # Green Bank Telescope (100-m, GBT)
-    #     '-13': '252', # DSS-13 (34-m BWG, R&D)
-    #     '-14': '253', # DSS-14 (70-m)
-    #     '-25': '257', # Goldstone DSS 25
-    #     '-35': '-35', # DSS-35 (34-m BWG)
-    #     '-36': '-36', # DSS-36 (34-m BWG)
-    #     '-38': '255', # Evpatoria (70-m)
-    #     '-43': '-43', # DSS-43 (70-m)
-    #     '-47': '-47', # DSS-47 (ATCA ref. W196)
-    #     '-73': '259', # Tromso (32-m, EISCAT)
-    # }
-    # radar_codes_dict = {
-    #     mpc_code: radar_site_loc[jpl_code] for jpl_code, mpc_code in code_map.items()
-    # }
-    # return radar_codes_dict
     return radar_site_loc
 
 def get_codes_dict():
@@ -194,17 +175,25 @@ def get_observer_info(obs_df):
     spacecraft = [ 'S/C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
                     'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', ]
     roving = ['247', '270']
-    conv_to_m = {
-        'ICRF_AU': 1.49597870700e11,
-        'ICRF_KM': 1.0e3,
+    conv_to_au = {
+        'ICRF_AU': (1,1),
+        'ICRF_KM': (1/1.495978707e8,86400/1.495978707e8),
     }
-    fields = ['stn', 'mode', 'sys', 'pos1', 'pos2', 'pos3', 'trx', 'rcv', 'com', 'frq', 'doppler']
+    m2au = 1.0/1.495978707e11
+    fields = ['stn', 'mode', 'sys', 'pos1', 'pos2', 'pos3', 
+              'vel1', 'vel2', 'vel3', 'trx', 'rcv', 'com', 'frq', 'doppler']
     for obs_info in zip(*[obs_df[field] for field in fields]):
-        stn, mode, sys, pos1, pos2, pos3, trx, rcv, com, freq, doppler = obs_info
+        stn, mode, sys, pos1, pos2, pos3, vel1, vel2, vel3, trx, rcv, com, freq, doppler = obs_info
         info_list = []
         if stn in gaia+occultation+spacecraft:
-            c = conv_to_m[sys]
-            info_list.extend((500, pos1*c, pos2*c, pos3*c, 0, 0, 0))
+            c = conv_to_au[sys]
+            c_pos = c[0]
+            if stn in gaia:
+                c_vel = c[1]
+                info_list.extend( (500, pos1*c_pos, pos2*c_pos, pos3*c_pos,
+                                        vel1*c_vel, vel2*c_vel, vel3*c_vel) )
+            else:
+                info_list.extend((500, pos1*c_pos, pos2*c_pos, pos3*c_pos, 0, 0, 0))
         elif mode == 'RAD':
             rx_lon, rx_lat, rx_rho = stn_codes_dict[rcv]
             tx_lon, tx_lat, tx_rho = stn_codes_dict[trx]
@@ -219,17 +208,17 @@ def get_observer_info(obs_df):
             lon = pos1*np.pi/180
             if sys == 'WGS84':
                 lat = pos2*np.pi/180
-                rho = pos3+6378137.0
+                rho = (pos3+6378137.0)*m2au
             elif sys == 'ITRF':
                 lat = np.arctan2(pos2, pos3)
-                rho = np.sqrt(pos2**2 + pos3**2)*1.0e3
+                rho = np.sqrt(pos2**2 + pos3**2)*1.0e3*m2au
             else:
                 raise ValueError(f"Invalid system {sys}")
             info_list.extend((399, lon, lat, rho))
         elif mode.startswith('SIM'):
             lon = pos1*np.pi/180
             lat = np.arctan2(pos2, pos3)
-            rho = np.sqrt(pos2**2 + pos3**2)*1.0e3
+            rho = np.sqrt(pos2**2 + pos3**2)*1.0e3*m2au
             if mode in {'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                 info_list.extend((
                     399, lon, lat, rho,
@@ -241,10 +230,10 @@ def get_observer_info(obs_df):
             else:
                 if sys == 'WGS84':
                     lat = pos2*np.pi/180
-                    rho = pos3+6378137.0
+                    rho = (pos3+6378137.0)*m2au
                 elif sys == 'ITRF':
                     lat = np.arctan2(pos2, pos3)
-                    rho = np.sqrt(pos2**2 + pos3**2)*1.0e3
+                    rho = np.sqrt(pos2**2 + pos3**2)*1.0e3*m2au
                 else:
                     raise ValueError(f"Invalid system {sys}")
                 info_list.extend((399, lon, lat, rho))

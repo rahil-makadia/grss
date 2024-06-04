@@ -21,6 +21,7 @@ ades_keep_columns = {
     'rmsDelay': 'float', 'rmsDoppler': 'float', 'com': 'Int64', 'frq': 'float',
     'raStar': 'float', 'decStar': 'float', 'deltaRA': 'float', 'deltaDec': 'float',
     'sys': 'str', 'ctr': 'Int64', 'pos1': 'float', 'pos2': 'float', 'pos3': 'float',
+    'vel1': 'float', 'vel2': 'float', 'vel3': 'float',
 }
 ades_add_columns = {
     'resRA': 'float', 'resDec': 'float', 'selAst': 'str',

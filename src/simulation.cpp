@@ -81,12 +81,12 @@ void get_observer_state(const real &tObsMjd,
     double baseBodyState[9];
     get_spk_state(baseBody, tObsMjdTDB, propSim->spkEphem, baseBodyState);
     if ((int)observerInfo[0] == 500) {
-        observerState[0] = (real) baseBodyState[0] + observerInfo[1]/propSim->consts.du2m;
-        observerState[1] = (real) baseBodyState[1] + observerInfo[2]/propSim->consts.du2m;
-        observerState[2] = (real) baseBodyState[2] + observerInfo[3]/propSim->consts.du2m;
-        observerState[3] = (real) baseBodyState[3] + observerInfo[4]/propSim->consts.duptu2mps;
-        observerState[4] = (real) baseBodyState[4] + observerInfo[5]/propSim->consts.duptu2mps;
-        observerState[5] = (real) baseBodyState[5] + observerInfo[6]/propSim->consts.duptu2mps;
+        observerState[0] = (real) baseBodyState[0] + observerInfo[1];
+        observerState[1] = (real) baseBodyState[1] + observerInfo[2];
+        observerState[2] = (real) baseBodyState[2] + observerInfo[3];
+        observerState[3] = (real) baseBodyState[3] + observerInfo[4];
+        observerState[4] = (real) baseBodyState[4] + observerInfo[5];
+        observerState[5] = (real) baseBodyState[5] + observerInfo[6];
         return;
     }
     std::string baseBodyFrame;
@@ -96,9 +96,9 @@ void get_observer_state(const real &tObsMjd,
     real lon = observerInfo[1];
     real lat = observerInfo[2];
     real rho = observerInfo[3];
-    real bodyFixedX = rho * cos(lat) * cos(lon) / propSim->consts.du2m;
-    real bodyFixedY = rho * cos(lat) * sin(lon) / propSim->consts.du2m;
-    real bodyFixedZ = rho * sin(lat) / propSim->consts.du2m;
+    real bodyFixedX = rho * cos(lat) * cos(lon);
+    real bodyFixedY = rho * cos(lat) * sin(lon);
+    real bodyFixedZ = rho * sin(lat);
     std::vector<real> bodyFixedState = {bodyFixedX, bodyFixedY, bodyFixedZ,
                                             0.0,        0.0,        0.0};
     mat_vec_mul(rotMat, bodyFixedState, observerState);
