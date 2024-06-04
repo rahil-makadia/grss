@@ -12,17 +12,13 @@ on:
 
 jobs:
   prop-only:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
       - name: Build GRSS library
         run: |
-          brew install gcc@14
+          sudo apt-get install doxygen
           source initialize.sh
           source build_cpp.sh -clean
       - name: Run tests
