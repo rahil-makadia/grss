@@ -931,7 +931,8 @@ def eliminate_obs(obs_df, max_obs_per_night, verbose):
 
 def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
                     t_max_tdb=None, debias_lowres=True, deweight=True,
-                    eliminate=False, num_obs_per_night=5, verbose=False):
+                    eliminate=False, num_obs_per_night=5, accept_weights=False,
+                    verbose=False):
     """
     Assemble the optical observations for a given body into an array for an orbit fit.
 
@@ -954,6 +955,8 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
         Flag to eliminate too many observations from the same night, by default False
     num_obs_per_night : int, optional
         Effective/Maximum number of effective observations per night, by default 5
+    accept_weights : bool, optional
+        Flag to accept the weights from the observations dataframe, by default False
     verbose : bool, optional
         Flag to print out information about the observations, by default False
 
@@ -983,7 +986,8 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
                 "Setting biases to zero.")
         opt_idx = obs_df.query("mode != 'RAD'").index
         obs_df.loc[opt_idx, ['biasRA', 'biasDec']] = 0.0
-    obs_df = apply_weighting_scheme(obs_df, verbose)
+    if not accept_weights:
+        obs_df = apply_weighting_scheme(obs_df, verbose)
     if deweight:
         obs_df = deweight_obs(obs_df, num_obs_per_night, verbose)
     elif eliminate:

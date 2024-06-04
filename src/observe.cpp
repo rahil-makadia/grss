@@ -103,6 +103,8 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
                      const std::vector<real> &xInterpApparent) {
     std::vector<real> opticalMeasurement(2*propSim->integParams.nInteg,
                                        std::numeric_limits<real>::quiet_NaN());
+    std::vector<real> opticalMeasurementDot(2*propSim->integParams.nInteg,
+                                       std::numeric_limits<real>::quiet_NaN());
     std::vector<real> opticalPartials(12*propSim->integParams.nInteg,
                                        std::numeric_limits<real>::quiet_NaN());
     std::vector<real> photocenterCorr(2*propSim->integParams.nInteg,
@@ -114,7 +116,7 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
     switch (propSim->obsType[interpIdx]) {
     case 0: case 3:
         get_optical_measurement(propSim, xInterpApparent, opticalMeasurement,
-                                opticalPartials);
+                                opticalMeasurementDot, opticalPartials);
         get_photocenter_correction(propSim, interpIdx, tInterpGeom,
                                     xInterpApparent, photocenterCorr);
         break;
@@ -128,6 +130,7 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
         break;
     }
     propSim->opticalObs.push_back(opticalMeasurement);
+    propSim->opticalObsDot.push_back(opticalMeasurementDot);
     propSim->opticalPartials.push_back(opticalPartials);
     propSim->opticalObsCorr.push_back(photocenterCorr);
     propSim->radarObs.push_back(radarMeasurement);
@@ -138,17 +141,20 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] xInterpApparent Apparent state vector of the target body.
  * @param[out] opticalMeasurement Optical measurement (RA and Dec).
+ * @param[out] opticalMeasurementDot Time derivative of the optical measurement.
  * @param[out] opticalPartials Partials of the optical measurement.
  */
 void get_optical_measurement(PropSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
                              std::vector<real> &opticalMeasurement,
+                             std::vector<real> &opticalMeasurementDot,
                              std::vector<real> &opticalPartials) {
     size_t starti = 0;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        real rho[3], rhoHat[3];
+        real rho[3], rhoHat[3], rhoDot[3];
         for (size_t j = 0; j < 3; j++) {
             rho[j] = xInterpApparent[starti + j];
+            rhoDot[j] = xInterpApparent[starti + 3 + j];
         }
         real dist;
         vnorm(rho, 3, dist);
@@ -160,18 +166,22 @@ void get_optical_measurement(PropSimulation *propSim,
             r_asc = r_asc + 2*PI;
         }
         const real x2py2 = rho[0]*rho[0] + rho[1]*rho[1];
+        const real xydist = sqrt(x2py2);
         const real dradx = -rho[1]/x2py2;
         const real drady = rho[0]/x2py2;
         real dec = asin(rhoHat[2]);
         const real dist2 = dist*dist;
-        const real ddecdx = -rho[0]*rho[2]/dist2/sqrt(x2py2);
-        const real ddecdy = -rho[1]*rho[2]/dist2/sqrt(x2py2);
-        const real ddecdz = sqrt(x2py2)/dist2;
+        const real ddecdx = -rho[0]*rho[2]/dist2/xydist;
+        const real ddecdy = -rho[1]*rho[2]/dist2/xydist;
+        const real ddecdz = xydist/dist2;
         const real conv = 180.0L/PI*3600.0L; // radians -> arcsec
-        r_asc *= conv;
-        dec *= conv;
-        opticalMeasurement[2*i] = r_asc;
-        opticalMeasurement[2*i+1] = dec;
+        opticalMeasurement[2*i] = r_asc*conv;
+        opticalMeasurement[2*i+1] = dec*conv;
+        const real rdot = (rhoDot[0]*rho[0] + rhoDot[1]*rho[1] + rhoDot[2]*rho[2])/dist;
+        const real raDot = (rhoDot[0]*rho[1] - rhoDot[1]*rho[0])/-x2py2;
+        const real decDot = (rhoDot[2] - rdot*sin(dec))/xydist;
+        opticalMeasurementDot[2*i] = raDot*conv;
+        opticalMeasurementDot[2*i+1] = decDot*conv;
         std::fill(opticalPartials.begin()+12*i, opticalPartials.begin()+12*(i+1), 0.0);
         opticalPartials[12*i] = dradx*conv;
         opticalPartials[12*i+1] = drady*conv;

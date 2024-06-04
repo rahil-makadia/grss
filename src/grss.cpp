@@ -800,6 +800,10 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Optical observation of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
+        .def_readwrite("opticalObsDot", &PropSimulation::opticalObsDot,
+                       R"mydelimiter(
+            Time derivative of the optical observation of each integration body in the simulation for each value in PropSimulation.tEval.
+            )mydelimiter")
         .def_readwrite("opticalPartials", &PropSimulation::opticalPartials,
                        R"mydelimiter(
             Optical observation partials of each integration body in the simulation for each value in PropSimulation.tEval.

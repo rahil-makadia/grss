@@ -775,6 +775,7 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
         const real a = 6378137.0/propSim->consts.du2m;
         const real f = 1/298.257223563;
         rec_to_geodetic(x, y, z, a, f, lon, lat, alt);
+        alt *= propSim->consts.du2m/1.0e3L;
     } else {
         const real dist = sqrt(x*x + y*y + z*z);
         lat = atan2(z, sqrt(x*x + y*y));

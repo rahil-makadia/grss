@@ -25,6 +25,7 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
 void get_optical_measurement(PropSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
                              std::vector<real> &opticalMeasurement,
+                             std::vector<real> &opticalMeasurementDot,
                              std::vector<real> &opticalPartials);
 
 /**

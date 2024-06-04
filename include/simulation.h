@@ -480,6 +480,7 @@ class PropSimulation {
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
     std::vector<std::vector<real>> opticalObs;
+    std::vector<std::vector<real>> opticalObsDot;
     std::vector<std::vector<real>> opticalPartials;
     std::vector<std::vector<real>> opticalObsCorr;
     std::vector<std::vector<real>> radarObs;

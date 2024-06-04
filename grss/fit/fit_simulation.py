@@ -546,6 +546,7 @@ class FitSimulation:
         self.obs_cov = None
         self.obs_weight = None
         self._compute_obs_weights()
+        self.sig_time = 1.0
         self.n_iter = 0
         self.n_iter_max = n_iter_max
         self.iters = []
@@ -758,17 +759,16 @@ class FitSimulation:
                 self.obs_cov.append([[sig**2]])
                 self.obs_weight.append([[1.0/sig**2]])
             else:
-                sig_corr_nan = np.isnan(sig_corr)
-                off_diag = 0.0 if sig_corr_nan else sig_corr*sig_ra*sig_dec
-                sub_cov = np.array([[sig_ra**2, off_diag],
+                off_diag = 0.0 if np.isnan(sig_corr) else sig_corr*sig_ra*sig_dec
+                cov = np.array([[sig_ra**2, off_diag],
                                     [off_diag, sig_dec**2]])
-                det = sub_cov[0, 0]*sub_cov[1, 1] - sub_cov[0, 1]*sub_cov[1, 0]
+                det = cov[0, 0]*cov[1, 1] - cov[0, 1]*cov[1, 0]
                 if det == 0.0:
-                    print(sub_cov)
+                    print(cov)
                     raise ValueError("Optical covariance matrix is singular.")
-                inv = np.array([[sub_cov[1, 1], -sub_cov[0, 1]],
-                                [-sub_cov[1, 0], sub_cov[0, 0]]])/det
-                self.obs_cov.append(sub_cov)
+                inv = np.array([[cov[1, 1], -cov[0, 1]],
+                                [-cov[1, 0], cov[0, 0]]])/det
+                self.obs_cov.append(cov)
                 self.obs_weight.append(inv)
         return None
 
@@ -1243,55 +1243,72 @@ class FitSimulation:
                 computed_obs[i, 1] = radar_obs[i][integ_body_idx]
             else:
                 raise ValueError("Observer info length not recognized.")
-        first_iter = self.n_iter == 1
         nom_body = integ_body_idx == 0
         radius_nonzero = self.fixed_propsim_params['radius'] != 0.0
-        if first_iter and nom_body and radius_nonzero:
-            gaia_idx = self.obs.query('stn == "258"').index
-            gaia_exist = len(gaia_idx) > 0
-            if gaia_exist:
-                self._gaia_weight_inflation(prop_sim_past, prop_sim_future, gaia_idx)
+        if nom_body and (self.sig_time != 0.0 or radius_nonzero) and self.n_iter == 1:
+            self._inflate_uncertainties(prop_sim_past, prop_sim_future)
         return computed_obs
 
-    def _gaia_weight_inflation(self, prop_sim_past, prop_sim_future, gaia_idx):
+    def _inflate_uncertainties(self, prop_sim_past, prop_sim_future):
         """
-        Treat Gaia astrometry data with an inflation factor.
+        Apply time uncertainties to the optical observations weights.
 
         Parameters
         ----------
-        prop_sim_past : libgrss.PropSimulation object
-            The propagated PropSimulation object for the past.
-        prop_sim_future : libgrss.PropSimulation object
-            The propagated PropSimulation object for the future.
-        gaia_idx : list
-            List of indices for the Gaia astrometry data.
+        computed_obs_dot : array
+            Computed optical observations dot.
 
         Returns
         -------
         None : NoneType
             None
         """
+        time_uncert = self.sig_time/86400 # 1 second -> days
+        stations = self.obs.stn.values
+        sig_times = self.obs.sigTime.values
+        sig_ra_vals = self.obs.sigRA.values
+        sig_dec_vals = self.obs.sigDec.values
+        sig_corr_vals = self.obs.sigCorr.values
         if self.past_obs_exist and self.future_obs_exist:
+            optical_obs_dot = prop_sim_past.opticalObsDot + prop_sim_future.opticalObsDot
             state_eval = prop_sim_past.xIntegEval + prop_sim_future.xIntegEval
         elif self.past_obs_exist:
+            optical_obs_dot = prop_sim_past.opticalObsDot
             state_eval = prop_sim_past.xIntegEval
         elif self.future_obs_exist:
+            optical_obs_dot = prop_sim_future.opticalObsDot
             state_eval = prop_sim_future.xIntegEval
+        computed_obs_dot = np.array(optical_obs_dot)[:,0:2]
+        computed_obs_dot[:, 0] *= self.obs.cosDec.values
         rel_dists = np.linalg.norm(np.array(state_eval)[:, :3], axis=1)
         lmbda = 0.3 # from fuentes-munoz et al. 2024
         au2m = 1.495978707e11
-        fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists)**2
-        fac *= (180/np.pi*3600)**2 # radians to arcseconds
-        # np.savetxt('./inflation_fac.txt', fac, fmt='%.18e')
-        for idx in gaia_idx:
-            cov = self.obs_cov[idx]
-            cov[0, 0] += fac[idx]
-            cov[1, 1] += fac[idx]
-            det = cov[0, 0]*cov[1, 1] - cov[0, 1]*cov[1, 0]
-            inv = np.array([[cov[1, 1], -cov[0, 1]],
-                            [-cov[1, 0], cov[0, 0]]])/det
-            self.obs_cov[idx] = cov
-            self.obs_weight[idx] = inv
+        fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists*180/np.pi*3600)**2
+        for i, obs_info_len in enumerate(self.observer_info_lengths):
+            if obs_info_len in {4, 7}:
+                sig_ra = sig_ra_vals[i]
+                sig_dec = sig_dec_vals[i]
+                sig_corr = sig_corr_vals[i]
+                off_diag = 0.0 if np.isnan(sig_corr) else sig_corr*sig_ra*sig_dec
+                cov = np.array([[sig_ra**2, off_diag],
+                                [off_diag, sig_dec**2]])
+                ra_dot_cos_dec = computed_obs_dot[i, 0]
+                dec_dot = computed_obs_dot[i, 1]
+                off_diag_time = ra_dot_cos_dec*dec_dot
+                cov_time = np.array([[ra_dot_cos_dec**2, off_diag_time],
+                                    [off_diag_time, dec_dot**2]])*time_uncert**2
+                cov += cov_time
+                sig_times[i] = self.sig_time
+                if stations[i] == '258':
+                    cov_fac = np.array([[fac[i], 0.0],
+                                        [0.0, fac[i]]])
+                    cov += cov_fac
+                det = cov[0, 0]*cov[1, 1] - cov[0, 1]*cov[1, 0]
+                inv = np.array([[cov[1, 1], -cov[0, 1]],
+                                [-cov[1, 0], cov[0, 0]]])/det
+                self.obs_cov[i] = cov
+                self.obs_weight[i] = inv
+        self.obs.sigTime = sig_times
         return None
 
     def _get_analytic_partials(self, prop_sim_past, prop_sim_future):
@@ -1572,22 +1589,36 @@ class FitSimulation:
                                             self.obs, rms_u, rms_w, chi_sq))
         return None
 
-    def _check_convergence(self):
+    def _check_convergence(self, delta_x):
         """
         Checks if the orbit fit has converged.
+
+        Parameters
+        ----------
+        delta_x : array
+            The state correction.
 
         Returns
         -------
         None : NoneType
             None
         """
+        # check for convergence based on weighted rms
         if self.n_iter > 1:
-            del_rms_convergence = 1e-4
+            del_rms_convergence = 1e-3
             curr_rms = self.iters[-1].weighted_rms
             prev_rms = self.iters[-2].weighted_rms
-            del_rms = abs(prev_rms - curr_rms)/prev_rms
+            del_rms = abs(prev_rms - curr_rms)#/prev_rms
             if del_rms < del_rms_convergence:
+                print("Converged based on weighted RMS.")
                 self.converged = True
+        # check for convergence based on magnitude of corrections
+        sigmas = np.sqrt(np.diag(self.covariance))
+        corrections = np.abs(delta_x/sigmas)
+        max_correction = np.max(corrections)
+        if max_correction < 1e-2:
+            print("Converged based on magnitude of corrections.")
+            self.converged = True
         return None
 
     def _get_lsq_state_correction(self, partials, residuals):
@@ -1639,7 +1670,7 @@ class FitSimulation:
         Parameters
         ----------
         verbose : bool, optional
-            FLag for printing the iteration information while fitting, by default True.
+            Flag for printing the iteration information while fitting, by default True.
 
         Returns
         -------
@@ -1654,7 +1685,6 @@ class FitSimulation:
             self.n_iter = i+1
             # get residuals and partials
             residuals, partials = self._get_residuals_and_partials()
-            # clean_residuals = self._flatten_and_clean(residuals)
             # calculate rms and reject outliers here if desired
             rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
                                                                             start_rejecting)
@@ -1685,7 +1715,7 @@ class FitSimulation:
                         f"{self.iters[-1].weighted_rms:.3f}\t\t\t",
                         f"{self.iters[-1].chi_squared:.3f}\t\t\t",
                         f"{self.iters[-1].reduced_chi_squared:.3f}")
-            self._check_convergence()
+            self._check_convergence(delta_x)
             if self.converged:
                 if self.reject_outliers and start_rejecting:
                     print(f"Converged after rejecting outliers. Rejected {self.num_rejected} out",

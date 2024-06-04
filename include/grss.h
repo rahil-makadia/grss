@@ -28,6 +28,7 @@ void PropSimulation::integrate() {
         std::reverse(this->lightTimeEval.begin(), this->lightTimeEval.end());
         std::reverse(this->xIntegEval.begin(), this->xIntegEval.end());
         std::reverse(this->opticalObs.begin(), this->opticalObs.end());
+        std::reverse(this->opticalObsDot.begin(), this->opticalObsDot.end());
         std::reverse(this->opticalPartials.begin(), this->opticalPartials.end());
         std::reverse(this->opticalObsCorr.begin(), this->opticalObsCorr.end());
         std::reverse(this->radarObs.begin(), this->radarObs.end());
