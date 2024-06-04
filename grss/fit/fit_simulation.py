@@ -1245,7 +1245,7 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
         nom_body = integ_body_idx == 0
         radius_nonzero = self.fixed_propsim_params['radius'] != 0.0
-        if nom_body and (self.sig_time != 0.0 or radius_nonzero) and self.n_iter == 1:
+        if nom_body and (self.sig_time != 0.0 or radius_nonzero):
             self._inflate_uncertainties(prop_sim_past, prop_sim_future)
         return computed_obs
 
@@ -1284,22 +1284,24 @@ class FitSimulation:
         lmbda = 0.3 # from fuentes-munoz et al. 2024
         au2m = 1.495978707e11
         fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists*180/np.pi*3600)**2
-        for i, obs_info_len in enumerate(self.observer_info_lengths):
-            if obs_info_len in {4, 7}:
+        modes = self.obs['mode'].values
+        for i in range(len(self.observer_info_lengths)):
+            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'OCC', 'SIM_OCC'}:
                 sig_ra = sig_ra_vals[i]
                 sig_dec = sig_dec_vals[i]
                 sig_corr = sig_corr_vals[i]
                 off_diag = 0.0 if np.isnan(sig_corr) else sig_corr*sig_ra*sig_dec
                 cov = np.array([[sig_ra**2, off_diag],
                                 [off_diag, sig_dec**2]])
-                ra_dot_cos_dec = computed_obs_dot[i, 0]
-                dec_dot = computed_obs_dot[i, 1]
-                off_diag_time = ra_dot_cos_dec*dec_dot
-                cov_time = np.array([[ra_dot_cos_dec**2, off_diag_time],
-                                    [off_diag_time, dec_dot**2]])*time_uncert**2
-                cov += cov_time
-                sig_times[i] = self.sig_time
-                if stations[i] == '258':
+                if self.sig_time != 0.0 and stations[i] not in {'258', 'S/C'}:
+                    ra_dot_cos_dec = computed_obs_dot[i, 0]
+                    dec_dot = computed_obs_dot[i, 1]
+                    off_diag_time = ra_dot_cos_dec*dec_dot
+                    cov_time = np.array([[ra_dot_cos_dec**2, off_diag_time],
+                                        [off_diag_time, dec_dot**2]])*time_uncert**2
+                    cov += cov_time
+                    sig_times[i] = self.sig_time
+                if stations[i] == '258' and self.fixed_propsim_params['radius'] != 0.0:
                     cov_fac = np.array([[fac[i], 0.0],
                                         [0.0, fac[i]]])
                     cov += cov_fac
@@ -1610,14 +1612,14 @@ class FitSimulation:
             prev_rms = self.iters[-2].weighted_rms
             del_rms = abs(prev_rms - curr_rms)#/prev_rms
             if del_rms < del_rms_convergence:
-                print("Converged based on weighted RMS.")
+                # print("Converged based on weighted RMS.")
                 self.converged = True
         # check for convergence based on magnitude of corrections
         sigmas = np.sqrt(np.diag(self.covariance))
         corrections = np.abs(delta_x/sigmas)
         max_correction = np.max(corrections)
         if max_correction < 1e-2:
-            print("Converged based on magnitude of corrections.")
+            # print("Converged based on magnitude of corrections.")
             self.converged = True
         return None
 
