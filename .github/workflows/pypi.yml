@@ -55,11 +55,11 @@ jobs:
         with:
           name: dist-ubuntu-latest
           path: dist
-      - name: Download MacOS distribution from previous job
-        uses: actions/download-artifact@master
-        with:
-          name: dist-macos-latest
-          path: dist
+      # - name: Download MacOS distribution from previous job
+      #   uses: actions/download-artifact@master
+      #   with:
+      #     name: dist-macos-latest
+      #     path: dist
       - name: Show files
         run: ls -l dist
       - name: Publish to Test PyPI
