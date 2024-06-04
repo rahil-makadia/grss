@@ -71,17 +71,18 @@ def _ades_ast_cat_check(df):
     df : pandas DataFrame
         ADES data frame
 
+    Returns
+    -------
+    df : pandas DataFrame
+        ADES data frame with invalid astCat values removed
+
     Raises
     ------
     ValueError
         If the astCat values are invalid
     """
     # from https://www.minorplanetcenter.net/iau/info/ADESFieldValues.html
-    valid_cats = [
-        'Gaia_Int', 'PS1_DR1', 'PS1_DR2', 'ATLAS2',
-        'Gaia3', 'Gaia3E', 'Gaia2', 'Gaia1', 'Gaia_2016',
-        'NOMAD', 'PPMXL', 'UBSC', 'UCAC5', 'UCAC4', 'URAT1', '2MASS'
-    ]
+    valid_cats = list(ades_catalog_map.keys())
     deprecated_cats = [
         'UCAC3', 'UCAC2', 'UCAC1',
         'USNOB1', 'USNOA2', 'USNOSA2', 'USNOA1', 'USNOSA1',
@@ -91,11 +92,18 @@ def _ades_ast_cat_check(df):
         'MPOSC3', 'PPM', 'AC', 'SAO1984', 'SAO', 'AGK3', 'FK4',
         'ACRS', 'LickGas', 'Ida93', 'Perth70', 'COSMOS',
         'Yale', 'ZZCAT', 'IHW', 'GZ', 'UNK']
-    if df['astCat'].isin(deprecated_cats).any():
+    df_cats = df['astCat']
+    if df_cats.isin(deprecated_cats).any():
         print("\tWARNING: At least one deprecated star catalog in the data.")
-    if not df['astCat'].isin(valid_cats+deprecated_cats).all():
-        raise ValueError(f"At least one invalid astCat in the data: {df['astCat'].unique()}.\n"
-                        f"Acceptable astCat values are {valid_cats+deprecated_cats}.")
+    if not df_cats.isin(valid_cats).all():
+        invalid_cats = np.setdiff1d(df_cats.unique(), valid_cats)
+        print("\tWARNING: At least one unrecognized astCat in the data. "
+                f"Unrecognized values are {invalid_cats}. "
+                "Force deleting corresponding observations and setting catalog to UNK...")
+        delete_idx = df[df['astCat'].isin(invalid_cats)].index
+        df.loc[delete_idx, 'selAst'] = 'd'
+        df.loc[delete_idx, 'astCat'] = 'UNK'
+    return df
 
 def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
                         t_max_tdb=None, verbose=False):
@@ -156,7 +164,7 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     if verbose:
         print(f"Read in {len(obs_df)} observations from the MPC.")
     _ades_mode_check(obs_df)
-    _ades_ast_cat_check(obs_df)
+    obs_df = _ades_ast_cat_check(obs_df)
     # filter the data based on the time range
     obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
     # reindex the data frame
@@ -304,8 +312,8 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
     if t_max_tdb is None:
         t_max_tdb = np.inf
     # get gaia query results
-    perm_id = obs_df['permID'][0]
-    prov_id = obs_df['provID'][0]
+    perm_id = obs_df.iloc[-1]['permID']
+    prov_id = obs_df.iloc[-1]['provID']
     body_id = perm_id if isinstance(perm_id, str) else prov_id
     res = _get_gaia_query_results(body_id, release=gaia_dr)
     if verbose:

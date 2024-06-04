@@ -152,10 +152,22 @@ void keplerian_to_cometary(const real &epochMjd,
             "keplerian_to_cometary: e cannot be negative");
     }
     real nu = keplerianState[5];
-    real E = 2 * atan2(tan(nu / 2) * sqrt(1 - e), sqrt(1 + e));
-    real M = E - e * sin(E);
-    real n = sqrt(GM / pow(a, 3.0L));
-    real T0 = epochMjd - (M / n);
+    real T0;
+    if (e < 1) {
+        const real E = 2 * atan2(sqrt(1 - e) * tan(nu / 2), sqrt(1 + e));
+        const real M = E - e * sin(E);
+        const real n = sqrt(GM /a/a/a);
+        T0 = epochMjd - (M / n);
+    } else if (e > 1) {
+        const real EHyp = 2 * atanh(sqrt((e - 1) / (e + 1)) * tan(nu / 2));
+        const real M = e * sinh(EHyp) - EHyp;
+        const real n = sqrt(-GM /a/a/a);
+        T0 = epochMjd - (M / n);
+    } else {
+        const real D = tan(nu / 2);
+        const real q = a * (1 - e);
+        T0 = epochMjd - sqrt(2 * q*q*q / GM) * (D - D*D*D/3);
+    }
 
     cometaryState[0] = e;
     cometaryState[1] = a * (1 - e);
@@ -299,9 +311,6 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState,
     real a = h * h / (GM * (1 - e * e));
 
     real i = acos(hVec[2] / h);
-    if (i > M_PI / 2) {
-        i = M_PI - i;
-    }
     real Omega = acos(nVec[0] / n);
     if (nVec[1] < 0) {
         Omega = 2 * M_PI - Omega;
@@ -320,8 +329,6 @@ void cartesian_to_keplerian(const std::vector<real> &cartesianState,
     if (rDotV < 0) {
         nu = 2 * M_PI - nu;
     }
-    // real E = 2*atan(tan(nu/2)*sqrt((1-e)/(1+e)));
-    // real M = E-e*sin(E);
 
     keplerianState[0] = a;
     keplerianState[1] = e;
@@ -410,8 +417,16 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
         om = elems[3];
         w = elems[4];
         nu = elems[5];
-        E = 2 * atan(sqrt((1 - e) / (1 + e)) * tan(nu / 2));
-        M = E - e * sin(E);
+        if (e < 1) {
+            E = 2 * atan2(sqrt(1 - e) * tan(nu / 2), sqrt(1 + e));
+            M = E - e * sin(E);
+        } else if (e > 1) {
+            E = 2 * atanh(sqrt((e - 1) / (e + 1)) * tan(nu / 2));
+            M = e * sinh(E) - E;
+        } else {
+            E = std::numeric_limits<real>::quiet_NaN();
+            M = std::numeric_limits<real>::quiet_NaN();
+        }
     } else {
         throw std::invalid_argument("get_cartesian_partials: invalid conversion "
                                     "type, must be com2cart or kep2cart");
@@ -456,10 +471,6 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     }
     real e_mag;
     vnorm(e_vec, 3, e_mag);
-    // if (fabs(e_mag - e) > elemTol) {
-    //     std::cout << "get_elements_partials: WARNING: e_mag - e = " << e_mag - e
-    //               << std::endl;
-    // }
     e = e_mag;
 
     real **partial_r_vec = new real*[6];
@@ -604,64 +615,92 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     fun = 0;
     delete[] partial_fun;
 
-    // eccentric anomaly
-    fun1 = tan(nu / 2);
-    fun2 = pow((1 + e) / (1 - e), 0.5);
-    partial_fun1 = new real[6];
-    partial_fun2 = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_fun1[i] = partial_nu[i] / (2 * cos(nu / 2) * cos(nu / 2));
-        partial_fun2[i] = (sqrt(1 - e) * partial_e_mag[i] / sqrt(1 + e) / 2 -
-                           sqrt(1 + e) * -partial_e_mag[i] / sqrt(1 - e) / 2) /
-                          (1 - e);
-    }
-    fun = fun1 / fun2;
-    partial_fun = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_fun[i] = (fun2 * partial_fun1[i] - fun1 * partial_fun2[i]) / (fun2 * fun2);
-    }
-    real *partial_E = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_E[i] = 2 * partial_fun[i] / (1 + fun * fun);
-    }
-    fun = 0;
-    fun1 = 0;
-    fun2 = 0;
-    delete[] partial_fun1;
-    delete[] partial_fun2;
-    delete[] partial_fun;
-    /*
-    alternative for eccentric anomaly
-    fun = 1 / e - r / (a * e);
-    partial_fun = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_fun[i] = -partial_e_mag[i] / (e * e) -
-                         ((a * e * partial_r_mag[i] - r * (partial_a[i] * e + a * partial_e_mag[i])) /
-                          (a * a * e * e));
-    }
-    partial_E = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_E[i] = -partial_fun[i] / sqrt(1 - fun * fun);
-    }
-    fun = 0;
-    delete[] partial_fun;
-    */ 
-
-    // mean anomaly
-    // if (fabs(E - e * sin(E) - M) > elemTol) {
-    //     std::cout << "get_elements_partials: WARNING: E - e*sin(E) - M = " << E - e * sin(E) - M
-    //               << std::endl;
-    // }
-    M = E - e * sin(E);
-    real *partial_M = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_M[i] = partial_E[i] - e * cos(E) * partial_E[i] - partial_e_mag[i] * sin(E);
-    }
-
-    // time of periapsis passage
     real *partial_tp = new real[6];
-    for (size_t i = 0; i < 6; i++) {
-        partial_tp[i] = -M / sqrt(GM) * 3 * sqrt(a) * partial_a[i] / 2 - partial_M[i] * sqrt(a * a * a / GM);
+    if (e_mag < 1){
+        // eccentric anomaly
+        fun1 = tan(nu / 2);
+        fun2 = pow((1 + e) / (1 - e), 0.5);
+        partial_fun1 = new real[6];
+        partial_fun2 = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_fun1[i] = partial_nu[i] / (2 * cos(nu / 2) * cos(nu / 2));
+            partial_fun2[i] = partial_e_mag[i] / (sqrt(1+e)*sqrt((1-e)*(1-e)*(1-e)));
+        }
+        fun = fun1 / fun2;
+        partial_fun = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_fun[i] = (fun2 * partial_fun1[i] - fun1 * partial_fun2[i]) / (fun2 * fun2);
+        }
+        real *partial_E = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_E[i] = 2 * partial_fun[i] / (1 + fun * fun);
+        }
+        fun = 0;
+        fun1 = 0;
+        fun2 = 0;
+        delete[] partial_fun1;
+        delete[] partial_fun2;
+        delete[] partial_fun;
+        // mean anomaly
+        M = E - e * sin(E);
+        real *partial_M = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_M[i] = partial_E[i] - e * cos(E) * partial_E[i] - partial_e_mag[i] * sin(E);
+        }
+        // time of periapsis passage
+        for (size_t i = 0; i < 6; i++) {
+            partial_tp[i] = -M / sqrt(GM) * 3 * sqrt(a) * partial_a[i] / 2 - partial_M[i] * sqrt(a * a * a / GM);
+        }
+        delete[] partial_E;
+        delete[] partial_M;
+    } else if (e_mag > 1) {
+        // hyperbolic eccentric anomaly
+        fun1 = tan(nu / 2);
+        fun2 = pow((e - 1) / (e + 1), 0.5);
+        partial_fun1 = new real[6];
+        partial_fun2 = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_fun1[i] = partial_nu[i] / (2 * cos(nu / 2) * cos(nu / 2));
+            partial_fun2[i] = partial_e_mag[i] / (sqrt(e-1)*sqrt((e+1)*(e+1)*(e+1)));
+        }
+        fun = fun1 * fun2;
+        partial_fun = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_fun[i] = fun1 * partial_fun2[i] + fun2 * partial_fun1[i];
+        }
+        real *partial_Ehyp = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_Ehyp[i] = 2 * partial_fun[i] / (1 - fun * fun);
+        }
+        fun = 0;
+        fun1 = 0;
+        fun2 = 0;
+        delete[] partial_fun1;
+        delete[] partial_fun2;
+        delete[] partial_fun;
+        // mean anomaly
+        const real Ehyp = E;
+        M = e * sinh(Ehyp) - Ehyp;
+        real *partial_M = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_M[i] = e * cosh(Ehyp) * partial_Ehyp[i] + partial_e_mag[i] * sinh(Ehyp) - partial_Ehyp[i];
+        }
+        // time of periapsis passage
+        for (size_t i = 0; i < 6; i++) {
+            partial_tp[i] = -M / sqrt(GM) * 3 * sqrt(-a) * -partial_a[i] / 2 - partial_M[i] * sqrt(a * a * a / -GM);
+        }
+        delete[] partial_Ehyp;
+        delete[] partial_M;
+    } else {
+        const real D = tan(nu / 2);
+        const real q = a * (1 - e);
+        real *partial_D = new real[6];
+        for (size_t i = 0; i < 6; i++) {
+            partial_D[i] = partial_nu[i] / (2 * cos(nu / 2) * cos(nu / 2));
+        }
+        for (size_t i = 0; i < 6; i++) {
+            partial_tp[i] = -sqrt(2 * q*q*q / GM) * (partial_D[i] - D*D *partial_D[i]) + (D - D*D*D/3) * (-sqrt(2/GM) * 1.5 * sqrt(q) * partial_q[i]);
+        }
     }
 
     // longitude of ascending node
@@ -766,8 +805,6 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
     delete[] partial_a;
     delete[] partial_q;
     delete[] partial_nu;
-    delete[] partial_E;
-    delete[] partial_M;
     delete[] partial_tp;
     delete[] partial_Omega;
     delete[] partial_w;

@@ -1,7 +1,7 @@
 """Parallel computing utilities for the GRSS orbit propagation code"""
 import os
 import time
-import numpy as np
+from tqdm.auto import tqdm
 # pylint: disable=no-name-in-module
 from .. import libgrss
 
@@ -62,7 +62,7 @@ def _handle_one_cloned_sim(sol, ref_nongrav):
         full_list = [sol['t'], mass, radius] + pos + vel + ng_list
     return full_list
 
-def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False):
+def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, num_threads, reconstruct=False):
     """
     Propagate multiple simulations in parallel using a reference simulation.
 
@@ -76,6 +76,10 @@ def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False)
         Reference simulation to use for propagating the orbits.
     clones : dict
         Dictionary of orbit solutions to propagate in parallel.
+    num_threads : int
+        Number of threads to use for parallel propagation.
+    reconstruct : bool
+        Whether to reconstruct the log files after propagation.
     """
     if all(key in ref_sol for key in ['e', 'q', 'tp', 'om', 'w', 'i']):
         is_cometary = True
@@ -96,7 +100,7 @@ def parallel_propagate(ref_sol, ref_nongrav, ref_sim, clones, reconstruct=False)
         for file in os.listdir(save_dir):
             os.remove(os.path.join(save_dir, file))
     start_time = time.time()
-    libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info)
+    libgrss.propSim_parallel_omp(ref_sim, is_cometary, all_info, num_threads)
     end_time = time.time()
     duration = end_time - start_time
     mm = int(duration / 60)
@@ -133,12 +137,10 @@ def reconstruct_all_log_files(log_dir):
     impact_list = []
     files = os.listdir(log_dir)
     files.sort()
-    for file in files:
-        if file.endswith('.log'):
-            log_file = os.path.join(log_dir, file)
-            file_ca_list, file_impact_list = _reconstruct_one_log_file(log_file)
-            ca_list.append(file_ca_list)
-            impact_list.append(file_impact_list)
+    for i in tqdm(range(len(files))):
+        file_ca_list, file_impact_list = _reconstruct_one_log_file(f'{log_dir}/{files[i]}')
+        ca_list.append(file_ca_list)
+        impact_list.append(file_impact_list)
     end_time = time.time()
     duration = end_time - start_time
     mm = int(duration / 60)
@@ -164,13 +166,8 @@ def _reconstruct_one_log_file(log_file):
     """
     # first read the log file
     with open(log_file, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    try:
-        ca_list, impact_list = _reconstruct_ca_and_impact(lines)
-    except:
-        print(f'Error in reconstructing log file: {log_file}')
-        print(f'result: {_reconstruct_ca_and_impact(lines)}')
-        raise
+        lines = f.read().splitlines()
+    ca_list, impact_list = _reconstruct_ca_and_impact(lines)
     return ca_list, impact_list
 
 def _reconstruct_ca_and_impact(lines):
@@ -188,14 +185,14 @@ def _reconstruct_ca_and_impact(lines):
         List of CloseApproachParameters (index 0) and ImpactParameters (index 1) objects.
     """
     delimiter = ' | '
-    str_cols = ['flybyBody', 'centralBody',]
-    list_cols = ['xRel', 'xRelMap', 'bVec', 'kizner_dx', 'kizner_dy', 'opik_dx', 'opik_dy',
-                    'scaled_dx', 'scaled_dy', 'mtp_dx', 'mtp_dy', 'xRelBodyFixed',]
-    bool_cols = ['impact',]
-    int_cols = ['flybyBodyIdx', 'centralBodyIdx', 'centralBodySpiceId']
-    float_cols = ['t', 'tMap', 'dist', 'vel', 'vInf', 'tPeri', 'tLin', 'bMag', 'gravFocusFactor',
+    str_cols = {'flybyBody', 'centralBody'}
+    list_cols = {'xRel', 'xRelMap', 'bVec', 'kizner_dx', 'kizner_dy', 'opik_dx', 'opik_dy',
+                    'scaled_dx', 'scaled_dy', 'mtp_dx', 'mtp_dy', 'xRelBodyFixed'}
+    bool_cols = {'impact'}
+    int_cols = {'flybyBodyIdx', 'centralBodyIdx', 'centralBodySpiceId'}
+    float_cols = {'t', 'tMap', 'dist', 'vel', 'vInf', 'tPeri', 'tLin', 'bMag', 'gravFocusFactor',
                     'kizner_x', 'kizner_y', 'kizner_z', 'opik_x', 'opik_y', 'opik_z', 'scaled_x',
-                    'scaled_y', 'scaled_z', 'mtp_x', 'mtp_y', 'mtp_z', 'lon', 'lat', 'alt']
+                    'scaled_y', 'scaled_z', 'mtp_x', 'mtp_y', 'mtp_z', 'lon', 'lat', 'alt'}
     out_list = [[],[]]
     for idx, typ in enumerate(['ca', 'impact']):
         if typ == 'ca':
@@ -205,13 +202,15 @@ def _reconstruct_ca_and_impact(lines):
             start_key = '$$IMPACT_START'
             end_key = '$$IMPACT_END'
         # find the index of the line that starts with "$$IMPACT_START" and "$$IMPACT_END"
-        start = [i for i, line in enumerate(lines) if line.startswith(start_key)]
-        end = [i for i, line in enumerate(lines) if line.startswith(end_key)]
+        try:
+            start = lines.index(start_key)
+            end = lines.index(end_key)
+        except ValueError:
+            start = None
+            end = None
         # if start and end keys do not exist, return None
         if not start or not end:
             continue
-        start = start[0]
-        end = end[0]
         # first line is the header
         header = lines[start+1].strip().split(delimiter)
         # create dict wiht key as index and value as column name
@@ -227,7 +226,7 @@ def _reconstruct_ca_and_impact(lines):
                     # do nothing, data is already string
                     pass
                 elif col in list_cols:
-                    parsed_info = raw_info.replace('[','').replace(']','').split(',')
+                    parsed_info = raw_info[1:].split(',')[:-1]
                     data[i] = [float(num) for num in parsed_info if num]
                 elif col in bool_cols:
                     data[i] = raw_info == 'true'
@@ -370,23 +369,20 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
                     if ca_or_impact.centralBodySpiceId == central_body]
     if not full_list:
         return tuple(all_clusters)
-    times = [ca_or_impact.t for ca_or_impact in full_list]
-    bodies = [ca_or_impact.flybyBody for ca_or_impact in full_list]
 
-    sort_idx = np.argsort(times)
-    cluster = [full_list[sort_idx[0]]]
-    cluster_bodies = [bodies[sort_idx[0]]]
-    for i in range(1, len(sort_idx)):
-        idx = sort_idx[i]
-        time_condition = times[idx] - times[sort_idx[i-1]] > max_duration
-        body_condition = bodies[idx] in cluster_bodies
+    full_list.sort(key=lambda x: x.t)  # Sort the list based on time
+    cluster = [full_list[0]]
+    cluster_bodies = {full_list[0].flybyBody}
+    for ca_or_impact in full_list[1:]:
+        time_condition = ca_or_impact.t - cluster[-1].t > max_duration
+        body_condition = ca_or_impact.flybyBody in cluster_bodies
         if time_condition or body_condition:
             all_clusters.append(cluster)
-            cluster = [full_list[idx]]
-            cluster_bodies = [bodies[idx]]
+            cluster = [ca_or_impact]
+            cluster_bodies = {ca_or_impact.flybyBody}
         else:
-            cluster.append(full_list[idx])
-            cluster_bodies.append(bodies[idx])
+            cluster.append(ca_or_impact)
+            cluster_bodies.add(ca_or_impact.flybyBody)
     all_clusters.append(cluster)
     end_time = time.time()
     duration = end_time - start_time

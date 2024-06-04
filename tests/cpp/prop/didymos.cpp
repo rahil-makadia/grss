@@ -17,7 +17,7 @@ int main() {
     gettimeofday(&t1, NULL);
     real tDiff;
 
-    int DEkernel = 441;
+    int DEkernel = 440;
     std::string DEkernelPath = "../../../grss/kernels/";
     real t0SimMjd = 59956.5L;
     real numDays = 3000.0L;

@@ -399,6 +399,13 @@ void LU_decompose(std::vector<std::vector<real>> &A, const size_t &N,
         }
         // failure, matrix is degenerate
         if (maxA < tol) {
+            std::cout << "matrix: " << std::endl;
+            for (size_t i = 0; i < N; i++) {
+                for (size_t j = 0; j < N; j++) {
+                    std::cout << std::setw(15) << std::scientific << A[i][j] << ",";
+                }
+                std::cout << std::endl;
+            }
             throw std::runtime_error("LUDecompose: Matrix is degenerate");
         }
         if (imax != i) {

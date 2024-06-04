@@ -62,9 +62,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("dt0", &IntegrationParameters::dt0, R"mydelimiter(
             Initial time step.
             )mydelimiter")
-        .def_readwrite("dtMax", &IntegrationParameters::dtMax, R"mydelimiter(
-            Maximum time step.
-            )mydelimiter")
         .def_readwrite("dtMin", &IntegrationParameters::dtMin, R"mydelimiter(
             Minimum time step.
             )mydelimiter")
@@ -140,14 +137,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("xIntegStack", &InterpolationParameters::xIntegStack,
                        R"mydelimiter(
             Stack of states of the integrated bodies used for interpolation at steps taken by the integrator.
-            )mydelimiter")
-        .def_readwrite("bStack", &InterpolationParameters::bStack,
-                       R"mydelimiter(
-            Stack of b matrices used for the interpolating coefficients at steps taken by the integrator.
-            )mydelimiter")
-        .def_readwrite("accIntegStack", &InterpolationParameters::accIntegStack,
-                       R"mydelimiter(
-            Stack of accelerations of the integrated bodies at steps taken by the integrator.
             )mydelimiter");
 
     py::class_<BPlaneParameters>(m, "BPlaneParameters", R"mydelimiter(
@@ -673,20 +662,23 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter");
 
     m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
-          py::arg("allBodies"), py::arg("isCometary"), R"mydelimiter(
+          py::arg("isCometary"), py::arg("allBodies"),
+          py::arg("maxThreads") = 128, R"mydelimiter(
         Propagate a simulation in parallel using OpenMP.
 
         Parameters
         ----------
         refSim : PropSimulation
             Reference simulation to copy.
+        isCometary : bool
+            Whether the bodies are cometary bodies.
         allBodies : list of list of real
             List of all bodies to propagate. Each list contains the initial MJD TDB time,
             mass, radius, initial state, and list of non-gravitational parameters of the body.
             The initial state is either the initial Heliocentric Ecliptic Cometary state
             or the initial barycentric Cartesian state (position and velocity separated).
-        isCometary : bool
-            Whether the bodies are cometary bodies.
+        maxThreads : int, optional
+            Maximum number of threads to use, by default min(128, available_cores).
 
         Returns
         -------
@@ -793,9 +785,9 @@ PYBIND11_MODULE(libgrss, m) {
             MJD Times to evaluate the states of the integrated bodies at.
             Can be TDB or UTC based on PropSimulation.tEvalUTC.
             )mydelimiter")
-        .def_readwrite("radarObserver", &PropSimulation::radarObserver,
+        .def_readwrite("obsType", &PropSimulation::obsType,
                        R"mydelimiter(
-            Whether the observer for each value in PropSimulation.tEval is for radar.
+            Observation type for each value in PropSimulation.tEval (0=optical, 1=delay, 2=doppler, 3=Gaia).
             )mydelimiter")
         .def_readwrite("lightTimeEval", &PropSimulation::lightTimeEval,
                        R"mydelimiter(
@@ -808,9 +800,17 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Optical observation of each integration body in the simulation for each value in PropSimulation.tEval.
             )mydelimiter")
+        .def_readwrite("opticalObsDot", &PropSimulation::opticalObsDot,
+                       R"mydelimiter(
+            Time derivative of the optical observation of each integration body in the simulation for each value in PropSimulation.tEval.
+            )mydelimiter")
         .def_readwrite("opticalPartials", &PropSimulation::opticalPartials,
                        R"mydelimiter(
             Optical observation partials of each integration body in the simulation for each value in PropSimulation.tEval.
+            )mydelimiter")
+        .def_readwrite("opticalObsCorr", &PropSimulation::opticalObsCorr,
+                       R"mydelimiter(
+            Photocenter-barycenter correction for each optical observation for each integration body in the simulation.
             )mydelimiter")
         .def_readwrite("radarObs", &PropSimulation::radarObs,
                        R"mydelimiter(
@@ -832,7 +832,7 @@ PYBIND11_MODULE(libgrss, m) {
             Returns
             -------
             xIntegInterp : list of real
-                Interpolated states of the integration bodies.
+                Interpolated GEOMETRIC states of the integrated bodies.
             )mydelimiter")
         .def("add_spice_body", &PropSimulation::add_spice_body, py::arg("body"),
              R"mydelimiter(
@@ -931,9 +931,9 @@ PYBIND11_MODULE(libgrss, m) {
              py::arg("convergedLightTims") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
              py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
-             py::arg("dtMax") = 21.0L, py::arg("dtMin") = 1.0e-4L,
-             py::arg("dtChangeFactor") = 0.25L, py::arg("tolInteg") = 1.0e-11L,
-             py::arg("tolPC") = 1.0e-16L, R"mydelimiter(
+             py::arg("dtMin") = 1.0e-4L, py::arg("dtChangeFactor") = 0.25L,
+             py::arg("tolInteg") = 1.0e-11L, py::arg("tolPC") = 1.0e-16L,
+             R"mydelimiter(
             Sets the integration parameters.
 
             Parameters
@@ -953,13 +953,11 @@ PYBIND11_MODULE(libgrss, m) {
             observerInfo : list of list of real
                 Observer information. Each list at least contains the central body SPICE ID
                 (e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
-                This information might be repeated for bistatic radar observations.
+                This information should be repeated for radar observations.
             adaptiveTimestep : bool
                 Flag to use adaptive time step for the propagation.
             dt0 : real
                 Initial time step.
-            dtMax : real
-                Maximum time step.
             dtMin : real
                 Minimum time step.
             dtChangeFactor : real
@@ -1008,8 +1006,6 @@ PYBIND11_MODULE(libgrss, m) {
                 Flag to use adaptive time step for the propagation.
             dt0 : real
                 Initial time step.
-            dtMax : real
-                Maximum time step.
             dtMin : real
                 Minimum time step.
             dtChangeFactor : real
@@ -1024,7 +1020,7 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def("extend", &PropSimulation::extend, py::arg("tf"),
              py::arg("tEvalNew") = std::vector<real>(),
-             py::arg("xObserverNew") = std::vector<std::vector<real>>(),
+             py::arg("observerInfoNew") = std::vector<std::vector<real>>(),
              R"mydelimiter(
             Extends the simulation to a new final time.
 
@@ -1035,10 +1031,10 @@ PYBIND11_MODULE(libgrss, m) {
             tEvalNew : list of real
                 Extra MJD Times to evaluate the states of the integrated bodies at.
                 Can be TDB or UTC based on tEvalUTC.
-            xObserverNew : list of list of real
-                Extra observer information. Each list at least contains the central body SPICE ID
+            observerInfoNew : list of list of real
+                New observer information. Each list at least contains the central body SPICE ID
                 (e.g., 399 for Earth) and the body-fixed longitude, latitude, and distance.
-                This information might be repeated for bistatic radar observations.
+                This information should be repeated for radar observations.
             )mydelimiter")
         .def("save", &PropSimulation::save, py::arg("filename"),
              R"mydelimiter(

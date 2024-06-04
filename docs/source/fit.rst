@@ -6,10 +6,12 @@ The optical measurements are acquired using the `Minor Planet Center API <https:
 
 #. Star catalog biases [#]_
 #. Measurement weighting [#]_
+#. Gaia astrometry handling [#]_
 
 Once the optical astrometry has been processed, the radar astrometry has been acquired, and the initial orbit is provided by the user, the least squares filter can be run. As of now, the filter can fit the nominal state, the nongravitational acceleration parameters, and any impulsive maneuver events. Currently the partial derivatives in the normal matrix are calculated using 1\ :sup:`st`-order central differences by default, but analytical partial derivatives are also a choice offered to the user. The filter also implements an outlier rejection scheme [#]_ to make sure any spurious measurements do not contaminate the fit.
 
 .. rubric:: References
 .. [#] Eggl, S., Farnocchia, D., Chamberlin, A.B., and Chesley, S.R., "Star catalog position and proper motion corrections in asteroid astrometry II: The Gaia era", Icarus, Volume 339, Pages 1-17, 2020. https://doi.org/10.1016/j.icarus.2019.113596.
 .. [#] Vereš, P., Farnocchia, D., Chesley, S.R., and Chamberlin, A.B., "Statistical analysis of astrometric errors for the most productive asteroid surveys", Volume 296, Pages 139-149, 2017. https://doi.org/10.1016/j.icarus.2017.05.021.
+.. [#] Fuentes-Muñoz, O., Farnocchia, D., Naidu, S.P., and Park, R.S., "Asteroid Orbit Determination Using Gaia FPR: Statistical Analysis", AJ, Volume 167, Pages 290-299, 2024. https://doi.org/10.3847/1538-3881/ad4291.
 .. [#] Carpino, M., Milani, A., and Chesley, S.R., "Error statistics of asteroid optical astrometric observations", Icarus, Volume 166, Pages 248-270, 2003. https://doi.org/10.1016/S0019-1035(03)00051-4.

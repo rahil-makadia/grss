@@ -1,10 +1,16 @@
 # minimum required CMake version
 cmake_minimum_required(VERSION 3.18.0)
 
-# if on a Mac, use gnu compilers instead of clang for ease of use with OpenMP
+# if on a Mac, use any GNU compiler from Homebrew
 if(APPLE)
-    set(CMAKE_C_COMPILER gcc-13)
-    set(CMAKE_CXX_COMPILER g++-13)
+    # find the brew GNU compiler version
+    execute_process(COMMAND bash -c "ls $HOMEBREW_PREFIX/bin/g++*" OUTPUT_VARIABLE BREW_GXX OUTPUT_STRIP_TRAILING_WHITESPACE)
+    # last two characters are the version number
+    string(REGEX REPLACE ".*g\\+\\+-(.*)$" "\\1" BREW_GXX_VERSION ${BREW_GXX})
+    message(STATUS "Found GNU g++ compiler version: ${BREW_GXX_VERSION}")
+    # use any GNU g++ compiler in BREW_PREFIX/bin without specifying the version
+    set(CMAKE_C_COMPILER "$ENV{HOMEBREW_PREFIX}/bin/gcc-${BREW_GXX_VERSION}")
+    set(CMAKE_CXX_COMPILER "$ENV{HOMEBREW_PREFIX}/bin/g++-${BREW_GXX_VERSION}")
 endif()
 
 # set the project name and get version from version.txt
@@ -16,7 +22,10 @@ project(grss VERSION ${ver})
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_compile_options(-std=c++11 -O3 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}") # operational flags
-# add_compile_options(-std=c++11 -g3 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}" -Werror -Wall -Wextra -pedantic) # debugging flags
+# add_compile_options(-std=c++11 -g2 -fPIC -fopenmp -DGRSS_VERSION="${${PROJECT_NAME}_VERSION}" -Werror -Wall -Wextra -pedantic) # debugging flags
+
+# Set static library output directory
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
 # Set header file directory
 include_directories(${CMAKE_SOURCE_DIR}/include)

@@ -7,14 +7,15 @@
  * @brief Compute the correction to the apparent state of the body due to the
  * gravitational light bending.
  */
-void get_glb_correction(PropSimulation *propSim, const real &tInterpGeom,
+void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
+                        const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary);
 
 /**
  * @brief Get the relevant measurement (optical/radar) for a given measurement time.
  */
 void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
-                     const real &t, const real &dt, const real tInterpGeom,
+                     const real tInterpGeom,
                      const std::vector<real> &xInterpGeom,
                      const std::vector<real> &xInterpApparent);
 
@@ -24,13 +25,21 @@ void get_measurement(PropSimulation *propSim, const size_t &interpIdx,
 void get_optical_measurement(PropSimulation *propSim,
                              const std::vector<real> &xInterpApparent,
                              std::vector<real> &opticalMeasurement,
+                             std::vector<real> &opticalMeasurementDot,
                              std::vector<real> &opticalPartials);
+
+/**
+ * @brief Get the photocenter-barycenter correction for an optical measurement.
+ */
+void get_photocenter_correction(PropSimulation *propSim, const size_t &interpIdx,
+                                const real &tInterpGeom,
+                                const std::vector<real> &xInterpApparent,
+                                std::vector<real> &photocenterCorr);
 
 /**
  * @brief Get the radar measurement and partials.
  */
 void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
-                           const real &t, const real &dt,
                            const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            std::vector<real> &radarMeasurement,
@@ -40,13 +49,13 @@ void get_radar_measurement(PropSimulation *propSim, const size_t &interpIdx,
  * @brief Get the radar delay measurement and partials.
  */
 void get_delay_measurement(PropSimulation *propSim, const size_t &interpIdx,
-                           const real &t, const real &dt, const size_t &i,
-                           const real tInterpGeom,
+                           const size_t &i, const real tInterpGeom,
                            const std::vector<real> &xInterpGeom,
                            const real &receiveTimeTDB, real &transmitTimeTDB,
                            std::vector<real> &xObsBaryRcv,
                            std::vector<real> &xTrgtBaryBounce,
-                           std::vector<real> &xObsBaryTx, real &delayMeasurement,
+                           std::vector<real> &xObsBaryTx,
+                           real &delayMeasurement,
                            std::vector<real> &delayPartials);
 
 /**
@@ -73,8 +82,7 @@ void get_doppler_measurement(PropSimulation *propSim, const size_t &i,
  * @brief Interpolate the integrator state for one evaluation time.
  */
 void evaluate_one_interpolation(
-    const PropSimulation *propSim, const real &t, const real &dt,
-    const real &tInterp,
+    const PropSimulation *propSim, const real &tInterp,
     std::vector<real> &xInterp);  // defined in interpolate.cpp
 
 #endif

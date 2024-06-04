@@ -9,6 +9,7 @@
  * simulation as a template.
  */
 void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
-                          const std::vector<std::vector<real> > &allBodies);
+                          const std::vector<std::vector<real> > &allBodies,
+                          const int &maxThreads = 128);
 
 #endif

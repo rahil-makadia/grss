@@ -1,4 +1,6 @@
 #!/bin/bash
+# raise error on failure
+set -e
 
 # first argument is the path to the directory containing the test files
 cd $1

@@ -532,6 +532,16 @@ PropSimulation::PropSimulation(std::string name, real t0,
         case 441: {
             kernel_sb = DEkernelPath + "sb441-n16s.bsp";
             kernel_mb = DEkernelPath + "de440.bsp";
+            if (defaultSpiceBodies == 441) {
+                std::cout
+                    << "WARNING: Choosing DE441 will load long-term ephemeris "
+                       "with a significantly higher memory footprint. "
+                       "For almost all applications, DE440 is sufficient. "
+                       "Be sure that you need the coverage provided by DE441."
+                    << std::endl;
+                kernel_sb = DEkernelPath + "sb441-n16.bsp";
+                kernel_mb = DEkernelPath + "de441_part-2.bsp";
+            }
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *
                 86400.0L * 86400.0L;  // default kg au^3 / day^2
@@ -718,7 +728,7 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->xObserver = simRef.xObserver;
     this->tEvalMargin = simRef.tEvalMargin;
     this->tEval = simRef.tEval;
-    this->radarObserver = simRef.radarObserver;
+    this->obsType = simRef.obsType;
     this->isPreprocessed = false;
 }
 
@@ -802,16 +812,17 @@ void PropSimulation::prepare_for_evaluation(
 
     std::vector<std::vector<real>> xObserver = std::vector<std::vector<real>>(
         tEval.size(), std::vector<real>(6, 0.0L));
-    std::vector<int> radarObserver = std::vector<int>(tEval.size(), 0);
+    std::vector<int> obsType = std::vector<int>(tEval.size(), 0);
     this->map_ephemeris();
     if (tEval.size() != 0) {
         for (size_t i = 0; i < tEval.size(); i++) {
             if (observerInfo[i].size() == 4 || observerInfo[i].size() == 7) {
-                radarObserver[i] = 0;
+                obsType[i] = 0;
+                // obsType = 3 is optical gaia measurement, set externally from Python when needed
             } else if (observerInfo[i].size() == 9) {
-                radarObserver[i] = 1;
+                obsType[i] = 1;
             } else if (observerInfo[i].size() == 10) {
-                radarObserver[i] = 2;
+                obsType[i] = 2;
             } else {
                 throw std::invalid_argument(
                     "The observerInfo vector must have 4/7 (optical), 9 (radar "
@@ -826,12 +837,12 @@ void PropSimulation::prepare_for_evaluation(
     if (this->tEval.size() == 0) {
         this->tEval = tEval;
         this->xObserver = xObserver;
-        this->radarObserver = radarObserver;
+        this->obsType = obsType;
     } else if (this->tEval.size() != 0) {
         for (size_t i = 0; i < tEval.size(); i++) {
             this->tEval.push_back(tEval[i]);
             this->xObserver.push_back(xObserver[i]);
-            this->radarObserver.push_back(radarObserver[i]);
+            this->obsType.push_back(obsType[i]);
         }
     }
 }
@@ -1035,7 +1046,6 @@ void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
  * @param[in] observerInfo Observer information array (default: empty).
  * @param[in] adaptiveTimestep Flag to use adaptive timestep (default: true).
  * @param[in] dt0 Initial timestep (default: 0.0).
- * @param[in] dtMax Maximum timestep (default: 21.0).
  * @param[in] dtMin Minimum timestep (default: 0.005).
  * @param[in] dtChangeFactor Maximum factor by which to change timestep (default: 0.25).
  * @param[in] tolInteg Tolerance for integrator (default: 1e-11).
@@ -1044,7 +1054,7 @@ void PropSimulation::set_sim_constants(real du2m, real tu2s, real G,
 void PropSimulation::set_integration_parameters(
     real tf, std::vector<real> tEval, bool tEvalUTC, bool evalApparentState,
     bool convergedLightTime, std::vector<std::vector<real>> observerInfo,
-    bool adaptiveTimestep, real dt0, real dtMax, real dtMin,
+    bool adaptiveTimestep, real dt0, real dtMin,
     real dtChangeFactor, real tolInteg, real tolPC) {
     this->integParams.tf = tf;
     this->tEvalUTC = tEvalUTC;
@@ -1054,7 +1064,6 @@ void PropSimulation::set_integration_parameters(
         prepare_for_evaluation(tEval, observerInfo);
     }
     this->integParams.dt0 = dt0;
-    this->integParams.dtMax = dtMax;
     this->integParams.dtMin = dtMin;
     this->integParams.dtChangeFactor = dtChangeFactor;
     this->integParams.adaptiveTimestep = adaptiveTimestep;
@@ -1085,7 +1094,6 @@ std::vector<real> PropSimulation::get_integration_parameters() {
         this->integParams.tf,
         (real)this->integParams.adaptiveTimestep,
         this->integParams.dt0,
-        this->integParams.dtMax,
         this->integParams.dtMin,
         this->integParams.dtChangeFactor,
         this->integParams.tolInteg,
@@ -1137,16 +1145,22 @@ void PropSimulation::preprocess() {
  * 
  * @param[in] tf New final time.
  * @param[in] tEvalNew New vector of times at which to evaluate the integrated state.
- * @param[in] xObserverNew New vector of observer states.
+ * @param[in] observerInfoNew New vector of observer information.
  */
 void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
-                            std::vector<std::vector<real>> xObserverNew) {
+                            std::vector<std::vector<real>> observerInfoNew) {
     std::cout << "WARNING: The extend() method is under development and may "
-                 "not work properly with the interpolation routines."
+                 "not work properly with the interpolation/observable "
+                 "computation routines."
               << std::endl;
 
     // empty existing vectors from previous integration
     this->caParams.clear();
+    this->interpParams.t0 = 0.0;
+    this->interpParams.dt0 = 0.0;
+    this->interpParams.xInteg0.clear();
+    this->interpParams.b0.clear();
+    this->interpParams.accInteg0.clear();
     this->interpParams.tStack.clear();
     this->interpParams.xIntegStack.clear();
     this->interpParams.bStack.clear();
@@ -1155,11 +1169,12 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->xObserver.clear();
     this->observerInfo.clear();
     this->tEval.clear();
-    this->radarObserver.clear();
+    this->obsType.clear();
     this->lightTimeEval.clear();
     this->xIntegEval.clear();
     this->opticalObs.clear();
     this->opticalPartials.clear();
+    this->opticalObsCorr.clear();
     this->radarObs.clear();
     this->radarPartials.clear();
 
@@ -1167,7 +1182,7 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->integParams.t0 = this->t;
     this->set_integration_parameters(tf, tEvalNew, this->tEvalUTC,
                                      this->evalApparentState,
-                                     this->convergedLightTime, xObserverNew);
+                                     this->convergedLightTime, observerInfoNew);
     this->integrate();
 }
 

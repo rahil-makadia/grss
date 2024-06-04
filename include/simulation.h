@@ -57,7 +57,6 @@ struct Constants {
  * @param t0 Initial time.
  * @param tf Final time.
  * @param dt0 Initial timestep.
- * @param dtMax Maximum timestep.
  * @param dtMin Minimum timestep.
  * @param dtChangeFactor Maximum factor by which to change timestep.
  * @param adaptiveTimestep Flag to use adaptive timestep.
@@ -73,7 +72,6 @@ struct IntegrationParameters {
     real t0;
     real tf;
     real dt0;
-    real dtMax;
     real dtMin;
     real dtChangeFactor;
     bool adaptiveTimestep;
@@ -374,9 +372,14 @@ class ImpactParameters : public CloseApproachParameters {
  * @param accIntegStack Stack of accelerations at integrator epochs.
  */
 struct InterpolationParameters {
+    real t0;
+    real dt0;
+    std::vector<real> b0;
+    std::vector<real> xInteg0;
+    std::vector<real> accInteg0;
     std::vector<real> tStack;
     std::vector<std::vector<real>> xIntegStack;
-    std::vector<std::vector<std::vector<real>>> bStack;
+    std::vector<std::vector<real>> bStack;
     std::vector<std::vector<real>> accIntegStack;
 };
 
@@ -406,11 +409,12 @@ struct InterpolationParameters {
  * @param observerInfo Observer information array.
  * @param tEvalMargin Margin for interpolation outside integration arc.
  * @param tEval Vector of times at which to evaluate the integrated state.
- * @param radarObserver Vector of radar observer flags (0=none, 1=delay, 2=doppler).
+ * @param obsType Vector of observation type flags (0=none, 1=delay, 2=doppler, 3=gaia).
  * @param lightTimeEval Vector of computed light times.
  * @param xIntegEval Vector of integrated states at evaluation times.
  * @param opticalObs Vector of optical observations.
  * @param opticalPartials Vector of optical observation partials.
+ * @param opticalObsCorr Vector of photocenter-barycenter corrections for optical observations.
  * @param radarObs Vector of radar observations.
  * @param radarPartials Vector of radar observation partials.
  */
@@ -472,11 +476,13 @@ class PropSimulation {
     std::vector<std::vector<real>> observerInfo;
     real tEvalMargin = 0.0L;
     std::vector<real> tEval;
-    std::vector<int> radarObserver;
+    std::vector<int> obsType;
     std::vector<std::vector<real>> lightTimeEval;
     std::vector<std::vector<real>> xIntegEval;
     std::vector<std::vector<real>> opticalObs;
+    std::vector<std::vector<real>> opticalObsDot;
     std::vector<std::vector<real>> opticalPartials;
+    std::vector<std::vector<real>> opticalObsCorr;
     std::vector<std::vector<real>> radarObs;
     std::vector<std::vector<real>> radarPartials;
     /**
@@ -518,7 +524,7 @@ class PropSimulation {
         bool convergedLightTime = false,
         std::vector<std::vector<real>> observerInfo =
             std::vector<std::vector<real>>(),
-        bool adaptiveTimestep = true, real dt0 = 0.0L, real dtMax = 21.0L,
+        bool adaptiveTimestep = true, real dt0 = 0.0L,
         real dtMin = 1.0e-4L, real dtChangeFactor = 0.25L,
         real tolInteg = 1.0e-11L, real tolPC = 1.0e-16L);
     /**
@@ -537,7 +543,7 @@ class PropSimulation {
      * @brief Extend the simulation to a new final time.
      */
     void extend(real tf, std::vector<real> tEvalNew = std::vector<real>(),
-                std::vector<std::vector<real>> xObserverNew =
+                std::vector<std::vector<real>> observerInfoNew =
                     std::vector<std::vector<real>>());
     /**
      * @brief Save the simulation to a file.
