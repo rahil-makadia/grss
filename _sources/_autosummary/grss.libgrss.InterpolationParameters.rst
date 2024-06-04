@@ -26,8 +26,6 @@ grss.libgrss.InterpolationParameters
 
     .. autosummary::
     
-        ~InterpolationParameters.accIntegStack
-        ~InterpolationParameters.bStack
         ~InterpolationParameters.tStack
         ~InterpolationParameters.xIntegStack
     

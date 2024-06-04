@@ -29,7 +29,6 @@ grss.libgrss.IntegrationParameters
         ~IntegrationParameters.adaptiveTimestep
         ~IntegrationParameters.dt0
         ~IntegrationParameters.dtChangeFactor
-        ~IntegrationParameters.dtMax
         ~IntegrationParameters.dtMin
         ~IntegrationParameters.n2Derivs
         ~IntegrationParameters.nInteg

@@ -62,7 +62,7 @@
     <link rel="prev" title="C++ API" href="../api_cpp.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -281,6 +281,7 @@
 <li class="toctree-l2"><a class="reference internal" href="force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="parallel.html">parallel.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pck.html">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation.h</a></li>
@@ -499,7 +500,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>propSim</strong> – <strong>[inout]</strong> <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>propSim</strong> – <strong>[inout]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
 <li><p><strong>tOld</strong> – <strong>[in]</strong> Time at the previous integrator epoch. </p></li>
 <li><p><strong>xIntegOld</strong> – <strong>[in]</strong> State at the previous integrator epoch. </p></li>
 <li><p><strong>t</strong> – <strong>[in]</strong> Time at the current integrator epoch. </p></li>
@@ -516,7 +517,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
 <li><p><strong>i</strong> – <strong>[in]</strong> Index of the first body. </p></li>
 <li><p><strong>j</strong> – <strong>[in]</strong> Index of the second body. </p></li>
 <li><p><strong>t</strong> – <strong>[in]</strong> Time at the current integrator epoch. </p></li>
@@ -533,7 +534,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
 <li><p><strong>i</strong> – <strong>[in]</strong> Index of the first body. </p></li>
 <li><p><strong>j</strong> – <strong>[in]</strong> Index of the second body. </p></li>
 <li><p><strong>t</strong> – <strong>[in]</strong> Time at the current integrator epoch. </p></li>
@@ -545,8 +546,21 @@ document.write(`
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4real">
-<span class="target" id="approach_8h_1acad8040916b1714f913f282ee8cb1c70"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_rel_state</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">i</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">j</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4real" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="approach_8h_1a4e3624cee5768348dd28bafd76a38c85"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_rel_state</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">i</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">j</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413get_rel_stateP14PropSimulationRK6size_tRK6size_tRK4real" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute relative state of a body at a given time. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>i</strong> – <strong>[in]</strong> Index of the first body. </p></li>
+<li><p><strong>j</strong> – <strong>[in]</strong> Index of the second body. </p></li>
+<li><p><strong>t</strong> – <strong>[in]</strong> Time to compute the relative state. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>xRel Relative state of the body. </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -556,7 +570,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
 <li><p><strong>i</strong> – <strong>[in]</strong> Index of the first body. </p></li>
 <li><p><strong>j</strong> – <strong>[in]</strong> Index of the second body. </p></li>
 <li><p><strong>x1</strong> – <strong>[in]</strong> Initial time of the bracketed interval. </p></li>
@@ -637,7 +651,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

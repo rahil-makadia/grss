@@ -62,7 +62,7 @@
     <link rel="prev" title="spk.h" href="spk.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -281,6 +281,7 @@
 <li class="toctree-l2"><a class="reference internal" href="force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="parallel.html">parallel.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pck.html">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation.h</a></li>
@@ -577,9 +578,9 @@ document.write(`
 <li><p><strong>stmParams</strong> – <strong>[inout]</strong> Structure containing the STM submatrices and their derivatives. </p></li>
 <li><p><strong>gm</strong> – <strong>[in]</strong> Gravitational parameter. </p></li>
 <li><p><strong>J2</strong> – <strong>[in]</strong> Oblateness coefficient. </p></li>
-<li><p><strong>dxBody</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_body"><span class="std std-ref">Body</span></a> fixed position difference in the x direction [AU]. </p></li>
-<li><p><strong>dyBody</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_body"><span class="std std-ref">Body</span></a> fixed position difference in the y direction [AU]. </p></li>
-<li><p><strong>dzBody</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#class_body"><span class="std std-ref">Body</span></a> fixed position difference in the z direction [AU]. </p></li>
+<li><p><strong>dxBody</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classBody"><span class="std std-ref">Body</span></a> fixed position difference in the x direction [AU]. </p></li>
+<li><p><strong>dyBody</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classBody"><span class="std std-ref">Body</span></a> fixed position difference in the y direction [AU]. </p></li>
+<li><p><strong>dzBody</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classBody"><span class="std std-ref">Body</span></a> fixed position difference in the z direction [AU]. </p></li>
 <li><p><strong>radius</strong> – <strong>[in]</strong> Radius of the body [AU]. </p></li>
 <li><p><strong>sinRA</strong> – <strong>[in]</strong> Sine of the right ascension of the body pole. </p></li>
 <li><p><strong>cosRA</strong> – <strong>[in]</strong> Cosine of the right ascension of the body pole. </p></li>
@@ -617,7 +618,7 @@ document.write(`
 </div>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv413STMParameters">
-<span class="target" id="struct_s_t_m_parameters"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STMParameters</span></span></span><a class="headerlink" href="#_CPPv413STMParameters" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STMParameters</span></span></span><a class="headerlink" href="#_CPPv413STMParameters" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;stm.h&gt;</em></div>
 <p>Structure to hold the STM submatrices and their derivatives. </p>
@@ -654,47 +655,47 @@ document.write(`
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters1BE">
-<span class="target" id="struct_s_t_m_parameters_1a76639c0dd2a6d5870b25ba1c4f0ce29c"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">B</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters1BE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1a76639c0dd2a6d5870b25ba1c4f0ce29c"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">B</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters1BE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters4BdotE">
-<span class="target" id="struct_s_t_m_parameters_1aa08ab36ab53b2d65bf468f06027a12b4"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Bdot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters4BdotE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1aa08ab36ab53b2d65bf468f06027a12b4"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Bdot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters4BdotE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters1CE">
-<span class="target" id="struct_s_t_m_parameters_1a54954b6d5aa0962d44c67e41d80ae9b6"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters1CE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1a54954b6d5aa0962d44c67e41d80ae9b6"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters1CE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters4CdotE">
-<span class="target" id="struct_s_t_m_parameters_1a3e166bf7770de915c89fdd2b99116d96"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Cdot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters4CdotE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1a3e166bf7770de915c89fdd2b99116d96"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Cdot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters4CdotE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters1DE">
-<span class="target" id="struct_s_t_m_parameters_1ab88dc1ee5c2fc363f35eea5df15ec2a7"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">D</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters1DE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1ab88dc1ee5c2fc363f35eea5df15ec2a7"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">D</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters1DE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters4DdotE">
-<span class="target" id="struct_s_t_m_parameters_1a972bd0992d4ad11b043ca05c2e8eeb6c"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ddot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters4DdotE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1a972bd0992d4ad11b043ca05c2e8eeb6c"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ddot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters4DdotE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters6dfdposE">
-<span class="target" id="struct_s_t_m_parameters_1a71140137087248ee2c7247c1e997cbfa"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">dfdpos</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters6dfdposE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1a71140137087248ee2c7247c1e997cbfa"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">dfdpos</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters6dfdposE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters6dfdvelE">
-<span class="target" id="struct_s_t_m_parameters_1a85bef0bce8e2aff85895276905927d7d"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">dfdvel</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters6dfdvelE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1a85bef0bce8e2aff85895276905927d7d"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">dfdvel</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters6dfdvelE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N13STMParameters6dfdparE">
-<span class="target" id="struct_s_t_m_parameters_1aeccbcb528db47a5570e36edb0e17b052"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">dfdpar</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters6dfdparE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structSTMParameters_1aeccbcb528db47a5570e36edb0e17b052"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">dfdpar</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N13STMParameters6dfdparE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -768,7 +769,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.prop.prop_parallel.cluster_ca_or_impacts" href="grss.prop.prop_parallel.cluster_ca_or_impacts.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -281,6 +281,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cppsummary/observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/parallel.html">parallel.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/pck.html">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/simulation.html">simulation.h</a></li>
@@ -502,7 +503,7 @@ document.write(`
 <h1>grss.prop.prop_parallel.parallel_propagate<a class="headerlink" href="#grss-prop-prop-parallel-parallel-propagate" title="Permalink to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.prop.prop_parallel.parallel_propagate">
-<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_parallel.</span></span><span class="sig-name descname"><span class="pre">parallel_propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_nongrav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconstruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_parallel.parallel_propagate" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.prop.prop_parallel.</span></span><span class="sig-name descname"><span class="pre">parallel_propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_sol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_nongrav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconstruct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.prop.prop_parallel.parallel_propagate" title="Permalink to this definition">#</a></dt>
 <dd><p>Propagate multiple simulations in parallel using a reference simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -511,6 +512,8 @@ document.write(`
 <li><p><strong>ref_nongrav</strong> (<a class="reference internal" href="grss.libgrss.NongravParameters.html#grss.libgrss.NongravParameters" title="grss.libgrss.NongravParameters"><em>libgrss.NongravParameters</em></a>) – Reference nongravitational parameters to use for propagating the orbits.</p></li>
 <li><p><strong>ref_sim</strong> (<a class="reference internal" href="grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><em>libgrss.PropSimulation</em></a>) – Reference simulation to use for propagating the orbits.</p></li>
 <li><p><strong>clones</strong> (<em>dict</em>) – Dictionary of orbit solutions to propagate in parallel.</p></li>
+<li><p><strong>num_threads</strong> (<em>int</em>) – Number of threads to use for parallel propagation.</p></li>
+<li><p><strong>reconstruct</strong> (<em>bool</em>) – Whether to reconstruct the log files after propagation.</p></li>
 </ul>
 </dd>
 </dl>
@@ -597,7 +600,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

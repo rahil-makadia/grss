@@ -65,7 +65,7 @@
     <link rel="prev" title="(28751) Eggl orbit determination test" href="eggl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -284,6 +284,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/parallel.html">parallel.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/pck.html">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cppsummary/simulation.html">simulation.h</a></li>
@@ -518,8 +519,7 @@ document.write(`
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;84100&#39;</span>
 <span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">nongrav_info</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_sbdb_info</span><span class="p">(</span><span class="n">body_id</span><span class="p">)</span>
-<span class="n">body_radius</span> <span class="o">=</span> <span class="n">nongrav_info</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">]</span>
-<span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">441</span>
+<span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">440</span>
 </pre></div>
 </div>
 </div>
@@ -570,7 +570,7 @@ Read in 191 Gaia observations from gaiafpr
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_iter_max</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">fit_sim</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">FitSimulation</span><span class="p">(</span><span class="n">init_sol</span><span class="p">,</span> <span class="n">obs_df</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">n_iter_max</span><span class="o">=</span><span class="n">n_iter_max</span><span class="p">,</span> <span class="n">de_kernel</span><span class="o">=</span><span class="n">de_kernel</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">body_radius</span><span class="p">,</span> <span class="n">nongrav_info</span><span class="o">=</span><span class="n">nongrav_info</span><span class="p">)</span>
+<span class="n">fit_sim</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">FitSimulation</span><span class="p">(</span><span class="n">init_sol</span><span class="p">,</span> <span class="n">obs_df</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">n_iter_max</span><span class="o">=</span><span class="n">n_iter_max</span><span class="p">,</span> <span class="n">de_kernel</span><span class="o">=</span><span class="n">de_kernel</span><span class="p">,</span> <span class="n">nongrav_info</span><span class="o">=</span><span class="n">nongrav_info</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -588,14 +588,14 @@ Read in 191 Gaia observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.398                   0.600                   590.102                         0.261
-2                        0.400                   0.588                   593.710                         0.262
-3                        0.400                   0.588                   593.710                         0.262
+1                        0.398                   0.576                   590.386                         0.261
+2                        0.398                   0.575                   590.402                         0.261
+3                        0.398                   0.575                   590.402                         0.261
 Converged without rejecting outliers. Starting outlier rejection now...
-4                        0.371                   0.557                   526.548                         0.234
-5                        0.371                   0.557                   525.736                         0.233
-6                        0.371                   0.557                   525.737                         0.233
-Converged after rejecting outliers. Rejected 4 out of 1134 optical observations.
+4                        0.376                   0.544                   530.058                         0.235
+5                        0.376                   0.544                   530.002                         0.235
+6                        0.376                   0.544                   530.002                         0.235
+Converged after rejecting outliers. Rejected 5 out of 1134 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -613,22 +613,22 @@ Converged after rejecting outliers. Rejected 4 out of 1134 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations at iteration 6 (of 6):
 ==============================================================
-RMS unweighted: 0.37101653660746375
-RMS weighted: 0.5569838178551341
-chi-squared: 525.7368015327879
-reduced chi-squared: 0.2334532866486625
-square root of reduced chi-squared: 0.4831700390635397
+RMS unweighted: 0.37593885140575173
+RMS weighted: 0.5438948509419494
+chi-squared: 530.0021432285334
+reduced chi-squared: 0.23534731049224397
+square root of reduced chi-squared: 0.4851260769039776
 --------------------------------------------------------------
 Solution Time: MJD 58042.000 TDB = 2017-10-16 00:00:00.000 TDB
 Solution Observation Arc: 10342.85 days (28.32 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02839420821e-01               1.41072497409e-09               2.02839418343e-01               1.41735965833e-09               -2.47803952358e-09              -1.757
-q                       2.17602309556e+00               5.02213641990e-09               2.17602309076e+00               5.05227629548e-09               -4.80001860481e-09              -0.956
-tp                      5.74182713236e+04               7.41859215578e-06               5.74182712968e+04               7.46560431349e-06               -2.68256262643e-05              -3.616
-om                      1.52357305306e+02               1.14596100392e-06               1.52357305978e+02               1.16802151318e-06               +6.72422089565e-07              +0.587
-w                       2.08338776381e+02               2.36706895048e-06               2.08338768511e+02               2.38052845527e-06               -7.87049211226e-06              -3.325
-i                       5.81853647038e+00               1.30273571989e-07               5.81853650247e+00               1.30787698162e-07               +3.20906154982e-08              +0.246
+e                       2.02839420821e-01               1.41072497409e-09               2.02839420883e-01               1.41733520795e-09               +6.19374551647e-11              +0.044
+q                       2.17602309556e+00               5.02213641990e-09               2.17602309687e+00               5.05576653353e-09               +1.30667832110e-09              +0.260
+tp                      5.74182713236e+04               7.41859215578e-06               5.74182713260e+04               7.47254795434e-06               +2.34495382756e-06              +0.316
+om                      1.52357305306e+02               1.14596100392e-06               1.52357305316e+02               1.16857627643e-06               +9.93051685327e-09              +0.009
+w                       2.08338776381e+02               2.36706895048e-06               2.08338777013e+02               2.38369101339e-06               +6.31239032600e-07              +0.267
+i                       5.81853647038e+00               1.30273571989e-07               5.81853649980e+00               1.31073957270e-07               +2.94233908349e-08              +0.226
 
 </pre></div></div>
 </div>
@@ -691,13 +691,13 @@ i                       5.81853647038e+00               1.30273571989e-07       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 5.10
-Mahalonobis distance between GRSS and JPL solution: 5.05
+Mahalonobis distance between JPL and GRSS solution: 0.37
+Mahalonobis distance between GRSS and JPL solution: 0.37
 Bhattacharya distance between JPL and GRSS solution: 0.0004
 Bhattacharya coefficient between JPL and GRSS solution: 0.9996
 </pre></div></div>
 </div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
@@ -707,21 +707,6 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.9996
 <span class="k">assert</span> <span class="n">bhatt_coeff</span> <span class="o">&gt;</span> <span class="mf">0.90</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">AssertionError</span>                            Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[11], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_f <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
-<span class="ansi-green-intense-fg ansi-bold">      2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> maha_dist_0 <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">5.0</span>
-<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">assert</span> bhattacharya <span style="color: rgb(98,98,98)">&lt;</span> <span style="color: rgb(98,98,98)">0.10</span>
-
-<span class="ansi-red-fg">AssertionError</span>:
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -799,7 +784,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

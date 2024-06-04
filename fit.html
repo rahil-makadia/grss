@@ -62,7 +62,7 @@
     <link rel="prev" title="GRSS Propagator Module (grss.prop)" href="prop.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -298,6 +298,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cppsummary/observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/parallel.html">parallel.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/pck.html">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/simulation.html">simulation.h</a></li>
@@ -510,22 +511,27 @@ document.write(`
 <p>The orbit determination code within GRSS is completely on the Python side of things, but it heavily relies on the C++ propagator binding. Given a small body orbit that needs to be fitted to a set of observations, the module uses the batch least squares algorithm to solve for an updated nominal orbit.</p>
 <p>The optical measurements are acquired using the <a class="reference external" href="https://minorplanetcenter.net/mpcops/documentation/observations-api/">Minor Planet Center API</a>, and the radar measurements are acquired using the <a class="reference external" href="https://ssd-api.jpl.nasa.gov/doc/sb_radar.html">JPL Small-body Radar API</a>. The optical astrometry is preprocessed to account for the following :</p>
 <ol class="arabic simple">
-<li><p>Star catalog biases <a class="footnote-reference brackets" href="#id4" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></li>
-<li><p>Measurement weighting <a class="footnote-reference brackets" href="#id5" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></li>
+<li><p>Star catalog biases <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></li>
+<li><p>Measurement weighting <a class="footnote-reference brackets" href="#id6" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></li>
+<li><p>Gaia astrometry handling <a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p></li>
 </ol>
-<p>Once the optical astrometry has been processed, the radar astrometry has been acquired, and the initial orbit is provided by the user, the least squares filter can be run. As of now, the filter can fit the nominal state, the nongravitational acceleration parameters, and any impulsive maneuver events. Currently the partial derivatives in the normal matrix are calculated using 1<sup>st</sup>-order central differences by default, but analytical partial derivatives are also a choice offered to the user. The filter also implements an outlier rejection scheme <a class="footnote-reference brackets" href="#id6" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> to make sure any spurious measurements do not contaminate the fit.</p>
+<p>Once the optical astrometry has been processed, the radar astrometry has been acquired, and the initial orbit is provided by the user, the least squares filter can be run. As of now, the filter can fit the nominal state, the nongravitational acceleration parameters, and any impulsive maneuver events. Currently the partial derivatives in the normal matrix are calculated using 1<sup>st</sup>-order central differences by default, but analytical partial derivatives are also a choice offered to the user. The filter also implements an outlier rejection scheme <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> to make sure any spurious measurements do not contaminate the fit.</p>
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id4" role="note">
+<aside class="footnote brackets" id="id5" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Eggl, S., Farnocchia, D., Chamberlin, A.B., and Chesley, S.R., “Star catalog position and proper motion corrections in asteroid astrometry II: The Gaia era”, Icarus, Volume 339, Pages 1-17, 2020. <a class="reference external" href="https://doi.org/10.1016/j.icarus.2019.113596">https://doi.org/10.1016/j.icarus.2019.113596</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id5" role="note">
+<aside class="footnote brackets" id="id6" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Vereš, P., Farnocchia, D., Chesley, S.R., and Chamberlin, A.B., “Statistical analysis of astrometric errors for the most productive asteroid surveys”, Volume 296, Pages 139-149, 2017. <a class="reference external" href="https://doi.org/10.1016/j.icarus.2017.05.021">https://doi.org/10.1016/j.icarus.2017.05.021</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="note">
+<aside class="footnote brackets" id="id7" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Fuentes-Muñoz, O., Farnocchia, D., Naidu, S.P., and Park, R.S., “Asteroid Orbit Determination Using Gaia FPR: Statistical Analysis”, AJ, Volume 167, Pages 290-299, 2024. <a class="reference external" href="https://doi.org/10.3847/1538-3881/ad4291">https://doi.org/10.3847/1538-3881/ad4291</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Carpino, M., Milani, A., and Chesley, S.R., “Error statistics of asteroid optical astrometric observations”, Icarus, Volume 166, Pages 248-270, 2003. <a class="reference external" href="https://doi.org/10.1016/S0019-1035(03)00051-4">https://doi.org/10.1016/S0019-1035(03)00051-4</a>.</p>
 </aside>
 </aside>
@@ -597,7 +603,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

@@ -62,7 +62,7 @@
     <link rel="prev" title="parallel.h" href="parallel.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -281,6 +281,7 @@
 <li class="toctree-l2"><a class="reference internal" href="force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="parallel.html">parallel.h</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation.h</a></li>
@@ -504,24 +505,24 @@ document.write(`
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48pck_freeP7PckInfo">
 <span class="target" id="pck_8h_1a90b8ef5e14d8f18d5e0e3b6b8298b197"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pck_free</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bpc</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48pck_freeP7PckInfo" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Free the memory allocated for an <a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure. </p>
+<dd><p>Free the memory allocated for an <a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>bpc</strong> – <strong>[in]</strong> <a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure. </p>
+<dd class="field-odd"><p><strong>bpc</strong> – <strong>[in]</strong> <a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure. </p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48pck_initRKNSt6stringE">
-<span class="target" id="pck_8h_1abf13b7a55d94da7d20e0bc7ea3e1a73a"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pck_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48pck_initRKNSt6stringE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="pck_8h_1a926fbcbd7ee77eabb5ed8261a09194c9"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">pck_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48pck_initRKNSt6stringE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Initialise a PCK file. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>path</strong> – <strong>[in]</strong> Path to the PCK file. </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>PckInfo* Pointer to the <a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure for the PCK file. </p>
+<dd class="field-even"><p>PckInfo* Pointer to the <a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure for the PCK file. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -529,11 +530,11 @@ document.write(`
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48pck_calcP7PckInfo4realiP4realP4real">
 <span class="target" id="pck_8h_1a8b0503248979b0b46209f004236aab3e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pck_calc</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bpc</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">epoch</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">spiceId</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">rotMat</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">rotMatDot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48pck_calcP7PckInfo4realiP4realP4real" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Compute angle,angleDot for a given frame at a given time using an <a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure. </p>
+<dd><p>Compute angle,angleDot for a given frame at a given time using an <a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bpc</strong> – <strong>[in]</strong> <a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure. </p></li>
+<li><p><strong>bpc</strong> – <strong>[in]</strong> <a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure. </p></li>
 <li><p><strong>epoch</strong> – <strong>[in]</strong> Epoch to compute the state at (MJD ET). </p></li>
 <li><p><strong>spiceId</strong> – <strong>[in]</strong> SPICE ID of the frame. </p></li>
 <li><p><strong>rotMat</strong> – <strong>[out]</strong> Rotation matrix </p></li>
@@ -575,7 +576,7 @@ document.write(`
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realR12PckEphemerisRNSt6vectorINSt6vectorI4realEEEE">
-<span class="target" id="pck_8h_1a18466460a94f6735d69f2fd0f57b4c7c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_pck_rotMat</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t0_mjd</span></span>, <a class="reference internal" href="#_CPPv412PckEphemeris" title="PckEphemeris"><span class="n"><span class="pre">PckEphemeris</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ephem</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xformMat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realR12PckEphemerisRNSt6vectorINSt6vectorI4realEEEE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="pck_8h_1a4b1923065e6bd00bc91fb02877e43c80"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_pck_rotMat</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">from</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t0_mjd</span></span>, <a class="reference internal" href="#_CPPv412PckEphemeris" title="PckEphemeris"><span class="n"><span class="pre">PckEphemeris</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ephem</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xformMat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414get_pck_rotMatRKNSt6stringERKNSt6stringERK4realR12PckEphemerisRNSt6vectorINSt6vectorI4realEEEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the rotation matrix from one frame to another. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -583,7 +584,7 @@ document.write(`
 <li><p><strong>from</strong> – <strong>[in]</strong> Frame to rotate from. </p></li>
 <li><p><strong>to</strong> – <strong>[in]</strong> Frame to rotate to. </p></li>
 <li><p><strong>t0_mjd</strong> – <strong>[in]</strong> t0_mjd Epoch to compute the rotation matrix at (MJD ET). </p></li>
-<li><p><strong>ephem</strong> – <strong>[in]</strong> <a class="reference internal" href="#struct_pck_ephemeris"><span class="std std-ref">PckEphemeris</span></a> structure. </p></li>
+<li><p><strong>ephem</strong> – <strong>[in]</strong> <a class="reference internal" href="#structPckEphemeris"><span class="std std-ref">PckEphemeris</span></a> structure. </p></li>
 <li><p><strong>xformMat</strong> – <strong>[out]</strong> Rotation matrix from ‘from’ to ‘to’. </p></li>
 </ul>
 </dd>
@@ -593,7 +594,7 @@ document.write(`
 </div>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv49PckTarget">
-<span class="target" id="struct_pck_target"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PckTarget</span></span></span><a class="headerlink" href="#_CPPv49PckTarget" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PckTarget</span></span></span><a class="headerlink" href="#_CPPv49PckTarget" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;pck.h&gt;</em></div>
 <p>Structure to hold the data for a single frame in an PCK file. </p>
@@ -627,42 +628,42 @@ document.write(`
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget4codeE">
-<span class="target" id="struct_pck_target_1a9ed657b88f5f00254f9a94472f1389ef"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">code</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget4codeE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1a9ed657b88f5f00254f9a94472f1389ef"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">code</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget4codeE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3refE">
-<span class="target" id="struct_pck_target_1a51d5983f93f6213f00b0e5d2c4de00ac"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ref</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3refE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1a51d5983f93f6213f00b0e5d2c4de00ac"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ref</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3refE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3begE">
-<span class="target" id="struct_pck_target_1a389505f268d22ce2b07d7dad61b66d8e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">beg</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3begE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1a389505f268d22ce2b07d7dad61b66d8e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">beg</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3begE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3endE">
-<span class="target" id="struct_pck_target_1abcc108061de6058133b4cdb636af45e7"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3endE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1abcc108061de6058133b4cdb636af45e7"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">end</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3endE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3resE">
-<span class="target" id="struct_pck_target_1a27fe9181002a62113309ad89eb924f7f"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">res</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3resE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1a27fe9181002a62113309ad89eb924f7f"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">res</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3resE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3oneE">
-<span class="target" id="struct_pck_target_1a5e596af0f5609a0efd25778aba11c163"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">one</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3oneE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1a5e596af0f5609a0efd25778aba11c163"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">one</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3oneE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3twoE">
-<span class="target" id="struct_pck_target_1ad00cfae242fea1544e99b40154077bcb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">two</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3twoE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1ad00cfae242fea1544e99b40154077bcb"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">two</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3twoE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9PckTarget3indE">
-<span class="target" id="struct_pck_target_1af4f2534b72f99fb863a5decd4d9856b6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ind</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3indE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckTarget_1af4f2534b72f99fb863a5decd4d9856b6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ind</span></span></span><a class="headerlink" href="#_CPPv4N9PckTarget3indE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -670,13 +671,13 @@ document.write(`
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv47PckInfo">
-<span class="target" id="struct_pck_info"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PckInfo</span></span></span><a class="headerlink" href="#_CPPv47PckInfo" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PckInfo</span></span></span><a class="headerlink" href="#_CPPv47PckInfo" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;pck.h&gt;</em></div>
 <p>Structure to hold the data for a single PCK file. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Param targets<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Array of <a class="reference internal" href="#struct_pck_target"><span class="std std-ref">PckTarget</span></a>. </p>
+<dd class="field-odd"><p>Array of <a class="reference internal" href="#structPckTarget"><span class="std std-ref">PckTarget</span></a>. </p>
 </dd>
 <dt class="field-even">Param num<span class="colon">:</span></dt>
 <dd class="field-even"><p>Number of targets. </p>
@@ -690,32 +691,40 @@ document.write(`
 <dt class="field-odd">Param len<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Length of the memory map. </p>
 </dd>
+<dt class="field-even">Param spiceIdToIdx<span class="colon">:</span></dt>
+<dd class="field-even"><p>Map of SPICE ID to index in the targets array. </p>
+</dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7PckInfo7targetsE">
-<span class="target" id="struct_pck_info_1a5bd1ec71e3f76261bdc65a70432cd684"></span><a class="reference internal" href="#_CPPv49PckTarget" title="PckTarget"><span class="n"><span class="pre">PckTarget</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">targets</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo7targetsE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckInfo_1a5bd1ec71e3f76261bdc65a70432cd684"></span><a class="reference internal" href="#_CPPv49PckTarget" title="PckTarget"><span class="n"><span class="pre">PckTarget</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">targets</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo7targetsE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7PckInfo3numE">
-<span class="target" id="struct_pck_info_1a041971bce01307ee13115e8562ed2818"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo3numE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckInfo_1a041971bce01307ee13115e8562ed2818"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo3numE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7PckInfo12allocatedNumE">
-<span class="target" id="struct_pck_info_1af18b6176e8fc81dc146fb7bff3a3b051"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allocatedNum</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo12allocatedNumE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckInfo_1af18b6176e8fc81dc146fb7bff3a3b051"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allocatedNum</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo12allocatedNumE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7PckInfo3mapE">
-<span class="target" id="struct_pck_info_1afbe94d4f8eb85d39421d4a157dd321dc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">map</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo3mapE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckInfo_1afbe94d4f8eb85d39421d4a157dd321dc"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">map</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo3mapE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N7PckInfo3lenE">
-<span class="target" id="struct_pck_info_1ad1faf80a3467fda57a30892235eeb183"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">len</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo3lenE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckInfo_1ad1faf80a3467fda57a30892235eeb183"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">len</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo3lenE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7PckInfo12spiceIdToIdxE">
+<span class="target" id="structPckInfo_1ad1972f86bb046ed8e6036518d19f4a2c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">spiceIdToIdx</span></span></span><a class="headerlink" href="#_CPPv4N7PckInfo12spiceIdToIdxE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -723,10 +732,10 @@ document.write(`
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv412PckEphemeris">
-<span class="target" id="struct_pck_ephemeris"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PckEphemeris</span></span></span><a class="headerlink" href="#_CPPv412PckEphemeris" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PckEphemeris</span></span></span><a class="headerlink" href="#_CPPv412PckEphemeris" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;pck.h&gt;</em></div>
-<p>Structure to hold all the data for the PCK files in a <a class="reference internal" href="simulation.html#class_prop_simulation"><span class="std std-ref">PropSimulation</span></a>. </p>
+<p>Structure to hold all the data for the PCK files in a <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Param histPckPath<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Path to the historical PCK file. </p>
@@ -738,45 +747,45 @@ document.write(`
 <dd class="field-odd"><p>Path to the predicted PCK file. </p>
 </dd>
 <dt class="field-even">Param histPck<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure for the historical PCK file. </p>
+<dd class="field-even"><p><a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure for the historical PCK file. </p>
 </dd>
 <dt class="field-odd">Param latestPck<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure for the latest PCK file. </p>
+<dd class="field-odd"><p><a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure for the latest PCK file. </p>
 </dd>
 <dt class="field-even">Param predictPck<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#struct_pck_info"><span class="std std-ref">PckInfo</span></a> structure for the predicted PCK file. </p>
+<dd class="field-even"><p><a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure for the predicted PCK file. </p>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12PckEphemeris11histPckPathE">
-<span class="target" id="struct_pck_ephemeris_1ae93fb19cc0699118d119033f039f50c9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">histPckPath</span></span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris11histPckPathE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris_1ae93fb19cc0699118d119033f039f50c9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">histPckPath</span></span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris11histPckPathE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12PckEphemeris13latestPckPathE">
-<span class="target" id="struct_pck_ephemeris_1a47b459334573ea4b68f592e6f172ac7f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">latestPckPath</span></span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris13latestPckPathE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris_1a47b459334573ea4b68f592e6f172ac7f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">latestPckPath</span></span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris13latestPckPathE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12PckEphemeris14predictPckPathE">
-<span class="target" id="struct_pck_ephemeris_1a19c346751de6e2f24a4d3a8e4c68031d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">predictPckPath</span></span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris14predictPckPathE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris_1a19c346751de6e2f24a4d3a8e4c68031d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">predictPckPath</span></span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris14predictPckPathE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12PckEphemeris7histPckE">
-<span class="target" id="struct_pck_ephemeris_1a90df4f3806b1ea07136e3e2ea5726f0d"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">histPck</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris7histPckE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris_1a90df4f3806b1ea07136e3e2ea5726f0d"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">histPck</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris7histPckE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12PckEphemeris9latestPckE">
-<span class="target" id="struct_pck_ephemeris_1ac57c9bfb7c4cb297ca8cd79e1e933c92"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">latestPck</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris9latestPckE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris_1ac57c9bfb7c4cb297ca8cd79e1e933c92"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">latestPck</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris9latestPckE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12PckEphemeris10predictPckE">
-<span class="target" id="struct_pck_ephemeris_1a3343f6e49036655694f8ef0d9dc02fa8"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">predictPck</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris10predictPckE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="structPckEphemeris_1a3343f6e49036655694f8ef0d9dc02fa8"></span><a class="reference internal" href="#_CPPv47PckInfo" title="PckInfo"><span class="n"><span class="pre">PckInfo</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">predictPck</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N12PckEphemeris10predictPckE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -850,7 +859,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

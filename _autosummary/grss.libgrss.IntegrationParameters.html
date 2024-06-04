@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.IntegBody" href="grss.libgrss.IntegBody.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 10, 2024"/>
+    <meta name="docbuild:last-update" content="Jun 04, 2024"/>
   </head>
   
   
@@ -281,6 +281,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/force.html">force.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/gr15.html">gr15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/interpolate.html">interpolate.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../cppsummary/observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/parallel.html">parallel.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/pck.html">pck.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../cppsummary/simulation.html">simulation.h</a></li>
@@ -491,7 +492,6 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.adaptiveTimestep"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.adaptiveTimestep</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dt0"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dt0</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dtChangeFactor"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtChangeFactor</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dtMax"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMax</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dtMin"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.n2Derivs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.nInteg"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nInteg</span></code></a></li>
@@ -548,37 +548,34 @@ integration of the equations of motion.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.dtChangeFactor" title="grss.libgrss.IntegrationParameters.dtChangeFactor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtChangeFactor</span></code></a></p></td>
 <td><p>Factor by which to limit the change in time step.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.dtMax" title="grss.libgrss.IntegrationParameters.dtMax"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMax</span></code></a></p></td>
-<td><p>Maximum time step.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.dtMin" title="grss.libgrss.IntegrationParameters.dtMin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMin</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.dtMin" title="grss.libgrss.IntegrationParameters.dtMin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dtMin</span></code></a></p></td>
 <td><p>Minimum time step.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.n2Derivs" title="grss.libgrss.IntegrationParameters.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.n2Derivs" title="grss.libgrss.IntegrationParameters.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
 <td><p>Number of second derivatives.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.nInteg" title="grss.libgrss.IntegrationParameters.nInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nInteg</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.nInteg" title="grss.libgrss.IntegrationParameters.nInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nInteg</span></code></a></p></td>
 <td><p>Number of integrated bodies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.nSpice" title="grss.libgrss.IntegrationParameters.nSpice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nSpice</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.nSpice" title="grss.libgrss.IntegrationParameters.nSpice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nSpice</span></code></a></p></td>
 <td><p>Number of bodies with SPICE ephemerides.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.nTotal" title="grss.libgrss.IntegrationParameters.nTotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTotal</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.nTotal" title="grss.libgrss.IntegrationParameters.nTotal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTotal</span></code></a></p></td>
 <td><p>Total number of bodies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.t0" title="grss.libgrss.IntegrationParameters.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.t0" title="grss.libgrss.IntegrationParameters.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
 <td><p>Initial time of integration (MJD TDB).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.tf" title="grss.libgrss.IntegrationParameters.tf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tf</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.tf" title="grss.libgrss.IntegrationParameters.tf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tf</span></code></a></p></td>
 <td><p>Final time of integration (MJD TDB).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.timestepCounter" title="grss.libgrss.IntegrationParameters.timestepCounter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestepCounter</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.timestepCounter" title="grss.libgrss.IntegrationParameters.timestepCounter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timestepCounter</span></code></a></p></td>
 <td><p>Counter for number of time steps.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.tolInteg" title="grss.libgrss.IntegrationParameters.tolInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolInteg</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.tolInteg" title="grss.libgrss.IntegrationParameters.tolInteg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolInteg</span></code></a></p></td>
 <td><p>Tolerance for integration.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.tolPC" title="grss.libgrss.IntegrationParameters.tolPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolPC</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegrationParameters.tolPC" title="grss.libgrss.IntegrationParameters.tolPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolPC</span></code></a></p></td>
 <td><p>Tolerance for predictor-corrector within IAS15.</p></td>
 </tr>
 </tbody>
@@ -599,12 +596,6 @@ integration of the equations of motion.</p>
 <dt class="sig sig-object py" id="grss.libgrss.IntegrationParameters.dtChangeFactor">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtChangeFactor</span></span><a class="headerlink" href="#grss.libgrss.IntegrationParameters.dtChangeFactor" title="Permalink to this definition">#</a></dt>
 <dd><p>Factor by which to limit the change in time step.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="grss.libgrss.IntegrationParameters.dtMax">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtMax</span></span><a class="headerlink" href="#grss.libgrss.IntegrationParameters.dtMax" title="Permalink to this definition">#</a></dt>
-<dd><p>Maximum time step.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -721,7 +712,6 @@ integration of the equations of motion.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.adaptiveTimestep"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.adaptiveTimestep</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dt0"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dt0</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dtChangeFactor"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtChangeFactor</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dtMax"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMax</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.dtMin"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.dtMin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.n2Derivs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegrationParameters.nInteg"><code class="docutils literal notranslate"><span class="pre">IntegrationParameters.nInteg</span></code></a></li>
@@ -767,7 +757,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 10, 2024.
+  Last updated on Jun 04, 2024.
   <br/>
 </p>
   </div>

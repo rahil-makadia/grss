@@ -54,11 +54,13 @@ grss.libgrss.PropSimulation
         ~PropSimulation.interpParams
         ~PropSimulation.lightTimeEval
         ~PropSimulation.name
+        ~PropSimulation.obsType
         ~PropSimulation.observerInfo
         ~PropSimulation.opticalObs
+        ~PropSimulation.opticalObsCorr
+        ~PropSimulation.opticalObsDot
         ~PropSimulation.opticalPartials
         ~PropSimulation.radarObs
-        ~PropSimulation.radarObserver
         ~PropSimulation.radarPartials
         ~PropSimulation.spiceBodies
         ~PropSimulation.t
