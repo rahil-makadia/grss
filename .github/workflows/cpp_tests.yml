@@ -12,13 +12,12 @@ on:
 
 jobs:
   prop-only:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
       - name: Build GRSS library
         run: |
-          sudo apt-get install doxygen
           source initialize.sh
           source build_cpp.sh -clean
       - name: Run tests
