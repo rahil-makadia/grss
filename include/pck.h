@@ -3,6 +3,7 @@
 
 #include "timeconvert.h"
 #include <unordered_map>
+#include <cstdint>
 
 /**
  * @brief Length of a record in an PCK file.
