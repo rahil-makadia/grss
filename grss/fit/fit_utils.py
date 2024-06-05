@@ -5,6 +5,7 @@ import numpy as np
 from numba import jit
 
 from ..utils import grss_path
+from .fit_ades import special_codes
 
 __all__ = [ 'mjd2et',
             'et2mjd',
@@ -170,22 +171,21 @@ def get_observer_info(obs_df):
     """
     stn_codes_dict = get_codes_dict()
     observer_info = []
-    gaia = ['258']
-    occultation = ['275']
-    spacecraft = [ 'S/C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
-                    'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', ]
-    roving = ['247', '270']
+    gaia = special_codes['gaia']
+    occultation = special_codes['occultation']
+    spacecraft = special_codes['spacecraft']
+    roving = special_codes['roving']
     conv_to_au = {
         'ICRF_AU': (1,1),
         'ICRF_KM': (1/1.495978707e8,86400/1.495978707e8),
     }
     m2au = 1.0/1.495978707e11
-    fields = ['stn', 'mode', 'sys', 'pos1', 'pos2', 'pos3', 
+    fields = ['stn', 'mode', 'sys', 'pos1', 'pos2', 'pos3',
               'vel1', 'vel2', 'vel3', 'trx', 'rcv', 'com', 'frq', 'doppler']
     for obs_info in zip(*[obs_df[field] for field in fields]):
         stn, mode, sys, pos1, pos2, pos3, vel1, vel2, vel3, trx, rcv, com, freq, doppler = obs_info
         info_list = []
-        if stn in gaia+occultation+spacecraft:
+        if stn in gaia|occultation|spacecraft:
             c = conv_to_au[sys]
             c_pos = c[0]
             if stn in gaia:
