@@ -41,9 +41,9 @@ target_link_libraries(libgrss PRIVATE ${PROJECT_NAME})
 # compile tests
 add_subdirectory(tests/cpp/prop)
 
-# build the documentation
+# build the documentation if Doxygen is installed and BUILD_DOCS is defined
 find_package(Doxygen)
-if (DOXYGEN_FOUND)
+if (DOXYGEN_FOUND AND BUILD_DOCS)
     # set input and output files
     set(DOXYGEN_IN ${CMAKE_SOURCE_DIR}/docs/doxygen/doxygen.config)
     set(DOXYGEN_OUT ${CMAKE_SOURCE_DIR}/docs/doxygen/doxyfile.out)
@@ -59,6 +59,6 @@ if (DOXYGEN_FOUND)
         COMMENT "Generating API documentation with Doxygen"
         VERBATIM
     )
-else (DOXYGEN_FOUND)
-    message(WARNING "Doxygen needs to be installed to generate the doxygen documentation")
-endif (DOXYGEN_FOUND)
+else (DOXYGEN_FOUND AND BUILD_DOCS)
+    message(STATUS "Doxygen needs to be installed and BUILD_DOCS needs to be ON to build the documentation")
+endif (DOXYGEN_FOUND AND BUILD_DOCS)

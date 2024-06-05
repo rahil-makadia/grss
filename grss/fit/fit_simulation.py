@@ -9,6 +9,7 @@ from astropy.time import Time
 from .. import libgrss
 from ..utils import default_kernel_path, grss_path
 from .fit_utils import get_observer_info, get_similarity_stats
+from .fit_ades import special_codes
 
 __all__ = [ 'FitSimulation',
 ]
@@ -546,7 +547,6 @@ class FitSimulation:
         self.obs_cov = None
         self.obs_weight = None
         self._compute_obs_weights()
-        self.sig_time = 1.0
         self.n_iter = 0
         self.n_iter_max = n_iter_max
         self.iters = []
@@ -1244,8 +1244,7 @@ class FitSimulation:
             else:
                 raise ValueError("Observer info length not recognized.")
         nom_body = integ_body_idx == 0
-        radius_nonzero = self.fixed_propsim_params['radius'] != 0.0
-        if nom_body and (self.sig_time != 0.0 or radius_nonzero):
+        if nom_body:
             self._inflate_uncertainties(prop_sim_past, prop_sim_future)
         return computed_obs
 
@@ -1263,7 +1262,6 @@ class FitSimulation:
         None : NoneType
             None
         """
-        time_uncert = self.sig_time/86400 # 1 second -> days
         stations = self.obs.stn.values
         sig_times = self.obs.sigTime.values
         sig_ra_vals = self.obs.sigRA.values
@@ -1280,28 +1278,37 @@ class FitSimulation:
             state_eval = prop_sim_future.xIntegEval
         computed_obs_dot = np.array(optical_obs_dot)[:,0:2]
         computed_obs_dot[:, 0] *= self.obs.cosDec.values
-        rel_dists = np.linalg.norm(np.array(state_eval)[:, :3], axis=1)
-        lmbda = 0.3 # from fuentes-munoz et al. 2024
-        au2m = 1.495978707e11
-        fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists*180/np.pi*3600)**2
+        radius_nonzero = self.fixed_propsim_params['radius'] != 0.0
+        fac = 0.0
+        if radius_nonzero:
+            rel_dists = np.linalg.norm(np.array(state_eval)[:, :3], axis=1)
+            lmbda = 0.3 # from fuentes-munoz et al. 2024
+            au2m = 1.495978707e11
+            fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists*180/np.pi*3600)**2
         modes = self.obs['mode'].values
+        no_time_uncert = (
+            special_codes["gaia"]
+            | special_codes["occultation"]
+            | special_codes["spacecraft"]
+        )
         for i in range(len(self.observer_info_lengths)):
-            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'OCC', 'SIM_OCC'}:
+            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'SIM_OCC'}:
                 sig_ra = sig_ra_vals[i]
                 sig_dec = sig_dec_vals[i]
                 sig_corr = sig_corr_vals[i]
                 off_diag = 0.0 if np.isnan(sig_corr) else sig_corr*sig_ra*sig_dec
                 cov = np.array([[sig_ra**2, off_diag],
                                 [off_diag, sig_dec**2]])
-                if self.sig_time != 0.0 and stations[i] not in {'258', 'S/C'}:
+                time_uncert = sig_times[i]
+                if time_uncert != 0.0 and stations[i] not in no_time_uncert:
                     ra_dot_cos_dec = computed_obs_dot[i, 0]
                     dec_dot = computed_obs_dot[i, 1]
                     off_diag_time = ra_dot_cos_dec*dec_dot
                     cov_time = np.array([[ra_dot_cos_dec**2, off_diag_time],
-                                        [off_diag_time, dec_dot**2]])*time_uncert**2
+                                        [off_diag_time, dec_dot**2]])*(time_uncert/86400)**2
                     cov += cov_time
-                    sig_times[i] = self.sig_time
-                if stations[i] == '258' and self.fixed_propsim_params['radius'] != 0.0:
+                    sig_times[i] = time_uncert
+                if radius_nonzero and stations[i] == '258':
                     cov_fac = np.array([[fac[i], 0.0],
                                         [0.0, fac[i]]])
                     cov += cov_fac

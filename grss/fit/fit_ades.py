@@ -21,6 +21,7 @@ ades_keep_columns = {
     'rmsDelay': 'float', 'rmsDoppler': 'float', 'com': 'Int64', 'frq': 'float',
     'raStar': 'float', 'decStar': 'float', 'deltaRA': 'float', 'deltaDec': 'float',
     'sys': 'str', 'ctr': 'Int64', 'pos1': 'float', 'pos2': 'float', 'pos3': 'float',
+    'vel1': 'float', 'vel2': 'float', 'vel3': 'float',
 }
 ades_add_columns = {
     'resRA': 'float', 'resDec': 'float', 'selAst': 'str',
@@ -104,3 +105,11 @@ ades_catalog_map = {v: k for k, v in ades_catalog_map.items()}
 pack_letters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 unpack_letters = {pack_letters[i]: i for i in range(len(pack_letters))}
 prog_codes = R"""0123456789!"#$%&'()*+,-./[\]^_`{|}~:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz£"""
+
+special_codes = {
+    'gaia': {'258'},
+    'occultation': {'275'},
+    'spacecraft': {'S/C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
+                   'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', },
+    'roving': {'247', '270'},
+}

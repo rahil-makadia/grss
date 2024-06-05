@@ -9,7 +9,14 @@ import numpy as np
 import pandas as pd
 
 from ..utils import grss_path
-from .fit_ades import ades_column_types, ades_catalog_map, unpack_letters, pack_letters, prog_codes
+from .fit_ades import (
+    ades_column_types,
+    ades_catalog_map,
+    unpack_letters,
+    pack_letters,
+    prog_codes,
+    special_codes,
+)
 
 __all__ = [ 'add_psv_obs',
             'add_gaia_obs',
@@ -162,7 +169,8 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     # remove any columns that are not in ades_column_types
     obs_df = obs_df[ades_column_types.keys()]
     if verbose:
-        print(f"Read in {len(obs_df)} observations from the MPC.")
+        source = "MPC" if optical_obs_file is None else "file"
+        print(f"Read in {len(obs_df)} observations from the {source}.")
     _ades_mode_check(obs_df)
     obs_df = _ades_ast_cat_check(obs_df)
     # filter the data based on the time range
@@ -368,6 +376,9 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']
         obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']
         obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']
+        obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']
+        obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']
+        obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']
     if verbose:
         print(f"\tFiltered to {gaia_add_counter} observations that",
                 "satisfy the time range constraints.")
@@ -785,6 +796,16 @@ def apply_weighting_scheme(obs_df, verbose):
     obs_df.loc[non_radar.index, 'sigCorr'] = 0.0
     cols = ['sigRA', 'sigDec']
     mode_grp = obs_df.groupby('mode')
+    default_time_uncert = 1.0
+    no_time_uncert = (
+        special_codes["gaia"]
+        | special_codes["occultation"]
+        | special_codes["spacecraft"]
+    )
+    non_radar_occ_sc = obs_df.query(
+        "mode != 'RAD' and stn not in @no_time_uncert and sigTime != sigTime"
+    )
+    obs_df.loc[non_radar_occ_sc.index, 'sigTime'] = default_time_uncert
     for mode, group in mode_grp:
         if mode in {'PHO', 'PHA', 'NOR', 'UNK'}:
             date_1890 = group.query("obsTimeMJD <= 11368.0") # until 1890-01-01
