@@ -67,7 +67,7 @@ dependencies = {file = "requirements.txt"}
 [tool.cibuildwheel]
 before-build = [
     "pip install pybind11",
-    "source build_cpp.sh -clean",
+    ". ./build_cpp.sh -clean",
 ]
 
 [tool.cibuildwheel.macos]

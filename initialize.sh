@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# get cspice and install pybind11
-cd ./extern/
-python3 get_cspice.py
+# get pybind11
 pip3 install "pybind11[global]>=2.10.0"
 
 # get debiasing data and kernels
