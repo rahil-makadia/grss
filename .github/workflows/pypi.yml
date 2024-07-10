@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest] #, macos-latest]
+        os: [ubuntu-latest, macos-latest]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -46,30 +46,30 @@ jobs:
         with:
           name: dist-${{ matrix.os }}
           path: dist
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Ubuntu distribution from previous job
-        uses: actions/download-artifact@master
-        with:
-          name: dist-ubuntu-latest
-          path: dist
-      # - name: Download MacOS distribution from previous job
-      #   uses: actions/download-artifact@master
-      #   with:
-      #     name: dist-macos-latest
-      #     path: dist
-      - name: Show files
-        run: ls -l dist
-      - name: Publish to Test PyPI
-        if: github.ref == 'refs/heads/dev'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository-url: https://test.pypi.org/legacy/
-      - name: Publish to PyPI
-        if: github.ref == 'refs/heads/main'
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+  # publish:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Download Ubuntu distribution from previous job
+  #       uses: actions/download-artifact@master
+  #       with:
+  #         name: dist-ubuntu-latest
+  #         path: dist
+  #     - name: Download MacOS distribution from previous job
+  #       uses: actions/download-artifact@master
+  #       with:
+  #         name: dist-macos-latest
+  #         path: dist
+  #     - name: Show files
+  #       run: ls -l dist
+  #     - name: Publish to Test PyPI
+  #       if: github.ref == 'refs/heads/dev'
+  #       uses: pypa/gh-action-pypi-publish@release/v1
+  #       with:
+  #         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+  #         repository-url: https://test.pypi.org/legacy/
+  #     - name: Publish to PyPI
+  #       if: github.ref == 'refs/heads/main'
+  #       uses: pypa/gh-action-pypi-publish@release/v1
+  #       with:
+  #         password: ${{ secrets.PYPI_API_TOKEN }}

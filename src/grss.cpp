@@ -928,7 +928,7 @@ PYBIND11_MODULE(libgrss, m) {
              &PropSimulation::set_integration_parameters, py::arg("tf"),
              py::arg("tEval") = std::vector<real>(),
              py::arg("tEvalUTC") = false, py::arg("evalApparentState") = false,
-             py::arg("convergedLightTims") = false,
+             py::arg("convergedLightTime") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
              py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
              py::arg("dtMin") = 1.0e-4L, py::arg("dtChangeFactor") = 0.25L,
