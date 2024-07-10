@@ -22,6 +22,8 @@ jobs:
           cd ./extern/
           python3 get_cspice.py
           cd ..
+          python3 -m venv ./venv
+          source ./venv/bin/activate
           source initialize.sh
           source build_cpp.sh -clean
       - name: Run tests
