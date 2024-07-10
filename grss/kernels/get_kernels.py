@@ -22,16 +22,16 @@ if (not mb430_exists or not sb431_exists):
 # de440 planets + de441 big16
 mb440_exists = os.path.exists(f'{script_dir}/de440.bsp')
 sb441s_exists = os.path.exists(f'{script_dir}/sb441-n16s.bsp')
-mb441_exists = os.path.exists(f'{script_dir}/de441_part-2.bsp')
+mb441_exists = os.path.exists(f'{script_dir}/de441.bsp')
 sb441_exists = os.path.exists(f'{script_dir}/sb441-n16.bsp')
 if (not mb440_exists or not mb441_exists or not sb441s_exists or not sb441_exists):
     print('Downloading DE440/441 planet and big16 asteroid kernels...')
     os.system((f'curl --silent --show-error -o {script_dir}/de440.bsp '
-                f'{NAIF_SITE}/spk/planets/de440.bsp'))
+                f'{SSD_SITE}/eph/planets/bsp/de440.bsp'))
     os.system((f'curl --silent --show-error -o {script_dir}/sb441-n16s.bsp '
                 f'{SSD_SITE}/xfr/sb441-n16s.bsp'))
-    os.system((f'curl --silent --show-error -o {script_dir}/de441_part-2.bsp '
-                f'{NAIF_SITE}/spk/planets/de441_part-2.bsp'))
+    os.system((f'curl --silent --show-error -o {script_dir}/de441.bsp '
+                f'{SSD_SITE}/eph/planets/bsp/de441.bsp'))
     os.system((f'curl --silent --show-error -o {script_dir}/sb441-n16.bsp '
                 f'{SSD_SITE}/eph/small_bodies/asteroids_de441/sb441-n16.bsp'))
 

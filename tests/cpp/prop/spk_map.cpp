@@ -122,7 +122,7 @@ int main(){
 
     kernel = 441;
     kernel_sb = "../../../grss/kernels/sb441-n16.bsp";
-    kernel_mb = "../../../grss/kernels/de441_part-2.bsp";
+    kernel_mb = "../../../grss/kernels/de441.bsp";
     spiceIds = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 199, 299, 301, 399,
                 // de440 asteroids
                 2000107, 2000001, 2000065, 2000511, 2000015, 2000031, 2000052, 2000010,

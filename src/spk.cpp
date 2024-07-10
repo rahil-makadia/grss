@@ -118,7 +118,7 @@ SpkInfo* spk_init(const std::string &path) {
             int m = bsp->num - 1;
             // New target?
             if (bsp->num == 0 || sum->code != bsp->targets[m].code) {
-                if (bsp->num <= bsp->allocatedNum) {
+                if (bsp->num == bsp->allocatedNum) {
                     bsp->allocatedNum += SPK_CACHE_ITEM_SIZE;  // increase space in batches of SPK_CACHE_ITEM_SIZE
                     bsp->targets = (SpkTarget *)realloc(
                         bsp->targets, bsp->allocatedNum * sizeof(SpkTarget));
