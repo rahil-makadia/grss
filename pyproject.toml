@@ -67,13 +67,11 @@ dependencies = {file = "requirements.txt"}
 [tool.cibuildwheel]
 before-build = [
     "pip install pybind11",
-    "rm -rf build",
-    "mkdir build",
-    "pybind11_DIR=$(pybind11-config --cmakedir)",
-    "cmake -DBUILD_DOCS=OFF -Dpybind11_DIR=$pybind11_DIR -DPYTHON_EXECUTABLE=$(which python) -B./build -S.",
+    ". ./build_cpp.sh -clean",
 ]
 
 [tool.cibuildwheel.macos]
+environment = {MACOSX_DEPLOYMENT_TARGET = "14"}
 archs = ["arm64"]
 
 [tool.cibuildwheel.linux]

@@ -4,6 +4,12 @@ on:
     branches:
       - main
       - dev
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'include/**'
+      - 'src/**'
+      - 'grss/**'
 
 jobs:
   sphinx:
@@ -19,7 +25,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           sudo apt-get install pandoc doxygen
-          source initialize.sh
+          pip3 install "pybind11[global]>=2.10.0"
           pip3 install .
       - name: Build docs
         run: |
@@ -31,7 +37,7 @@ jobs:
           make clean html
           cd ..
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}

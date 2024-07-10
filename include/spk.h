@@ -31,7 +31,7 @@ struct SpkCacheItem {
  * It is set to 32, which is a bit of a buffer on the usual number of
  * 27 SpiceBodies in each PropSimulation (Sun+8planets+Moon+Pluto+16Asteriods).
  */
-#define SPK_CACHE_ITEM_SIZE 32
+#define SPK_CACHE_ITEM_SIZE 44
 
 /**
  * @brief Structure to hold a cache of SPK data.

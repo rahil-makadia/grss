@@ -540,7 +540,7 @@ PropSimulation::PropSimulation(std::string name, real t0,
                        "Be sure that you need the coverage provided by DE441."
                     << std::endl;
                 kernel_sb = DEkernelPath + "sb441-n16.bsp";
-                kernel_mb = DEkernelPath + "de441_part-2.bsp";
+                kernel_mb = DEkernelPath + "de441.bsp";
             }
             real G = 6.6743e-11L /
                 (149597870700.0L * 149597870700.0L * 149597870700.0L) *

@@ -121,7 +121,7 @@ PckInfo* pck_init(const std::string &path) {
             int m = bpc->num - 1;
             // New target?
             if (bpc->num == 0 || sum->code != bpc->targets[m].code) {
-                if (bpc->num <= bpc->allocatedNum) {
+                if (bpc->num == bpc->allocatedNum) {
                     bpc->allocatedNum += 4;  // increase space in batches of PCK_CACHE_ITEM_SIZE(4)
                     bpc->targets = (PckTarget *)realloc(
                         bpc->targets, bpc->allocatedNum * sizeof(PckTarget));
