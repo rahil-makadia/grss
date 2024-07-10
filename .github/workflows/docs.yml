@@ -4,6 +4,12 @@ on:
     branches:
       - main
       - dev
+    paths:
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - 'include/**'
+      - 'src/**'
+      - 'grss/**'
 
 jobs:
   sphinx:
