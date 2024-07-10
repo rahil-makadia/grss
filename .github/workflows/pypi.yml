@@ -30,9 +30,8 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           xcode-version: '15.1.0'
-      - name: Initialize repository
-        run: |
-          source initialize.sh
+      - name: Get Pybind11
+        run: pip3 install "pybind11[global]>=2.10.0"
       - name: Build python distributions
         run: source build_python.sh
       - name: Upload distribution for next job

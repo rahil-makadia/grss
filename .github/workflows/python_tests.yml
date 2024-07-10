@@ -13,7 +13,7 @@ on:
 
 jobs:
   prop-and-fit:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
       - name: Install GRSS (including dependencies)
         run: |
           python3 -m pip install --upgrade pip
-          source initialize.sh
+          pip3 install "pybind11[global]>=2.10.0"
           pip3 install .
       - name: Run tests
         run: |
