@@ -16,11 +16,12 @@ if [[ $clean -eq 1 ]]; then
     rm -rf build
 fi
 mkdir -p build
-cd build
 if [[ $docs -eq 1 ]]; then
-    cmake -DBUILD_DOCS=ON ..
+    DOCFLAG="-DBUILD_DOCS=ON"
 else
-    cmake -DBUILD_DOCS=OFF ..
+    DOCFLAG="-DBUILD_DOCS=OFF"
 fi
+cmake $DOCFLAG -Dpybind11_DIR=$(pybind11-config --cmakedir) -DPYTHON_EXECUTABLE=$(which python) -B./build -S.
+cd build
 make
 cd ..
