@@ -38,6 +38,10 @@ find_package(pybind11 REQUIRED)
 pybind11_add_module(libgrss src/${PROJECT_NAME}.cpp)
 target_link_libraries(libgrss PRIVATE ${PROJECT_NAME})
 
+# copy the libgrss* files to the python package directory
+file(GLOB LIBGRSS_FILES ${CMAKE_SOURCE_DIR}/build/libgrss.*)
+file(COPY ${LIBGRSS_FILES} DESTINATION ${CMAKE_SOURCE_DIR}/grss)
+
 # compile tests
 add_subdirectory(tests/cpp/prop)
 
