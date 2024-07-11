@@ -37,13 +37,8 @@ class CMakeBuild(build_ext):
         if not binary_created:
             raise FileNotFoundError("libgrss binary for C++ source code not found "
                                     "in cmake build directory")
-        os.system(f"cp {ext.sourcedir}/build/libgrss* {self.build_lib}/grss/")
+        os.system(f"cp {ext.sourcedir}/build/libgrss.* {self.build_lib}/grss/")
         return
-
-# run get_cspice in the extern folder if installing from source
-if (not os.path.exists("./extern/cspice/lib/cspice.a") or
-    not os.path.exists("./extern/cspice/include/SpiceUsr.h") ):
-    subprocess.run(["python", "get_cspice.py"], cwd="./extern", check=True)
 
 setup(
     ext_modules=[CMakeExtension("libgrss")],
