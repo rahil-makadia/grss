@@ -12,10 +12,11 @@ static double inline _mjd(double et) { return 51544.5 + et / 86400.0; }
  * @param[in] bsp SpkInfo structure.
  */
 void spk_free(SpkInfo* bsp) {
-    if (bsp == nullptr)
+    if (bsp == nullptr) {
         return;
+    }
 
-    if (bsp->targets){
+    if (bsp->targets) {
         for (int m = 0; m < bsp->num; m++) {
             free(bsp->targets[m].one);
             free(bsp->targets[m].two);
@@ -25,6 +26,7 @@ void spk_free(SpkInfo* bsp) {
     munmap(bsp->map, bsp->len);
     memset(bsp, 0, sizeof(SpkInfo));
     free(bsp);
+    bsp = nullptr;
 }
 
 /**

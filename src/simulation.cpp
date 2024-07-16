@@ -848,24 +848,44 @@ void PropSimulation::prepare_for_evaluation(
 }
 
 void PropSimulation::map_ephemeris(){
-    this->spkEphem.mb = spk_init(this->spkEphem.mbPath);
-    this->spkEphem.sb = spk_init(this->spkEphem.sbPath);
-    this->pckEphem.histPck = pck_init(this->pckEphem.histPckPath);
-    this->pckEphem.latestPck = pck_init(this->pckEphem.latestPckPath);
-    this->pckEphem.predictPck = pck_init(this->pckEphem.predictPckPath);
+    if (this->spkEphem.mb == nullptr){
+        this->spkEphem.mb = spk_init(this->spkEphem.mbPath);
+    }
+    if (this->spkEphem.sb == nullptr){
+        this->spkEphem.sb = spk_init(this->spkEphem.sbPath);
+    }
+    if (this->pckEphem.histPck == nullptr){
+        this->pckEphem.histPck = pck_init(this->pckEphem.histPckPath);
+    }
+    if (this->pckEphem.latestPck == nullptr){
+        this->pckEphem.latestPck = pck_init(this->pckEphem.latestPckPath);
+    }
+    if (this->pckEphem.predictPck == nullptr){
+        this->pckEphem.predictPck = pck_init(this->pckEphem.predictPckPath);
+    }
 }
 
 void PropSimulation::unmap_ephemeris(){
-    spk_free(this->spkEphem.mb);
-    spk_free(this->spkEphem.sb);
-    this->spkEphem.mb = nullptr;
-    this->spkEphem.sb = nullptr;
-    pck_free(this->pckEphem.histPck);
-    pck_free(this->pckEphem.latestPck);
-    pck_free(this->pckEphem.predictPck);
-    this->pckEphem.histPck = nullptr;
-    this->pckEphem.latestPck = nullptr;
-    this->pckEphem.predictPck = nullptr;
+    if (this->spkEphem.mb != nullptr){
+        spk_free(this->spkEphem.mb);
+        this->spkEphem.mb = nullptr;
+    }
+    if (this->spkEphem.sb != nullptr){
+        spk_free(this->spkEphem.sb);
+        this->spkEphem.sb = nullptr;
+    }
+    if (this->pckEphem.histPck != nullptr){
+        pck_free(this->pckEphem.histPck);
+        this->pckEphem.histPck = nullptr;
+    }
+    if (this->pckEphem.latestPck != nullptr){
+        pck_free(this->pckEphem.latestPck);
+        this->pckEphem.latestPck = nullptr;
+    }
+    if (this->pckEphem.predictPck != nullptr){
+        pck_free(this->pckEphem.predictPck);
+        this->pckEphem.predictPck = nullptr;
+    }
 }
 
 /**
