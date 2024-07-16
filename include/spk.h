@@ -113,7 +113,7 @@ struct SpkEphemeris {
     SpkInfo* mb = nullptr;
     SpkInfo* sb = nullptr;
     size_t nextIdxToWrite = -1;
-    SpkCache cache[SPK_CACHE_SIZE];
+    std::vector<SpkCache> cache = std::vector<SpkCache>(SPK_CACHE_SIZE);
 };
 
 /**

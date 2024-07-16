@@ -12,10 +12,11 @@ static double inline _mjd(double et) { return 51544.5 + et / 86400.0; }
  * @param[in] bpc PckInfo structure.
  */
 void pck_free(PckInfo* bpc) {
-    if (bpc == nullptr)
+    if (bpc == nullptr) {
         return;
+    }
 
-    if (bpc->targets){
+    if (bpc->targets) {
         for (int m = 0; m < bpc->num; m++) {
             free(bpc->targets[m].one);
             free(bpc->targets[m].two);
@@ -25,6 +26,7 @@ void pck_free(PckInfo* bpc) {
     munmap(bpc->map, bpc->len);
     memset(bpc, 0, sizeof(PckInfo));
     free(bpc);
+    bpc = nullptr;
 }
 
 /**
