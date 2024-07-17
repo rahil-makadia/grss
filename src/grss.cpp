@@ -202,7 +202,8 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Name of the central body.
             )mydelimiter")
-        .def_readwrite("centralBodyIdx", &CloseApproachParameters::centralBodyIdx,
+        .def_readwrite("centralBodyIdx",
+                       &CloseApproachParameters::centralBodyIdx,
                        R"mydelimiter(
             Index of the central body.
             )mydelimiter")
@@ -251,6 +252,11 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def_readwrite("dt", &CloseApproachParameters::dt, R"mydelimiter(
             Partials of time of periapsis with respect to CA state.
+            )mydelimiter")
+        .def_readwrite("dOpikTotalDerivTerm2",
+                       &CloseApproachParameters::dOpikTotalDerivTerm2,
+                       R"mydelimiter(
+            Partial derivatives of the Öpik total derivative term 2 (non-constant planet velocity).
             )mydelimiter")
         .def("get_ca_parameters", &CloseApproachParameters::get_ca_parameters,
              py::arg("propSim"), py::arg("tMap"), R"mydelimiter(

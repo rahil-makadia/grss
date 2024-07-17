@@ -360,7 +360,7 @@ def partials_to_ellipse(ca, au2units, n_std, print_ellipse_params, units, analyt
     part_tlin_minus_t = ca.dTLinMinusT + extra_zeros
     part_tlin = part_tlin_minus_t @ stm_tca_tmap
     part_t = ca.dt + extra_zeros
-    # part_tlin += part_t
+    part_tlin += part_t
     part_kizner = np.zeros((3,stm_tca_tmap.shape[0]))
     part_kizner[:2,:] = np.array([ca.kizner.dx+extra_zeros,ca.kizner.dy+extra_zeros])@stm_tca_tmap
     part_kizner[2,:] = part_tlin
@@ -369,6 +369,7 @@ def partials_to_ellipse(ca, au2units, n_std, print_ellipse_params, units, analyt
     part_scaled[2,:] = part_tlin
     part_opik = np.zeros((3,stm_tca_tmap.shape[0]))
     part_opik[:2,:] = np.array([ca.opik.dx+extra_zeros,ca.opik.dy+extra_zeros])@stm_tca_tmap
+    part_opik[:2,:6] += ca.dOpikTotalDerivTerm2
     part_opik[2,:] = part_tlin
     part_mtp = np.zeros((3,stm_tca_tmap.shape[0]))
     part_mtp[:2,:] = np.array([ca.mtp.dx+extra_zeros,ca.mtp.dy+extra_zeros])@stm_tca_tmap

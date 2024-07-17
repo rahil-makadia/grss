@@ -468,9 +468,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     for (size_t k = 0; k < 3; k++) {
         vCentralBodyHelio[k] = xCentralBody[3+k]-xSun[3+k];
     }
-    real xiHat[3], zetaHat[3], vCentralBodyHelioCrossSHat[3];
-    vcross(vCentralBodyHelio, sHat, vCentralBodyHelioCrossSHat);
-    vunit(vCentralBodyHelioCrossSHat, 3, xiHat);
+    real xiHat[3], zetaHat[3], vPlanetCrossSHatVec[3];
+    vcross(vCentralBodyHelio, sHat, vPlanetCrossSHatVec);
+    vunit(vPlanetCrossSHatVec, 3, xiHat);
     vcross(sHat, xiHat, zetaHat);
     for (size_t k = 0; k < 3; k++) {
         zetaHat[k] *= -1;
@@ -655,26 +655,76 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             this->scaled.dy[k] = (this->kizner.dy[k] - this->scaled.y*partial_lambda[k])/this->gravFocusFactor;
         }
 
-        // // Acceleration of the Sun is not included in the calculation
-        // // because it is negligibly small
-        // real accSun[3];
-        // memset(accSun, 0, 3*sizeof(real));
-        // for (size_t k = 0; k < propSim->integParams.nSpice; k++) {
-        //     if (propSim->spiceBodies[k].spiceId == 10) {
-        //         accSun[0] = propSim->spiceBodies[k].acc[0];
-        //         accSun[1] = propSim->spiceBodies[k].acc[1];
-        //         accSun[2] = propSim->spiceBodies[k].acc[2];
-        //         break;
-        //     }
-        // }
-        real **partial_vel_planet = new real*[6];
-        for (size_t k = 0; k < 6; k++) {
-            partial_vel_planet[k] = new real[3];
-            for (size_t k2 = 0; k2 < 3; k2++) {
-                // partial_vel_planet[k][k2] = this->dt[k]*(accPlanet[k2] - accSun[k2]);
-                partial_vel_planet[k][k2] = this->dt[k]*accPlanet[k2];
+        // Acceleration of the Sun is not included in the calculation
+        real accSun[3];
+        for (size_t k = 0; k < propSim->integParams.nSpice; k++) {
+            if (propSim->spiceBodies[k].spiceId == 10) {
+                accSun[0] = propSim->spiceBodies[k].acc[0];
+                accSun[1] = propSim->spiceBodies[k].acc[1];
+                accSun[2] = propSim->spiceBodies[k].acc[2];
+                break;
             }
         }
+        real **partial_vel_planet = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_vel_planet[k] = new real[6];
+            for (size_t k2 = 0; k2 < 6; k2++) {
+                partial_vel_planet[k][k2] = this->dt[k2]*(accPlanet[k] - accSun[k]);
+            }
+        }
+        // partials of xi and zeta w.r.t planet velocity are needed for total derivative
+        real **partial_vpl_vpl = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_vpl_vpl[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_vpl_vpl[k][k2] = 0;
+            }
+            partial_vpl_vpl[k][k] = 1;
+        }
+        real vPlanetCrossSHat;
+        vnorm(vPlanetCrossSHatVec, 3, vPlanetCrossSHat);
+        real **partial_vPlanetCrossSHatVec_vpl = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_vPlanetCrossSHatVec_vpl[k] = new real[3];
+            vcross(partial_vpl_vpl[k], sHat, partial_vPlanetCrossSHatVec_vpl[k]);
+        }
+        real *partial_vPlanetCrossSHat_vpl = new real[3];
+        vcross(xiHat, sHat, partial_vPlanetCrossSHat_vpl);
+        for (size_t k = 0; k < 3; k++){
+            partial_vPlanetCrossSHat_vpl[k] *= -1.0;
+        }
+        real **partial_xiHat_vpl = new real*[3];
+        real **partial_zetaHat_vpl = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_xiHat_vpl[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_xiHat_vpl[k][k2] =
+                    (vPlanetCrossSHat * partial_vPlanetCrossSHatVec_vpl[k][k2] -
+                     vPlanetCrossSHatVec[k2] * partial_vPlanetCrossSHat_vpl[k]) /
+                    vPlanetCrossSHat / vPlanetCrossSHat;
+            }
+            partial_zetaHat_vpl[k] = new real[3];
+            vcross(sHat, partial_xiHat_vpl[k], partial_zetaHat_vpl[k]);
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_zetaHat_vpl[k][k2] *= -1.0;
+            }
+        }
+        real *partial_xi_vpl = new real[3];
+        real *partial_zeta_vpl = new real[3];
+        for (size_t k = 0; k < 3; k++) {
+            vdot(partial_zetaHat_vpl[k], hVec, 3, partial_xi_vpl[k]);
+            partial_xi_vpl[k] /= vInf;
+            vdot(partial_xiHat_vpl[k], hVec, 3, partial_zeta_vpl[k]);
+            partial_zeta_vpl[k] /= -vInf;
+        }
+        for (size_t k = 0; k < 6; k++) {
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                temp1Vec[k2] = partial_vel_planet[k2][k];
+            }
+            vdot(partial_xi_vpl, temp1Vec, 3, this->dOpikTotalDerivTerm2[0][k]);
+            vdot(partial_zeta_vpl, temp1Vec, 3, this->dOpikTotalDerivTerm2[1][k]);
+        }
+
         real **partial_xiHat = new real*[6];
         real temp3, temp3Vec[3];
         real temp4, temp4Vec[3];
@@ -723,9 +773,15 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             delete[] partial_rHat[k];
             delete[] partial_sHat[k];
             delete[] partial_tHat[k];
-            delete[] partial_vel_planet[k];
             delete[] partial_xiHat[k];
             delete[] partial_zetaHat[k];
+        }
+        for (size_t k = 0; k < 3; k++) {
+            delete[] partial_vel_planet[k];
+            delete[] partial_vpl_vpl[k];
+            delete[] partial_vPlanetCrossSHatVec_vpl[k];
+            delete[] partial_xiHat_vpl[k];
+            delete[] partial_zetaHat_vpl[k];
         }
         delete[] partial_alpha;
         delete[] partial_vInf;
@@ -742,6 +798,13 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         delete[] partial_tHat;
         delete[] partial_lambda;
         delete[] partial_vel_planet;
+        delete[] partial_vpl_vpl;
+        delete[] partial_vPlanetCrossSHatVec_vpl;
+        delete[] partial_vPlanetCrossSHat_vpl;
+        delete[] partial_xiHat_vpl;
+        delete[] partial_zetaHat_vpl;
+        delete[] partial_xi_vpl;
+        delete[] partial_zeta_vpl;
         delete[] partial_xiHat;
         delete[] partial_zetaHat;
     }

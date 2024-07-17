@@ -298,6 +298,7 @@ struct BPlaneParameters {
  * @param mtp Modified Target Plane parameters.
  * @param dTLinMinusT Partial derivatives of the (linearized intersection minus map) time with respect to the state at the close approach.
  * @param dt Partial derivatives of the time of closest approach with respect to the state at the close approach.
+ * @param dOpikTotalDerivTerm2 Partial derivatives of the Öpik total derivative term 2 (non-constant planet velocity).
  */
 class CloseApproachParameters {
    private:
@@ -328,6 +329,7 @@ class CloseApproachParameters {
     BPlaneParameters mtp;
     std::vector<real> dTLinMinusT = std::vector<real>(6, 0.0L);
     std::vector<real> dt = std::vector<real>(6, 0.0L);
+    std::vector< std::vector<real> > dOpikTotalDerivTerm2 = std::vector< std::vector<real> >(2, std::vector<real>(6, 0.0L));
     /**
      * @brief Get the close approach parameters.
      */

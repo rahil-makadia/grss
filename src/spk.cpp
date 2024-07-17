@@ -24,7 +24,7 @@ void spk_free(SpkInfo* bsp) {
         free(bsp->targets);
     }
     munmap(bsp->map, bsp->len);
-    memset(bsp, 0, sizeof(SpkInfo));
+    memset((void *)bsp, 0, sizeof(SpkInfo));
     free(bsp);
     bsp = nullptr;
 }
@@ -227,17 +227,17 @@ void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *state) {
     U[0] = 0.0;
     U[1] = 0.0;
     U[2] = 4.0;
-    for (size_t p = 2; p < P; p++) {
+    for (int p = 2; p < P; p++) {
         T[p] = 2.0 * z * T[p - 1] - T[p - 2];
         S[p] = 2.0 * z * S[p - 1] + 2.0 * T[p - 1] - S[p - 2];
     }
-    for (size_t p = 3; p < P; p++) {
+    for (int p = 3; p < P; p++) {
         U[p] = 2.0 * z * U[p - 1] + 4.0 * S[p - 1] - U[p - 2];
     }
     const double c = 1.0 / val[1]; // derivative scaling factor from SPICE/spke02.f and chbint.f
     for (size_t i = 0; i < 3; i++) {
         const int b = 2 + i * P;
-        for (size_t p = 0; p < P; p++) {
+        for (int p = 0; p < P; p++) {
             const double v = val[b + p];
             state[i] += v * T[p] / 149597870.7;
             state[i + 3] += v * S[p] * c / 149597870.7 * 86400.0;
