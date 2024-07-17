@@ -33,6 +33,7 @@ grss.libgrss.CloseApproachParameters
         ~CloseApproachParameters.centralBody
         ~CloseApproachParameters.centralBodyIdx
         ~CloseApproachParameters.centralBodySpiceId
+        ~CloseApproachParameters.dOpikTotalDerivTerm2
         ~CloseApproachParameters.dTLinMinusT
         ~CloseApproachParameters.dist
         ~CloseApproachParameters.dt

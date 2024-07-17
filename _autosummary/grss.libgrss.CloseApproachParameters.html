@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.CloseApproachParameters &#8212; GRSS 4.1.4 documentation</title>
+    <title>grss.libgrss.CloseApproachParameters &#8212; GRSS 4.1.5 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.Body" href="grss.libgrss.Body.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Jul 16, 2024"/>
+    <meta name="docbuild:last-update" content="Jul 17, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.1.4 documentation</p>
+    <p class="title logo__title">GRSS v4.1.5 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -494,6 +494,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.centralBody"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.centralBody</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.centralBodyIdx"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.centralBodyIdx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.centralBodySpiceId"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.centralBodySpiceId</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dOpikTotalDerivTerm2"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dOpikTotalDerivTerm2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dTLinMinusT"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dTLinMinusT</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dist"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dist</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dt"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dt</span></code></a></li>
@@ -573,61 +574,64 @@ the close approach between two integrated or SPICE bodies.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.centralBodySpiceId" title="grss.libgrss.CloseApproachParameters.centralBodySpiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">centralBodySpiceId</span></code></a></p></td>
 <td><p>SPICE ID of the central body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dTLinMinusT" title="grss.libgrss.CloseApproachParameters.dTLinMinusT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dTLinMinusT</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dOpikTotalDerivTerm2" title="grss.libgrss.CloseApproachParameters.dOpikTotalDerivTerm2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dOpikTotalDerivTerm2</span></code></a></p></td>
+<td><p>Partial derivatives of the Öpik total derivative term 2 (non-constant planet velocity).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dTLinMinusT" title="grss.libgrss.CloseApproachParameters.dTLinMinusT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dTLinMinusT</span></code></a></p></td>
 <td><p>Partials of difference between linearized time of periapsis and time of periapsis with respect to CA state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dist" title="grss.libgrss.CloseApproachParameters.dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dist" title="grss.libgrss.CloseApproachParameters.dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code></a></p></td>
 <td><p>Distance of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dt" title="grss.libgrss.CloseApproachParameters.dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.dt" title="grss.libgrss.CloseApproachParameters.dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code></a></p></td>
 <td><p>Partials of time of periapsis with respect to CA state.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.flybyBody" title="grss.libgrss.CloseApproachParameters.flybyBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flybyBody</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.flybyBody" title="grss.libgrss.CloseApproachParameters.flybyBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flybyBody</span></code></a></p></td>
 <td><p>Name of the flyby body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.flybyBodyIdx" title="grss.libgrss.CloseApproachParameters.flybyBodyIdx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flybyBodyIdx</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.flybyBodyIdx" title="grss.libgrss.CloseApproachParameters.flybyBodyIdx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flybyBodyIdx</span></code></a></p></td>
 <td><p>Index of the flyby body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.gravFocusFactor" title="grss.libgrss.CloseApproachParameters.gravFocusFactor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gravFocusFactor</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.gravFocusFactor" title="grss.libgrss.CloseApproachParameters.gravFocusFactor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gravFocusFactor</span></code></a></p></td>
 <td><p>Lambda parameter of the close approach (gravitational focusing).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.impact" title="grss.libgrss.CloseApproachParameters.impact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impact</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.impact" title="grss.libgrss.CloseApproachParameters.impact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">impact</span></code></a></p></td>
 <td><p>Whether the close approach is an impact when accounting for gravitational focusing.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.kizner" title="grss.libgrss.CloseApproachParameters.kizner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kizner</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.kizner" title="grss.libgrss.CloseApproachParameters.kizner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kizner</span></code></a></p></td>
 <td><p>Kizner B-plane parameters of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.mtp" title="grss.libgrss.CloseApproachParameters.mtp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtp</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.mtp" title="grss.libgrss.CloseApproachParameters.mtp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtp</span></code></a></p></td>
 <td><p>Modified Target Plane (MTP) B-plane parameters of the close approach.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.opik" title="grss.libgrss.CloseApproachParameters.opik"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opik</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.opik" title="grss.libgrss.CloseApproachParameters.opik"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opik</span></code></a></p></td>
 <td><p>Öpik B-plane parameters of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.scaled" title="grss.libgrss.CloseApproachParameters.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.scaled" title="grss.libgrss.CloseApproachParameters.scaled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scaled</span></code></a></p></td>
 <td><p>Scaled B-plane parameters of the close approach.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.t" title="grss.libgrss.CloseApproachParameters.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.t" title="grss.libgrss.CloseApproachParameters.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
 <td><p>Time of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.tLin" title="grss.libgrss.CloseApproachParameters.tLin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tLin</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.tLin" title="grss.libgrss.CloseApproachParameters.tLin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tLin</span></code></a></p></td>
 <td><p>Linearized time of periapsis</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.tMap" title="grss.libgrss.CloseApproachParameters.tMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tMap</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.tMap" title="grss.libgrss.CloseApproachParameters.tMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tMap</span></code></a></p></td>
 <td><p>Time of the mapping point.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.tPeri" title="grss.libgrss.CloseApproachParameters.tPeri"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tPeri</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.tPeri" title="grss.libgrss.CloseApproachParameters.tPeri"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tPeri</span></code></a></p></td>
 <td><p>Time of periapsis (according to Keplerian hyperbolic motion).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.vInf" title="grss.libgrss.CloseApproachParameters.vInf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vInf</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.vInf" title="grss.libgrss.CloseApproachParameters.vInf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vInf</span></code></a></p></td>
 <td><p>Hyperbolic excess velocity of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.vel" title="grss.libgrss.CloseApproachParameters.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.vel" title="grss.libgrss.CloseApproachParameters.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
 <td><p>Velocity of the close approach.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.xRel" title="grss.libgrss.CloseApproachParameters.xRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRel</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.xRel" title="grss.libgrss.CloseApproachParameters.xRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRel</span></code></a></p></td>
 <td><p>Relative state of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.xRelMap" title="grss.libgrss.CloseApproachParameters.xRelMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRelMap</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.CloseApproachParameters.xRelMap" title="grss.libgrss.CloseApproachParameters.xRelMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRelMap</span></code></a></p></td>
 <td><p>Relative state of the mapping point.</p></td>
 </tr>
 </tbody>
@@ -660,6 +664,12 @@ the close approach between two integrated or SPICE bodies.</p>
 <dt class="sig sig-object py" id="grss.libgrss.CloseApproachParameters.centralBodySpiceId">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">centralBodySpiceId</span></span><a class="headerlink" href="#grss.libgrss.CloseApproachParameters.centralBodySpiceId" title="Permalink to this definition">#</a></dt>
 <dd><p>SPICE ID of the central body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.CloseApproachParameters.dOpikTotalDerivTerm2">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dOpikTotalDerivTerm2</span></span><a class="headerlink" href="#grss.libgrss.CloseApproachParameters.dOpikTotalDerivTerm2" title="Permalink to this definition">#</a></dt>
+<dd><p>Partial derivatives of the Öpik total derivative term 2 (non-constant planet velocity).</p>
 </dd></dl>
 
 <dl class="py property">
@@ -869,6 +879,7 @@ the close approach between two integrated or SPICE bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.centralBody"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.centralBody</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.centralBodyIdx"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.centralBodyIdx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.centralBodySpiceId"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.centralBodySpiceId</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dOpikTotalDerivTerm2"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dOpikTotalDerivTerm2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dTLinMinusT"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dTLinMinusT</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dist"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dist</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.CloseApproachParameters.dt"><code class="docutils literal notranslate"><span class="pre">CloseApproachParameters.dt</span></code></a></li>
@@ -925,7 +936,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jul 16, 2024.
+  Last updated on Jul 17, 2024.
   <br/>
 </p>
   </div>
