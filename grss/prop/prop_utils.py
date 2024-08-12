@@ -866,9 +866,10 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
         size = zoom_size*1e3
         m = Basemap(width=size,height=size,
                     rsphere=(6378137.00,6356752.3142),
-                    resolution='l',area_thresh=size/100,projection='lcc',
+                    resolution='i',area_thresh=size/100,projection='lcc',
                     lat_0=mean_lat,lon_0=mean_lon)
-        m.shadedrelief()
+        m.bluemarble()
+        m.drawcountries()
         lat_step = lon_step = 3 if zoom_size <= 1e3 else 10
         if zoom_size <= 500:
             lat_step = lon_step = 1
@@ -894,10 +895,10 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
     lat_half = 'N' if mean_lat > 0 else 'S'
+    if save_name is not None:
+        plt.savefig(save_name, dpi=500, bbox_inches='tight')
     plt.suptitle('Impact Location at 100km altitude w.r.t Earth: '
                     f'{mean_lat:0.2f}$^o${lat_half}, {mean_lon:0.2f}$^o$E',
                     y=0.93)
-    if save_name is not None:
-        plt.savefig(save_name, dpi=500, bbox_inches='tight')
     plt.show()
     return None

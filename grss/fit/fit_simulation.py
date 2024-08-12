@@ -1727,15 +1727,17 @@ class FitSimulation:
             self._check_convergence(delta_x)
             if self.converged:
                 if self.reject_outliers and start_rejecting:
-                    print(f"Converged after rejecting outliers. Rejected {self.num_rejected} out",
-                            f"of {len(self.optical_idx)} optical observations.")
+                    if verbose:
+                        print(f"Converged after rejecting outliers. Rejected {self.num_rejected}",
+                                f"out of {len(self.optical_idx)} optical observations.")
                     break
                 msg = "Converged without rejecting outliers."
                 if self.reject_outliers:
                     msg += " Starting outlier rejection now..."
                     start_rejecting = True
                     self.converged = False
-                print(msg)
+                if verbose:
+                    print(msg)
                 if not self.reject_outliers:
                     break
         if self.n_iter == self.n_iter_max and not self.converged:
