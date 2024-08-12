@@ -895,6 +895,8 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
     lat_half = 'N' if mean_lat > 0 else 'S'
+    if mean_lat < 0:
+        mean_lat = np.abs(mean_lat)
     if save_name is not None:
         plt.savefig(save_name, dpi=500, bbox_inches='tight')
     plt.suptitle('Impact Location at 100km altitude w.r.t Earth: '
