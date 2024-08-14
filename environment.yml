@@ -8,4 +8,4 @@ dependencies:
   - jupyter
   - ipykernel
   - pip:
-    -r requirements.txt
+    - -r requirements.txt
