@@ -1,12 +1,12 @@
 ---
-title: 'GRSS: An open-source small-body science tool for planetary defense'
+title: 'Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense'
 tags:
   - Python
   - C++
   - Asteroids
   - Comets
   - Orbit Determination
-  - Orbit Propagator
+  - Orbit Propagation
 authors:
   - name: Rahil Makadia
     corresponding: true
