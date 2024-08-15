@@ -40,14 +40,15 @@ Understanding the motion of small solar system bodies is of utmost importance wh
 
 In this paper, we present ``GRSS``, the Gauss-Radau Small-body Simulator, an open-source library for orbit determination and propagation of small bodies in the solar system. ``GRSS`` is an open-source, MIT licensed software library with a C++11 foundation and a Python binding. The propagator is based on the ``IAS15`` algorithm, a 15<sup>th</sup> order integrator based on Gauss-Radau quadrature [@Rein2014]. Only the particles of interest are integrated within ``GRSS`` to reduce computational cost. The states for the planets and Big16 main-belt asteroids are computed using memory-mapped SPICE digital ephemeris kernels as done by @Holman2023 in the ``ASSIST`` orbit propagator library. In addition to the propagator, the C++ portion of the library also has the ability to predict impacts and calculate close encounter circumstances using various formulations of the B-plane [@Kizner1961; @Opik1976; @Chodas1999; @Milani1999].
 
-The C++ functionality is exposed to Python through a binding generated using ``pybind11`` [@pybind11]. The Python layer of ``GRSS`` uses the propagator as the foundation to compute the orbits of small bodies from a given set of optical and/or radar astrometry from the Minor Planet Center[^1], the JPL Small Body Radar Astrometry database[^2], and the Gaia Focused Product Release (FPR) solar system observations database[^3]. Additionally, the orbit determination modules also have the ability to fit especially demanding measurements such as stellar occultations. These capabilities of the ``GRSS`` library have already been used to study the the heliocentric changes in the orbit of the (65803) Didymos binary asteroid system as a result of the DART impact [@Makadia2022; @Makadia2024].
+The C++ functionality is exposed to Python through a binding generated using ``pybind11``[^1]. The Python layer of ``GRSS`` uses the propagator as the foundation to compute the orbits of small bodies from a given set of optical and/or radar astrometry from the Minor Planet Center[^2], the JPL Small Body Radar Astrometry database[^3], and the Gaia Focused Product Release (FPR) solar system observations database[^4]. Additionally, the orbit determination modules also have the ability to fit especially demanding measurements such as stellar occultations. These capabilities of the ``GRSS`` library have already been used to study the the heliocentric changes in the orbit of the (65803) Didymos binary asteroid system as a result of the DART impact [@Makadia2022; @Makadia2024].
 
-``GRSS`` will continue to be developed in the future, with anticipated contributions including the ability to perform mission studies for future asteroid deflections. ``GRSS`` is publicly available to the community through the Python Package Index (PyPI) and the source code is available on GitHub[^4]. Therefore, ``GRSS`` will allow the research community to have access to a reliable and efficient tool for studying the dynamics of small bodies in the solar system.
+``GRSS`` will continue to be developed in the future, with anticipated contributions including the ability to perform mission studies for future asteroid deflections. ``GRSS`` is publicly available to the community through the Python Package Index (PyPI) and the source code is available on GitHub[^5]. Therefore, ``GRSS`` will allow the research community to have access to a reliable and efficient tool for studying the dynamics of small bodies in the solar system.
 
-[^1]: <https://minorplanetcenter.net/>
-[^2]: <https://ssd.jpl.nasa.gov/sb/radar.html>
-[^3]: <https://www.cosmos.esa.int/web/gaia/fpr#SSOs>
-[^4]: <https://github.com/rahil-makadia/grss>
+[^1]: <https://github.com/pybind/pybind11>
+[^2]: <https://minorplanetcenter.net/>
+[^3]: <https://ssd.jpl.nasa.gov/sb/radar.html>
+[^4]: <https://www.cosmos.esa.int/web/gaia/fpr#SSOs>
+[^5]: <https://github.com/rahil-makadia/grss>
 
 # Acknowledgements
 
