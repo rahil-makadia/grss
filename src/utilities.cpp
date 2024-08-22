@@ -261,6 +261,22 @@ void mat_vec_mul(const std::vector<std::vector<real>> &A,
 }
 
 /**
+ * @param[in] v Vector.
+ * @param[in] A Matrix.
+ * @param[in] dim Dimension of the vector and matrix.
+ * @param[out] vA Product of v and A.
+ */
+void vec_mat_mul(const std::vector<real> &v, real **A,
+                 const size_t &dim, std::vector<real> &vA) {
+    for (size_t i = 0; i < dim; i++) {
+        vA[i] = 0;
+        for (size_t j = 0; j < dim; j++) {
+            vA[i] += v[j] * A[j][i];
+        }
+    }
+}
+
+/**
  * @param[in] A Matrix 1.
  * @param[in] B Matrix 2.
  * @param[out] AB Product of A and B.

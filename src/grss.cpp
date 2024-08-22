@@ -246,17 +246,11 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("mtp", &CloseApproachParameters::mtp, R"mydelimiter(
             Modified Target Plane (MTP) B-plane parameters of the close approach.
             )mydelimiter")
-        .def_readwrite("dTLinMinusT", &CloseApproachParameters::dTLinMinusT,
-                       R"mydelimiter(
-            Partials of difference between linearized time of periapsis and time of periapsis with respect to CA state.
+        .def_readwrite("dtLin", &CloseApproachParameters::dtLin, R"mydelimiter(
+            Partials of linearized time of periapsis with respect to CA state.
             )mydelimiter")
         .def_readwrite("dt", &CloseApproachParameters::dt, R"mydelimiter(
             Partials of time of periapsis with respect to CA state.
-            )mydelimiter")
-        .def_readwrite("dOpikTotalDerivTerm2",
-                       &CloseApproachParameters::dOpikTotalDerivTerm2,
-                       R"mydelimiter(
-            Partial derivatives of the Öpik total derivative term 2 (non-constant planet velocity).
             )mydelimiter")
         .def("get_ca_parameters", &CloseApproachParameters::get_ca_parameters,
              py::arg("propSim"), py::arg("tMap"), R"mydelimiter(
