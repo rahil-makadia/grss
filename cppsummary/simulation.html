@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>simulation.h &#8212; GRSS 4.1.5 documentation</title>
+    <title>simulation.h &#8212; GRSS 4.2.0 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="pck.h" href="pck.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Aug 18, 2024"/>
+    <meta name="docbuild:last-update" content="Aug 22, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.1.5 documentation</p>
+    <p class="title logo__title">GRSS v4.2.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -1397,14 +1397,11 @@ document.write(`
 <dt class="field-even">Param mtp<span class="colon">:</span></dt>
 <dd class="field-even"><p>Modified Target Plane parameters. </p>
 </dd>
-<dt class="field-odd">Param dTLinMinusT<span class="colon">:</span></dt>
+<dt class="field-odd">Param dtLin<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Partial derivatives of the (linearized intersection minus map) time with respect to the state at the close approach. </p>
 </dd>
 <dt class="field-even">Param dt<span class="colon">:</span></dt>
 <dd class="field-even"><p>Partial derivatives of the time of closest approach with respect to the state at the close approach. </p>
-</dd>
-<dt class="field-odd">Param dOpikTotalDerivTerm2<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Partial derivatives of the Öpik total derivative term 2 (non-constant planet velocity). </p>
 </dd>
 </dl>
 <p>Subclassed by <a class="reference internal" href="#classImpactParameters"><span class="std std-ref">ImpactParameters</span></a></p>
@@ -1559,18 +1556,13 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N23CloseApproachParameters11dTLinMinusTE">
-<span class="target" id="classCloseApproachParameters_1a43c291ada5e75fede3a8e56de3dc4177"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dTLinMinusT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">6</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N23CloseApproachParameters11dTLinMinusTE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N23CloseApproachParameters5dtLinE">
+<span class="target" id="classCloseApproachParameters_1ad3f297d128022fb7bf0d2b374fe8078b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dtLin</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">6</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N23CloseApproachParameters5dtLinE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N23CloseApproachParameters2dtE">
 <span class="target" id="classCloseApproachParameters_1a3ed8383ac1448ead93dd82d8d2bcc06e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dt</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">6</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N23CloseApproachParameters2dtE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N23CloseApproachParameters20dOpikTotalDerivTerm2E">
-<span class="target" id="classCloseApproachParameters_1aaa27d20a6e1af42daffd6b8e8d46c76e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dOpikTotalDerivTerm2</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">6</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N23CloseApproachParameters20dOpikTotalDerivTerm2E" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -2300,7 +2292,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Aug 18, 2024.
+  Last updated on Aug 22, 2024.
   <br/>
 </p>
   </div>

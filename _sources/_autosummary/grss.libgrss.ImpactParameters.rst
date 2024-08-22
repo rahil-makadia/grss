@@ -34,10 +34,9 @@ grss.libgrss.ImpactParameters
         ~ImpactParameters.centralBody
         ~ImpactParameters.centralBodyIdx
         ~ImpactParameters.centralBodySpiceId
-        ~ImpactParameters.dOpikTotalDerivTerm2
-        ~ImpactParameters.dTLinMinusT
         ~ImpactParameters.dist
         ~ImpactParameters.dt
+        ~ImpactParameters.dtLin
         ~ImpactParameters.flybyBody
         ~ImpactParameters.flybyBodyIdx
         ~ImpactParameters.gravFocusFactor
