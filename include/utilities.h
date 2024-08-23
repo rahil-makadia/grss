@@ -182,6 +182,12 @@ void mat_vec_mul(const std::vector<std::vector<real>> &A,
                  const std::vector<real> &v, std::vector<real> &Av);
 
 /**
+ * @brief Multiply a vector by a matrix.
+ */
+void vec_mat_mul(const std::vector<real> &v, real **A,
+                 const size_t &dim, std::vector<real> &vA);
+
+/**
  * @brief Multiply two matrices.
  */
 void mat_mat_mul(const std::vector<std::vector<real>> &A,

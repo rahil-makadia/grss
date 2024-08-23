@@ -296,7 +296,7 @@ struct BPlaneParameters {
  * @param opik Öpik B-plane parameters.
  * @param scaled Scaled Kizner B-plane parameters.
  * @param mtp Modified Target Plane parameters.
- * @param dTLinMinusT Partial derivatives of the (linearized intersection minus map) time with respect to the state at the close approach.
+ * @param dtLin Partial derivatives of the (linearized intersection minus map) time with respect to the state at the close approach.
  * @param dt Partial derivatives of the time of closest approach with respect to the state at the close approach.
  */
 class CloseApproachParameters {
@@ -326,7 +326,7 @@ class CloseApproachParameters {
     BPlaneParameters opik;
     BPlaneParameters scaled;
     BPlaneParameters mtp;
-    std::vector<real> dTLinMinusT = std::vector<real>(6, 0.0L);
+    std::vector<real> dtLin = std::vector<real>(6, 0.0L);
     std::vector<real> dt = std::vector<real>(6, 0.0L);
     /**
      * @brief Get the close approach parameters.

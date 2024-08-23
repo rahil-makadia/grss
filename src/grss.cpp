@@ -202,7 +202,8 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Name of the central body.
             )mydelimiter")
-        .def_readwrite("centralBodyIdx", &CloseApproachParameters::centralBodyIdx,
+        .def_readwrite("centralBodyIdx",
+                       &CloseApproachParameters::centralBodyIdx,
                        R"mydelimiter(
             Index of the central body.
             )mydelimiter")
@@ -245,9 +246,8 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("mtp", &CloseApproachParameters::mtp, R"mydelimiter(
             Modified Target Plane (MTP) B-plane parameters of the close approach.
             )mydelimiter")
-        .def_readwrite("dTLinMinusT", &CloseApproachParameters::dTLinMinusT,
-                       R"mydelimiter(
-            Partials of difference between linearized time of periapsis and time of periapsis with respect to CA state.
+        .def_readwrite("dtLin", &CloseApproachParameters::dtLin, R"mydelimiter(
+            Partials of linearized time of periapsis with respect to CA state.
             )mydelimiter")
         .def_readwrite("dt", &CloseApproachParameters::dt, R"mydelimiter(
             Partials of time of periapsis with respect to CA state.

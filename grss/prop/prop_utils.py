@@ -327,8 +327,7 @@ def partials_to_ellipse(ca, au2units, n_std, print_ellipse_params, units, analyt
     units : str
         units of the plot
     analytic_info : tuple
-        Tuple of analytic B-plane information (initial covariance
-        and state conversion partial derivatives)
+        Tuple of analytic B-plane information (just initial covariance for now)
 
     Returns
     -------
@@ -341,47 +340,31 @@ def partials_to_ellipse(ca, au2units, n_std, print_ellipse_params, units, analyt
         init_cov = np.array(analytic_info[0])
     else:
         init_cov = analytic_info[0]
-    if not isinstance(analytic_info[1], np.ndarray):
-        part_cart_part_state = np.array(analytic_info[1])
-    else:
-        part_cart_part_state = analytic_info[1]
-    part_state_part_cart = np.linalg.inv(part_cart_part_state)
 
-    stm_flat = ca.xRel[6:]
-    stm_tca_t0 = np.array(libgrss.reconstruct_stm(stm_flat)) @ part_state_part_cart
     stm_flat = ca.xRelMap[6:]
-    stm_tmap_t0 = np.array(libgrss.reconstruct_stm(stm_flat)) @ part_state_part_cart
-    if ca.t == ca.tMap:
-        stm_tca_tmap = np.eye(stm_tca_t0.shape[0])
-    else:
-        stm_tca_tmap = stm_tca_t0 @ np.linalg.inv(stm_tmap_t0)
+    stm_tmap_t0 = np.array(libgrss.reconstruct_stm(stm_flat))# @ part_state_part_cart
 
-    extra_zeros = [0]*(stm_tca_tmap.shape[0]-6)
-    part_tlin_minus_t = ca.dTLinMinusT + extra_zeros
-    part_tlin = part_tlin_minus_t @ stm_tca_tmap
-    part_t = ca.dt + extra_zeros
-    # part_tlin += part_t
-    part_kizner = np.zeros((3,stm_tca_tmap.shape[0]))
-    part_kizner[:2,:] = np.array([ca.kizner.dx+extra_zeros,ca.kizner.dy+extra_zeros])@stm_tca_tmap
-    part_kizner[2,:] = part_tlin
-    part_scaled = np.zeros((3,stm_tca_tmap.shape[0]))
-    part_scaled[:2,:] = np.array([ca.scaled.dx+extra_zeros,ca.scaled.dy+extra_zeros])@stm_tca_tmap
-    part_scaled[2,:] = part_tlin
-    part_opik = np.zeros((3,stm_tca_tmap.shape[0]))
-    part_opik[:2,:] = np.array([ca.opik.dx+extra_zeros,ca.opik.dy+extra_zeros])@stm_tca_tmap
-    part_opik[2,:] = part_tlin
-    part_mtp = np.zeros((3,stm_tca_tmap.shape[0]))
-    part_mtp[:2,:] = np.array([ca.mtp.dx+extra_zeros,ca.mtp.dy+extra_zeros])@stm_tca_tmap
-    part_mtp[2,:] = part_tlin
+    extra_zeros = [0]*(stm_tmap_t0.shape[0]-6)
+    part_kizner = np.zeros((3,stm_tmap_t0.shape[0]))
+    part_kizner[:2,:] = np.array([ca.kizner.dx+extra_zeros,ca.kizner.dy+extra_zeros])
+    part_kizner[2,:] = ca.dtLin + extra_zeros
+    part_scaled = np.zeros((3,stm_tmap_t0.shape[0]))
+    part_scaled[:2,:] = np.array([ca.scaled.dx+extra_zeros,ca.scaled.dy+extra_zeros])
+    part_scaled[2,:] = ca.dtLin + extra_zeros
+    part_opik = np.zeros((3,stm_tmap_t0.shape[0]))
+    part_opik[:2,:] = np.array([ca.opik.dx+extra_zeros,ca.opik.dy+extra_zeros])
+    part_opik[2,:] = ca.dtLin + extra_zeros
+    part_mtp = np.zeros((3,stm_tmap_t0.shape[0]))
+    part_mtp[:2,:] = np.array([ca.mtp.dx+extra_zeros,ca.mtp.dy+extra_zeros])
+    part_mtp[2,:] = ca.dt + extra_zeros
 
-    init_cart_cov = part_cart_part_state @ init_cov @ part_cart_part_state.T
-    cov_tmap = stm_tmap_t0 @ init_cart_cov @ stm_tmap_t0.T
+    cov_tmap = stm_tmap_t0 @ init_cov @ stm_tmap_t0.T
     cov_kizner = part_kizner @ cov_tmap @ part_kizner.T
     cov_scaled = part_scaled @ cov_tmap @ part_scaled.T
     cov_opik = part_opik @ cov_tmap @ part_opik.T
     cov_mtp = part_mtp @ cov_tmap @ part_mtp.T
 
-    t_dev = (part_t @ cov_tmap @ part_t)**0.5
+    t_dev = cov_mtp[2,2]**0.5
 
     cov_kizner = cov_kizner[:2,:2]*au2units**2
     cov_opik = cov_opik[:2,:2]*au2units**2
@@ -865,9 +848,10 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
         size = zoom_size*1e3
         m = Basemap(width=size,height=size,
                     rsphere=(6378137.00,6356752.3142),
-                    resolution='l',area_thresh=size/100,projection='lcc',
+                    resolution='i',area_thresh=size/100,projection='lcc',
                     lat_0=mean_lat,lon_0=mean_lon)
-        m.shadedrelief()
+        m.bluemarble()
+        m.drawcountries()
         lat_step = lon_step = 3 if zoom_size <= 1e3 else 10
         if zoom_size <= 500:
             lat_step = lon_step = 1
@@ -893,10 +877,12 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     x_lon,y_lat = m(lon,lat)
     m.plot(x_lon,y_lat,'r.')
     lat_half = 'N' if mean_lat > 0 else 'S'
+    if mean_lat < 0:
+        mean_lat = np.abs(mean_lat)
+    if save_name is not None:
+        plt.savefig(save_name, dpi=500, bbox_inches='tight')
     plt.suptitle('Impact Location at 100km altitude w.r.t Earth: '
                     f'{mean_lat:0.2f}$^o${lat_half}, {mean_lon:0.2f}$^o$E',
                     y=0.93)
-    if save_name is not None:
-        plt.savefig(save_name, dpi=500, bbox_inches='tight')
     plt.show()
     return None

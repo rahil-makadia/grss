@@ -563,7 +563,11 @@ class FitSimulation:
         self.fixed_propsim_params['events'] = events if events is not None else []
         self.reject_outliers = True
         self.reject_criteria = [3.0, 2.8]
-        self.num_rejected = 0
+        # number of rejected obs is the count of ['D', 'd'] in selAst
+        sel_ast = self.obs['selAst'].values
+        num_auto_rejected = np.sum(sel_ast == 'D')
+        num_force_rejected = np.sum(sel_ast == 'd')
+        self.num_rejected = num_auto_rejected + num_force_rejected
         self.converged = False
         return None
 
@@ -1525,7 +1529,6 @@ class FitSimulation:
                                 "Default values are chi_reject=3.0 and chi_recover=2.8 "
                                 "(Implemented as FitSimulation.reject_criteria=[3.0, 2.8])")
         full_cov = self.covariance
-        self.num_rejected = 0
         rms_u = 0
         chi_sq = 0
         j = 0
@@ -1556,9 +1559,10 @@ class FitSimulation:
                 # outlier rejection, only reject RA/Dec measurements
                 if size == 2:
                     if residual_chi_squared > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                        if sel_ast[i] == 'A':
+                            self.num_rejected += 1
                         sel_ast[i] = 'D'
-                        self.num_rejected += 1
-                    elif sel_ast[i] == 'D' and residual_chi_squared < chi_recover**2:
+                    elif residual_chi_squared < chi_recover**2 and sel_ast[i] == 'D':
                         sel_ast[i] = 'A'
                         self.num_rejected -= 1
             if sel_ast[i] not in {'D', 'd'}:
@@ -1614,7 +1618,7 @@ class FitSimulation:
         """
         # check for convergence based on weighted rms
         if self.n_iter > 1:
-            del_rms_convergence = 1e-3
+            del_rms_convergence = 1e-4
             curr_rms = self.iters[-1].weighted_rms
             prev_rms = self.iters[-2].weighted_rms
             del_rms = abs(prev_rms - curr_rms)#/prev_rms
@@ -1727,15 +1731,17 @@ class FitSimulation:
             self._check_convergence(delta_x)
             if self.converged:
                 if self.reject_outliers and start_rejecting:
-                    print(f"Converged after rejecting outliers. Rejected {self.num_rejected} out",
-                            f"of {len(self.optical_idx)} optical observations.")
+                    if verbose:
+                        print(f"Converged after rejecting outliers. Rejected {self.num_rejected}",
+                                f"out of {len(self.optical_idx)} optical observations.")
                     break
                 msg = "Converged without rejecting outliers."
                 if self.reject_outliers:
                     msg += " Starting outlier rejection now..."
                     start_rejecting = True
                     self.converged = False
-                print(msg)
+                if verbose:
+                    print(msg)
                 if not self.reject_outliers:
                     break
         if self.n_iter == self.n_iter_max and not self.converged:
@@ -1791,7 +1797,7 @@ class FitSimulation:
                 str_to_print += f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}"
                 str_to_print += f"\t\t{final_val:.11e}\t\t{final_unc:.11e}"
                 str_to_print += f"\t\t{final_val-init_val:+.11e}"
-                str_to_print += f"\t\t{(final_val-init_val)/init_unc:+.3f}\n"
+                str_to_print += f"\t\t{(final_val-init_val)/final_unc:+.3f}\n"
         print(str_to_print, file=out_stream)
         return None
 

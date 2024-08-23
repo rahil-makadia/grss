@@ -24,7 +24,7 @@ void pck_free(PckInfo* bpc) {
         free(bpc->targets);
     }
     munmap(bpc->map, bpc->len);
-    memset(bpc, 0, sizeof(PckInfo));
+    memset((void *)bpc, 0, sizeof(PckInfo));
     free(bpc);
     bpc = nullptr;
 }

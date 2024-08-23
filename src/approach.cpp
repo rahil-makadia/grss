@@ -394,8 +394,8 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     const real v = sqrt(xRelMap[3] * xRelMap[3] + xRelMap[4] * xRelMap[4] +
                         xRelMap[5] * xRelMap[5]);
     this->vel = v;
-    const real a = (mu * r) / (2 * mu - r * v * v);
-    const real vInf = sqrt(-mu / a);
+    real a = (mu * r) / (2 * mu - r * v * v);
+    real vInf = sqrt(-mu / a);
     this->vInf = vInf;
     real h, pos[3], vel[3], hVec[3];
     for (size_t k = 0; k < 3; k++) {
@@ -454,10 +454,10 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     this->scaled.z = this->kizner.z / this->gravFocusFactor;
     real posDotVel;
     vdot(pos, vel, 3, posDotVel);
-    const real sinhF = vInf*posDotVel/mu/e;
-    const real F = asinh(sinhF); // or F = -log(2*r/a/e);
-    const real n = sqrt(-mu / a / a / a);
-    this->tPeri = tMap - (e*sinhF - F)/n;
+    real sinhF = vInf*posDotVel/mu/e;
+    real F = asinh(sinhF); // or F = -log(2*r/a/e);
+    real n = sqrt(-mu / a / a / a);
+    this->tPeri = tMap + (F - e*sinhF)/n;
     this->tLin = this->tPeri - log(e) / n;
     // calculate B-plane parameters (Öpik xi, zeta formulation)
     double xCentralBody[9];
@@ -468,9 +468,9 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     for (size_t k = 0; k < 3; k++) {
         vCentralBodyHelio[k] = xCentralBody[3+k]-xSun[3+k];
     }
-    real xiHat[3], zetaHat[3], vCentralBodyHelioCrossSHat[3];
-    vcross(vCentralBodyHelio, sHat, vCentralBodyHelioCrossSHat);
-    vunit(vCentralBodyHelioCrossSHat, 3, xiHat);
+    real xiHat[3], zetaHat[3], vPlanetCrossSHatVec[3];
+    vcross(vCentralBodyHelio, sHat, vPlanetCrossSHatVec);
+    vunit(vPlanetCrossSHatVec, 3, xiHat);
     vcross(sHat, xiHat, zetaHat);
     for (size_t k = 0; k < 3; k++) {
         zetaHat[k] *= -1;
@@ -494,7 +494,7 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     vdot(posCA, eHatY, 3, this->mtp.y);
     vdot(posCA, eHatZ, 3, this->mtp.z);
 
-    if (tMap == this->tCA && propSim->integBodies[i].propStm == true){
+    if (propSim->integBodies[i].propStm == true){
         real **partial_r_vec = new real*[6];
         real **partial_v_vec = new real*[6];
         for (size_t k = 0; k < 6; k++) {
@@ -514,7 +514,6 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         partial_v_vec[4][1] = 1;
         partial_v_vec[5][2] = 1;
 
-        real alpha = vInf*vInf;
         real *partial_alpha = new real[6];
         real *partial_vInf = new real[6];
         real *partial_a = new real[6];
@@ -523,15 +522,22 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         vnorm(posCA, 3, rCA);
         vnorm(velCA, 3, vCA);
         rCA3 = rCA*rCA*rCA;
+        a = (mu * rCA) / (2 * mu - rCA * vCA * vCA);
+        n = sqrt(-mu / a / a / a);
+        vInf = sqrt(-mu / a);
         for (size_t k = 0; k < 6; k++) {
             vdot(velCA, partial_v_vec[k], 3, temp1);
             vdot(posCA, partial_r_vec[k], 3, temp2);
             partial_alpha[k] = 2*(temp1 + mu*temp2/rCA3);
-            partial_vInf[k] = partial_alpha[k]/(2*vInf);
-            partial_a[k] = -a*partial_alpha[k]/alpha;
+            partial_vInf[k] = partial_alpha[k]/2/vInf;
+            partial_a[k] = -a*partial_alpha[k]/(vCA*vCA - 2*mu/rCA);
             partial_n[k] = -3*n*partial_a[k]/2/a;
         }
 
+        real hVecCA[3];
+        vcross(posCA, velCA, hVecCA);
+        real hCA;
+        vnorm(hVecCA, 3, hCA);
         real **partial_hVec = new real*[6];
         real *partial_h = new real[6];
         for (size_t k = 0; k < 6; k++) {
@@ -544,17 +550,21 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             for (size_t k2 = 0; k2 < 3; k2++) {
                 partial_hVec[k][k2] += temp1Vec[k2];
             }
-            vdot(partial_hVec[k], hVec, 3, partial_h[k]);
-            partial_h[k] /= h;
+            vdot(partial_hVec[k], hVecCA, 3, partial_h[k]);
+            partial_h[k] /= hCA;
         }
 
+        real vCrossHCA[3], eVecCA[3];
+        vcross(velCA, hVecCA, vCrossHCA);
+        for (size_t k = 0; k < 3; k++) {
+            eVecCA[k] = vCrossHCA[k] / mu - posCA[k] / rCA;
+        }
+        vnorm(eVecCA, 3, e);
         real **partial_eVec = new real*[6];
         real *partial_e = new real[6];
         for (size_t k = 0; k < 6; k++) {
             partial_eVec[k] = new real[3];
-        }
-        for (size_t k = 0; k < 6; k++) {
-            vcross(partial_v_vec[k], hVec, temp1Vec);
+            vcross(partial_v_vec[k], hVecCA, temp1Vec);
             for (size_t k2 = 0; k2 < 3; k2++) {
                 partial_eVec[k][k2] = temp1Vec[k2] / mu;
             }
@@ -563,25 +573,31 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
                 partial_eVec[k][k2] += temp1Vec[k2] / mu;
             }
             for (size_t k2 = 0; k2 < 3; k2++) {
-                partial_eVec[k][k2] -= partial_r_vec[k][k2] / r;
+                partial_eVec[k][k2] -= partial_r_vec[k][k2] / rCA;
             }
             vdot(posCA, partial_r_vec[k], 3, temp1Vec[0]);
             for (size_t k2 = 0; k2 < 3; k2++) {
-                partial_eVec[k][k2] += temp1Vec[0] * posCA[k2] / (r * r * r);
+                partial_eVec[k][k2] += temp1Vec[0] * posCA[k2] / (rCA * rCA * rCA);
             }
             vdot(partial_eVec[k], eVec, 3, partial_e[k]);
             partial_e[k] /= e;
         }
 
         real *partial_F = new real[6];
+        real posDotVelCA;
+        vdot(posCA, velCA, 3, posDotVelCA);
+        sinhF = vInf*posDotVelCA/mu/e;
+        F = asinh(sinhF); // or F = -log(2*r/a/e);
         for (size_t k = 0; k < 6; k++) {
             vdot(posCA, partial_v_vec[k], 3, temp1);
             vdot(velCA, partial_r_vec[k], 3, temp2);
-            partial_F[k] = (posDotVel*partial_vInf[k]/mu + vInf*(temp1+temp2)/mu - partial_e[k]*sinhF)/e/cosh(F);
+            partial_F[k] = (posDotVelCA*partial_vInf[k]/mu + vInf*(temp1+temp2)/mu - partial_e[k]*sinhF)/e/cosh(F);
         }
-        std::vector<real> accCA(propSim->integParams.n2Derivs, 0.0);
-        get_state_der(propSim, tMap, this->xRelCA, accCA);
-        real accRel[3], accPlanet[3];
+
+        std::vector<real> accMap(propSim->integParams.n2Derivs, 0.0);
+        std::vector<real> xMap = propSim->interpolate(this->tMap);
+        get_state_der(propSim, tMap, xMap, accMap);
+        real accRelMap[3], accPlanet[3];
         if (j < propSim->integParams.nInteg) {
             accPlanet[0] = propSim->integBodies[j].acc[0];
             accPlanet[1] = propSim->integBodies[j].acc[1];
@@ -592,17 +608,31 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             accPlanet[2] = propSim->spiceBodies[j - propSim->integParams.nInteg].acc[2];
         }
         for (size_t k = 0; k < 3; k++) {
-            accRel[k] = propSim->integBodies[i].acc[k] - accPlanet[k];
+            accRelMap[k] = propSim->integBodies[i].acc[k] - accPlanet[k];
         }
-        real posDotAcc, posCADotVelCA;
-        vdot(posCA, accRel, 3, posDotAcc);
-        vdot(posCA, velCA, 3, posCADotVelCA);
 
+        real posDotAccMap;
+        vdot(pos, accRelMap, 3, posDotAccMap);
+        std::vector<real> dtLinMinustCA(6, 0.0);
         for (size_t k = 0; k < 6; k++) {
-            this->dTLinMinusT[k] = (r*partial_F[k]/a - (e*sinhF + 1)*partial_e[k]/e - (tLin-tMap)*partial_n[k])/n;
-            vdot(posCA, partial_v_vec[k], 3, temp1);
-            vdot(velCA, partial_r_vec[k], 3, temp2);
-            this->dt[k] = -(temp1+temp2)/(posDotAcc + vCA*vCA);
+            dtLinMinustCA[k] = (rCA*partial_F[k]/a - (e*sinhF + 1)*partial_e[k]/e - (tLin-this->tCA)*partial_n[k])/n;
+            vdot(pos, partial_v_vec[k], 3, temp1);
+            vdot(vel, partial_r_vec[k], 3, temp2);
+            this->dt[k] = -(temp1+temp2)/(posDotAccMap + v*v);
+        }
+
+        real **partial_xCA = new real*[6];
+        for (size_t k = 0; k < 6; k++) {
+            partial_xCA[k] = new real[6];
+            for (size_t k2 = 0; k2 < 6; k2++) {
+                partial_xCA[k][k2] = 0;
+            }
+        }
+        for (size_t k = 0; k < 3; k++) {
+            for (size_t k2 = 0; k2 < 6; k2++) {
+                partial_xCA[k][k2] = partial_r_vec[k2][k] + vel[k]*this->dt[k2];
+                partial_xCA[k+3][k2] = partial_v_vec[k2][k] + accRelMap[k]*this->dt[k2];
+            }
         }
 
         real **partial_pHat = new real*[6];
@@ -621,12 +651,15 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
                 partial_pHat[k][k2] = partial_eVec[k][k2]/e - partial_e[k]*eVec[k2]/e/e;
             }
             vcross(partial_hVec[k], pHat, temp1Vec);
-            vcross(hVec, partial_pHat[k], temp2Vec);
+            vcross(hVecCA, partial_pHat[k], temp2Vec);
             for (size_t k2 = 0; k2 < 3; k2++) {
-                partial_qHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - partial_h[k]*qHat[k2])/h;
+                partial_qHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - partial_h[k]*qHat[k2])/hCA;
             }
             for (size_t k2 = 0; k2 < 3; k2++) {
-                partial_sHat[k][k2] = -partial_e[k]*pHat[k2]/e/e + partial_pHat[k][k2]/e + partial_e[k]*qHat[k2]/e/e/sqrt(e*e-1) + sqrt(e*e-1)*partial_qHat[k][k2]/e;
+                partial_sHat[k][k2] = -partial_e[k] * pHat[k2] / e / e +
+                                        partial_pHat[k][k2] / e +
+                                        partial_e[k] * qHat[k2] / e / e / sqrt(e * e - 1) +
+                                        sqrt(e * e - 1) * partial_qHat[k][k2] / e;
             }
             vcross(vVec, partial_sHat[k], temp1Vec);
             vdot(tHat, temp1Vec, 3, temp1);
@@ -641,55 +674,121 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
                 partial_rHat[k][k2] = temp1Vec[k2] + temp2Vec[k2];
             }
         }
+
+        real lambda = sqrt(1.0 + 2 * mu / radius / vInf / vInf);
         real *partial_lambda = new real[6];
+        std::vector<real> k_dx(6, 0.0);
+        std::vector<real> k_dy(6, 0.0);
+        std::vector<real> s_dx(6, 0.0);
+        std::vector<real> s_dy(6, 0.0);
         for (size_t k = 0; k < 6; k++) {
             vdot(tHat, partial_hVec[k], 3, temp1);
-            vdot(hVec, partial_tHat[k], 3, temp2);
-            this->kizner.dx[k] = (temp1 + temp2 - this->kizner.x*partial_vInf[k])/vInf;
+            vdot(hVecCA, partial_tHat[k], 3, temp2);
+            k_dx[k] = (temp1 + temp2 - this->kizner.x*partial_vInf[k])/vInf;
             vdot(rHat, partial_hVec[k], 3, temp1);
-            vdot(hVec, partial_rHat[k], 3, temp2);
+            vdot(hVecCA, partial_rHat[k], 3, temp2);
+            k_dy[k] = -(temp1 + temp2 + this->kizner.y*partial_vInf[k])/vInf;
 
-            partial_lambda[k] = -2*mu*partial_vInf[k]/this->gravFocusFactor/radius/vInf/vInf/vInf;
-            this->kizner.dy[k] = -(temp1 + temp2 + this->kizner.y*partial_vInf[k])/vInf;
-            this->scaled.dx[k] = (this->kizner.dx[k] - this->scaled.x*partial_lambda[k])/this->gravFocusFactor;
-            this->scaled.dy[k] = (this->kizner.dy[k] - this->scaled.y*partial_lambda[k])/this->gravFocusFactor;
+            partial_lambda[k] = -2*mu*partial_vInf[k]/lambda/radius/vInf/vInf/vInf;
+            s_dx[k] = (k_dx[k] - this->scaled.x*partial_lambda[k])/lambda;
+            s_dy[k] = (k_dy[k] - this->scaled.y*partial_lambda[k])/lambda;
         }
 
-        // // Acceleration of the Sun is not included in the calculation
-        // // because it is negligibly small
-        // real accSun[3];
-        // memset(accSun, 0, 3*sizeof(real));
-        // for (size_t k = 0; k < propSim->integParams.nSpice; k++) {
-        //     if (propSim->spiceBodies[k].spiceId == 10) {
-        //         accSun[0] = propSim->spiceBodies[k].acc[0];
-        //         accSun[1] = propSim->spiceBodies[k].acc[1];
-        //         accSun[2] = propSim->spiceBodies[k].acc[2];
-        //         break;
-        //     }
-        // }
+        // map off-nominal trajectory for full partials
+        vec_mat_mul(k_dx, partial_xCA, 6, this->kizner.dx);
+        vec_mat_mul(k_dy, partial_xCA, 6, this->kizner.dy);
+        vec_mat_mul(s_dx, partial_xCA, 6, this->scaled.dx);
+        vec_mat_mul(s_dy, partial_xCA, 6, this->scaled.dy);
+        vec_mat_mul(dtLinMinustCA, partial_xCA, 6, this->dtLin);
+        for (size_t k = 0; k < 6; k++) {
+            this->dtLin[k] += this->dt[k];
+        }
+
+        // Acceleration of the Sun for opik formulation
+        real accSun[3];
+        for (size_t k = 0; k < propSim->integParams.nSpice; k++) {
+            if (propSim->spiceBodies[k].spiceId == 10) {
+                accSun[0] = propSim->spiceBodies[k].acc[0];
+                accSun[1] = propSim->spiceBodies[k].acc[1];
+                accSun[2] = propSim->spiceBodies[k].acc[2];
+                break;
+            }
+        }
         real **partial_vel_planet = new real*[6];
         for (size_t k = 0; k < 6; k++) {
             partial_vel_planet[k] = new real[3];
             for (size_t k2 = 0; k2 < 3; k2++) {
-                // partial_vel_planet[k][k2] = this->dt[k]*(accPlanet[k2] - accSun[k2]);
-                partial_vel_planet[k][k2] = this->dt[k]*accPlanet[k2];
+                partial_vel_planet[k][k2] = this->dt[k]*(accPlanet[k2] - accSun[k2]);
             }
         }
+        // partials of xi and zeta w.r.t planet velocity are needed for total derivative
+        real **partial_vpl_vpl = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_vpl_vpl[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_vpl_vpl[k][k2] = 0;
+            }
+        }
+        partial_vpl_vpl[0][0] = 1;
+        partial_vpl_vpl[1][1] = 1;
+        partial_vpl_vpl[2][2] = 1;
+        real vPlanetCrossSHat;
+        vnorm(vPlanetCrossSHatVec, 3, vPlanetCrossSHat);
+        real **partial_vPlanetCrossSHatVec_vpl = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_vPlanetCrossSHatVec_vpl[k] = new real[3];
+            vcross(partial_vpl_vpl[k], sHat, partial_vPlanetCrossSHatVec_vpl[k]);
+        }
+        real *partial_vPlanetCrossSHat_vpl = new real[3];
+        vcross(xiHat, sHat, partial_vPlanetCrossSHat_vpl);
+        for (size_t k = 0; k < 3; k++){
+            partial_vPlanetCrossSHat_vpl[k] *= -1.0;
+        }
+        real **partial_xiHat_vpl = new real*[3];
+        real **partial_zetaHat_vpl = new real*[3];
+        for (size_t k = 0; k < 3; k++) {
+            partial_xiHat_vpl[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_xiHat_vpl[k][k2] =
+                    (vPlanetCrossSHat * partial_vPlanetCrossSHatVec_vpl[k][k2] -
+                     vPlanetCrossSHatVec[k2] * partial_vPlanetCrossSHat_vpl[k]) /
+                    vPlanetCrossSHat / vPlanetCrossSHat;
+            }
+            partial_zetaHat_vpl[k] = new real[3];
+            vcross(sHat, partial_xiHat_vpl[k], partial_zetaHat_vpl[k]);
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_zetaHat_vpl[k][k2] *= -1.0;
+            }
+        }
+        real *partial_xi_vpl = new real[3];
+        real *partial_zeta_vpl = new real[3];
+        for (size_t k = 0; k < 3; k++) {
+            vdot(partial_zetaHat_vpl[k], hVecCA, 3, partial_xi_vpl[k]);
+            partial_xi_vpl[k] /= vInf;
+            vdot(partial_xiHat_vpl[k], hVecCA, 3, partial_zeta_vpl[k]);
+            partial_zeta_vpl[k] /= -vInf;
+        }
+        std::vector<std::vector<real>> opikTotalDerivTerm2(2, std::vector<real>(6,0.0));
+        for (size_t k = 0; k < 6; k++) {
+            vdot(partial_xi_vpl, partial_vel_planet[k], 3, opikTotalDerivTerm2[0][k]);
+            vdot(partial_zeta_vpl, partial_vel_planet[k], 3, opikTotalDerivTerm2[1][k]);
+        }
+
         real **partial_xiHat = new real*[6];
-        real temp3, temp3Vec[3];
-        real temp4, temp4Vec[3];
         for (size_t k = 0; k < 6; k++) {
             partial_xiHat[k] = new real[3];
-            vcross(partial_v_vec[k], sHat, temp1Vec);
+            /*  the variation from changing planet velocity comes from
+                opikTotalDerivTerm2, so we dont need the below cross product */
+            // vcross(partial_vel_planet[k], sHat, temp1Vec);
             vcross(vCentralBodyHelio, partial_sHat[k], temp2Vec);
-            vcross(vCentralBodyHelio, sHat, temp3Vec);
-            vnorm(temp3Vec, 3, temp3);
+            // temp1 = xiHat[0] * (temp1Vec[0] + temp2Vec[0]) +
+            //         xiHat[1] * (temp1Vec[1] + temp2Vec[1]) +
+            //         xiHat[2] * (temp1Vec[2] + temp2Vec[2]);
+            temp1 = xiHat[0] * temp2Vec[0] + xiHat[1] * temp2Vec[1] +
+                    xiHat[2] * temp2Vec[2];
             for (size_t k2 = 0; k2 < 3; k2++) {
-                temp4Vec[0] = (temp1Vec[k2]+temp2Vec[k2])*xiHat[0];
-                temp4Vec[1] = (temp1Vec[k2]+temp2Vec[k2])*xiHat[1];
-                temp4Vec[2] = (temp1Vec[k2]+temp2Vec[k2])*xiHat[2];
-                vdot(xiHat, temp4Vec, 3, temp4);
-                partial_xiHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - temp4)/temp3;
+                // partial_xiHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - temp1*xiHat[k2])/vPlanetCrossSHat;
+                partial_xiHat[k][k2] = (temp2Vec[k2] - temp1*xiHat[k2])/vPlanetCrossSHat;
             }
         }
         real **partial_zetaHat = new real*[6];
@@ -701,17 +800,73 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
                 partial_zetaHat[k][k2] = -(temp1Vec[k2] + temp2Vec[k2]);
             }
         }
+        std::vector<real> o_dx(6, 0.0);
+        std::vector<real> o_dy(6, 0.0);
         for (size_t k = 0; k < 6; k++) {
             vdot(zetaHat, partial_hVec[k], 3, temp1);
-            vdot(hVec, partial_zetaHat[k], 3, temp2);
-            this->opik.dx[k] = (temp1 + temp2 - this->opik.x*partial_vInf[k])/vInf;
+            vdot(hVecCA, partial_zetaHat[k], 3, temp2);
+            o_dx[k] = (temp1 + temp2 - this->opik.x*partial_vInf[k])/vInf;
             vdot(xiHat, partial_hVec[k], 3, temp1);
-            vdot(hVec, partial_xiHat[k], 3, temp2);
-            this->opik.dy[k] = -(temp1 + temp2 + this->opik.y*partial_vInf[k])/vInf;
+            vdot(hVecCA, partial_xiHat[k], 3, temp2);
+            o_dy[k] = -(temp1 + temp2 + this->opik.y*partial_vInf[k])/vInf;
+        }
+        // map off-nominal trajectory for full partials
+        vec_mat_mul(o_dx, partial_xCA, 6, this->opik.dx);
+        vec_mat_mul(o_dy, partial_xCA, 6, this->opik.dy);
+        for (size_t k = 0; k < 6; k++) {
+            this->opik.dx[k] += opikTotalDerivTerm2[0][k];
+            this->opik.dy[k] += opikTotalDerivTerm2[1][k];
         }
 
-        this->mtp.dx = {eHatX[0], eHatX[1], eHatX[2], 0.0, 0.0, 0.0};
-        this->mtp.dy = {eHatY[0], eHatY[1], eHatY[2], 0.0, 0.0, 0.0};
+        // calculate mtp derivatives
+        real **partial_eHatZ = new real*[6];
+        for (size_t k = 0; k < 6; k++) {
+            partial_eHatZ[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                temp1Vec[k2] = partial_xCA[k2+3][k];
+                partial_eHatZ[k][k2] = 0;
+            }
+            vdot(eHatZ, temp1Vec, 3, temp1);
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_eHatZ[k][k2] = (temp1Vec[k2] - temp1*eHatZ[k2])/vCA;
+            }
+        }
+        real **partial_eHatY = new real*[6];
+        vnorm(vVecCrosseHatZ, 3, temp2);
+        for (size_t k = 0; k < 6; k++) {
+            partial_eHatY[k] = new real[3];
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                vcross(vVec, partial_eHatZ[k], temp1Vec);
+                vdot(eHatY, temp1Vec, 3, temp1);
+                partial_eHatY[k][k2] = (temp1Vec[k2] - temp1*eHatY[k2])/temp2;
+            }
+        }
+        real **partial_eHatX = new real*[6];
+        for (size_t k = 0; k < 6; k++) {
+            partial_eHatX[k] = new real[3];
+            vcross(partial_eHatY[k], eHatZ, temp1Vec);
+            vcross(eHatY, partial_eHatZ[k], temp2Vec);
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                partial_eHatX[k][k2] = temp1Vec[k2] + temp2Vec[k2];
+            }
+        }
+        std::vector<real> m_dx(6, 0.0);
+        std::vector<real> m_dy(6, 0.0);
+        for (size_t k = 0; k < 6; k++) {
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                temp1Vec[k2] = partial_xCA[k2][k];
+            }
+            vdot(temp1Vec, eHatX, 3, temp1);
+            vdot(posCA, partial_eHatX[k], 3, temp2);
+            m_dx[k] = temp1 + temp2;
+            vdot(temp1Vec, eHatY, 3, temp1);
+            vdot(posCA, partial_eHatY[k], 3, temp2);
+            m_dy[k] = temp1 + temp2;
+        }
+        // map off-nominal trajectory for full partials
+        vec_mat_mul(m_dx, partial_xCA, 6, this->mtp.dx);
+        vec_mat_mul(m_dy, partial_xCA, 6, this->mtp.dy);
+
         // clean up
         for (size_t k = 0; k < 6; k++) {
             delete[] partial_r_vec[k];
@@ -726,6 +881,15 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
             delete[] partial_vel_planet[k];
             delete[] partial_xiHat[k];
             delete[] partial_zetaHat[k];
+            delete[] partial_eHatZ[k];
+            delete[] partial_eHatY[k];
+            delete[] partial_eHatX[k];
+        }
+        for (size_t k = 0; k < 3; k++) {
+            delete[] partial_vpl_vpl[k];
+            delete[] partial_vPlanetCrossSHatVec_vpl[k];
+            delete[] partial_xiHat_vpl[k];
+            delete[] partial_zetaHat_vpl[k];
         }
         delete[] partial_alpha;
         delete[] partial_vInf;
@@ -742,8 +906,18 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         delete[] partial_tHat;
         delete[] partial_lambda;
         delete[] partial_vel_planet;
+        delete[] partial_vpl_vpl;
+        delete[] partial_vPlanetCrossSHatVec_vpl;
+        delete[] partial_vPlanetCrossSHat_vpl;
+        delete[] partial_xiHat_vpl;
+        delete[] partial_zetaHat_vpl;
+        delete[] partial_xi_vpl;
+        delete[] partial_zeta_vpl;
         delete[] partial_xiHat;
         delete[] partial_zetaHat;
+        delete[] partial_eHatZ;
+        delete[] partial_eHatY;
+        delete[] partial_eHatX;
     }
 }
 
