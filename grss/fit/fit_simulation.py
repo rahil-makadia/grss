@@ -1797,7 +1797,7 @@ class FitSimulation:
                 str_to_print += f"{key}\t\t\t{init_val:.11e}\t\t{init_unc:.11e}"
                 str_to_print += f"\t\t{final_val:.11e}\t\t{final_unc:.11e}"
                 str_to_print += f"\t\t{final_val-init_val:+.11e}"
-                str_to_print += f"\t\t{(final_val-init_val)/init_unc:+.3f}\n"
+                str_to_print += f"\t\t{(final_val-init_val)/final_unc:+.3f}\n"
         print(str_to_print, file=out_stream)
         return None
 

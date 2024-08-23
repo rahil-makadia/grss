@@ -777,13 +777,18 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
         real **partial_xiHat = new real*[6];
         for (size_t k = 0; k < 6; k++) {
             partial_xiHat[k] = new real[3];
-            vcross(partial_vel_planet[k], sHat, temp1Vec);
+            /*  the variation from changing planet velocity comes from
+                opikTotalDerivTerm2, so we dont need the below cross product */
+            // vcross(partial_vel_planet[k], sHat, temp1Vec);
             vcross(vCentralBodyHelio, partial_sHat[k], temp2Vec);
-            temp1 = xiHat[0] * (temp1Vec[0] + temp2Vec[0]) +
-                    xiHat[1] * (temp1Vec[1] + temp2Vec[1]) +
-                    xiHat[2] * (temp1Vec[2] + temp2Vec[2]);
+            // temp1 = xiHat[0] * (temp1Vec[0] + temp2Vec[0]) +
+            //         xiHat[1] * (temp1Vec[1] + temp2Vec[1]) +
+            //         xiHat[2] * (temp1Vec[2] + temp2Vec[2]);
+            temp1 = xiHat[0] * temp2Vec[0] + xiHat[1] * temp2Vec[1] +
+                    xiHat[2] * temp2Vec[2];
             for (size_t k2 = 0; k2 < 3; k2++) {
-                partial_xiHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - temp1*xiHat[k2])/vPlanetCrossSHat;
+                // partial_xiHat[k][k2] = (temp1Vec[k2] + temp2Vec[k2] - temp1*xiHat[k2])/vPlanetCrossSHat;
+                partial_xiHat[k][k2] = (temp2Vec[k2] - temp1*xiHat[k2])/vPlanetCrossSHat;
             }
         }
         real **partial_zetaHat = new real*[6];
