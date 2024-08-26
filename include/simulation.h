@@ -226,7 +226,6 @@ class IntegBody : public Body {
  * @param deltaV Delta-V for the event.
  * @param multiplier Multiplier for the Delta-V.
  * @param dt Time duration for the continuous event.
- * @param threshold Threshold for the continuous impulse to reach in time tEvent+dt.
  * @param isContinuous Flag to indicate if the event is continuous.
  * @param isHappening Flag to indicate if the continuous event is happening.
  */
@@ -244,10 +243,8 @@ class Event {
 
     // for continuous ejecta events
     real dt = 1.0L;
-    real threshold = 0.999L;
     bool isContinuous = false;
     bool isHappening = false;
-    real c = 3.8L;
     /**
      * @brief Apply the impulse event to the body.
      */
@@ -521,12 +518,12 @@ class PropSimulation {
      * @brief Add an impulse event to the simulation.
      */
     void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
-                   real multiplier = 1.0L);
+                   real multiplier);
     /**
      * @brief Add an ejecta event to the simulation.
      */
     void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
-                   real multiplier = 1.0L, real dt = 1.0L, real threshold = 0.999L);
+                   real multiplier, real dt);
     /**
      * @brief Set the values of the PropSimulation Constants object.
      */

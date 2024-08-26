@@ -865,7 +865,7 @@ PYBIND11_MODULE(libgrss, m) {
                                                   std::vector<real>, real)>(
                  &PropSimulation::add_event),
              py::arg("body"), py::arg("tEvent"), py::arg("deltaV"),
-             py::arg("multiplier") = 1.0L,
+             py::arg("multiplier"),
              R"mydelimiter(
             Adds an impulsive delta-V event to the simulation.
 
@@ -882,11 +882,10 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def("add_event",
              static_cast<void (PropSimulation::*)(
-                 IntegBody, real, std::vector<real>, real, real, real)>(
+                 IntegBody, real, std::vector<real>, real, real)>(
                  &PropSimulation::add_event),
              py::arg("bodyName"), py::arg("tEvent"), py::arg("deltaV"),
-             py::arg("multiplier") = 1.0L, py::arg("dt") = 1.0L,
-             py::arg("threshold") = 0.999L,
+             py::arg("multiplier"), py::arg("dt"),
              R"mydelimiter(
              Adds an ejecta event to the simulation.
 
@@ -902,8 +901,6 @@ PYBIND11_MODULE(libgrss, m) {
                 Multiplier to apply to the delta-V.
             dt : real
                 Time duration for the continuous ejecta event.
-            threshold : real
-                Threshold for the ejecta impulse to reach in time tEvent+dt.
             )mydelimiter")
         .def("set_sim_constants", &PropSimulation::set_sim_constants,
              py::arg("du2m") = 149597870700.0L, py::arg("tu2s") = 86400.0L,

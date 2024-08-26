@@ -1060,11 +1060,8 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     event.multiplier = multiplier;
 
     event.dt = 0.0;
-    event.threshold = 1.0;
     event.isContinuous = false;
     event.isHappening = false;
-    // event.c is infinity for impulse events
-    event.c = std::numeric_limits<real>::infinity();
     event_postprocess(this, event);
     this->eventMngr.nImpEvents++;
 }
@@ -1075,11 +1072,10 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
  * @param[in] deltaV Delta-V for the ejecta.
  * @param[in] multiplier Multiplier for the Delta-V.
  * @param[in] dt Time duration for the ejecta.
- * @param[in] threshold Threshold for the ejecta impulse to reach in time tEvent+dt.
  */
 void PropSimulation::add_event(IntegBody body, real tEvent,
                                std::vector<real> deltaV, real multiplier,
-                               real dt, real threshold) {
+                               real dt) {
     size_t bodyIndex = event_preprocess(this, body, tEvent);
     Event event;
     event.t = tEvent;
@@ -1089,10 +1085,8 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     event.multiplier = multiplier;
 
     event.dt = dt;
-    event.threshold = threshold;
     event.isContinuous = true;
     event.isHappening = false;
-    event.c = tanh(threshold)/dt;
     event_postprocess(this, event);
     this->eventMngr.nConEvents++;
 }
