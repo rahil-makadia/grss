@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>gr15.h &#8212; GRSS 4.2.0 documentation</title>
+    <title>gr15.h &#8212; GRSS 4.2.1 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="force.h" href="force.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Aug 23, 2024"/>
+    <meta name="docbuild:last-update" content="Aug 26, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.2.0 documentation</p>
+    <p class="title logo__title">GRSS v4.2.1 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -231,9 +231,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Constants.html">grss.libgrss.Constants</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Event.html">grss.libgrss.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.ImpactParameters.html">grss.libgrss.ImpactParameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.ImpulseEvent.html">grss.libgrss.ImpulseEvent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.IntegBody.html">grss.libgrss.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.IntegrationParameters.html">grss.libgrss.IntegrationParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.InterpolationParameters.html">grss.libgrss.InterpolationParameters</a></li>
@@ -558,17 +556,59 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv422check_and_apply_eventsP14PropSimulationRK4realR4realR6size_tRNSt6vectorI4realEE">
-<span class="target" id="gr15_8h_1af747129535880670275c8d99fc5c6108"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">check_and_apply_events</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tNextEvent</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nextEventIdx</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xInteg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422check_and_apply_eventsP14PropSimulationRK4realR4realR6size_tRNSt6vectorI4realEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Check if any events need to be applied after the current timestep. </p>
+<dt class="sig sig-object cpp" id="_CPPv432check_and_apply_impulsive_eventsP14PropSimulationRK4realRNSt6vectorI4realEE">
+<span class="target" id="gr15_8h_1ac6413d8c57a472ac3377b3b407d629af"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">check_and_apply_impulsive_events</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xInteg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv432check_and_apply_impulsive_eventsP14PropSimulationRK4realRNSt6vectorI4realEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Check if any impulsive events need to be applied after the current timestep. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
 <li><p><strong>t</strong> – <strong>[in]</strong> Current time. </p></li>
-<li><p><strong>tNextEvent</strong> – <strong>[out]</strong> Time of the next event. </p></li>
-<li><p><strong>nextEventIdx</strong> – <strong>[out]</strong> Index of the next event. </p></li>
 <li><p><strong>xInteg</strong> – <strong>[in]</strong> Vector of integrated states after the current timestep. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423check_continuous_eventsP14PropSimulationRK4real">
+<span class="target" id="gr15_8h_1ada37dd14a3c76a985ee67a00645eac2f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">check_continuous_events</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423check_continuous_eventsP14PropSimulationRK4real" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Check if any continuous events need to be applied after the current timestep. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>t</strong> – <strong>[in]</strong> Current time. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412check_eventsP14PropSimulationRK4realRNSt6vectorI4realEE">
+<span class="target" id="gr15_8h_1af4507fcc9fdaa5a6357c0a1f396b890f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">check_events</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xInteg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412check_eventsP14PropSimulationRK4realRNSt6vectorI4realEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Top level function to check for events after the current timestep. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>t</strong> – <strong>[in]</strong> Current time. </p></li>
+<li><p><strong>xInteg</strong> – <strong>[in]</strong> Vector of integrated states after the current timestep. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420event_timestep_checkP14PropSimulationR4real">
+<span class="target" id="gr15_8h_1a04f4be8559b60554585ed73866ae455f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">event_timestep_check</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420event_timestep_checkP14PropSimulationR4real" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Check whether timestep is too large that it would skip an event. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>dt</strong> – <strong>[in]</strong> Current timestep.</p></li>
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
 </ul>
 </dd>
 </dl>
@@ -681,7 +721,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Aug 23, 2024.
+  Last updated on Aug 26, 2024.
   <br/>
 </p>
   </div>

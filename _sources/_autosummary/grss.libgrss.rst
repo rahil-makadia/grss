@@ -38,9 +38,7 @@
         Body
         CloseApproachParameters
         Constants
-        Event
         ImpactParameters
-        ImpulseEvent
         IntegBody
         IntegrationParameters
         InterpolationParameters

@@ -47,7 +47,6 @@ grss.libgrss.PropSimulation
         ~PropSimulation.convergedLightTime
         ~PropSimulation.evalApparentState
         ~PropSimulation.evalMeasurements
-        ~PropSimulation.events
         ~PropSimulation.impactParams
         ~PropSimulation.integBodies
         ~PropSimulation.integParams
