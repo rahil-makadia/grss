@@ -339,14 +339,14 @@ void IntegBody::prepare_stm(){
  * @param[inout] xInteg State of the body.
  * @param[in] propDir Direction of propagation.
  */
-void ImpulseEvent::apply(const real& t, std::vector<real>& xInteg,
+void Event::apply_impulsive(const real& t, std::vector<real>& xInteg,
                          const real& propDir) {
     if (t != this->t) {
         throw std::runtime_error(
-            "ImpulseEvent::apply: Integration time does "
+            "Event::apply_impulsive: Integration time does "
             "not match event time. Cannot apply impulse.");
     }
-    size_t velStartIdx = 6 * this->bodyIndex + 3;
+    size_t velStartIdx = this->xIntegIndex + 3;
     for (size_t i = 0; i < 3; i++) {
         xInteg[velStartIdx + i] += propDir * this->multiplier * this->deltaV[i];
     }
@@ -985,29 +985,23 @@ void PropSimulation::remove_body(std::string name) {
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
-/**
- * @param[in] body IntegBody object to apply the ImpulseEvent to.
- * @param[in] tEvent Time at which to apply the ImpulseEvent.
- * @param[in] deltaV Delta-V for the impulse.
- * @param[in] multiplier Multiplier for the Delta-V.
- */
-void PropSimulation::add_event(IntegBody body, real tEvent,
-                               std::vector<real> deltaV, real multiplier) {
+size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
+                        const real &tEvent) {
     // check if tEvent is valid
-    const bool forwardProp = this->integParams.tf > this->integParams.t0;
-    const bool backwardProp = this->integParams.tf < this->integParams.t0;
+    const bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
+    const bool backwardProp = propSim->integParams.tf < propSim->integParams.t0;
     if ((forwardProp &&
-         (tEvent < this->integParams.t0 || tEvent >= this->integParams.tf)) ||
+         (tEvent < propSim->integParams.t0 || tEvent >= propSim->integParams.tf)) ||
         (backwardProp &&
-         (tEvent > this->integParams.t0 || tEvent <= this->integParams.tf))) {
+         (tEvent > propSim->integParams.t0 || tEvent <= propSim->integParams.tf))) {
         throw std::invalid_argument("Event time " + std::to_string(tEvent) +
                                     " is not within simulation time bounds.");
     }
     // check if body exists
     bool bodyExists = false;
     size_t bodyIndex;
-    for (size_t i = 0; i < this->integParams.nInteg; i++) {
-        if (this->integBodies[i].name == body.name) {
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+        if (propSim->integBodies[i].name == body.name) {
             bodyExists = true;
             bodyIndex = i;
             break;
@@ -1016,28 +1010,91 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     if (!bodyExists) {
         throw std::invalid_argument("Integration body with name " + body.name +
                                     " does not exist in simulation " +
-                                    this->name);
+                                    propSim->name);
     }
-    ImpulseEvent event;
-    event.t = tEvent;
-    event.deltaV = deltaV;
-    event.multiplier = multiplier;
-    event.bodyName = body.name;
-    event.bodyIndex = bodyIndex;
-    // add event to this->events sorted by time
-    if (this->events.size() == 0) {
-        this->events.push_back(event);
+    return bodyIndex;
+}
+
+void event_postprocess(PropSimulation *propSim, Event &event) {
+    // assign event xIntegIndex
+    event.xIntegIndex = 0;
+    for (size_t i = 0; i < event.bodyIndex; i++) {
+        event.xIntegIndex += 2*propSim->integBodies[i].n2Derivs;
+    }
+    // add event to either continuous or impulse events based on isContinuous
+    std::vector<Event> *eventsList;
+    if (event.isContinuous) {
+        eventsList = &propSim->eventMngr.continuousEvents;
     } else {
-        for (size_t i = 0; i < this->events.size(); i++) {
-            if (event.t < this->events[i].t) {
-                this->events.insert(this->events.begin() + i, event);
+        eventsList = &propSim->eventMngr.impulsiveEvents;
+    }
+    if (eventsList->size() == 0) {
+        eventsList->push_back(event);
+    } else {
+        for (size_t i = 0; i < eventsList->size(); i++) {
+            if (event.t < eventsList->at(i).t) {
+                eventsList->insert(eventsList->begin() + i, event);
                 break;
-            } else if (i == this->events.size() - 1) {
-                this->events.push_back(event);
+            } else if (i == eventsList->size() - 1) {
+                eventsList->push_back(event);
                 break;
             }
         }
     }
+}
+
+/**
+ * @param[in] body IntegBody object to apply the ImpulseEvent to.
+ * @param[in] tEvent Time at which to apply the ImpulseEvent.
+ * @param[in] deltaV Delta-V for the impulse.
+ * @param[in] multiplier Multiplier for the Delta-V.
+ */
+void PropSimulation::add_event(IntegBody body, real tEvent,
+                               std::vector<real> deltaV, real multiplier) {
+    size_t bodyIndex = event_preprocess(this, body, tEvent);
+    Event event;
+    event.t = tEvent;
+    event.bodyName = body.name;
+    event.bodyIndex = bodyIndex;
+    event.deltaV = deltaV;
+    event.multiplier = multiplier;
+
+    event.dt = 0.0;
+    event.threshold = 1.0;
+    event.isContinuous = false;
+    event.isHappening = false;
+    // event.c is infinity for impulse events
+    event.c = std::numeric_limits<real>::infinity();
+    event_postprocess(this, event);
+    this->eventMngr.nImpEvents++;
+}
+
+/**
+ * @param[in] body IntegBody object to apply the EjectaEvent to.
+ * @param[in] tEvent Time at which to apply the EjectaEvent.
+ * @param[in] deltaV Delta-V for the ejecta.
+ * @param[in] multiplier Multiplier for the Delta-V.
+ * @param[in] dt Time duration for the ejecta.
+ * @param[in] threshold Threshold for the ejecta impulse to reach in time tEvent+dt.
+ */
+void PropSimulation::add_event(IntegBody body, real tEvent,
+                               std::vector<real> deltaV, real multiplier,
+                               real dt, real threshold) {
+    size_t bodyIndex = event_preprocess(this, body, tEvent);
+    Event event;
+    event.t = tEvent;
+    event.bodyName = body.name;
+    event.bodyIndex = bodyIndex;
+    event.deltaV = deltaV;
+    event.multiplier = multiplier;
+
+    event.dt = dt;
+    event.threshold = threshold;
+    event.isContinuous = true;
+    event.isHappening = false;
+    event.c = tanh(threshold)/dt;
+    event_postprocess(this, event);
+    this->eventMngr.nConEvents++;
 }
 
 /**
@@ -1155,7 +1212,19 @@ void PropSimulation::preprocess() {
         }
         bool backwardProp = this->integParams.t0 > this->integParams.tf;
         if (backwardProp) {
-            std::reverse(this->events.begin(), this->events.end());
+            std::reverse(this->eventMngr.impulsiveEvents.begin(), this->eventMngr.impulsiveEvents.end());
+            std::reverse(this->eventMngr.continuousEvents.begin(), this->eventMngr.continuousEvents.end());
+        }
+        this->eventMngr.nextImpEventIdx = 0;
+        this->eventMngr.nextConEventIdx = 0;
+        if (this->eventMngr.nImpEvents > 0) {
+            this->eventMngr.tNextImpEvent = this->eventMngr.impulsiveEvents[0].t;
+        }
+        if (this->eventMngr.nConEvents > 0) {
+            this->eventMngr.tNextConEvent = this->eventMngr.continuousEvents[0].t;
+            this->eventMngr.allConEventDone = false;
+        } else {
+            this->eventMngr.allConEventDone = true;
         }
         this->isPreprocessed = true;
     }

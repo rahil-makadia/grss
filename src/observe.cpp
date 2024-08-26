@@ -9,85 +9,116 @@
 void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
                         const real &tInterpGeom,
                         std::vector<real> &xInterpApparentBary) {
-    double sunState[9];
-    get_spk_state(10, tInterpGeom, propSim->spkEphem, sunState);
-    std::vector<real> earthState = propSim->xObserver[interpIdx];
-
-    std::vector<real> sunEarthPos = {earthState[0] - sunState[0],
-                                     earthState[1] - sunState[1],
-                                     earthState[2] - sunState[2]};
-    real sunEarthDist;
-    vnorm(sunEarthPos, sunEarthDist);
-    std::vector<real> sunTargetPos = {xInterpApparentBary[0] - sunState[0],
-                                      xInterpApparentBary[1] - sunState[1],
-                                      xInterpApparentBary[2] - sunState[2]};
-    real sunTargetDist;
-    vnorm(sunTargetPos, sunTargetDist);
-    std::vector<real> earthTargetPos = {xInterpApparentBary[0] - earthState[0],
-                                        xInterpApparentBary[1] - earthState[1],
-                                        xInterpApparentBary[2] - earthState[2]};
-    real earthTargetDist;
-    vnorm(earthTargetPos, earthTargetDist);
-
-    real G = propSim->consts.G;
+    const real G = propSim->consts.G;
     real sunGM = 0;
+    real earthGM = 0;
     for (size_t i = 0; i < propSim->integParams.nSpice; i++) {
         if (propSim->spiceBodies[i].spiceId == 10) {
             sunGM = G * propSim->spiceBodies[i].mass;
         }
+        if (propSim->spiceBodies[i].spiceId == 399) {
+            earthGM = G * propSim->spiceBodies[i].mass;
+        }
     }
-    if (sunGM == 0) {
+    if (sunGM == 0 || earthGM == 0) {
         throw std::runtime_error(
-            "Sun GM not found in get_delta_delay_relativistic");
+            "Sun GM or Earth GM not found in get_delta_delay_relativistic");
     }
-    real c = propSim->consts.clight;
+    const real c = propSim->consts.clight;
 
-    // from section 7.2.4 in the Explanatory Supplement to the Astronomical
-    // Almanac, 3rd edition
-    std::vector<real> e(3, 0.0);
-    vunit(sunEarthPos, e);
-    std::vector<real> q(3, 0.0);
-    vunit(sunTargetPos, q);
+    double sunState[9];
+    double earthState[9];
+    get_spk_state(10, tInterpGeom, propSim->spkEphem, sunState);
+    get_spk_state(399, tInterpGeom, propSim->spkEphem, earthState);
+    std::vector<real> observerState = propSim->xObserver[interpIdx];
+    std::vector<real> observerTargetPos = {xInterpApparentBary[0] - observerState[0],
+                                            xInterpApparentBary[1] - observerState[1],
+                                            xInterpApparentBary[2] - observerState[2]};
+    real observerTargetDist;
+    vnorm(observerTargetPos, observerTargetDist);
     std::vector<real> p(3, 0.0);
-    vunit(earthTargetPos, p);
+    vunit(observerTargetPos, p);
+
     std::vector<real> deltaP1Targ(3, 0.0);
     std::vector<real> deltaP1Star(3, 0.0);
-    std::vector<real> p1(3, 0.0);
+    std::vector<real> p1(p);
 
-    real pDotQ, eDotP, qDotE;
-    vdot(p, q, pDotQ);
-    vdot(e, p, eDotP);
-    vdot(q, e, qDotE);
+    size_t numBendingBodies = 1; // sun (1) or sun+earth (2)
+    for (size_t i = 0; i < numBendingBodies; i++){
+        double centralBodyState[6];
+        real centralBodyGM;
+        switch (i) {
+        case 0:
+            for (size_t j = 0; j < 6; j++) {
+                centralBodyState[j] = sunState[j];
+            }
+            centralBodyGM = sunGM;
+            break;
+        case 1:
+            for (size_t j = 0; j < 6; j++) {
+                centralBodyState[j] = earthState[j];
+            }
+            centralBodyGM = earthGM;
+            break;
+        default:
+            throw std::runtime_error(
+                "get_glb_correction: central body index must be 0 or 1");
+            break;
+        }
 
-    real g1 = 2 * sunGM / c / c / sunEarthDist;
-    real g2 = 1.0L + qDotE;
+        std::vector<real> centralBodyObserverPos = {observerState[0] - centralBodyState[0],
+                                                    observerState[1] - centralBodyState[1],
+                                                    observerState[2] - centralBodyState[2]};
+        real centralBodyObserverDist;
+        vnorm(centralBodyObserverPos, centralBodyObserverDist);
+        std::vector<real> centralBodyTargetPos = {xInterpApparentBary[0] - centralBodyState[0],
+                                                    xInterpApparentBary[1] - centralBodyState[1],
+                                                    xInterpApparentBary[2] - centralBodyState[2]};
+        real centralBodyTargetDist;
+        vnorm(centralBodyTargetPos, centralBodyTargetDist);
+        
+        // from section 7.2.4 in the Explanatory Supplement to the Astronomical
+        // Almanac, 3rd edition
+        std::vector<real> e(3, 0.0);
+        vunit(centralBodyObserverPos, e);
+        std::vector<real> q(3, 0.0);
+        vunit(centralBodyTargetPos, q);
+        
+        real pDotQ, eDotP, qDotE;
+        vdot(p, q, pDotQ);
+        vdot(e, p, eDotP);
+        vdot(q, e, qDotE);
 
-    deltaP1Targ[0] = g1 * (pDotQ * e[0] - eDotP * q[0]) / g2;
-    deltaP1Targ[1] = g1 * (pDotQ * e[1] - eDotP * q[1]) / g2;
-    deltaP1Targ[2] = g1 * (pDotQ * e[2] - eDotP * q[2]) / g2;
+        real g1 = 2 * centralBodyGM / c / c / centralBodyObserverDist;
+        real g2 = 1.0L + qDotE;
 
-    deltaP1Star[0] = g1 * (e[0] - eDotP * p[0]) / (1 + eDotP);
-    deltaP1Star[1] = g1 * (e[1] - eDotP * p[1]) / (1 + eDotP);
-    deltaP1Star[2] = g1 * (e[2] - eDotP * p[2]) / (1 + eDotP);
+        deltaP1Targ[0] += g1 * (pDotQ * e[0] - eDotP * q[0]) / g2;
+        deltaP1Targ[1] += g1 * (pDotQ * e[1] - eDotP * q[1]) / g2;
+        deltaP1Targ[2] += g1 * (pDotQ * e[2] - eDotP * q[2]) / g2;
 
-    // do absolute correction first
-    p1[0] = p[0] + deltaP1Targ[0];
-    p1[1] = p[1] + deltaP1Targ[1];
-    p1[2] = p[2] + deltaP1Targ[2];
-    // if not gaia obs, do full relative correction
-    if (propSim->obsType[interpIdx] != 3) {
-        p1[0] -= deltaP1Star[0];
-        p1[1] -= deltaP1Star[1];
-        p1[2] -= deltaP1Star[2];
+        deltaP1Star[0] += g1 * (e[0] - eDotP * p[0]) / (1 + eDotP);
+        deltaP1Star[1] += g1 * (e[1] - eDotP * p[1]) / (1 + eDotP);
+        deltaP1Star[2] += g1 * (e[2] - eDotP * p[2]) / (1 + eDotP);
+
+        // do absolute correction first
+        p1[0] += deltaP1Targ[0];
+        p1[1] += deltaP1Targ[1];
+        p1[2] += deltaP1Targ[2];
+        // if not gaia obs, do full relative correction
+        if (propSim->obsType[interpIdx] != 3) {
+            p1[0] -= deltaP1Star[0];
+            p1[1] -= deltaP1Star[1];
+            p1[2] -= deltaP1Star[2];
+        }
     }
 
-    earthTargetPos[0] = earthTargetDist * p1[0];
-    earthTargetPos[1] = earthTargetDist * p1[1];
-    earthTargetPos[2] = earthTargetDist * p1[2];
+    observerTargetPos[0] = observerTargetDist * p1[0];
+    observerTargetPos[1] = observerTargetDist * p1[1];
+    observerTargetPos[2] = observerTargetDist * p1[2];
 
-    xInterpApparentBary[0] = earthState[0] + earthTargetPos[0];
-    xInterpApparentBary[1] = earthState[1] + earthTargetPos[1];
-    xInterpApparentBary[2] = earthState[2] + earthTargetPos[2];
+    xInterpApparentBary[0] = observerState[0] + observerTargetPos[0];
+    xInterpApparentBary[1] = observerState[1] + observerTargetPos[1];
+    xInterpApparentBary[2] = observerState[2] + observerTargetPos[2];
 }
 
 /**

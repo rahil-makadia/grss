@@ -222,6 +222,13 @@ class IntegBody : public Body {
  * @param t Time of the event.
  * @param bodyName Name of the IntegBody for the event
  * @param bodyIndex Index of the IntegBody in the PropSimulation.
+ * @param xIntegIndex Starting index of the body's state in the flattened state vector.
+ * @param deltaV Delta-V for the event.
+ * @param multiplier Multiplier for the Delta-V.
+ * @param dt Time duration for the continuous event.
+ * @param threshold Threshold for the continuous impulse to reach in time tEvent+dt.
+ * @param isContinuous Flag to indicate if the event is continuous.
+ * @param isHappening Flag to indicate if the continuous event is happening.
  */
 class Event {
    private:
@@ -229,27 +236,36 @@ class Event {
     real t;
     std::string bodyName;
     size_t bodyIndex;
-};
+    size_t xIntegIndex;
 
-/**
- * @brief Class for impulse events in a PropSimulation.
- * 
- * @param deltaV Delta-V for the impulse.
- * @param multiplier Multiplier for the Delta-V.
- */
-class ImpulseEvent : public Event {
-   private:
-   public:
+    // for impulsive events
     std::vector<real> deltaV = {0.0L, 0.0L, 0.0L};
     real multiplier = 1.0L;
+
+    // for continuous ejecta events
+    real dt = 1.0L;
+    real threshold = 0.999L;
+    bool isContinuous = false;
+    bool isHappening = false;
+    real c = 3.8L;
     /**
      * @brief Apply the impulse event to the body.
-     * 
-     * @param[in] t Time of the event.
-     * @param[inout] xInteg State of the body.
-     * @param[in] propDir Direction of propagation.
      */
-    void apply(const real &t, std::vector<real> &xInteg, const real &propDir);
+    void apply_impulsive(const real &t, std::vector<real> &xInteg, const real &propDir);
+};
+
+class EventManager {
+   private:
+   public:
+    std::vector<Event> impulsiveEvents = {};
+    std::vector<Event> continuousEvents = {};
+    size_t nextImpEventIdx = 0;
+    size_t nextConEventIdx = 0;
+    real tNextImpEvent = std::numeric_limits<real>::quiet_NaN();
+    real tNextConEvent = std::numeric_limits<real>::quiet_NaN();
+    size_t nImpEvents = 0;
+    size_t nConEvents = 0;
+    bool allConEventDone = true;
 };
 
 /** 
@@ -461,7 +477,7 @@ class PropSimulation {
     IntegrationParameters integParams;
     std::vector<SpiceBody> spiceBodies;
     std::vector<IntegBody> integBodies;
-    std::vector<ImpulseEvent> events;
+    EventManager eventMngr;
     std::vector<CloseApproachParameters> caParams;
     std::vector<ImpactParameters> impactParams;
     real t;
@@ -506,6 +522,11 @@ class PropSimulation {
      */
     void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
                    real multiplier = 1.0L);
+    /**
+     * @brief Add an ejecta event to the simulation.
+     */
+    void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
+                   real multiplier = 1.0L, real dt = 1.0L, real threshold = 0.999L);
     /**
      * @brief Set the values of the PropSimulation Constants object.
      */

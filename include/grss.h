@@ -20,7 +20,8 @@ void PropSimulation::integrate() {
 
     // flip vectors if integration is backwards in time
     if (this->integParams.t0 > this->integParams.tf) {
-        std::reverse(this->events.begin(), this->events.end());
+        std::reverse(this->eventMngr.impulsiveEvents.begin(), this->eventMngr.impulsiveEvents.end());
+        std::reverse(this->eventMngr.continuousEvents.begin(), this->eventMngr.continuousEvents.end());
         std::reverse(this->xObserver.begin(), this->xObserver.end());
         std::reverse(this->observerInfo.begin(), this->observerInfo.end());
         std::reverse(this->tEval.begin(), this->tEval.end());

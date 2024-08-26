@@ -38,6 +38,12 @@ static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accI
 static void force_thruster(const PropSimulation *propSim, std::vector<real> &accInteg);
 
 /**
+ * @brief Compute the acceleration of the system due to a continuous event.
+ */
+static void force_continuous_event(const real &t, const PropSimulation *propSim,
+                                   std::vector<real> &accInteg);
+
+/**
  * @param[in] t Time [TDB MJD]
  * @param[in] xInteg State vector
  * @param[in] propSim PropSimulation object
@@ -115,6 +121,7 @@ void get_state_der(PropSimulation *propSim, const real &t,
     force_J2(propSim, accInteg, allSTMs);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
+    force_continuous_event(t, propSim, accInteg);
     #ifdef PRINT_FORCES
     forceFile.open("cpp.11", std::ios::app);
     forceFile << std::setw(10) << "total_acc" << std::setw(25) << accInteg[0]
@@ -635,4 +642,33 @@ static void force_thruster(const PropSimulation *propSim,
     #ifdef PRINT_FORCES
     forceFile.close();
     #endif
+}
+
+/**
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ */
+static void force_continuous_event(const real &t, const PropSimulation *propSim,
+                                   std::vector<real> &accInteg) {
+    if (!propSim->eventMngr.allConEventDone){
+        const bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
+        const real propDir = forwardProp ? 1.0 : -1.0;
+        for (size_t i = 0; i < propSim->eventMngr.continuousEvents.size(); i++){
+            if (propSim->eventMngr.continuousEvents[i].isHappening){
+                const Event event = propSim->eventMngr.continuousEvents[i];
+                const size_t starti = event.xIntegIndex / 2;
+                const real tPastEvent = t - event.t;
+                // f = np.sin(np.pi*x/(2*time_for_val))
+                // df = np.pi/(2*time_for_val)*np.cos(np.pi*x/(2*time_for_val))
+                const real preFac = PI/(2*event.dt);
+                real accFac = preFac*cos(preFac*tPastEvent);
+                if (accFac > preFac || accFac < 0.0){
+                    accFac = 0.0;
+                }
+                accInteg[starti + 0] += accFac * event.deltaV[0] * propDir;
+                accInteg[starti + 1] += accFac * event.deltaV[1] * propDir;
+                accInteg[starti + 2] += accFac * event.deltaV[2] * propDir;
+            }
+        }
+    }
 }

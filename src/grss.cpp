@@ -636,31 +636,6 @@ PYBIND11_MODULE(libgrss, m) {
             Reconstructed state transition matrix.
         )mydelimiter");
 
-    py::class_<Event>(m, "Event", R"mydelimiter(
-        The Event class contains the properties of an integration event.
-        )mydelimiter")
-        .def(py::init<>())
-        .def_readwrite("t", &ImpulseEvent::t, R"mydelimiter(
-            MJD TDB Time of the event.
-            )mydelimiter")
-        .def_readwrite("bodyName", &ImpulseEvent::bodyName, R"mydelimiter(
-            Name of the integration body to apply the event to.
-            )mydelimiter")
-        .def_readwrite("bodyIndex", &ImpulseEvent::bodyIndex, R"mydelimiter(
-            Index of the integration body to apply the event to.
-            )mydelimiter");
-
-    py::class_<ImpulseEvent, Event>(m, "ImpulseEvent", R"mydelimiter(
-        The ImpulseEvent class contains the properties of an impulsive delta-V event.
-        )mydelimiter")
-        .def(py::init<>())
-        .def_readwrite("deltaV", &ImpulseEvent::deltaV, R"mydelimiter(
-            Delta-V of the event.
-            )mydelimiter")
-        .def_readwrite("multiplier", &ImpulseEvent::multiplier, R"mydelimiter(
-            Multiplier on the delta-V the event.
-            )mydelimiter");
-
     m.def("propSim_parallel_omp", &propSim_parallel_omp, py::arg("refSim"),
           py::arg("isCometary"), py::arg("allBodies"),
           py::arg("maxThreads") = 128, R"mydelimiter(
@@ -733,9 +708,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("integBodies", &PropSimulation::integBodies,
                        R"mydelimiter(
             Integration bodies of the simulation. List of PropSimulation.IntegBody objects.
-            )mydelimiter")
-        .def_readwrite("events", &PropSimulation::events, R"mydelimiter(
-            Events of the simulation. List of PropSimulation.Event objects.
             )mydelimiter")
         .def_readwrite("caParams", &PropSimulation::caParams, R"mydelimiter(
             Close approach parameters of the simulation. List of PropSimulation.CloseApproachParameters objects.
@@ -888,8 +860,12 @@ PYBIND11_MODULE(libgrss, m) {
             name : str
                 Name of the body to remove.
             )mydelimiter")
-        .def("add_event", &PropSimulation::add_event, py::arg("body"),
-             py::arg("tEvent"), py::arg("deltaV"), py::arg("multiplier") = 1.0L,
+        .def("add_event",
+             static_cast<void (PropSimulation::*)(IntegBody, real,
+                                                  std::vector<real>, real)>(
+                 &PropSimulation::add_event),
+             py::arg("body"), py::arg("tEvent"), py::arg("deltaV"),
+             py::arg("multiplier") = 1.0L,
              R"mydelimiter(
             Adds an impulsive delta-V event to the simulation.
 
@@ -903,6 +879,31 @@ PYBIND11_MODULE(libgrss, m) {
                 Delta-V to apply to the body.
             multiplier : real
                 Multiplier to apply to the delta-V.
+            )mydelimiter")
+        .def("add_event",
+             static_cast<void (PropSimulation::*)(
+                 IntegBody, real, std::vector<real>, real, real, real)>(
+                 &PropSimulation::add_event),
+             py::arg("bodyName"), py::arg("tEvent"), py::arg("deltaV"),
+             py::arg("multiplier") = 1.0L, py::arg("dt") = 1.0L,
+             py::arg("threshold") = 0.999L,
+             R"mydelimiter(
+             Adds an ejecta event to the simulation.
+
+            Parameters
+            ----------
+            body : str
+                Name of the body to apply the delta-V to.
+            tEvent : real
+                MJD Epoch of the event. Must be in TDB.
+            deltaV : list of real
+                Delta-V to apply to the body.
+            multiplier : real
+                Multiplier to apply to the delta-V.
+            dt : real
+                Time duration for the continuous ejecta event.
+            threshold : real
+                Threshold for the ejecta impulse to reach in time tEvent+dt.
             )mydelimiter")
         .def("set_sim_constants", &PropSimulation::set_sim_constants,
              py::arg("du2m") = 149597870700.0L, py::arg("tu2s") = 86400.0L,
