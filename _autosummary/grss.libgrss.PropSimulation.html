@@ -737,7 +737,7 @@ document.write(`
 <span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.libgrss.PropSimulation.add_event" title="Permalink to this definition">#</a></dt>
 <dd><p>Overloaded function.</p>
 <ol class="arabic">
-<li><p>add_event(self: grss.libgrss.PropSimulation, body: grss.libgrss.IntegBody, tEvent: float, deltaV: list[float], multiplier: float = 1.0) -&gt; None</p>
+<li><p>add_event(self: grss.libgrss.PropSimulation, body: grss.libgrss.IntegBody, tEvent: float, deltaV: list[float], multiplier: float) -&gt; None</p>
 <blockquote>
 <div><p>Adds an impulsive delta-V event to the simulation.</p>
 <dl class="simple">
@@ -752,7 +752,7 @@ document.write(`
 </dl>
 </div></blockquote>
 </li>
-<li><p>add_event(self: grss.libgrss.PropSimulation, bodyName: grss.libgrss.IntegBody, tEvent: float, deltaV: list[float], multiplier: float = 1.0, dt: float = 1.0, threshold: float = 0.999) -&gt; None</p>
+<li><p>add_event(self: grss.libgrss.PropSimulation, bodyName: grss.libgrss.IntegBody, tEvent: float, deltaV: list[float], multiplier: float, dt: float) -&gt; None</p>
 <blockquote>
 <div><blockquote>
 <div><p>Adds an ejecta event to the simulation.</p>
@@ -767,8 +767,6 @@ document.write(`
 <dt>multiplier<span class="classifier">real</span></dt><dd><p>Multiplier to apply to the delta-V.</p>
 </dd>
 <dt>dt<span class="classifier">real</span></dt><dd><p>Time duration for the continuous ejecta event.</p>
-</dd>
-<dt>threshold<span class="classifier">real</span></dt><dd><p>Threshold for the ejecta impulse to reach in time tEvent+dt.</p>
 </dd>
 </dl>
 </div></blockquote>
