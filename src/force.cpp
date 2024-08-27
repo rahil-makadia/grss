@@ -655,19 +655,27 @@ static void force_continuous_event(const real &t, const PropSimulation *propSim,
         const real propDir = forwardProp ? 1.0 : -1.0;
         for (size_t i = 0; i < propSim->eventMngr.continuousEvents.size(); i++){
             if (propSim->eventMngr.continuousEvents[i].isHappening){
-                const Event event = propSim->eventMngr.continuousEvents[i];
-                const size_t starti = event.xIntegIndex / 2;
-                const real tPastEvent = t - event.t;
+                const size_t starti =
+                    propSim->eventMngr.continuousEvents[i].xIntegIndex / 2;
+                const real tPastEvent =
+                    t - propSim->eventMngr.continuousEvents[i].t;
                 // f = np.sin(np.pi*x/(2*time_for_val))
                 // df = np.pi/(2*time_for_val)*np.cos(np.pi*x/(2*time_for_val))
-                const real preFac = PI/(2*event.dt);
-                real accFac = preFac*cos(preFac*tPastEvent);
-                if (accFac > preFac || accFac < 0.0){
+                const real preFac =
+                    PI / (2 * propSim->eventMngr.continuousEvents[i].dt);
+                real accFac = preFac * cos(preFac * tPastEvent);
+                if (accFac > preFac || accFac < 0.0) {
                     accFac = 0.0;
                 }
-                accInteg[starti + 0] += accFac * event.deltaV[0] * propDir;
-                accInteg[starti + 1] += accFac * event.deltaV[1] * propDir;
-                accInteg[starti + 2] += accFac * event.deltaV[2] * propDir;
+                accInteg[starti + 0] += accFac *
+                    propSim->eventMngr.continuousEvents[i].deltaV[0] *
+                    propSim->eventMngr.continuousEvents[i].multiplier * propDir;
+                accInteg[starti + 1] += accFac *
+                    propSim->eventMngr.continuousEvents[i].deltaV[1] *
+                    propSim->eventMngr.continuousEvents[i].multiplier * propDir;
+                accInteg[starti + 2] += accFac *
+                    propSim->eventMngr.continuousEvents[i].deltaV[2] *
+                    propSim->eventMngr.continuousEvents[i].multiplier * propDir;
             }
         }
     }

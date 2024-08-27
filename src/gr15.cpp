@@ -309,7 +309,8 @@ void event_timestep_check(PropSimulation *propSim, real &dt) {
         for (size_t i = 0; i < propSim->eventMngr.nConEvents; i++) {
             if (propSim->eventMngr.continuousEvents[i].isHappening) {
                 // if any continuous event is happening, set dt to 1/10th of the event duration
-                dt = propSim->eventMngr.continuousEvents[i].dt/10.0L;
+                // dt is the min of the current dt and the one dictated by the event
+                dt = fmin(1.0, propSim->eventMngr.continuousEvents[i].dt/10.0L);
                 dt = forwardProp ? dt : -dt;
             }
             if (forwardProp && propSim->t < propSim->eventMngr.continuousEvents[i].t) {

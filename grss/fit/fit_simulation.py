@@ -987,11 +987,14 @@ class FitSimulation:
         for i in range(len(self.fixed_propsim_params['events'])):
             fixed_event = tuple(self.fixed_propsim_params['events'][i])
             event = [None]*5
-            event[0] = fixed_event[0]
+            event[0] = fixed_event[0] # time of delta-v
             event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
             event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
             event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
             event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
+            fixed_event_continuous = len(fixed_event) == 6 and fixed_event[5] != 0.0
+            if fixed_event_continuous or f"dt{i}" in x_dict.keys():
+                event.append(x_dict[f"dt{i}"] if f"dt{i}" in x_dict.keys() else fixed_event[5])
             events.append(tuple(event))
         return events
 
@@ -1023,10 +1026,14 @@ class FitSimulation:
             dvy = event[2]
             dvz = event[3]
             multiplier = event[4]
+            event_args = (integ_body, t_event, [dvx, dvy, dvz], multiplier)
+            if len(event) == 6:
+                dt = event[5]
+                event_args += (dt,)
             if t_event < self.t_sol:
-                prop_sim_past.add_event(integ_body, t_event, [dvx, dvy, dvz], multiplier)
+                prop_sim_past.add_event(*event_args)
             else:
-                prop_sim_future.add_event(integ_body, t_event, [dvx, dvy, dvz], multiplier)
+                prop_sim_future.add_event(*event_args)
         return prop_sim_past, prop_sim_future
 
     def _get_perturbed_state(self, key):
@@ -1055,6 +1062,7 @@ class FitSimulation:
         fd_delta : float
             Finite difference perturbation.
         """
+        fd_pert = np.inf
         if self.fit_cartesian:
             if key in {'x', 'y', 'z'}:
                 fd_pert = 1e-8
@@ -1074,6 +1082,11 @@ class FitSimulation:
             fd_pert = 1e0
         if key[:3] in {'dvx', 'dvy', 'dvz'}:
             fd_pert = 1e-11
+        if key[:2] == 'dt':
+            fd_pert = 1.0
+        if fd_pert == np.inf:
+            raise ValueError("Finite difference perturbation not defined"
+                                " for the given state parameter.")
         x_plus = self.x_nom.copy()
         x_minus = self.x_nom.copy()
         # fd_pert = finite difference perturbation to nominal state for calculating derivatives
@@ -1720,6 +1733,11 @@ class FitSimulation:
                 print("WARNING: Eccentricity is negative per least squares state correction. "
                         "Setting to 0.0. This solution may not be trustworthy.")
             self.x_nom = dict(zip(self.x_nom.keys(), next_state))
+            # make sure any keys starting with dt are positive and stay in the range [0, 180]
+            for key in self.x_nom:
+                if key[:2] == 'dt':
+                    self.x_nom[key] = abs(self.x_nom[key])
+                    self.x_nom[key] = min(self.x_nom[key], 180.0)
             # add iteration
             self._add_iteration(i+1, rms_u, rms_w, chi_sq)
             if verbose:
