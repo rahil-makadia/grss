@@ -46,7 +46,7 @@ class IterationParams:
         self.covariance = covariance
         variance = np.sqrt(np.diag(self.covariance))
         self.variance = dict(zip([f'var_{k}' for k in self.x_nom.keys()], variance))
-        self.obs = obs
+        self.obs = obs.copy()
         force_del_idx = self.obs[self.obs['selAst'] == 'd'].index
         auto_del_idx = self.obs[self.obs['selAst'] == 'D'].index
         self.rejected_idx = np.concatenate((force_del_idx, auto_del_idx))
@@ -549,7 +549,7 @@ class FitSimulation:
         self._compute_obs_weights()
         self.n_iter = 0
         self.n_iter_max = n_iter_max
-        self.iters = []
+        self.iters = [[]]
         self.de_kernel = de_kernel
         self.de_kernel_path = default_kernel_path
         self.analytic_partials = False
@@ -1546,6 +1546,7 @@ class FitSimulation:
         chi_sq = 0
         j = 0
         sel_ast = self.obs['selAst'].values
+        res_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
@@ -1554,8 +1555,8 @@ class FitSimulation:
             else:
                 raise ValueError("Observer info length not recognized.")
             resid = residuals[i]
-            # calculate chi-squared for each residual
-            if start_rejecting:
+            # calculate chi-squared for each residual if after the first iteration
+            if self.n_iter > 1:
                 obs_cov = self.obs_cov[i]
                 obs_partials = partials[j:j+size, :]
                 if sel_ast[i] in {'D', 'd'}:
@@ -1567,22 +1568,24 @@ class FitSimulation:
                 else:
                     resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
                     resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
-                                              [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
+                                                [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
                 residual_chi_squared = resid @ resid_cov_inv @ resid.T
-                # outlier rejection, only reject RA/Dec measurements
-                if size == 2:
-                    if residual_chi_squared > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
-                        if sel_ast[i] == 'A':
-                            self.num_rejected += 1
-                        sel_ast[i] = 'D'
-                    elif residual_chi_squared < chi_recover**2 and sel_ast[i] == 'D':
-                        sel_ast[i] = 'A'
-                        self.num_rejected -= 1
+                res_chisq_vals[i] = residual_chi_squared
+            # outlier rejection, only reject RA/Dec measurements
+            if start_rejecting and size == 2:
+                if residual_chi_squared > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                    if sel_ast[i] == 'A':
+                        self.num_rejected += 1
+                    sel_ast[i] = 'D'
+                elif residual_chi_squared < chi_recover**2 and sel_ast[i] == 'D':
+                    sel_ast[i] = 'A'
+                    self.num_rejected -= 1
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
                 chi_sq += resid @ self.obs_weight[i] @ resid.T
             j += size
         self.obs['selAst'] = sel_ast
+        self.obs['resChi'] = res_chisq_vals**0.5
         rejected_fraction = self.num_rejected/len(self.obs)
         if rejected_fraction > 0.25:
             print("WARNING: More than 25% of observations rejected. Consider changing the",
@@ -1721,9 +1724,6 @@ class FitSimulation:
             # get new covariance
             self.covariance = cov
             # get new state
-            if i == 0:
-                # add prefit iteration
-                self._add_iteration(0, rms_u, rms_w, chi_sq)
             if self.constraint_dir is not None:
                 constr_hat = self.constraint_dir/np.linalg.norm(self.constraint_dir)
                 delta_x -= np.dot(delta_x, constr_hat)*constr_hat
@@ -1762,11 +1762,17 @@ class FitSimulation:
                     print(msg)
                 if not self.reject_outliers:
                     break
+        # add postfit iteration if converged
+        if self.converged:
+            residuals, partials = self._get_residuals_and_partials()
+            rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
+                                                                        start_rejecting)
+            self._add_iteration(self.n_iter+1, rms_u, rms_w, chi_sq)
         if self.n_iter == self.n_iter_max and not self.converged:
             print("WARNING: Maximum number of iterations reached without converging.")
         return None
 
-    def print_summary(self, iter_idx=-1, out_stream=sys.stdout):
+    def print_summary(self, iter_idx=None, out_stream=sys.stdout):
         """
         Prints a summary of the orbit fit calculations at a given iteration.
 
@@ -1780,10 +1786,14 @@ class FitSimulation:
         None : NoneType
             None
         """
+        iter_idx = len(self.iters)-1 if iter_idx is None else iter_idx
         data = self.iters[iter_idx]
         arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
-        str_to_print = "Summary of the orbit fit calculations at iteration "
-        str_to_print += f"{data.iter_number} (of {self.n_iter}):\n"
+        str_to_print = "Summary of the orbit fit calculations"
+        if data.iter_number <= self.n_iter:
+            str_to_print += f" after iteration {data.iter_number} (of {self.n_iter}):\n"
+        else:
+            str_to_print += " after postfit pass:\n"
         str_to_print += "==============================================================\n"
         str_to_print += f"RMS unweighted: {data.unweighted_rms}\n"
         str_to_print += f"RMS weighted: {data.weighted_rms}\n"
@@ -1799,7 +1809,7 @@ class FitSimulation:
         str_to_print += "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)\n"
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
-        init_sol = self.iters[0].x_nom
+        init_sol = self.x_init
         final_sol = data.x_nom
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
@@ -1835,7 +1845,9 @@ class FitSimulation:
         """
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
-        ticks = np.arange(1, self.n_iter+1, 1)
+        ticks = np.arange(1, self.n_iter+2, 1)
+        labels = list(ticks)
+        labels[-1] = "Postfit"
         start_idx = 1
         iters_for_plot = self.iters[start_idx:]
         final_iter = iters_for_plot[-1]
@@ -1845,7 +1857,8 @@ class FitSimulation:
                         [iteration.unweighted_rms for iteration in iters_for_plot],
                         label=f"Final Unweighted RMS={final_iter.unweighted_rms:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel("Unweighted RMS")
         plt.legend()
         plt.subplot(2, 2, 2)
@@ -1853,7 +1866,8 @@ class FitSimulation:
                         [iteration.weighted_rms for iteration in iters_for_plot],
                         label=f"Final Weighted RMS={final_iter.weighted_rms:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel("Weighted RMS")
         plt.legend()
         plt.subplot(2, 2, 3)
@@ -1861,7 +1875,8 @@ class FitSimulation:
                         [iteration.chi_squared for iteration in iters_for_plot],
                         label=fr"Final $\chi^2$={final_iter.chi_squared:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel(r"$\chi^2$")
         plt.legend()
         plt.subplot(2, 2, 4)
@@ -1869,7 +1884,8 @@ class FitSimulation:
                         [iteration.reduced_chi_squared for iteration in iters_for_plot],
                         label=fr"Final Reduced $\chi^2$={final_iter.reduced_chi_squared:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel(r"Reduced $\chi^2$")
         plt.legend()
         plt.tight_layout()
@@ -2033,8 +2049,11 @@ class FitSimulation:
             f.write(f'{iter_summary_buff}{iter_summary_str}{iter_summary_buff}\n')
             f.write(subsection_full + '\n')
             for itrn in self.iters[1:]:
-                f.write("Summary of the orbit fit calculations at iteration")
-                f.write(f" {itrn.iter_number} (of {self.n_iter}):\n")
+                f.write("Summary of the orbit fit calculations")
+                if itrn.iter_number <= self.n_iter:
+                    f.write(f" after iteration {itrn.iter_number} (of {self.n_iter}):\n")
+                else:
+                    f.write(" after postfit pass:\n")
                 f.write(f"RMS unweighted: {itrn.unweighted_rms}\n")
                 f.write(f"RMS weighted: {itrn.weighted_rms}\n")
                 f.write(f"chi-squared: {itrn.chi_squared}\n")
@@ -2043,7 +2062,7 @@ class FitSimulation:
                 f.write(f'{"Variable":<8}{"Initial Value":>20}')
                 f.write(f'{"Uncertainty":>20}{"Fitted Value":>20}')
                 f.write(f'{"Uncertainty":>20}{"Change":>20}{"Change":>8}'+' (\u03C3)\n')
-                init_sol = self.iters[0].x_nom
+                init_sol = self.x_init
                 final_sol = itrn.x_nom
                 with np.errstate(divide='ignore'):
                     for i, key in enumerate(init_sol.keys()):
@@ -2064,7 +2083,7 @@ class FitSimulation:
                         f.write(f'{final_val-init_val:+18.11e}{half_tab}')
                         f.write(f'{(final_val-init_val)/init_unc:+10.3f}\n')
                 f.write("\n")
-                if itrn.iter_number != self.n_iter:
+                if itrn.iter_number <= self.n_iter:
                     f.write(subsection_full + '\n')
 
             mean_0 = np.array(list(self.x_init.values()))
