@@ -71,7 +71,6 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         print(f"Read in {num_obs} radar observations from JPL radar API.")
     data = raw_data['data']
     time_range_count = 0
-    pre1972_count = 0
     for i in range(num_obs):
         obs = data[num_obs-i-1]
         date = Time(obs[1], format='iso', scale='utc')
@@ -105,14 +104,6 @@ def add_radar_obs(obs_df, t_min_tdb=None, t_max_tdb=None, verbose=False):
         obs_df.loc[idx,'frq'] = freq
         obs_df.loc[idx,'sigDelay'] = obs_sigma if delay else np.nan
         obs_df.loc[idx,'sigDoppler'] = obs_sigma if doppler else np.nan
-        if date.utc.mjd < 41317:
-            pre1972_count += 1
-            obs_df.loc[idx,'selAst'] = 'd'
-    if pre1972_count > 0:
-        print(f"\tWARNING: {pre1972_count} radar observations were taken before 1972.\n"
-                "\t\tThese residuals cannot be reliably computed because high-accuracy Earth "
-                "orientation kernels are not available for this time period.\n"
-                "\t\tForce deleting them...")
     if verbose:
         print(f"\tFiltered to {num_obs-time_range_count} observations that satisfy the "
                 "time range constraints.")

@@ -21,9 +21,10 @@ void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
             break;
         case 399:
             baseBodyFrame = "ITRF93";
-            // High precision frame is not defined before 1972 JAN 01
-            // 00:00:42.183 TDB or after 2099 AUG 25 00:01:09.182 TDB
-            if (tMjdTDB < 41317.000488239L || tMjdTDB > 87940.000800717L) {
+            // High precision frame is not defined
+            // before 1962 JAN 20 00:00:41.184 TDB or
+            // after 2099 AUG 27 00:01:09.182 TDB
+            if (tMjdTDB < 37684.0004767L || tMjdTDB > 87942.0008007L) {
                 baseBodyFrame = "IAU_EARTH";
             }
             break;
@@ -691,9 +692,9 @@ PropSimulation::PropSimulation(std::string name, real t0,
     }
     this->spkEphem.mbPath = kernel_mb;
     this->spkEphem.sbPath = kernel_sb;
-    this->pckEphem.histPckPath = DEkernelPath + "earth_720101_230601.bpc";
-    this->pckEphem.latestPckPath = DEkernelPath + "earth_latest_high_prec.bpc";
-    this->pckEphem.predictPckPath = DEkernelPath + "earth_200101_990825_predict.bpc";
+    this->pckEphem.histPckPath = DEkernelPath + "earth_historic.bpc";
+    this->pckEphem.latestPckPath = DEkernelPath + "earth_latest.bpc";
+    this->pckEphem.predictPckPath = DEkernelPath + "earth_predict.bpc";
 }
 
 /**
