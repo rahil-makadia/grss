@@ -39,10 +39,7 @@ void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
     std::vector<real> p(3, 0.0);
     vunit(observerTargetPos, p);
 
-    std::vector<real> deltaP1Targ(3, 0.0);
-    std::vector<real> deltaP1Star(3, 0.0);
     std::vector<real> p1(p);
-
     size_t numBendingBodies = 1; // sun (1) or sun+earth (2)
     for (size_t i = 0; i < numBendingBodies; i++){
         double centralBodyState[6];
@@ -89,13 +86,15 @@ void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
         vdot(e, p, eDotP);
         vdot(q, e, qDotE);
 
-        real g1 = 2 * centralBodyGM / c / c / centralBodyObserverDist;
-        real g2 = 1.0L + qDotE;
+        const real g1 = 2 * centralBodyGM / c / c / centralBodyObserverDist;
+        const real g2 = 1.0L + qDotE;
 
+        std::vector<real> deltaP1Targ(3, 0.0);
         deltaP1Targ[0] += g1 * (pDotQ * e[0] - eDotP * q[0]) / g2;
         deltaP1Targ[1] += g1 * (pDotQ * e[1] - eDotP * q[1]) / g2;
         deltaP1Targ[2] += g1 * (pDotQ * e[2] - eDotP * q[2]) / g2;
 
+        std::vector<real> deltaP1Star(3, 0.0);
         deltaP1Star[0] += g1 * (e[0] - eDotP * p[0]) / (1 + eDotP);
         deltaP1Star[1] += g1 * (e[1] - eDotP * p[1]) / (1 + eDotP);
         deltaP1Star[2] += g1 * (e[2] - eDotP * p[2]) / (1 + eDotP);
@@ -109,6 +108,11 @@ void get_glb_correction(PropSimulation *propSim, const size_t &interpIdx,
             p1[0] -= deltaP1Star[0];
             p1[1] -= deltaP1Star[1];
             p1[2] -= deltaP1Star[2];
+        }
+        // re-normalize
+        const real p1Norm = sqrt(p1[0]*p1[0] + p1[1]*p1[1] + p1[2]*p1[2]);
+        for (size_t j = 0; j < 3; j++) {
+            p1[j] /= p1Norm;
         }
     }
 
