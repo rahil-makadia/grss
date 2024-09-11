@@ -561,6 +561,12 @@ class FitSimulation:
             for key in nongrav_info:
                 self.fixed_propsim_params[key] = nongrav_info[key]
         self.fixed_propsim_params['events'] = events if events is not None else []
+        self.prior_est = None
+        self.prior_sigs = None
+        self._priors_given = False
+        self._xbar0 = None
+        self._info0 = None
+        self._prior_constant = None
         self.reject_outliers = True
         self.reject_criteria = [3.0, 2.8]
         # number of rejected obs is the count of ['D', 'd'] in selAst
@@ -619,6 +625,38 @@ class FitSimulation:
             msg = ("Covariance matrix must be the same size "
                     "as the number of fitted parameters.")
             raise ValueError(msg)
+        return None
+
+    def _check_priors(self):
+        """
+        Check the prior estimates and sigmas provided by the user
+        and make sure they are valid.
+
+        Returns
+        -------
+        None : NoneType
+            None
+
+        Raises
+        ------
+        ValueError
+            If the prior estimates and sigmas do not have the same length.
+        """
+        # check that the keys in self.x_init are the same as in self.prior_est and self.prior_sigs
+        if self.prior_est is not None and self.prior_sigs is not None:
+            self._priors_given = True
+            if len(self.prior_est) != len(self.prior_sigs):
+                raise ValueError("Prior estimates and sigmas must have the same length.")
+            for key in self.prior_est.keys():
+                if key not in self.x_init:
+                    raise ValueError(f"Key {key} not found in initial state vector.")
+            self._info0 = np.zeros_like(self.covariance_init)
+            self._xbar0 = np.zeros(self.n_fit)
+            for key in self.prior_est.keys():
+                idx = list(self.x_init.keys()).index(key)
+                self._info0[idx, idx] = 1/self.prior_sigs[key]**2
+                self._xbar0[idx] = self.prior_est[key] - self.x_init[key]
+            self._prior_constant = list(self.x_nom.values())+self._xbar0
         return None
 
     def _flatten_and_clean(self, arr):
@@ -1584,6 +1622,11 @@ class FitSimulation:
                 rms_u += resid @ resid.T
                 chi_sq += resid @ self.obs_weight[i] @ resid.T
             j += size
+        # # write res_chisq_vals to file if any values are negative
+        # if np.any(res_chisq_vals < 0):
+        #     print("WARNING: Negative outlier rejection chi-squared values detected. "
+        #             "Writing to file 'warn_neg_chisq_vals.txt'.")
+        #     np.savetxt("warn_neg_chisq_vals.txt", res_chisq_vals, fmt="%.16f")
         self.obs['selAst'] = sel_ast
         self.obs['resChi'] = res_chisq_vals**0.5
         rejected_fraction = self.num_rejected/len(self.obs)
@@ -1667,8 +1710,12 @@ class FitSimulation:
         delta_x : array
             The state correction.
         """
-        atwa = np.zeros((self.n_fit, self.n_fit))
-        atwb = np.zeros(self.n_fit)
+        if self._priors_given:
+            atwa = self._info0.copy()
+            atwb = (self._info0 @ self._xbar0).copy()
+        else:
+            atwa = np.zeros((self.n_fit, self.n_fit))
+            atwb = np.zeros(self.n_fit)
         j = 0
         sel_ast = self.obs['selAst'].values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
@@ -1686,11 +1733,11 @@ class FitSimulation:
             j += size
         # use pseudo-inverse if the data arc is less than 7 days
         if self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min() < 7.0:
-            cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+            self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         else:
-            cov = np.array(libgrss.matrix_inverse(atwa))
-        delta_x = cov @ atwb
-        return delta_x.ravel(), cov
+            self.covariance = np.array(libgrss.matrix_inverse(atwa))
+        delta_x = self.covariance @ atwb
+        return delta_x.ravel()
 
     def filter_lsq(self, verbose=True):
         """
@@ -1706,38 +1753,52 @@ class FitSimulation:
         None : NoneType
             None
         """
+        self._check_priors()
         start_rejecting = False
         if verbose:
             print("Iteration\t\tUnweighted RMS\t\tWeighted RMS",
                     "\t\tChi-squared\t\tReduced Chi-squared")
+        delta_x = np.zeros(self.n_fit)
         for i in range(self.n_iter_max):
+            if self._priors_given:
+                self._xbar0 -= delta_x
+                a_priori_constant = list(self.x_nom.values())+self._xbar0
+                a_priori_constant_violation = np.linalg.norm(a_priori_constant-self._prior_constant)
+                if a_priori_constant_violation >= 1e-11:
+                    print(f"a priori constraint constant violation before iteration {i+1}: "
+                            f"{a_priori_constant_violation}. Solution may not be trustworthy. "
+                            "Violation for each estimated parameter:")
+                    print(dict(zip(self.x_nom.keys(), a_priori_constant-self._prior_constant)))
             self.n_iter = i+1
             # get residuals and partials
             residuals, partials = self._get_residuals_and_partials()
             # calculate rms and reject outliers here if desired
             rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
                                                                             start_rejecting)
-            # get initial guess
-            curr_state = np.array(list(self.x_nom.values()))
+            # get current state
+            curr_state = list(self.x_nom.values())
             # get state correction
-            delta_x, cov = self._get_lsq_state_correction(partials, residuals)
-            # get new covariance
-            self.covariance = cov
-            # get new state
+            delta_x = self._get_lsq_state_correction(partials, residuals)
             if self.constraint_dir is not None:
                 constr_hat = self.constraint_dir/np.linalg.norm(self.constraint_dir)
                 delta_x -= np.dot(delta_x, constr_hat)*constr_hat
-            next_state = curr_state + delta_x
-            if self.fit_cometary and next_state[0] < 0.0:
-                next_state[0] = 0.0
-                print("WARNING: Eccentricity is negative per least squares state correction. "
-                        "Setting to 0.0. This solution may not be trustworthy.")
-            self.x_nom = dict(zip(self.x_nom.keys(), next_state))
-            # make sure any keys starting with dt are positive and stay in the range [0, 180]
+            # make sure eccentricity is non-negative and
+            # any keys starting with dt are 0.1 at minimum
             for key in self.x_nom:
+                if self.fit_cometary and key == 'e':
+                    idx = list(self.x_nom.keys()).index(key)
+                    if curr_state[idx] + delta_x[idx] < 0.0:
+                        delta_x[idx] = -curr_state[idx]
+                        print("WARNING: Eccentricity is negative per least squares "
+                                "state correction. Setting to 0.0. This solution "
+                                "may not be trustworthy.")
                 if key[:2] == 'dt':
-                    self.x_nom[key] = abs(self.x_nom[key])
-                    self.x_nom[key] = min(self.x_nom[key], 180.0)
+                    idx = list(self.x_nom.keys()).index(key)
+                    if curr_state[idx] + delta_x[idx] < 0.1:
+                        delta_x[idx] = 0.1 - curr_state[idx]
+            # get new nominal state
+            next_state = curr_state + delta_x
+            self.x_nom = dict(zip(self.x_nom.keys(), next_state))
             # add iteration
             self._add_iteration(i+1, rms_u, rms_w, chi_sq)
             if verbose:
@@ -1968,6 +2029,18 @@ class FitSimulation:
                     f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
                 if key in units_dict:
                     f.write(f" {units_dict[key]}")
+                if self._priors_given and key in self.prior_est:
+                    p_val = self.prior_est[key]
+                    p_sig = self.prior_sigs[key]
+                    if key in ['om', 'w', 'i']:
+                        p_val *= 180/np.pi
+                        p_sig *= 180/np.pi
+                    if key in ['a1', 'a2', 'a3']:
+                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e})")
+                    else:
+                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f})")
+                    if key in units_dict:
+                        f.write(f" {units_dict[key]}")
                 f.write("\n")
             f.write("\n")
             f.write("Initial Covariance Matrix:\n")
@@ -1995,6 +2068,18 @@ class FitSimulation:
                     f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
                 if key in units_dict:
                     f.write(f" {units_dict[key]}")
+                if self._priors_given and key in self.prior_est:
+                    p_val = self.prior_est[key]
+                    p_sig = self.prior_sigs[key]
+                    if key in ['om', 'w', 'i']:
+                        p_val *= 180/np.pi
+                        p_sig *= 180/np.pi
+                    if key in ['a1', 'a2', 'a3']:
+                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e})")
+                    else:
+                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f})")
+                    if key in units_dict:
+                        f.write(f" {units_dict[key]}")
                 f.write("\n")
             f.write("\n")
             f.write("Final Covariance Matrix:\n")
