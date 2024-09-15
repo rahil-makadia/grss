@@ -479,7 +479,8 @@ def apply_debiasing_scheme(obs_df, lowres, verbose):
             unbias_counter += len(group)
             continue
         if cat_code not in biased_catalogs:
-            print(f"\tUnknown star catalog: {cat}")
+            if verbose:
+                print(f"\tUnknown star catalog: {cat}")
             obs_df.loc[group.index, 'biasRA'] = 0.0
             obs_df.loc[group.index, 'biasDec'] = 0.0
             continue

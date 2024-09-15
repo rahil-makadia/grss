@@ -691,14 +691,18 @@ class FitSimulation:
         weights = self.simulated_obs['weights']
         if not len(times) == len(modes) == len(weights):
             raise ValueError("Simulated observation data must have the same length.")
+        perm_id = self.obs['permID'][0]
+        prov_id = self.obs['provID'][0]
         for i, time in enumerate(times):
             idx = len(self.obs)
             mode = modes[i]
             if mode not in {'SIM_CCD', 'SIM_OCC', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                 raise ValueError(f"Unknown simulated observation mode {mode}.")
             weight = weights[i]
-            self.obs.loc[idx, 'permID'] = 'SIM_'+str(self.obs['permID'][0])
-            self.obs.loc[idx, 'provID'] = 'SIM_'+str(self.obs['provID'][0])
+            if isinstance(perm_id, str):
+                self.obs.loc[idx, 'permID'] = f'SIM_{perm_id}'
+            if isinstance(prov_id, str):
+                self.obs.loc[idx, 'provID'] = f'SIM_{prov_id}'
             self.obs.loc[idx, 'obsTime'] = f'{time.utc.isot}Z'
             self.obs.loc[idx, 'obsTimeMJD'] = time.utc.mjd
             self.obs.loc[idx, 'obsTimeMJDTDB'] = time.tdb.mjd
@@ -1347,7 +1351,7 @@ class FitSimulation:
             | special_codes["spacecraft"]
         )
         for i in range(len(self.observer_info_lengths)):
-            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'SIM_OCC'}:
+            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'SIM_CCD', 'SIM_OCC'}:
                 sig_ra = sig_ra_vals[i]
                 sig_dec = sig_dec_vals[i]
                 sig_corr = sig_corr_vals[i]
@@ -1611,11 +1615,11 @@ class FitSimulation:
                 res_chisq_vals[i] = residual_chi_squared
             # outlier rejection, only reject RA/Dec measurements
             if start_rejecting and size == 2:
-                if residual_chi_squared > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                if abs(residual_chi_squared) > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
                     if sel_ast[i] == 'A':
                         self.num_rejected += 1
                     sel_ast[i] = 'D'
-                elif residual_chi_squared < chi_recover**2 and sel_ast[i] == 'D':
+                elif abs(residual_chi_squared) < chi_recover**2 and sel_ast[i] == 'D':
                     sel_ast[i] = 'A'
                     self.num_rejected -= 1
             if sel_ast[i] not in {'D', 'd'}:
