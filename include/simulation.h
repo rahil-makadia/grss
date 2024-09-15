@@ -242,7 +242,8 @@ class Event {
     real multiplier = 1.0L;
 
     // for continuous ejecta events
-    real dt = 1.0L;
+    std::vector<real> expAccel0 = {0.0L, 0.0L, 0.0L};
+    real tau = 1.0L;
     bool isContinuous = false;
     bool isHappening = false;
     /**
@@ -522,8 +523,8 @@ class PropSimulation {
     /**
      * @brief Add an ejecta event to the simulation.
      */
-    void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
-                   real multiplier, real dt);
+    void add_event(IntegBody body, real tEvent, std::vector<real> expAccel0,
+                   real multiplier, real tau);
     /**
      * @brief Set the values of the PropSimulation Constants object.
      */

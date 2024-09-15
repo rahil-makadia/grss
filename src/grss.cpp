@@ -884,8 +884,8 @@ PYBIND11_MODULE(libgrss, m) {
              static_cast<void (PropSimulation::*)(
                  IntegBody, real, std::vector<real>, real, real)>(
                  &PropSimulation::add_event),
-             py::arg("bodyName"), py::arg("tEvent"), py::arg("deltaV"),
-             py::arg("multiplier"), py::arg("dt"),
+             py::arg("bodyName"), py::arg("tEvent"), py::arg("expAccel0"),
+             py::arg("multiplier"), py::arg("tau"),
              R"mydelimiter(
              Adds an ejecta event to the simulation.
 
@@ -895,12 +895,12 @@ PYBIND11_MODULE(libgrss, m) {
                 Name of the body to apply the delta-V to.
             tEvent : real
                 MJD Epoch of the event. Must be in TDB.
-            deltaV : list of real
-                Delta-V to apply to the body.
+            expAccel0 : list of real
+                Initial exponentiallly decaying acceleration.
             multiplier : real
-                Multiplier to apply to the delta-V.
-            dt : real
-                Time duration for the continuous ejecta event.
+                Multiplier for the exponential decay.
+            tau : real
+                Time constant for the exponentiallly decaying acceleration.
             )mydelimiter")
         .def("set_sim_constants", &PropSimulation::set_sim_constants,
              py::arg("du2m") = 149597870700.0L, py::arg("tu2s") = 86400.0L,

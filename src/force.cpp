@@ -657,24 +657,16 @@ static void force_continuous_event(const real &t, const PropSimulation *propSim,
             if (propSim->eventMngr.continuousEvents[i].isHappening){
                 const size_t starti =
                     propSim->eventMngr.continuousEvents[i].xIntegIndex / 2;
-                const real tPastEvent =
-                    t - propSim->eventMngr.continuousEvents[i].t;
-                // f = np.sin(np.pi*x/(2*time_for_val))
-                // df = np.pi/(2*time_for_val)*np.cos(np.pi*x/(2*time_for_val))
-                const real preFac =
-                    PI / (2 * propSim->eventMngr.continuousEvents[i].dt);
-                real accFac = preFac * cos(preFac * tPastEvent);
-                if (accFac > preFac || accFac < 0.0) {
-                    accFac = 0.0;
-                }
-                accInteg[starti + 0] += accFac *
-                    propSim->eventMngr.continuousEvents[i].deltaV[0] *
+                const real tPastEvent = t - propSim->eventMngr.continuousEvents[i].t;
+                const real postFac = exp(-tPastEvent/propSim->eventMngr.continuousEvents[i].tau);
+                accInteg[starti + 0] += propSim->eventMngr.continuousEvents[i].expAccel0[0] *
+                    postFac *
                     propSim->eventMngr.continuousEvents[i].multiplier * propDir;
-                accInteg[starti + 1] += accFac *
-                    propSim->eventMngr.continuousEvents[i].deltaV[1] *
+                accInteg[starti + 1] += propSim->eventMngr.continuousEvents[i].expAccel0[1] *
+                    postFac *
                     propSim->eventMngr.continuousEvents[i].multiplier * propDir;
-                accInteg[starti + 2] += accFac *
-                    propSim->eventMngr.continuousEvents[i].deltaV[2] *
+                accInteg[starti + 2] += propSim->eventMngr.continuousEvents[i].expAccel0[2] *
+                    postFac *
                     propSim->eventMngr.continuousEvents[i].multiplier * propDir;
             }
         }

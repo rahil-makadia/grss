@@ -1060,7 +1060,7 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     event.deltaV = deltaV;
     event.multiplier = multiplier;
 
-    event.dt = 0.0;
+    event.tau = 0.0;
     event.isContinuous = false;
     event.isHappening = false;
     event_postprocess(this, event);
@@ -1070,22 +1070,23 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
 /**
  * @param[in] body IntegBody object to apply the EjectaEvent to.
  * @param[in] tEvent Time at which to apply the EjectaEvent.
- * @param[in] deltaV Delta-V for the ejecta.
- * @param[in] multiplier Multiplier for the Delta-V.
- * @param[in] dt Time duration for the ejecta.
+ * @param[in] expAccel0 Initial exponentiallly decaying acceleration.
+ * @param[in] multiplier Multiplier for the exponential decay.
+ * @param[in] tau Time constant for the exponentiallly decaying acceleration.
  */
 void PropSimulation::add_event(IntegBody body, real tEvent,
-                               std::vector<real> deltaV, real multiplier,
-                               real dt) {
+                               std::vector<real> expAccel0, real multiplier,
+                               real tau) {
     size_t bodyIndex = event_preprocess(this, body, tEvent);
     Event event;
     event.t = tEvent;
     event.bodyName = body.name;
     event.bodyIndex = bodyIndex;
-    event.deltaV = deltaV;
+    event.deltaV = std::vector<real>(3, 0.0);
     event.multiplier = multiplier;
 
-    event.dt = dt;
+    event.expAccel0 = expAccel0;
+    event.tau = tau;
     event.isContinuous = true;
     event.isHappening = false;
     event_postprocess(this, event);

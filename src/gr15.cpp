@@ -255,14 +255,12 @@ void check_continuous_events(PropSimulation *propSim, const real &t) {
         bool allDone = true;
         bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
         for (size_t i = 0; i < propSim->eventMngr.nConEvents; i++) {
-            // const bool eventStarted = t >= propSim->eventMngr.continuousEvents[i].t;
-            // const bool eventEnded = t > propSim->eventMngr.continuousEvents[i].t + propSim->eventMngr.continuousEvents[i].dt;
             bool eventStarted, eventEnded;
             if (forwardProp) {
                 eventStarted = t >= propSim->eventMngr.continuousEvents[i].t;
-                eventEnded = t >= (propSim->eventMngr.continuousEvents[i].t + propSim->eventMngr.continuousEvents[i].dt);
+                eventEnded = t >= propSim->integParams.tf;
             } else {
-                eventStarted = t <= (propSim->eventMngr.continuousEvents[i].t + propSim->eventMngr.continuousEvents[i].dt);
+                eventStarted = t <= propSim->integParams.t0;
                 eventEnded = t < propSim->eventMngr.continuousEvents[i].t;
             }
             if (eventStarted && !eventEnded) {
@@ -306,17 +304,12 @@ void event_timestep_check(PropSimulation *propSim, real &dt) {
         }
     }
     if (!propSim->eventMngr.allConEventDone) {
-        for (size_t i = 0; i < propSim->eventMngr.nConEvents; i++) {
-            if (propSim->eventMngr.continuousEvents[i].isHappening) {
-                // if any continuous event is happening, set dt to 1/10th of the event duration
-                // dt is the min of the current dt and the one dictated by the event
-                dt = fmin(1.0, propSim->eventMngr.continuousEvents[i].dt/10.0L);
-                dt = forwardProp ? dt : -dt;
-            }
-            if (forwardProp && propSim->t < propSim->eventMngr.continuousEvents[i].t) {
-                tNextEvent = fmin(tNextEvent, propSim->eventMngr.continuousEvents[i].t);
-            } else if (!forwardProp && propSim->t > propSim->eventMngr.continuousEvents[i].t+propSim->eventMngr.continuousEvents[i].dt) {
-                tNextEvent = fmax(tNextEvent, propSim->eventMngr.continuousEvents[i].t+propSim->eventMngr.continuousEvents[i].dt);
+        for (size_t i = 0; i < propSim->eventMngr.nConEvents; i++) { 
+            const real tNextConEvent = propSim->eventMngr.continuousEvents[i].t;
+            if (forwardProp && propSim->t < tNextConEvent) {
+                tNextEvent = fmin(tNextEvent, tNextConEvent);
+            } else if (!forwardProp && propSim->t > tNextConEvent) {
+                tNextEvent = fmax(tNextEvent, tNextConEvent);
             }
         }
     }
