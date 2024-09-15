@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.PropSimulation &#8212; GRSS 4.2.3 documentation</title>
+    <title>grss.libgrss.PropSimulation &#8212; GRSS 4.3.0 documentation</title>
   
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.2.3 documentation</p>
+    <p class="title logo__title">GRSS v4.3.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -752,7 +752,7 @@ document.write(`
 </dl>
 </div></blockquote>
 </li>
-<li><p>add_event(self: grss.libgrss.PropSimulation, bodyName: grss.libgrss.IntegBody, tEvent: float, deltaV: list[float], multiplier: float, dt: float) -&gt; None</p>
+<li><p>add_event(self: grss.libgrss.PropSimulation, bodyName: grss.libgrss.IntegBody, tEvent: float, expAccel0: list[float], multiplier: float, tau: float) -&gt; None</p>
 <blockquote>
 <div><blockquote>
 <div><p>Adds an ejecta event to the simulation.</p>
@@ -762,11 +762,11 @@ document.write(`
 </dd>
 <dt>tEvent<span class="classifier">real</span></dt><dd><p>MJD Epoch of the event. Must be in TDB.</p>
 </dd>
-<dt>deltaV<span class="classifier">list of real</span></dt><dd><p>Delta-V to apply to the body.</p>
+<dt>expAccel0<span class="classifier">list of real</span></dt><dd><p>Initial exponentiallly decaying acceleration.</p>
 </dd>
-<dt>multiplier<span class="classifier">real</span></dt><dd><p>Multiplier to apply to the delta-V.</p>
+<dt>multiplier<span class="classifier">real</span></dt><dd><p>Multiplier for the exponential decay.</p>
 </dd>
-<dt>dt<span class="classifier">real</span></dt><dd><p>Time duration for the continuous ejecta event.</p>
+<dt>tau<span class="classifier">real</span></dt><dd><p>Time constant for the exponentiallly decaying acceleration.</p>
 </dd>
 </dl>
 </div></blockquote>
