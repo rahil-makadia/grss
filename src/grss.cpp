@@ -928,7 +928,7 @@ PYBIND11_MODULE(libgrss, m) {
              py::arg("tEvalUTC") = false, py::arg("evalApparentState") = false,
              py::arg("convergedLightTime") = false,
              py::arg("observerInfo") = std::vector<std::vector<real>>(),
-             py::arg("adaptiveTimestep") = true, py::arg("dt0") = 0.0L,
+             py::arg("adaptiveTimestep") = true, py::arg("dt0") = 1.0L,
              py::arg("dtMin") = 1.0e-4L, py::arg("dtChangeFactor") = 0.25L,
              py::arg("tolInteg") = 1.0e-11L, py::arg("tolPC") = 1.0e-16L,
              R"mydelimiter(

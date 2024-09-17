@@ -5,7 +5,7 @@
  * @return real Initial timestep.
  */
 real get_initial_timestep(PropSimulation *propSim){
-    real dt0 = propSim->integParams.dtMin;
+    real dt0 = 1.0L;
     if (propSim->integParams.dt0 != 0.0) {
         dt0 = fabs(propSim->integParams.dt0);
     }
@@ -233,9 +233,7 @@ void check_and_apply_impulsive_events(PropSimulation *propSim, const real &t,
     real *tNextImpEvent = &propSim->eventMngr.tNextImpEvent;
     while (*nextImpEventIdx < propSim->eventMngr.nImpEvents && t == *tNextImpEvent) {
         // apply events for the state just reached by the integrator
-        bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
-        real propDir = forwardProp ? 1.0L : -1.0L;
-        propSim->eventMngr.impulsiveEvents[*nextImpEventIdx].apply_impulsive(t, xInteg, propDir);
+        propSim->eventMngr.impulsiveEvents[*nextImpEventIdx].apply_impulsive(propSim, t, xInteg);
         // update next event index and time
         (*nextImpEventIdx)++;
         if (*nextImpEventIdx < propSim->eventMngr.nImpEvents) {
