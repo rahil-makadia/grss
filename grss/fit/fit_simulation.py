@@ -843,7 +843,7 @@ class FitSimulation:
         """
         # pylint: disable=no-member
         t_eval_past = self.obs.obsTimeMJD.values[self.past_obs_idx]
-        tf_past = np.min(t_eval_past)
+        tf_past = np.min(self.obs.obsTimeMJDTDB.values[self.past_obs_idx])
         prop_sim_past = libgrss.PropSimulation(name, self.t_sol,
                                                 self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
@@ -887,7 +887,7 @@ class FitSimulation:
         """
         # pylint: disable=no-member
         t_eval_future = self.obs.obsTimeMJD.values[self.future_obs_idx]
-        tf_future = np.max(t_eval_future)
+        tf_future = np.max(self.obs.obsTimeMJDTDB.values[self.future_obs_idx])
         prop_sim_future = libgrss.PropSimulation(name, self.t_sol,
                                                     self.de_kernel, self.de_kernel_path)
         prop_sim_future.tEvalMargin = 1.0
@@ -1340,7 +1340,7 @@ class FitSimulation:
         radius_nonzero = self.fixed_propsim_params['radius'] != 0.0
         fac = 0.0
         if radius_nonzero:
-            rel_dists = np.linalg.norm(np.array(state_eval)[:, :3], axis=1)
+            rel_dists = np.linalg.norm([state[:3] for state in state_eval], axis=1)
             lmbda = 0.3 # from fuentes-munoz et al. 2024
             au2m = 1.495978707e11
             fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists*180/np.pi*3600)**2
@@ -1412,7 +1412,8 @@ class FitSimulation:
                 size = 1
             else:
                 raise ValueError("Observer info length not recognized.")
-            part = np.zeros((size, self.n_fit))
+            # part is partial of observable with respect to state at observation time
+            part = np.zeros((size, 6))
             if self.past_obs_exist and i < len_past_idx:
                 sim_idx = i
                 optical_partials = past_optical_partials
@@ -1423,14 +1424,16 @@ class FitSimulation:
                 optical_partials = future_optical_partials
                 radar_partials = future_radar_partials
                 state = future_states
-            stm = libgrss.reconstruct_stm(state[sim_idx][6:])
+            # stm is partial of state at observation time with respect to nominal state
+            stm = libgrss.reconstruct_stm(state[sim_idx][6:])[:6]
             if is_optical:
                 part[0, :6] = optical_partials[sim_idx, :6]*cos_dec[i]
                 part[1, :6] = optical_partials[sim_idx, 6:12]
             else:
                 part[0, :6] = radar_partials[sim_idx, :6]
+            # partial is partial of observable with respect to nominal state
             partial = part @ stm
-            partials[partials_idx:partials_idx+size, :] = partial
+            partials[partials_idx:partials_idx+size, :partial.shape[1]] = partial
             partials_idx += size
         return partials
 

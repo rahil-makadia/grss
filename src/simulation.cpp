@@ -340,16 +340,25 @@ void IntegBody::prepare_stm(){
  * @param[inout] xInteg State of the body.
  * @param[in] propDir Direction of propagation.
  */
-void Event::apply_impulsive(const real& t, std::vector<real>& xInteg,
-                         const real& propDir) {
+void Event::apply_impulsive(PropSimulation *propSim, const real &t, std::vector<real>& xInteg) {
     if (t != this->t) {
         throw std::runtime_error(
             "Event::apply_impulsive: Integration time does "
             "not match event time. Cannot apply impulse.");
     }
     size_t velStartIdx = this->xIntegIndex + 3;
+    bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
+    real propDir = forwardProp ? 1.0L : -1.0L;
     for (size_t i = 0; i < 3; i++) {
         xInteg[velStartIdx + i] += propDir * this->multiplier * this->deltaV[i];
+    }
+    if (propSim->integBodies[this->bodyIndex].propStm) {
+        IntegBody *body = &propSim->integBodies[this->bodyIndex];
+        const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est;
+        const size_t DeltaVStmIdx = this->xIntegIndex + 6 + 36 + 6*numNongravs;
+        xInteg[DeltaVStmIdx+3] = forwardProp ? 1.0L : -1.0L;
+        xInteg[DeltaVStmIdx+10] = forwardProp ? 1.0L : -1.0L;
+        xInteg[DeltaVStmIdx+17] = forwardProp ? 1.0L : -1.0L;
     }
 }
 
@@ -748,7 +757,7 @@ void PropSimulation::prepare_for_evaluation(
     // sort tEval into ascending order or descending order based on the
     // integration direction (not during orbit fits)
     if (observerInfo.size() == 0) {
-    std::vector<size_t> tEvalSortedIdx(tEval.size());
+        std::vector<size_t> tEvalSortedIdx(tEval.size());
         sort_vector(tEval, forwardProp, tEvalSortedIdx);
     }
     if (forwardProp) {
@@ -986,7 +995,7 @@ void PropSimulation::remove_body(std::string name) {
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
-size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
+static size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
                         const real &tEvent) {
     // check if tEvent is valid
     const bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
@@ -1016,7 +1025,21 @@ size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
     return bodyIndex;
 }
 
-void event_postprocess(PropSimulation *propSim, Event &event) {
+static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const Event &event){
+    body->n2Derivs += 3*3;
+    propSim->integBodies[event.bodyIndex].n2Derivs += 3*3;
+    propSim->integParams.n2Derivs += 3*3;
+
+    const bool backwardProp = propSim->integParams.tf < propSim->integParams.t0;
+    std::vector<real> extraVec = std::vector<real>(6*3, 0.0);
+    // add extra vector at the end of stm vector
+    for (size_t i = 0; i < extraVec.size(); i++) {
+        body->stm.push_back(extraVec[i]);
+        propSim->integBodies[event.bodyIndex].stm.push_back(extraVec[i]);
+    }
+}
+
+static void event_postprocess(PropSimulation *propSim, Event &event) {
     // assign event xIntegIndex
     event.xIntegIndex = 0;
     for (size_t i = 0; i < event.bodyIndex; i++) {
@@ -1059,6 +1082,10 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     event.bodyIndex = bodyIndex;
     event.deltaV = deltaV;
     event.multiplier = multiplier;
+    // modify stm if estimating Delta-V
+    if (body.propStm) {
+        event_stm_handling(this, &body, event);
+    }
 
     event.tau = 0.0;
     event.isContinuous = false;
