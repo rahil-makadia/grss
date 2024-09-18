@@ -336,9 +336,9 @@ void IntegBody::prepare_stm(){
 }
 
 /**
+ * @param[in] propSim PropSimulation object.
  * @param[in] t Time of the event.
  * @param[inout] xInteg State of the body.
- * @param[in] propDir Direction of propagation.
  */
 void Event::apply_impulsive(PropSimulation *propSim, const real &t, std::vector<real>& xInteg) {
     if (t != this->t) {

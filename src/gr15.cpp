@@ -289,6 +289,7 @@ void check_events(PropSimulation *propSim, const real &t, std::vector<real> &xIn
 
 /**
  * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] dt Current timestep.
  */
 void event_timestep_check(PropSimulation *propSim, real &dt) {
     real tNextEvent = propSim->integParams.tf;

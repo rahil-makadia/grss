@@ -96,16 +96,11 @@ void check_events(PropSimulation *propSim, const real &t, std::vector<real> &xIn
 
 /**
  * @brief Check whether timestep is too large that it would skip an event.
- * 
- * @param[in] propSim PropSimulation object for the integration.
- * @param[in] dt Current timestep.
  */
 void event_timestep_check(PropSimulation *propSim, real &dt);
 
 /**
  * @brief 15th-order Gauss-Radau integrator for the PropSimulation.
- * 
- * @param[inout] propSim PropSimulation object for the integration.
  */
 void gr15(PropSimulation *propSim);
 

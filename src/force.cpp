@@ -645,6 +645,7 @@ static void force_thruster(const PropSimulation *propSim,
 }
 
 /**
+ * @param[in] t Time [TDB MJD]
  * @param[in] propSim PropSimulation object.
  * @param[inout] accInteg State derivative vector.
  */
