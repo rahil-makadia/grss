@@ -1028,15 +1028,23 @@ class FitSimulation:
         events = []
         for i in range(len(self.fixed_propsim_params['events'])):
             fixed_event = tuple(self.fixed_propsim_params['events'][i])
+            fixed_event_impulsive = len(fixed_event) == 5
+            fixed_event_continuous = len(fixed_event) == 6
+            if fixed_event_continuous and fixed_event[5] == 0.0:
+                raise ValueError("Continuous event time constant cannot be 0.")
+            assert fixed_event_impulsive or fixed_event_continuous
             event = [None]*5
             event[0] = fixed_event[0] # time of delta-v
-            event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
-            event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
-            event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
-            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
-            fixed_event_continuous = len(fixed_event) == 6 and fixed_event[5] != 0.0
-            if fixed_event_continuous or f"dt{i}" in x_dict.keys():
+            if fixed_event_impulsive:
+                event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
+                event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
+                event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
+            elif fixed_event_continuous:
+                event[1] = x_dict[f"ax{i}"] if f"ax{i}" in x_dict.keys() else fixed_event[1]
+                event[2] = x_dict[f"ay{i}"] if f"ay{i}" in x_dict.keys() else fixed_event[2]
+                event[3] = x_dict[f"az{i}"] if f"az{i}" in x_dict.keys() else fixed_event[3]
                 event.append(x_dict[f"dt{i}"] if f"dt{i}" in x_dict.keys() else fixed_event[5])
+            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
             events.append(tuple(event))
         return events
 
@@ -1064,11 +1072,11 @@ class FitSimulation:
         """
         for event in events:
             t_event = event[0]
-            dvx = event[1]
-            dvy = event[2]
-            dvz = event[3]
+            dvx_or_ax = event[1]
+            dvy_or_ay = event[2]
+            dvz_or_az = event[3]
             multiplier = event[4]
-            event_args = (integ_body, t_event, [dvx, dvy, dvz], multiplier)
+            event_args = (integ_body, t_event, [dvx_or_ax, dvy_or_ay, dvz_or_az], multiplier)
             if len(event) == 6:
                 dt = event[5]
                 event_args += (dt,)
@@ -1123,6 +1131,8 @@ class FitSimulation:
         if key[:4] == 'mult':
             fd_pert = 1e0
         if key[:3] in {'dvx', 'dvy', 'dvz'}:
+            fd_pert = 1e-11
+        if key[:2] in {'ax', 'ay', 'az'}:
             fd_pert = 1e-11
         if key[:2] == 'dt':
             fd_pert = 1.0
