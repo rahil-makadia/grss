@@ -240,6 +240,7 @@ class Event {
     // for impulsive events
     std::vector<real> deltaV = {0.0L, 0.0L, 0.0L};
     real multiplier = 1.0L;
+    bool multiplierEst = false;
 
     // for continuous ejecta events
     std::vector<real> expAccel0 = {0.0L, 0.0L, 0.0L};

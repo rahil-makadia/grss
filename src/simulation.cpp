@@ -356,9 +356,15 @@ void Event::apply_impulsive(PropSimulation *propSim, const real &t, std::vector<
         IntegBody *body = &propSim->integBodies[this->bodyIndex];
         const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est;
         const size_t DeltaVStmIdx = this->xIntegIndex + 6 + 36 + 6*numNongravs;
-        xInteg[DeltaVStmIdx+3] = forwardProp ? 1.0L : -1.0L;
-        xInteg[DeltaVStmIdx+10] = forwardProp ? 1.0L : -1.0L;
-        xInteg[DeltaVStmIdx+17] = forwardProp ? 1.0L : -1.0L;
+        if (this->multiplierEst){
+            xInteg[DeltaVStmIdx+3] = propDir * this->deltaV[0];
+            xInteg[DeltaVStmIdx+4] = propDir * this->deltaV[1];
+            xInteg[DeltaVStmIdx+5] = propDir * this->deltaV[2];
+        } else {
+            xInteg[DeltaVStmIdx+3] = propDir;
+            xInteg[DeltaVStmIdx+10] = propDir;
+            xInteg[DeltaVStmIdx+17] = propDir;
+        }
     }
 }
 
@@ -1026,12 +1032,16 @@ static size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
 }
 
 static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const Event &event){
-    body->n2Derivs += 3*3;
-    propSim->integBodies[event.bodyIndex].n2Derivs += 3*3;
-    propSim->integParams.n2Derivs += 3*3;
+    int numEventParams = 3;
+    if (event.multiplierEst) {
+        numEventParams = 1;
+    }
+    body->n2Derivs += 3*numEventParams;
+    propSim->integBodies[event.bodyIndex].n2Derivs += 3*numEventParams;
+    propSim->integParams.n2Derivs += 3*numEventParams;
 
     const bool backwardProp = propSim->integParams.tf < propSim->integParams.t0;
-    std::vector<real> extraVec = std::vector<real>(6*3, 0.0);
+    std::vector<real> extraVec = std::vector<real>(6*numEventParams, 0.0);
     // add extra vector at the end of stm vector
     for (size_t i = 0; i < extraVec.size(); i++) {
         body->stm.push_back(extraVec[i]);
@@ -1081,6 +1091,17 @@ void PropSimulation::add_event(IntegBody body, real tEvent,
     event.bodyName = body.name;
     event.bodyIndex = bodyIndex;
     event.deltaV = deltaV;
+    // if multiplier is numeric, estimate it otherwise estimate full deltaV vector
+    if (!std::isfinite(multiplier)) {
+        if (body.propStm){
+            event.multiplierEst = false;
+        }
+        multiplier = 1.0;
+    } else {
+        if (body.propStm) {
+            event.multiplierEst = true;
+        }
+    }
     event.multiplier = multiplier;
     // modify stm if estimating Delta-V
     if (body.propStm) {
