@@ -1135,7 +1135,8 @@ class FitSimulation:
         if key[:2] in {'ax', 'ay', 'az'}:
             fd_pert = 1e-11
         if key[:2] == 'dt':
-            fd_pert = 1.0
+            # 10 percent of the time constant
+            fd_pert = 0.1*self.x_nom[key]
         if fd_pert == np.inf:
             raise ValueError("Finite difference perturbation not defined"
                                 " for the given state parameter.")
@@ -2002,6 +2003,8 @@ class FitSimulation:
             'w': 'deg', 'i': 'deg', 'x': 'AU', 'y': 'AU', 'z': 'AU',
             'vx': 'AU/day', 'vy': 'AU/day', 'vz': 'AU/day',
             'a1': 'AU/day^2', 'a2': 'AU/day^2', 'a3': 'AU/day^2',
+            'dv': 'AU/day', 'ax': 'AU/day^2', 'ay': 'AU/day^2', 'az': 'AU/day^2',
+            'dt': 'day'
         }
         with open(filename, 'x', encoding='utf-8') as f:
             f.write(section_full + '\n')
@@ -2040,24 +2043,25 @@ class FitSimulation:
                 if key in ['om', 'w', 'i']:
                     val *= 180/np.pi
                     sig *= 180/np.pi
-                if key in ['a1', 'a2', 'a3']:
+                if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
                     f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e}")
                 else:
                     f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
-                if key in units_dict:
-                    f.write(f" {units_dict[key]}")
+                if key[:2] in units_dict:
+                    f.write(f" {units_dict[key[:2]]}")
                 if self._priors_given and key in self.prior_est:
                     p_val = self.prior_est[key]
                     p_sig = self.prior_sigs[key]
                     if key in ['om', 'w', 'i']:
                         p_val *= 180/np.pi
                         p_sig *= 180/np.pi
-                    if key in ['a1', 'a2', 'a3']:
-                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e})")
+                    if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
+                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e}")
                     else:
-                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f})")
-                    if key in units_dict:
-                        f.write(f" {units_dict[key]}")
+                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f}")
+                    if key[:2] in units_dict:
+                        f.write(f" {units_dict[key[:2]]}")
+                    f.write(")")
                 f.write("\n")
             f.write("\n")
             f.write("Initial Covariance Matrix:\n")
@@ -2079,24 +2083,25 @@ class FitSimulation:
                 if key in ['om', 'w', 'i']:
                     val *= 180/np.pi
                     sig *= 180/np.pi
-                if key in ['a1', 'a2', 'a3']:
+                if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
                     f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e}")
                 else:
                     f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
-                if key in units_dict:
-                    f.write(f" {units_dict[key]}")
+                if key[:2] in units_dict:
+                    f.write(f" {units_dict[key[:2]]}")
                 if self._priors_given and key in self.prior_est:
                     p_val = self.prior_est[key]
                     p_sig = self.prior_sigs[key]
                     if key in ['om', 'w', 'i']:
                         p_val *= 180/np.pi
                         p_sig *= 180/np.pi
-                    if key in ['a1', 'a2', 'a3']:
-                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e})")
+                    if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
+                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e}")
                     else:
-                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f})")
-                    if key in units_dict:
-                        f.write(f" {units_dict[key]}")
+                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f}")
+                    if key[:2] in units_dict:
+                        f.write(f" {units_dict[key[:2]]}")
+                    f.write(")")
                 f.write("\n")
             f.write("\n")
             f.write("Final Covariance Matrix:\n")

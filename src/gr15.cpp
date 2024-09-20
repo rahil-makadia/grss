@@ -310,6 +310,18 @@ void event_timestep_check(PropSimulation *propSim, real &dt) {
             } else if (!forwardProp && propSim->t > tNextConEvent) {
                 tNextEvent = fmax(tNextEvent, tNextConEvent);
             }
+            // break up the timestep if early in a continuous event
+            if (propSim->eventMngr.continuousEvents[i].isHappening) {
+                const real timeConstant = propSim->eventMngr.continuousEvents[i].tau;
+                const real timeConstantFac = 5.0L;
+                const real numSegments = 100.0L;
+                const real dtSegment = timeConstantFac*timeConstant/numSegments;
+                if (forwardProp && propSim->t < tNextConEvent+timeConstantFac*timeConstant) {
+                    dt = fmin(dt, dtSegment);
+                } else if (!forwardProp && propSim->t < tNextConEvent+timeConstantFac*timeConstant) {
+                    dt = fmax(dt, -dtSegment);
+                }
+            }
         }
     }
     if ((forwardProp && propSim->t + dt > tNextEvent) ||
