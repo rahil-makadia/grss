@@ -262,9 +262,9 @@ void check_continuous_events(PropSimulation *propSim, const real &t) {
                 eventEnded = t < propSim->eventMngr.continuousEvents[i].t;
             }
             if (eventStarted && !eventEnded) {
-                propSim->eventMngr.continuousEvents[i].isHappening = true;
+                propSim->eventMngr.continuousEvents[i].hasStarted = true;
             } else {
-                propSim->eventMngr.continuousEvents[i].isHappening = false;
+                propSim->eventMngr.continuousEvents[i].hasStarted = false;
             }
             if (!eventEnded) {
                 allDone = false;
@@ -311,7 +311,7 @@ void event_timestep_check(PropSimulation *propSim, real &dt) {
                 tNextEvent = fmax(tNextEvent, tNextConEvent);
             }
             // break up the timestep if early in a continuous event
-            if (propSim->eventMngr.continuousEvents[i].isHappening) {
+            if (propSim->eventMngr.continuousEvents[i].hasStarted) {
                 const real timeConstant = propSim->eventMngr.continuousEvents[i].tau;
                 const real timeConstantFac = 5.0L;
                 const real numSegments = 100.0L;

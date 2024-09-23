@@ -1030,7 +1030,7 @@ class FitSimulation:
             fixed_event = tuple(self.fixed_propsim_params['events'][i])
             fixed_event_impulsive = len(fixed_event) == 5
             fixed_event_continuous = len(fixed_event) == 6
-            if fixed_event_continuous and fixed_event[5] == 0.0:
+            if fixed_event_continuous and fixed_event[4] == 0.0:
                 raise ValueError("Continuous event time constant cannot be 0.")
             assert fixed_event_impulsive or fixed_event_continuous
             event = [None]*5
@@ -1039,12 +1039,13 @@ class FitSimulation:
                 event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
                 event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
                 event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
+                event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
             elif fixed_event_continuous:
                 event[1] = x_dict[f"ax{i}"] if f"ax{i}" in x_dict.keys() else fixed_event[1]
                 event[2] = x_dict[f"ay{i}"] if f"ay{i}" in x_dict.keys() else fixed_event[2]
                 event[3] = x_dict[f"az{i}"] if f"az{i}" in x_dict.keys() else fixed_event[3]
-                event.append(x_dict[f"dt{i}"] if f"dt{i}" in x_dict.keys() else fixed_event[5])
-            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
+                event[4] = x_dict[f"dt{i}"] if f"dt{i}" in x_dict.keys() else fixed_event[4]
+                event.append(fixed_event[5])
             events.append(tuple(event))
         return events
 
@@ -1070,20 +1071,42 @@ class FitSimulation:
         prop_sim_future : libgrss.PropSimulation object
             PropSimulation object for the future.
         """
-        for event in events:
-            t_event = event[0]
-            dvx_or_ax = event[1]
-            dvy_or_ay = event[2]
-            dvz_or_az = event[3]
-            multiplier = event[4]
-            event_args = (integ_body, t_event, [dvx_or_ax, dvy_or_ay, dvz_or_az], multiplier)
-            if len(event) == 6:
-                dt = event[5]
-                event_args += (dt,)
-            if t_event < self.t_sol:
-                prop_sim_past.add_event(*event_args)
+        est_keys = self.x_nom.keys()
+        for i, event_list in enumerate(events):
+            t_event = event_list[0]
+            dvx_or_ax = event_list[1]
+            dvy_or_ay = event_list[2]
+            dvz_or_az = event_list[3]
+            multiplier_or_dt = event_list[4]
+            continuous_flag = event_list[5] if len(event_list) == 6 else False
+            event = libgrss.Event()
+            event.t = t_event
+            event.bodyName = integ_body.name
+            event.isContinuous = continuous_flag
+            if continuous_flag:
+                event.expAccel0 = [dvx_or_ax, dvy_or_ay, dvz_or_az]
+                event.tau = multiplier_or_dt
+                event.expAccel0Est = (
+                    f"ax{i}" in est_keys and
+                    f"ay{i}" in est_keys and
+                    f"az{i}" in est_keys
+                )
+                event.tauEst = f"dt{i}" in est_keys
+                event.eventEst = event.expAccel0Est or event.tauEst
             else:
-                prop_sim_future.add_event(*event_args)
+                event.deltaV = [dvx_or_ax, dvy_or_ay, dvz_or_az]
+                event.multiplier = multiplier_or_dt
+                event.deltaVEst = (
+                    f"dvx{i}" in est_keys and
+                    f"dvy{i}" in est_keys and 
+                    f"dvz{i}" in est_keys
+                )
+                event.multiplierEst = f"mult{i}" in est_keys
+                event.eventEst = event.deltaVEst or event.multiplierEst
+            if t_event < self.t_sol:
+                prop_sim_past.add_event(event)
+            else:
+                prop_sim_future.add_event(event)
         return prop_sim_past, prop_sim_future
 
     def _get_perturbed_state(self, key):

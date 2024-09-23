@@ -234,19 +234,27 @@ class Event {
    public:
     real t;
     std::string bodyName;
+    bool isContinuous = false;
+    bool eventEst = false;
     size_t bodyIndex;
     size_t xIntegIndex;
+    bool hasStarted = false;
 
     // for impulsive events
-    std::vector<real> deltaV = {0.0L, 0.0L, 0.0L};
-    real multiplier = 1.0L;
+    std::vector<real> deltaV = std::vector<real>(3, std::numeric_limits<real>::quiet_NaN());
+    real multiplier = std::numeric_limits<real>::quiet_NaN();
+    bool deltaVEst = false;
     bool multiplierEst = false;
 
     // for continuous ejecta events
-    std::vector<real> expAccel0 = {0.0L, 0.0L, 0.0L};
-    real tau = 1.0L;
-    bool isContinuous = false;
-    bool isHappening = false;
+    std::vector<real> expAccel0 = std::vector<real>(3, std::numeric_limits<real>::quiet_NaN());
+    real tau = std::numeric_limits<real>::quiet_NaN();
+    bool expAccel0Est = false;
+    bool tauEst = false;
+    /**
+     * @brief Empty constructor for the Event class.
+     */
+    Event() {};
     /**
      * @brief Apply the impulse event to the body.
      */
@@ -517,15 +525,9 @@ class PropSimulation {
      */
     void remove_body(std::string name);
     /**
-     * @brief Add an impulse event to the simulation.
+     * @brief Add an event to the simulation.
      */
-    void add_event(IntegBody body, real tEvent, std::vector<real> deltaV,
-                   real multiplier);
-    /**
-     * @brief Add an ejecta event to the simulation.
-     */
-    void add_event(IntegBody body, real tEvent, std::vector<real> expAccel0,
-                   real multiplier, real tau);
+    void add_event(Event event);
     /**
      * @brief Set the values of the PropSimulation Constants object.
      */

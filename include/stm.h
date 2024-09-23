@@ -71,4 +71,10 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
                  const real &dy, const real &dz, const real &dvx,
                  const real &dvy, const real &dvz, real *rVec, real *nVec);
 
+/**
+ * @brief Compute the derivatives of a continuous event with respect to position, velocity, and parameters.
+ */
+void stm_continuous_event(STMParameters &stmParams,
+                          const PropSimulation *propSim, const size_t &eventIdx,
+                          const real &tPastEvent, const real &postFac);
 #endif

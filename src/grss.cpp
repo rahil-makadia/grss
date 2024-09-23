@@ -555,7 +555,7 @@ PYBIND11_MODULE(libgrss, m) {
                 Radius of the body.
             cometaryState : list of real
                 Initial Heliocentric Ecliptic Cometary state of the body.
-            ngParams : PropSimulation.NongravParameters
+            ngParams : libgrss.NongravParameters
                 Non-gravitational parameters of the body.
             )mydelimiter")
 
@@ -577,7 +577,7 @@ PYBIND11_MODULE(libgrss, m) {
                 Initial barycentric Cartesian position of the body.
             vel : list of real
                 Initial barycentric Cartesian velocity of the body.
-            ngParams : PropSimulation.NongravParameters
+            ngParams : libgrss.NongravParameters
                 Non-gravitational parameters of the body.
             )mydelimiter")
         .def_readwrite("spiceId", &IntegBody::spiceId, R"mydelimiter(
@@ -620,6 +620,52 @@ PYBIND11_MODULE(libgrss, m) {
             -------
             None : NoneType
                 None.
+            )mydelimiter");
+
+    // expose event class and its empty constructor
+    py::class_<Event>(m, "Event", R"mydelimiter(
+        The Event class contains the properties of an impulsive or continuous event.
+        Impulsive events are instantaneous changes in the velocity of the body.
+        Continuous events are an exponentially decaying acceleration acting on the body.
+        )mydelimiter")
+        .def(py::init<>())
+        .def_readwrite("t", &Event::t, R"mydelimiter(
+            Time of the event (MJD TDB).
+            )mydelimiter")
+        .def_readwrite("bodyName", &Event::bodyName, R"mydelimiter(
+            Name of the body the event is acting on. Throws an error if the body
+            is not found in the simulation.
+            )mydelimiter")
+        .def_readwrite("isContinuous", &Event::isContinuous, R"mydelimiter(
+            Whether the event is a continuous event. False by default.
+            )mydelimiter")
+        .def_readwrite("eventEst", &Event::eventEst, R"mydelimiter(
+            Flag for whether to estimate anything for the event. False by default.
+            )mydelimiter")
+        .def_readwrite("deltaV", &Event::deltaV, R"mydelimiter(
+            Delta-V vector of the event.
+            )mydelimiter")
+        .def_readwrite("multiplier", &Event::multiplier, R"mydelimiter(
+            Multiplier of the event. For impulsive events, this is a scalar
+            multiplier for the delta-V vector. Not used for continuous events.
+            )mydelimiter")
+        .def_readwrite("deltaVEst", &Event::deltaVEst, R"mydelimiter(
+            Flag for whether to estimate the delta-V of the event. False by default.
+            )mydelimiter")
+        .def_readwrite("multiplierEst", &Event::multiplierEst, R"mydelimiter(
+            Flag for whether to estimate the multiplier of the event. False by default.
+            )mydelimiter")
+        .def_readwrite("expAccel0", &Event::expAccel0, R"mydelimiter(
+            Initial acceleration vector for the continuous event.
+            )mydelimiter")
+        .def_readwrite("tau", &Event::tau, R"mydelimiter(
+            Time constant for the exponential decay of the continuous event.
+            )mydelimiter")
+        .def_readwrite("expAccel0Est", &Event::expAccel0Est, R"mydelimiter(
+            Flag for whether to estimate the initial acceleration of the continuous event. False by default.
+            )mydelimiter")
+        .def_readwrite("tauEst", &Event::tauEst, R"mydelimiter(
+            Flag for whether to estimate the time constant of the continuous event. False by default.
             )mydelimiter");
 
     m.def("reconstruct_stm", &reconstruct_stm, py::arg("stm"), R"mydelimiter(
@@ -695,26 +741,26 @@ PYBIND11_MODULE(libgrss, m) {
             Path to the SPICE DE kernel.
             )mydelimiter")
         .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
-            Constants of the simulation. PropSimulation.Constants object.
+            Constants of the simulation. libgrss.Constants object.
             )mydelimiter")
         .def_readwrite("integParams", &PropSimulation::integParams,
                        R"mydelimiter(
-            Integration parameters of the simulation. PropSimulation.IntegParams object.
+            Integration parameters of the simulation. libgrss.IntegParams object.
             )mydelimiter")
         .def_readwrite("spiceBodies", &PropSimulation::spiceBodies,
                        R"mydelimiter(
-            SPICE bodies of the simulation. List of PropSimulation.SpiceBodies objects.
+            SPICE bodies of the simulation. List of libgrss.SpiceBodies objects.
             )mydelimiter")
         .def_readwrite("integBodies", &PropSimulation::integBodies,
                        R"mydelimiter(
-            Integration bodies of the simulation. List of PropSimulation.IntegBody objects.
+            Integration bodies of the simulation. List of libgrss.IntegBody objects.
             )mydelimiter")
         .def_readwrite("caParams", &PropSimulation::caParams, R"mydelimiter(
-            Close approach parameters of the simulation. List of PropSimulation.CloseApproachParameters objects.
+            Close approach parameters of the simulation. List of libgrss.CloseApproachParameters objects.
             )mydelimiter")
         .def_readwrite("impactParams", &PropSimulation::impactParams,
                        R"mydelimiter(
-            Impact parameters of the simulation. List of PropSimulation.ImpactParameters objects.
+            Impact parameters of the simulation. List of libgrss.ImpactParameters objects.
             )mydelimiter")
         .def_readwrite("t", &PropSimulation::t, R"mydelimiter(
             Current time of the simulation.
@@ -724,7 +770,7 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def_readwrite("interpParams", &PropSimulation::interpParams,
                        R"mydelimiter(
-            Interpolation parameters of the simulation. PropSimulation.InterpolationParameters object.
+            Interpolation parameters of the simulation. libgrss.InterpolationParameters object.
             )mydelimiter")
         .def_readwrite("tEvalUTC", &PropSimulation::tEvalUTC, R"mydelimiter(
             Whether the MJD evaluation time is in UTC for each value in PropSimulation.tEval,
@@ -812,7 +858,7 @@ PYBIND11_MODULE(libgrss, m) {
 
             Parameters
             ----------
-            body : PropSimulation.SpiceBody
+            body : libgrss.SpiceBody
                 SPICE body to add to the simulation.
             )mydelimiter")
         .def("map_ephemeris", &PropSimulation::map_ephemeris, R"mydelimiter(
@@ -848,7 +894,7 @@ PYBIND11_MODULE(libgrss, m) {
 
             Parameters
             ----------
-            body : PropSimulation.IntegBody
+            body : libgrss.IntegBody
                 Integration body to add to the simulation.
             )mydelimiter")
         .def("remove_body", &PropSimulation::remove_body, py::arg("name"),
@@ -860,47 +906,14 @@ PYBIND11_MODULE(libgrss, m) {
             name : str
                 Name of the body to remove.
             )mydelimiter")
-        .def("add_event",
-             static_cast<void (PropSimulation::*)(IntegBody, real,
-                                                  std::vector<real>, real)>(
-                 &PropSimulation::add_event),
-             py::arg("body"), py::arg("tEvent"), py::arg("deltaV"),
-             py::arg("multiplier"),
-             R"mydelimiter(
-            Adds an impulsive delta-V event to the simulation.
+        .def("add_event", &PropSimulation::add_event, py::arg("event"),
+            R"mydelimiter(
+            Adds an event to the simulation.
 
             Parameters
             ----------
-            body : str
-                Name of the body to apply the delta-V to.
-            tEvent : real
-                MJD Epoch of the event. Must be in TDB.
-            deltaV : list of real
-                Delta-V to apply to the body.
-            multiplier : real
-                Multiplier to apply to the delta-V.
-            )mydelimiter")
-        .def("add_event",
-             static_cast<void (PropSimulation::*)(
-                 IntegBody, real, std::vector<real>, real, real)>(
-                 &PropSimulation::add_event),
-             py::arg("bodyName"), py::arg("tEvent"), py::arg("expAccel0"),
-             py::arg("multiplier"), py::arg("tau"),
-             R"mydelimiter(
-             Adds an ejecta event to the simulation.
-
-            Parameters
-            ----------
-            body : str
-                Name of the body to apply the delta-V to.
-            tEvent : real
-                MJD Epoch of the event. Must be in TDB.
-            expAccel0 : list of real
-                Initial exponentiallly decaying acceleration.
-            multiplier : real
-                Multiplier for the exponential decay.
-            tau : real
-                Time constant for the exponentiallly decaying acceleration.
+            event : libgrss.Event
+                Event to add to the simulation.
             )mydelimiter")
         .def("set_sim_constants", &PropSimulation::set_sim_constants,
              py::arg("du2m") = 149597870700.0L, py::arg("tu2s") = 86400.0L,
@@ -943,7 +956,7 @@ PYBIND11_MODULE(libgrss, m) {
                 Can be TDB or UTC based on tEvalUTC.
             tEvalUTC : bool
                 Whether the MJD evaluation time is in UTC for each value in
-                PropSimulation.tEval, as opposed to TDB.
+                libgrss.tEval, as opposed to TDB.
             evalApparentState : bool
                 Whether to evaluate the apparent state of the integration bodies.
             convergedLightTimes : bool

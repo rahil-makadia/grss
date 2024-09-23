@@ -352,10 +352,33 @@ void Event::apply_impulsive(PropSimulation *propSim, const real &t, std::vector<
     for (size_t i = 0; i < 3; i++) {
         xInteg[velStartIdx + i] += propDir * this->multiplier * this->deltaV[i];
     }
-    if (propSim->integBodies[this->bodyIndex].propStm) {
+    if (propSim->integBodies[this->bodyIndex].propStm && this->eventEst) {
         IntegBody *body = &propSim->integBodies[this->bodyIndex];
         const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est;
-        const size_t DeltaVStmIdx = this->xIntegIndex + 6 + 36 + 6*numNongravs;
+        size_t DeltaVStmIdx = this->xIntegIndex + 6 + 36 + 6*numNongravs;
+        for (size_t i = 0; i < propSim->eventMngr.impulsiveEvents.size(); i++) {
+            const bool sameBody = propSim->eventMngr.impulsiveEvents[i].bodyIndex == this->bodyIndex;
+            const bool hasStarted = propSim->eventMngr.impulsiveEvents[i].hasStarted;
+            const bool deltaVEst = propSim->eventMngr.impulsiveEvents[i].deltaVEst;
+            const bool multiplierEst = propSim->eventMngr.impulsiveEvents[i].multiplierEst;
+            if (sameBody && hasStarted && multiplierEst) {
+                DeltaVStmIdx += 6*1; // only multiplier
+            } else if (sameBody && hasStarted && deltaVEst) {
+                DeltaVStmIdx += 6*3; // full deltaV vector
+            }
+        }
+        for (size_t i = 0; i < propSim->eventMngr.continuousEvents.size(); i++) {
+            const bool sameBody = propSim->eventMngr.continuousEvents[i].bodyIndex == this->bodyIndex;
+            const bool hasStarted = propSim->eventMngr.continuousEvents[i].hasStarted;
+            const bool expAccel0Est = propSim->eventMngr.continuousEvents[i].expAccel0Est;
+            const bool tauEst = propSim->eventMngr.continuousEvents[i].tauEst;
+            if (sameBody && hasStarted && expAccel0Est) {
+                DeltaVStmIdx += 6*3; // expAccel0 vector
+            }
+            if (sameBody && hasStarted && tauEst) {
+                DeltaVStmIdx += 6*1; // time constant
+            }
+        }
         if (this->multiplierEst){
             xInteg[DeltaVStmIdx+3] = propDir * this->deltaV[0];
             xInteg[DeltaVStmIdx+4] = propDir * this->deltaV[1];
@@ -366,6 +389,7 @@ void Event::apply_impulsive(PropSimulation *propSim, const real &t, std::vector<
             xInteg[DeltaVStmIdx+17] = propDir;
         }
     }
+    this->hasStarted = true;
 }
 
 /**
@@ -1001,7 +1025,7 @@ void PropSimulation::remove_body(std::string name) {
     std::cout << "Error: Body " << name << " not found." << std::endl;
 }
 
-static size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
+static size_t event_preprocess(PropSimulation *propSim, const std::string &eventBodyName,
                         const real &tEvent) {
     // check if tEvent is valid
     const bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
@@ -1017,14 +1041,14 @@ static size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
     bool bodyExists = false;
     size_t bodyIndex;
     for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
-        if (propSim->integBodies[i].name == body.name) {
+        if (propSim->integBodies[i].name == eventBodyName) {
             bodyExists = true;
             bodyIndex = i;
             break;
         }
     }
     if (!bodyExists) {
-        throw std::invalid_argument("Integration body with name " + body.name +
+        throw std::invalid_argument("Integration body with name " + eventBodyName +
                                     " does not exist in simulation " +
                                     propSim->name);
     }
@@ -1032,11 +1056,27 @@ static size_t event_preprocess(PropSimulation *propSim, const IntegBody &body,
 }
 
 static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const Event &event){
-    int numEventParams = 3;
-    if (event.multiplierEst) {
+    int numEventParams = -1;
+    if (!event.isContinuous && !event.deltaVEst && event.multiplierEst) {
+        // only multiplier is estimated for an impulsive delta-V
         numEventParams = 1;
+    } else if (!event.isContinuous && event.deltaVEst && !event.multiplierEst) {
+        // only delta-V vector is estimated for an impulsive delta-V
+        numEventParams = 3;
+    } else if (event.isContinuous && !event.expAccel0Est && event.tauEst) {
+        // only time constant is estimated for a continuous event
+        numEventParams = 1;
+    } else if (event.isContinuous && event.expAccel0Est && !event.tauEst) {
+        // only exponential initial acceleration is estimated for a continuous event
+        numEventParams = 3;
+    } else if (event.isContinuous && event.expAccel0Est && event.tauEst) {
+        // exponential initial acceleration and time constant are estimated for a continuous event
+        numEventParams = 4;
+    } else {
+        throw std::invalid_argument(
+            "event_stm_handling: Invalid event estimation configuration for analytic STM "
+            "propagation.");
     }
-    body->n2Derivs += 3*numEventParams;
     propSim->integBodies[event.bodyIndex].n2Derivs += 3*numEventParams;
     propSim->integParams.n2Derivs += 3*numEventParams;
 
@@ -1044,12 +1084,15 @@ static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const E
     std::vector<real> extraVec = std::vector<real>(6*numEventParams, 0.0);
     // add extra vector at the end of stm vector
     for (size_t i = 0; i < extraVec.size(); i++) {
-        body->stm.push_back(extraVec[i]);
         propSim->integBodies[event.bodyIndex].stm.push_back(extraVec[i]);
     }
 }
 
 static void event_postprocess(PropSimulation *propSim, Event &event) {
+    // modify stm if estimating Delta-V
+    if (propSim->integBodies[event.bodyIndex].propStm && event.eventEst) {
+        event_stm_handling(propSim, &propSim->integBodies[event.bodyIndex], event);
+    }
     // assign event xIntegIndex
     event.xIntegIndex = 0;
     for (size_t i = 0; i < event.bodyIndex; i++) {
@@ -1078,67 +1121,41 @@ static void event_postprocess(PropSimulation *propSim, Event &event) {
 }
 
 /**
- * @param[in] body IntegBody object to apply the ImpulseEvent to.
- * @param[in] tEvent Time at which to apply the ImpulseEvent.
- * @param[in] deltaV Delta-V for the impulse.
- * @param[in] multiplier Multiplier for the Delta-V.
+ * @param[in] event Event object to add to the simulation.
  */
-void PropSimulation::add_event(IntegBody body, real tEvent,
-                               std::vector<real> deltaV, real multiplier) {
-    size_t bodyIndex = event_preprocess(this, body, tEvent);
-    Event event;
-    event.t = tEvent;
-    event.bodyName = body.name;
+void PropSimulation::add_event(Event event) {
+    size_t bodyIndex = event_preprocess(this, event.bodyName, event.t);
     event.bodyIndex = bodyIndex;
-    event.deltaV = deltaV;
-    // if multiplier is numeric, estimate it otherwise estimate full deltaV vector
-    if (!std::isfinite(multiplier)) {
-        if (body.propStm){
-            event.multiplierEst = false;
+    event.hasStarted = false;
+    if (event.isContinuous) {
+        // make sure exponential accelerations are not nan and time constant is postive
+        if (!std::isfinite(event.expAccel0[0]) || !std::isfinite(event.expAccel0[1]) ||
+            !std::isfinite(event.expAccel0[2]) || !std::isfinite(event.tau) || event.tau <= 0.0) {
+            throw std::invalid_argument(
+                "add_event: Exponential acceleration must be finite and time "
+                "constant must be finite and positive.");
         }
-        multiplier = 1.0;
+        // make sure deltaV is nan and multiplier is nan
+        if (std::isfinite(event.deltaV[0]) || std::isfinite(event.deltaV[1]) ||
+            std::isfinite(event.deltaV[2]) || std::isfinite(event.multiplier)) {
+            throw std::invalid_argument("add_event: Delta-V and multiplier must be nan.");
+        }
+        this->eventMngr.nConEvents++;
     } else {
-        if (body.propStm) {
-            event.multiplierEst = true;
+        // make sure deltaV is not nan and multiplier is not nan
+        if (!std::isfinite(event.deltaV[0]) || !std::isfinite(event.deltaV[1]) ||
+            !std::isfinite(event.deltaV[2]) || !std::isfinite(event.multiplier)) {
+            throw std::invalid_argument("add_event: Delta-V and multiplier must be finite.");
         }
+        // make sure exponential acceleration is nan
+        if (std::isfinite(event.expAccel0[0]) || std::isfinite(event.expAccel0[1]) ||
+            std::isfinite(event.expAccel0[2]) || std::isfinite(event.tau)) {
+            throw std::invalid_argument(
+                "add_event: Exponential acceleration must be zero.");
+        }
+        this->eventMngr.nImpEvents++;
     }
-    event.multiplier = multiplier;
-    // modify stm if estimating Delta-V
-    if (body.propStm) {
-        event_stm_handling(this, &body, event);
-    }
-
-    event.tau = 0.0;
-    event.isContinuous = false;
-    event.isHappening = false;
     event_postprocess(this, event);
-    this->eventMngr.nImpEvents++;
-}
-
-/**
- * @param[in] body IntegBody object to apply the EjectaEvent to.
- * @param[in] tEvent Time at which to apply the EjectaEvent.
- * @param[in] expAccel0 Initial exponentiallly decaying acceleration.
- * @param[in] multiplier Multiplier for the exponential decay.
- * @param[in] tau Time constant for the exponentiallly decaying acceleration.
- */
-void PropSimulation::add_event(IntegBody body, real tEvent,
-                               std::vector<real> expAccel0, real multiplier,
-                               real tau) {
-    size_t bodyIndex = event_preprocess(this, body, tEvent);
-    Event event;
-    event.t = tEvent;
-    event.bodyName = body.name;
-    event.bodyIndex = bodyIndex;
-    event.deltaV = std::vector<real>(3, 0.0);
-    event.multiplier = multiplier;
-
-    event.expAccel0 = expAccel0;
-    event.tau = tau;
-    event.isContinuous = true;
-    event.isHappening = false;
-    event_postprocess(this, event);
-    this->eventMngr.nConEvents++;
 }
 
 /**
