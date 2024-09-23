@@ -79,16 +79,28 @@ void refine_b(std::vector<real> &b, std::vector<real> &e, const real &dtRatio,
               const size_t &dim);
 
 /**
- * @brief Check if any events need to be applied after the current timestep.
+ * @brief Check if any impulsive events need to be applied after the current timestep.
  */
-void check_and_apply_events(PropSimulation *propSim, const real &t,
-                            real &tNextEvent, size_t &nextEventIdx,
-                            std::vector<real> &xInteg);
+void check_and_apply_impulsive_events(PropSimulation *propSim, const real &t,
+                                      std::vector<real> &xInteg);
+
+/**
+ * @brief Check if any continuous events need to be applied after the current timestep.
+ */
+void check_continuous_events(PropSimulation *propSim, const real &t);
+
+/**
+ * @brief Top level function to check for events after the current timestep.
+ */
+void check_events(PropSimulation *propSim, const real &t, std::vector<real> &xInteg);
+
+/**
+ * @brief Check whether timestep is too large that it would skip an event.
+ */
+void event_timestep_check(PropSimulation *propSim, real &dt);
 
 /**
  * @brief 15th-order Gauss-Radau integrator for the PropSimulation.
- * 
- * @param[inout] propSim PropSimulation object for the integration.
  */
 void gr15(PropSimulation *propSim);
 

@@ -525,3 +525,54 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
         stmParams.dfdpar[8] += g*nHat[2];
     }
 }
+
+/**
+ * @param[inout] stmParams Structure containing the STM submatrices and their derivatives.
+ * @param[in] propSim PropSimulation object.
+ * @param[in] eventIdx Index of the continuous event.
+ * @param[in] tPastEvent Time since the continuous event started [days].
+ * @param[in] postFac Exponential decay factor for the continuous event.
+ */
+void stm_continuous_event(STMParameters &stmParams,
+                          const PropSimulation *propSim, const size_t &eventIdx,
+                          const real &tPastEvent, const real &postFac){
+    const Event *thisEvent = &propSim->eventMngr.continuousEvents[eventIdx];
+    const IntegBody *body = &propSim->integBodies[thisEvent->bodyIndex];
+    const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est;
+    size_t dfdparIdx = 3*numNongravs;
+    for (size_t i = 0; i < propSim->eventMngr.impulsiveEvents.size(); i++) {
+        const bool sameBody = propSim->eventMngr.impulsiveEvents[i].bodyIndex == thisEvent->bodyIndex;
+        const bool hasStarted = propSim->eventMngr.impulsiveEvents[i].hasStarted;
+        const bool deltaVEst = propSim->eventMngr.impulsiveEvents[i].deltaVEst;
+        const bool multiplierEst = propSim->eventMngr.impulsiveEvents[i].multiplierEst;
+        if (sameBody && hasStarted && multiplierEst) {
+            dfdparIdx += 3*1; // only multiplier
+        } else if (sameBody && hasStarted && deltaVEst) {
+            dfdparIdx += 3*3; // full deltaV vector
+        }
+    }
+    for (size_t i = 0; i < eventIdx; i++) {
+        const bool sameBody = propSim->eventMngr.continuousEvents[i].bodyIndex == thisEvent->bodyIndex;
+        const bool hasStarted = propSim->eventMngr.continuousEvents[i].hasStarted;
+        const bool expAccel0Est = propSim->eventMngr.continuousEvents[i].expAccel0Est;
+        const bool tauEst = propSim->eventMngr.continuousEvents[i].tauEst;
+        if (sameBody && hasStarted && expAccel0Est) {
+            dfdparIdx += 3*3; // expAccel0 vector
+        }
+        if (sameBody && hasStarted && tauEst) {
+            dfdparIdx += 3*1; // time constant
+        }
+    }
+    if (thisEvent->isContinuous && thisEvent->expAccel0Est) {
+        stmParams.dfdpar[dfdparIdx + 0] = postFac;
+        stmParams.dfdpar[dfdparIdx + 4] = postFac;
+        stmParams.dfdpar[dfdparIdx + 8] = postFac;
+        dfdparIdx += 9;
+    }
+    if (thisEvent->isContinuous && thisEvent->tauEst) {
+        const real postFac2 = tPastEvent/thisEvent->tau/thisEvent->tau;
+        for (size_t i = 0; i < 3; i++) {
+            stmParams.dfdpar[dfdparIdx + i] = -thisEvent->expAccel0[i]*postFac*postFac2;
+        }
+    }
+}

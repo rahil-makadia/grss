@@ -216,38 +216,30 @@ void get_interpIdxInWindow(const PropSimulation *propSim,
                            bool &interpIdxInWindow) {
     interpIdxInWindow = false;
     const size_t interpIdx = propSim->interpIdx;
+    real tCheck = propSim->tEval[interpIdx];
+    if (propSim->tEvalUTC) {
+        tCheck += delta_et_utc(tCheck)/86400.0;
+    }
     bool fwInWindow, fwInWindowMarginStart, fwInWindowMarginEnd;
     bool bwInWindow, bwInWindowMarginStart, bwInWindowMarginEnd;
-    fwInWindow =
-        (forwardProp && propSim->tEval[interpIdx] >= tWindowStart &&
-         propSim->tEval[interpIdx] < tNext);
+    fwInWindow = (forwardProp && tCheck >= tWindowStart && tCheck < tNext);
     fwInWindowMarginStart =
-        (forwardProp &&
-         propSim->tEval[interpIdx] <= propSim->integParams.t0 &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin >=
-             propSim->integParams.t0 &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin >= tWindowStart);
+        (forwardProp && tCheck <= propSim->integParams.t0 &&
+         tCheck + propSim->tEvalMargin >= propSim->integParams.t0 &&
+         tCheck + propSim->tEvalMargin >= tWindowStart);
     fwInWindowMarginEnd =
-        (forwardProp &&
-         propSim->tEval[interpIdx] >= propSim->integParams.tf &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin <=
-             propSim->integParams.tf &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin <= tNext);
-    bwInWindow =
-        (backwardProp && propSim->tEval[interpIdx] <= tWindowStart &&
-         propSim->tEval[interpIdx] > tNext);
+        (forwardProp && tCheck >= propSim->integParams.tf &&
+         tCheck - propSim->tEvalMargin <= propSim->integParams.tf &&
+         tCheck - propSim->tEvalMargin <= tNext);
+    bwInWindow = (backwardProp && tCheck <= tWindowStart && tCheck > tNext);
     bwInWindowMarginStart =
-        (backwardProp &&
-         propSim->tEval[interpIdx] >= propSim->integParams.t0 &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin <=
-             propSim->integParams.t0 &&
-         propSim->tEval[interpIdx] - propSim->tEvalMargin <= tWindowStart);
+        (backwardProp && tCheck >= propSim->integParams.t0 &&
+         tCheck - propSim->tEvalMargin <= propSim->integParams.t0 &&
+         tCheck - propSim->tEvalMargin <= tWindowStart);
     bwInWindowMarginEnd =
-        (backwardProp &&
-         propSim->tEval[interpIdx] <= propSim->integParams.tf &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin >=
-             propSim->integParams.tf &&
-         propSim->tEval[interpIdx] + propSim->tEvalMargin >= tNext);
+        (backwardProp && tCheck <= propSim->integParams.tf &&
+         tCheck + propSim->tEvalMargin >= propSim->integParams.tf &&
+         tCheck + propSim->tEvalMargin >= tNext);
     interpIdxInWindow = fwInWindow || fwInWindowMarginStart ||
         fwInWindowMarginEnd || bwInWindow || bwInWindowMarginStart ||
         bwInWindowMarginEnd;

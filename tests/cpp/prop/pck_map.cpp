@@ -12,8 +12,8 @@ int main(){
     std::random_device rd;  // Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
     // limits of distribution are dictated by the time span of 
-    // earth_720101_230601.bpc and earth_200101_990825_predict.bpc
-    std::uniform_real_distribution<> dis(41317.0005, 87940.0008);
+    // earth_620120_240827.bpc and earth_200101_990827_predict.bpc
+    std::uniform_real_distribution<> dis(37684.0004767L, 87942.0008007L);
 
     std::cout
         << "/////////////////////// PCK map accuracy test ///////////////////////"
@@ -24,9 +24,9 @@ int main(){
     std::string from = "ITRF93";
     std::string to = "J2000";
     std::string pck_text = "../../../grss/kernels/pck00011.tpc";
-    std::string pck_hist = "../../../grss/kernels/earth_720101_230601.bpc";
-    std::string pck_latest = "../../../grss/kernels/earth_latest_high_prec.bpc";
-    std::string pck_predict = "../../../grss/kernels/earth_200101_990825_predict.bpc";
+    std::string pck_hist = "../../../grss/kernels/earth_historic.bpc";
+    std::string pck_latest = "../../../grss/kernels/earth_latest.bpc";
+    std::string pck_predict = "../../../grss/kernels/earth_predict.bpc";
 
     //////////// GRSS ////////////
     PckEphemeris pckEphem;

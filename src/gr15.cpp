@@ -5,7 +5,7 @@
  * @return real Initial timestep.
  */
 real get_initial_timestep(PropSimulation *propSim){
-    real dt0 = propSim->integParams.dtMin;
+    real dt0 = 1.0L;
     if (propSim->integParams.dt0 != 0.0) {
         dt0 = fabs(propSim->integParams.dt0);
     }
@@ -225,29 +225,108 @@ void refine_b(std::vector<real> &b, std::vector<real> &e, const real &dtRatio, c
 /**
  * @param[in] propSim PropSimulation object for the integration.
  * @param[in] t Current time.
- * @param[out] tNextEvent Time of the next event.
- * @param[out] nextEventIdx Index of the next event.
  * @param[in] xInteg Vector of integrated states after the current timestep.
  */
-void check_and_apply_events(PropSimulation *propSim, const real &t,
-                            real &tNextEvent, size_t &nextEventIdx,
-                            std::vector<real> &xInteg) {
-    while (nextEventIdx < propSim->events.size() && t == tNextEvent) {
+void check_and_apply_impulsive_events(PropSimulation *propSim, const real &t,
+                                      std::vector<real> &xInteg) {
+    size_t *nextImpEventIdx = &propSim->eventMngr.nextImpEventIdx;
+    real *tNextImpEvent = &propSim->eventMngr.tNextImpEvent;
+    while (*nextImpEventIdx < propSim->eventMngr.nImpEvents && t == *tNextImpEvent) {
         // apply events for the state just reached by the integrator
-        real propDir;
-        if (propSim->integParams.t0 < propSim->integParams.tf) {
-            propDir = 1.0L;
-        } else {
-            propDir = -1.0L;
-        }
-        propSim->events[nextEventIdx].apply(t, xInteg, propDir);
+        propSim->eventMngr.impulsiveEvents[*nextImpEventIdx].apply_impulsive(propSim, t, xInteg);
         // update next event index and time
-        nextEventIdx++;
-        if (nextEventIdx < propSim->events.size()) {
-            tNextEvent = propSim->events[nextEventIdx].t;
+        (*nextImpEventIdx)++;
+        if (*nextImpEventIdx < propSim->eventMngr.nImpEvents) {
+            *tNextImpEvent = propSim->eventMngr.impulsiveEvents[*nextImpEventIdx].t;
         } else {
-            tNextEvent = propSim->integParams.tf;
+            *tNextImpEvent = propSim->integParams.tf;
         }
+    }
+}
+
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] t Current time.
+ */
+void check_continuous_events(PropSimulation *propSim, const real &t) {
+    if (!propSim->eventMngr.allConEventDone){
+        bool allDone = true;
+        bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
+        for (size_t i = 0; i < propSim->eventMngr.nConEvents; i++) {
+            bool eventStarted, eventEnded;
+            if (forwardProp) {
+                eventStarted = t >= propSim->eventMngr.continuousEvents[i].t;
+                eventEnded = t >= propSim->integParams.tf;
+            } else {
+                eventStarted = t <= propSim->integParams.t0;
+                eventEnded = t < propSim->eventMngr.continuousEvents[i].t;
+            }
+            if (eventStarted && !eventEnded) {
+                propSim->eventMngr.continuousEvents[i].hasStarted = true;
+            } else {
+                propSim->eventMngr.continuousEvents[i].hasStarted = false;
+            }
+            if (!eventEnded) {
+                allDone = false;
+            }
+        }
+        if (allDone) {
+            propSim->eventMngr.allConEventDone = true;
+            propSim->eventMngr.tNextConEvent = propSim->integParams.tf;
+        }
+    }
+}
+
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] t Current time.
+ * @param[in] xInteg Vector of integrated states after the current timestep.
+ */
+void check_events(PropSimulation *propSim, const real &t, std::vector<real> &xInteg){
+    check_and_apply_impulsive_events(propSim, t, xInteg);
+    check_continuous_events(propSim, t);
+}
+
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] dt Current timestep.
+ */
+void event_timestep_check(PropSimulation *propSim, real &dt) {
+    real tNextEvent = propSim->integParams.tf;
+    const bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
+    if (propSim->eventMngr.nImpEvents > 0) {
+        const real tNextImpEvent = propSim->eventMngr.tNextImpEvent;
+        if (forwardProp) {
+            tNextEvent = fmin(tNextEvent, tNextImpEvent);
+        } else {
+            tNextEvent = fmax(tNextEvent, tNextImpEvent);
+        }
+    }
+    if (!propSim->eventMngr.allConEventDone) {
+        for (size_t i = 0; i < propSim->eventMngr.nConEvents; i++) { 
+            const real tNextConEvent = propSim->eventMngr.continuousEvents[i].t;
+            if (forwardProp && propSim->t < tNextConEvent) {
+                tNextEvent = fmin(tNextEvent, tNextConEvent);
+            } else if (!forwardProp && propSim->t > tNextConEvent) {
+                tNextEvent = fmax(tNextEvent, tNextConEvent);
+            }
+            // break up the timestep if early in a continuous event
+            if (propSim->eventMngr.continuousEvents[i].hasStarted) {
+                const real timeConstant = propSim->eventMngr.continuousEvents[i].tau;
+                const real timeConstantFac = 5.0L;
+                const real numSegments = 100.0L;
+                const real dtSegment = timeConstantFac*timeConstant/numSegments;
+                if (forwardProp && propSim->t < tNextConEvent+timeConstantFac*timeConstant) {
+                    dt = fmin(dt, dtSegment);
+                } else if (!forwardProp && propSim->t < tNextConEvent+timeConstantFac*timeConstant) {
+                    dt = fmax(dt, -dtSegment);
+                }
+            }
+        }
+    }
+    if ((forwardProp && propSim->t + dt > tNextEvent) ||
+        (!forwardProp && propSim->t + dt < tNextEvent)) {
+        dt = tNextEvent - propSim->t;
     }
 }
 
@@ -342,21 +421,8 @@ void gr15(PropSimulation *propSim) {
     std::vector<real> g(7 * dim, 0.0);
     std::vector<real> e(7 * dim, 0.0);
     real dtReq;
-    real tNextEvent = propSim->integParams.tf;
-    size_t nextEventIdx = 0;
-    if (t == propSim->integParams.t0) {
-        nextEventIdx = 0;
-    }
-    if (propSim->events.size() != 0) {
-        tNextEvent = propSim->events[0].t;
-    }
-    check_and_apply_events(propSim, t, tNextEvent, nextEventIdx, xInteg);
-    if ((propSim->integParams.tf > propSim->integParams.t0 &&
-         t + dt > tNextEvent) ||
-        (propSim->integParams.tf < propSim->integParams.t0 &&
-         t + dt < tNextEvent)) {
-        dt = tNextEvent - t;
-    }
+    check_events(propSim, t, xInteg);
+    event_timestep_check(propSim, dt);
     propSim->interpParams.tStack.push_back(t);
     propSim->interpParams.xIntegStack.push_back(xInteg);
     std::vector<real> accInteg0(dim, 0.0);
@@ -430,11 +496,12 @@ void gr15(PropSimulation *propSim) {
             approx_xInteg(xInteg0, accInteg0, dt, 1.0, b, dim,
                         propSim->integBodies, xInteg, xIntegCompCoeffs);
             t += dt;
+            check_events(propSim, t, xInteg);
             get_state_der(propSim, t, xInteg, accInteg0);
-            check_and_apply_events(propSim, t, tNextEvent, nextEventIdx,
-                                    xInteg);
             propSim->interpParams.tStack.push_back(t);
             propSim->interpParams.xIntegStack.push_back(xInteg);
+            propSim->t = t;
+            propSim->xInteg = xInteg;
             propSim->integParams.timestepCounter++;
             refine_b(b, e, dtReq/dt, dim);
             check_ca_or_impact(propSim, t-dt, xInteg0, t, xInteg);
@@ -445,14 +512,7 @@ void gr15(PropSimulation *propSim) {
                 keepStepping = 0;
             }
             dt = dtReq;
-            if ((propSim->integParams.tf > propSim->integParams.t0 &&
-                 t + dt > tNextEvent) ||
-                (propSim->integParams.tf < propSim->integParams.t0 &&
-                 t + dt < tNextEvent)) {
-                dt = tNextEvent - t;
-            }
-            propSim->t = t;
-            propSim->xInteg = xInteg;
+            event_timestep_check(propSim, dt);
             oneStepDone = 1;
         }
     }

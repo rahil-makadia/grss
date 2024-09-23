@@ -32,6 +32,7 @@ ades_add_columns = {
 }
 ades_grss_columns = {
     'obsTimeMJD': 'float', 'obsTimeMJDTDB': 'float', 'cosDec': 'float',
+    'resChi': 'float',
 }
 ades_column_types = ades_keep_columns | ades_add_columns | ades_grss_columns
 

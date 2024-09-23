@@ -46,7 +46,7 @@ class IterationParams:
         self.covariance = covariance
         variance = np.sqrt(np.diag(self.covariance))
         self.variance = dict(zip([f'var_{k}' for k in self.x_nom.keys()], variance))
-        self.obs = obs
+        self.obs = obs.copy()
         force_del_idx = self.obs[self.obs['selAst'] == 'd'].index
         auto_del_idx = self.obs[self.obs['selAst'] == 'D'].index
         self.rejected_idx = np.concatenate((force_del_idx, auto_del_idx))
@@ -549,7 +549,7 @@ class FitSimulation:
         self._compute_obs_weights()
         self.n_iter = 0
         self.n_iter_max = n_iter_max
-        self.iters = []
+        self.iters = [[]]
         self.de_kernel = de_kernel
         self.de_kernel_path = default_kernel_path
         self.analytic_partials = False
@@ -561,6 +561,12 @@ class FitSimulation:
             for key in nongrav_info:
                 self.fixed_propsim_params[key] = nongrav_info[key]
         self.fixed_propsim_params['events'] = events if events is not None else []
+        self.prior_est = None
+        self.prior_sigs = None
+        self._priors_given = False
+        self._xbar0 = None
+        self._info0 = None
+        self._prior_constant = None
         self.reject_outliers = True
         self.reject_criteria = [3.0, 2.8]
         # number of rejected obs is the count of ['D', 'd'] in selAst
@@ -621,6 +627,38 @@ class FitSimulation:
             raise ValueError(msg)
         return None
 
+    def _check_priors(self):
+        """
+        Check the prior estimates and sigmas provided by the user
+        and make sure they are valid.
+
+        Returns
+        -------
+        None : NoneType
+            None
+
+        Raises
+        ------
+        ValueError
+            If the prior estimates and sigmas do not have the same length.
+        """
+        # check that the keys in self.x_init are the same as in self.prior_est and self.prior_sigs
+        if self.prior_est is not None and self.prior_sigs is not None:
+            self._priors_given = True
+            if len(self.prior_est) != len(self.prior_sigs):
+                raise ValueError("Prior estimates and sigmas must have the same length.")
+            for key in self.prior_est.keys():
+                if key not in self.x_init:
+                    raise ValueError(f"Key {key} not found in initial state vector.")
+            self._info0 = np.zeros_like(self.covariance_init)
+            self._xbar0 = np.zeros(self.n_fit)
+            for key in self.prior_est.keys():
+                idx = list(self.x_init.keys()).index(key)
+                self._info0[idx, idx] = 1/self.prior_sigs[key]**2
+                self._xbar0[idx] = self.prior_est[key] - self.x_init[key]
+            self._prior_constant = list(self.x_nom.values())+self._xbar0
+        return None
+
     def _flatten_and_clean(self, arr):
         """
         Flatten an array and remove any NaN values.
@@ -653,14 +691,18 @@ class FitSimulation:
         weights = self.simulated_obs['weights']
         if not len(times) == len(modes) == len(weights):
             raise ValueError("Simulated observation data must have the same length.")
+        perm_id = self.obs['permID'][0]
+        prov_id = self.obs['provID'][0]
         for i, time in enumerate(times):
             idx = len(self.obs)
             mode = modes[i]
             if mode not in {'SIM_CCD', 'SIM_OCC', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                 raise ValueError(f"Unknown simulated observation mode {mode}.")
             weight = weights[i]
-            self.obs.loc[idx, 'permID'] = 'SIM_'+str(self.obs['permID'][0])
-            self.obs.loc[idx, 'provID'] = 'SIM_'+str(self.obs['provID'][0])
+            if isinstance(perm_id, str):
+                self.obs.loc[idx, 'permID'] = f'SIM_{perm_id}'
+            if isinstance(prov_id, str):
+                self.obs.loc[idx, 'provID'] = f'SIM_{prov_id}'
             self.obs.loc[idx, 'obsTime'] = f'{time.utc.isot}Z'
             self.obs.loc[idx, 'obsTimeMJD'] = time.utc.mjd
             self.obs.loc[idx, 'obsTimeMJDTDB'] = time.tdb.mjd
@@ -801,7 +843,7 @@ class FitSimulation:
         """
         # pylint: disable=no-member
         t_eval_past = self.obs.obsTimeMJD.values[self.past_obs_idx]
-        tf_past = np.min(t_eval_past)
+        tf_past = np.min(self.obs.obsTimeMJDTDB.values[self.past_obs_idx])
         prop_sim_past = libgrss.PropSimulation(name, self.t_sol,
                                                 self.de_kernel, self.de_kernel_path)
         prop_sim_past.tEvalMargin = 1.0
@@ -845,7 +887,7 @@ class FitSimulation:
         """
         # pylint: disable=no-member
         t_eval_future = self.obs.obsTimeMJD.values[self.future_obs_idx]
-        tf_future = np.max(t_eval_future)
+        tf_future = np.max(self.obs.obsTimeMJDTDB.values[self.future_obs_idx])
         prop_sim_future = libgrss.PropSimulation(name, self.t_sol,
                                                     self.de_kernel, self.de_kernel_path)
         prop_sim_future.tEvalMargin = 1.0
@@ -986,12 +1028,24 @@ class FitSimulation:
         events = []
         for i in range(len(self.fixed_propsim_params['events'])):
             fixed_event = tuple(self.fixed_propsim_params['events'][i])
+            fixed_event_impulsive = len(fixed_event) == 5
+            fixed_event_continuous = len(fixed_event) == 6
+            if fixed_event_continuous and fixed_event[4] == 0.0:
+                raise ValueError("Continuous event time constant cannot be 0.")
+            assert fixed_event_impulsive or fixed_event_continuous
             event = [None]*5
-            event[0] = fixed_event[0]
-            event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
-            event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
-            event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
-            event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
+            event[0] = fixed_event[0] # time of delta-v
+            if fixed_event_impulsive:
+                event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
+                event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
+                event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
+                event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
+            elif fixed_event_continuous:
+                event[1] = x_dict[f"ax{i}"] if f"ax{i}" in x_dict.keys() else fixed_event[1]
+                event[2] = x_dict[f"ay{i}"] if f"ay{i}" in x_dict.keys() else fixed_event[2]
+                event[3] = x_dict[f"az{i}"] if f"az{i}" in x_dict.keys() else fixed_event[3]
+                event[4] = x_dict[f"dt{i}"] if f"dt{i}" in x_dict.keys() else fixed_event[4]
+                event.append(fixed_event[5])
             events.append(tuple(event))
         return events
 
@@ -1017,16 +1071,42 @@ class FitSimulation:
         prop_sim_future : libgrss.PropSimulation object
             PropSimulation object for the future.
         """
-        for event in events:
-            t_event = event[0]
-            dvx = event[1]
-            dvy = event[2]
-            dvz = event[3]
-            multiplier = event[4]
-            if t_event < self.t_sol:
-                prop_sim_past.add_event(integ_body, t_event, [dvx, dvy, dvz], multiplier)
+        est_keys = self.x_nom.keys()
+        for i, event_list in enumerate(events):
+            t_event = event_list[0]
+            dvx_or_ax = event_list[1]
+            dvy_or_ay = event_list[2]
+            dvz_or_az = event_list[3]
+            multiplier_or_dt = event_list[4]
+            continuous_flag = event_list[5] if len(event_list) == 6 else False
+            event = libgrss.Event()
+            event.t = t_event
+            event.bodyName = integ_body.name
+            event.isContinuous = continuous_flag
+            if continuous_flag:
+                event.expAccel0 = [dvx_or_ax, dvy_or_ay, dvz_or_az]
+                event.tau = multiplier_or_dt
+                event.expAccel0Est = (
+                    f"ax{i}" in est_keys and
+                    f"ay{i}" in est_keys and
+                    f"az{i}" in est_keys
+                )
+                event.tauEst = f"dt{i}" in est_keys
+                event.eventEst = event.expAccel0Est or event.tauEst
             else:
-                prop_sim_future.add_event(integ_body, t_event, [dvx, dvy, dvz], multiplier)
+                event.deltaV = [dvx_or_ax, dvy_or_ay, dvz_or_az]
+                event.multiplier = multiplier_or_dt
+                event.deltaVEst = (
+                    f"dvx{i}" in est_keys and
+                    f"dvy{i}" in est_keys and 
+                    f"dvz{i}" in est_keys
+                )
+                event.multiplierEst = f"mult{i}" in est_keys
+                event.eventEst = event.deltaVEst or event.multiplierEst
+            if t_event < self.t_sol:
+                prop_sim_past.add_event(event)
+            else:
+                prop_sim_future.add_event(event)
         return prop_sim_past, prop_sim_future
 
     def _get_perturbed_state(self, key):
@@ -1055,6 +1135,7 @@ class FitSimulation:
         fd_delta : float
             Finite difference perturbation.
         """
+        fd_pert = np.inf
         if self.fit_cartesian:
             if key in {'x', 'y', 'z'}:
                 fd_pert = 1e-8
@@ -1074,6 +1155,14 @@ class FitSimulation:
             fd_pert = 1e0
         if key[:3] in {'dvx', 'dvy', 'dvz'}:
             fd_pert = 1e-11
+        if key[:2] in {'ax', 'ay', 'az'}:
+            fd_pert = 1e-11
+        if key[:2] == 'dt':
+            # 10 percent of the time constant
+            fd_pert = 0.1*self.x_nom[key]
+        if fd_pert == np.inf:
+            raise ValueError("Finite difference perturbation not defined"
+                                " for the given state parameter.")
         x_plus = self.x_nom.copy()
         x_minus = self.x_nom.copy()
         # fd_pert = finite difference perturbation to nominal state for calculating derivatives
@@ -1285,7 +1374,7 @@ class FitSimulation:
         radius_nonzero = self.fixed_propsim_params['radius'] != 0.0
         fac = 0.0
         if radius_nonzero:
-            rel_dists = np.linalg.norm(np.array(state_eval)[:, :3], axis=1)
+            rel_dists = np.linalg.norm([state[:3] for state in state_eval], axis=1)
             lmbda = 0.3 # from fuentes-munoz et al. 2024
             au2m = 1.495978707e11
             fac = (lmbda*self.fixed_propsim_params['radius']/au2m/rel_dists*180/np.pi*3600)**2
@@ -1296,7 +1385,7 @@ class FitSimulation:
             | special_codes["spacecraft"]
         )
         for i in range(len(self.observer_info_lengths)):
-            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'SIM_OCC'}:
+            if modes[i] not in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP', 'SIM_CCD', 'SIM_OCC'}:
                 sig_ra = sig_ra_vals[i]
                 sig_dec = sig_dec_vals[i]
                 sig_corr = sig_corr_vals[i]
@@ -1357,7 +1446,8 @@ class FitSimulation:
                 size = 1
             else:
                 raise ValueError("Observer info length not recognized.")
-            part = np.zeros((size, self.n_fit))
+            # part is partial of observable with respect to state at observation time
+            part = np.zeros((size, 6))
             if self.past_obs_exist and i < len_past_idx:
                 sim_idx = i
                 optical_partials = past_optical_partials
@@ -1368,14 +1458,16 @@ class FitSimulation:
                 optical_partials = future_optical_partials
                 radar_partials = future_radar_partials
                 state = future_states
-            stm = libgrss.reconstruct_stm(state[sim_idx][6:])
+            # stm is partial of state at observation time with respect to nominal state
+            stm = libgrss.reconstruct_stm(state[sim_idx][6:])[:6]
             if is_optical:
                 part[0, :6] = optical_partials[sim_idx, :6]*cos_dec[i]
                 part[1, :6] = optical_partials[sim_idx, 6:12]
             else:
                 part[0, :6] = radar_partials[sim_idx, :6]
+            # partial is partial of observable with respect to nominal state
             partial = part @ stm
-            partials[partials_idx:partials_idx+size, :] = partial
+            partials[partials_idx:partials_idx+size, :partial.shape[1]] = partial
             partials_idx += size
         return partials
 
@@ -1533,6 +1625,7 @@ class FitSimulation:
         chi_sq = 0
         j = 0
         sel_ast = self.obs['selAst'].values
+        res_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
@@ -1541,8 +1634,8 @@ class FitSimulation:
             else:
                 raise ValueError("Observer info length not recognized.")
             resid = residuals[i]
-            # calculate chi-squared for each residual
-            if start_rejecting:
+            # calculate chi-squared for each residual if after the first iteration
+            if self.n_iter > 1:
                 obs_cov = self.obs_cov[i]
                 obs_partials = partials[j:j+size, :]
                 if sel_ast[i] in {'D', 'd'}:
@@ -1554,22 +1647,29 @@ class FitSimulation:
                 else:
                     resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
                     resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
-                                              [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
+                                                [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
                 residual_chi_squared = resid @ resid_cov_inv @ resid.T
-                # outlier rejection, only reject RA/Dec measurements
-                if size == 2:
-                    if residual_chi_squared > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
-                        if sel_ast[i] == 'A':
-                            self.num_rejected += 1
-                        sel_ast[i] = 'D'
-                    elif residual_chi_squared < chi_recover**2 and sel_ast[i] == 'D':
-                        sel_ast[i] = 'A'
-                        self.num_rejected -= 1
+                res_chisq_vals[i] = residual_chi_squared
+            # outlier rejection, only reject RA/Dec measurements
+            if start_rejecting and size == 2:
+                if abs(residual_chi_squared) > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                    if sel_ast[i] == 'A':
+                        self.num_rejected += 1
+                    sel_ast[i] = 'D'
+                elif abs(residual_chi_squared) < chi_recover**2 and sel_ast[i] == 'D':
+                    sel_ast[i] = 'A'
+                    self.num_rejected -= 1
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
                 chi_sq += resid @ self.obs_weight[i] @ resid.T
             j += size
+        # # write res_chisq_vals to file if any values are negative
+        # if np.any(res_chisq_vals < 0):
+        #     print("WARNING: Negative outlier rejection chi-squared values detected. "
+        #             "Writing to file 'warn_neg_chisq_vals.txt'.")
+        #     np.savetxt("warn_neg_chisq_vals.txt", res_chisq_vals, fmt="%.16f")
         self.obs['selAst'] = sel_ast
+        self.obs['resChi'] = res_chisq_vals**0.5
         rejected_fraction = self.num_rejected/len(self.obs)
         if rejected_fraction > 0.25:
             print("WARNING: More than 25% of observations rejected. Consider changing the",
@@ -1651,8 +1751,12 @@ class FitSimulation:
         delta_x : array
             The state correction.
         """
-        atwa = np.zeros((self.n_fit, self.n_fit))
-        atwb = np.zeros(self.n_fit)
+        if self._priors_given:
+            atwa = self._info0.copy()
+            atwb = (self._info0 @ self._xbar0).copy()
+        else:
+            atwa = np.zeros((self.n_fit, self.n_fit))
+            atwb = np.zeros(self.n_fit)
         j = 0
         sel_ast = self.obs['selAst'].values
         for i, obs_info_len in enumerate(self.observer_info_lengths):
@@ -1670,11 +1774,11 @@ class FitSimulation:
             j += size
         # use pseudo-inverse if the data arc is less than 7 days
         if self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min() < 7.0:
-            cov = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+            self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         else:
-            cov = np.array(libgrss.matrix_inverse(atwa))
-        delta_x = cov @ atwb
-        return delta_x.ravel(), cov
+            self.covariance = np.array(libgrss.matrix_inverse(atwa))
+        delta_x = self.covariance @ atwb
+        return delta_x.ravel()
 
     def filter_lsq(self, verbose=True):
         """
@@ -1690,35 +1794,51 @@ class FitSimulation:
         None : NoneType
             None
         """
+        self._check_priors()
         start_rejecting = False
         if verbose:
             print("Iteration\t\tUnweighted RMS\t\tWeighted RMS",
                     "\t\tChi-squared\t\tReduced Chi-squared")
+        delta_x = np.zeros(self.n_fit)
         for i in range(self.n_iter_max):
+            if self._priors_given:
+                self._xbar0 -= delta_x
+                a_priori_constant = list(self.x_nom.values())+self._xbar0
+                a_priori_constant_violation = np.linalg.norm(a_priori_constant-self._prior_constant)
+                if a_priori_constant_violation >= 1e-11:
+                    print(f"a priori constraint constant violation before iteration {i+1}: "
+                            f"{a_priori_constant_violation}. Solution may not be trustworthy. "
+                            "Violation for each estimated parameter:")
+                    print(dict(zip(self.x_nom.keys(), a_priori_constant-self._prior_constant)))
             self.n_iter = i+1
             # get residuals and partials
             residuals, partials = self._get_residuals_and_partials()
             # calculate rms and reject outliers here if desired
             rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
                                                                             start_rejecting)
-            # get initial guess
-            curr_state = np.array(list(self.x_nom.values()))
+            # get current state
+            curr_state = list(self.x_nom.values())
             # get state correction
-            delta_x, cov = self._get_lsq_state_correction(partials, residuals)
-            # get new covariance
-            self.covariance = cov
-            # get new state
-            if i == 0:
-                # add prefit iteration
-                self._add_iteration(0, rms_u, rms_w, chi_sq)
+            delta_x = self._get_lsq_state_correction(partials, residuals)
             if self.constraint_dir is not None:
                 constr_hat = self.constraint_dir/np.linalg.norm(self.constraint_dir)
                 delta_x -= np.dot(delta_x, constr_hat)*constr_hat
+            # make sure eccentricity is non-negative and
+            # any keys starting with dt are 0.1 at minimum
+            for key in self.x_nom:
+                if self.fit_cometary and key == 'e':
+                    idx = list(self.x_nom.keys()).index(key)
+                    if curr_state[idx] + delta_x[idx] < 0.0:
+                        delta_x[idx] = -curr_state[idx]
+                        print("WARNING: Eccentricity is negative per least squares "
+                                "state correction. Setting to 0.0. This solution "
+                                "may not be trustworthy.")
+                if key[:2] == 'dt':
+                    idx = list(self.x_nom.keys()).index(key)
+                    if curr_state[idx] + delta_x[idx] < 0.1:
+                        delta_x[idx] = 0.1 - curr_state[idx]
+            # get new nominal state
             next_state = curr_state + delta_x
-            if self.fit_cometary and next_state[0] < 0.0:
-                next_state[0] = 0.0
-                print("WARNING: Eccentricity is negative per least squares state correction. "
-                        "Setting to 0.0. This solution may not be trustworthy.")
             self.x_nom = dict(zip(self.x_nom.keys(), next_state))
             # add iteration
             self._add_iteration(i+1, rms_u, rms_w, chi_sq)
@@ -1744,11 +1864,17 @@ class FitSimulation:
                     print(msg)
                 if not self.reject_outliers:
                     break
+        # add postfit iteration if converged
+        if self.converged:
+            residuals, partials = self._get_residuals_and_partials()
+            rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
+                                                                        start_rejecting)
+            self._add_iteration(self.n_iter+1, rms_u, rms_w, chi_sq)
         if self.n_iter == self.n_iter_max and not self.converged:
             print("WARNING: Maximum number of iterations reached without converging.")
         return None
 
-    def print_summary(self, iter_idx=-1, out_stream=sys.stdout):
+    def print_summary(self, iter_idx=None, out_stream=sys.stdout):
         """
         Prints a summary of the orbit fit calculations at a given iteration.
 
@@ -1762,10 +1888,14 @@ class FitSimulation:
         None : NoneType
             None
         """
+        iter_idx = len(self.iters)-1 if iter_idx is None else iter_idx
         data = self.iters[iter_idx]
         arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
-        str_to_print = "Summary of the orbit fit calculations at iteration "
-        str_to_print += f"{data.iter_number} (of {self.n_iter}):\n"
+        str_to_print = "Summary of the orbit fit calculations"
+        if data.iter_number <= self.n_iter:
+            str_to_print += f" after iteration {data.iter_number} (of {self.n_iter}):\n"
+        else:
+            str_to_print += " after postfit pass:\n"
         str_to_print += "==============================================================\n"
         str_to_print += f"RMS unweighted: {data.unweighted_rms}\n"
         str_to_print += f"RMS weighted: {data.weighted_rms}\n"
@@ -1781,7 +1911,7 @@ class FitSimulation:
         str_to_print += "\t\t\tUncertainty\t\t\tChange\t\t\t\tChange (sigma)\n"
         init_variance = np.sqrt(np.diag(self.covariance_init))
         final_variance = np.sqrt(np.diag(self.covariance))
-        init_sol = self.iters[0].x_nom
+        init_sol = self.x_init
         final_sol = data.x_nom
         with np.errstate(divide='ignore'):
             for i, key in enumerate(init_sol.keys()):
@@ -1817,7 +1947,9 @@ class FitSimulation:
         """
         plt.rcParams['font.size'] = 12
         plt.rcParams['axes.labelsize'] = 12
-        ticks = np.arange(1, self.n_iter+1, 1)
+        ticks = np.arange(1, self.n_iter+2, 1)
+        labels = list(ticks)
+        labels[-1] = "Postfit"
         start_idx = 1
         iters_for_plot = self.iters[start_idx:]
         final_iter = iters_for_plot[-1]
@@ -1827,7 +1959,8 @@ class FitSimulation:
                         [iteration.unweighted_rms for iteration in iters_for_plot],
                         label=f"Final Unweighted RMS={final_iter.unweighted_rms:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel("Unweighted RMS")
         plt.legend()
         plt.subplot(2, 2, 2)
@@ -1835,7 +1968,8 @@ class FitSimulation:
                         [iteration.weighted_rms for iteration in iters_for_plot],
                         label=f"Final Weighted RMS={final_iter.weighted_rms:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel("Weighted RMS")
         plt.legend()
         plt.subplot(2, 2, 3)
@@ -1843,7 +1977,8 @@ class FitSimulation:
                         [iteration.chi_squared for iteration in iters_for_plot],
                         label=fr"Final $\chi^2$={final_iter.chi_squared:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel(r"$\chi^2$")
         plt.legend()
         plt.subplot(2, 2, 4)
@@ -1851,7 +1986,8 @@ class FitSimulation:
                         [iteration.reduced_chi_squared for iteration in iters_for_plot],
                         label=fr"Final Reduced $\chi^2$={final_iter.reduced_chi_squared:.3e}")
         plt.xticks(ticks)
-        plt.xlabel("Iteration #")
+        plt.gca().set_xticklabels(labels)
+        plt.xlabel("Iteration")
         plt.ylabel(r"Reduced $\chi^2$")
         plt.legend()
         plt.tight_layout()
@@ -1890,6 +2026,8 @@ class FitSimulation:
             'w': 'deg', 'i': 'deg', 'x': 'AU', 'y': 'AU', 'z': 'AU',
             'vx': 'AU/day', 'vy': 'AU/day', 'vz': 'AU/day',
             'a1': 'AU/day^2', 'a2': 'AU/day^2', 'a3': 'AU/day^2',
+            'dv': 'AU/day', 'ax': 'AU/day^2', 'ay': 'AU/day^2', 'az': 'AU/day^2',
+            'dt': 'day'
         }
         with open(filename, 'x', encoding='utf-8') as f:
             f.write(section_full + '\n')
@@ -1928,12 +2066,25 @@ class FitSimulation:
                 if key in ['om', 'w', 'i']:
                     val *= 180/np.pi
                     sig *= 180/np.pi
-                if key in ['a1', 'a2', 'a3']:
+                if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
                     f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e}")
                 else:
                     f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
-                if key in units_dict:
-                    f.write(f" {units_dict[key]}")
+                if key[:2] in units_dict:
+                    f.write(f" {units_dict[key[:2]]}")
+                if self._priors_given and key in self.prior_est:
+                    p_val = self.prior_est[key]
+                    p_sig = self.prior_sigs[key]
+                    if key in ['om', 'w', 'i']:
+                        p_val *= 180/np.pi
+                        p_sig *= 180/np.pi
+                    if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
+                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e}")
+                    else:
+                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f}")
+                    if key[:2] in units_dict:
+                        f.write(f" {units_dict[key[:2]]}")
+                    f.write(")")
                 f.write("\n")
             f.write("\n")
             f.write("Initial Covariance Matrix:\n")
@@ -1955,12 +2106,25 @@ class FitSimulation:
                 if key in ['om', 'w', 'i']:
                     val *= 180/np.pi
                     sig *= 180/np.pi
-                if key in ['a1', 'a2', 'a3']:
+                if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
                     f.write(f"{key.upper()}: {val:.11e} \u00B1 {sig:.11e}")
                 else:
                     f.write(f"{key.upper()}: {val:.11f} \u00B1 {sig:.11f}")
-                if key in units_dict:
-                    f.write(f" {units_dict[key]}")
+                if key[:2] in units_dict:
+                    f.write(f" {units_dict[key[:2]]}")
+                if self._priors_given and key in self.prior_est:
+                    p_val = self.prior_est[key]
+                    p_sig = self.prior_sigs[key]
+                    if key in ['om', 'w', 'i']:
+                        p_val *= 180/np.pi
+                        p_sig *= 180/np.pi
+                    if key[:2] in {'a1', 'a2', 'a3', 'dv', 'ax', 'ay', 'az'}:
+                        f.write(f" (a priori: {p_val:.11e} \u00B1 {p_sig:.11e}")
+                    else:
+                        f.write(f" (a priori: {p_val:.11f} \u00B1 {p_sig:.11f}")
+                    if key[:2] in units_dict:
+                        f.write(f" {units_dict[key[:2]]}")
+                    f.write(")")
                 f.write("\n")
             f.write("\n")
             f.write("Final Covariance Matrix:\n")
@@ -2015,8 +2179,11 @@ class FitSimulation:
             f.write(f'{iter_summary_buff}{iter_summary_str}{iter_summary_buff}\n')
             f.write(subsection_full + '\n')
             for itrn in self.iters[1:]:
-                f.write("Summary of the orbit fit calculations at iteration")
-                f.write(f" {itrn.iter_number} (of {self.n_iter}):\n")
+                f.write("Summary of the orbit fit calculations")
+                if itrn.iter_number <= self.n_iter:
+                    f.write(f" after iteration {itrn.iter_number} (of {self.n_iter}):\n")
+                else:
+                    f.write(" after postfit pass:\n")
                 f.write(f"RMS unweighted: {itrn.unweighted_rms}\n")
                 f.write(f"RMS weighted: {itrn.weighted_rms}\n")
                 f.write(f"chi-squared: {itrn.chi_squared}\n")
@@ -2025,7 +2192,7 @@ class FitSimulation:
                 f.write(f'{"Variable":<8}{"Initial Value":>20}')
                 f.write(f'{"Uncertainty":>20}{"Fitted Value":>20}')
                 f.write(f'{"Uncertainty":>20}{"Change":>20}{"Change":>8}'+' (\u03C3)\n')
-                init_sol = self.iters[0].x_nom
+                init_sol = self.x_init
                 final_sol = itrn.x_nom
                 with np.errstate(divide='ignore'):
                     for i, key in enumerate(init_sol.keys()):
@@ -2046,7 +2213,7 @@ class FitSimulation:
                         f.write(f'{final_val-init_val:+18.11e}{half_tab}')
                         f.write(f'{(final_val-init_val)/init_unc:+10.3f}\n')
                 f.write("\n")
-                if itrn.iter_number != self.n_iter:
+                if itrn.iter_number <= self.n_iter:
                     f.write(subsection_full + '\n')
 
             mean_0 = np.array(list(self.x_init.values()))

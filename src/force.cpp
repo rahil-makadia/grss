@@ -38,6 +38,12 @@ static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accI
 static void force_thruster(const PropSimulation *propSim, std::vector<real> &accInteg);
 
 /**
+ * @brief Compute the acceleration of the system due to a continuous event.
+ */
+static void force_continuous_event(const real &t, const PropSimulation *propSim,
+                                   std::vector<real> &accInteg, STMParameters* allSTMs);
+
+/**
  * @param[in] t Time [TDB MJD]
  * @param[in] xInteg State vector
  * @param[in] propSim PropSimulation object
@@ -115,6 +121,7 @@ void get_state_der(PropSimulation *propSim, const real &t,
     force_J2(propSim, accInteg, allSTMs);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
+    force_continuous_event(t, propSim, accInteg, allSTMs);
     #ifdef PRINT_FORCES
     forceFile.open("cpp.11", std::ios::app);
     forceFile << std::setw(10) << "total_acc" << std::setw(25) << accInteg[0]
@@ -635,4 +642,38 @@ static void force_thruster(const PropSimulation *propSim,
     #ifdef PRINT_FORCES
     forceFile.close();
     #endif
+}
+
+/**
+ * @param[in] t Time [TDB MJD]
+ * @param[in] propSim PropSimulation object.
+ * @param[inout] accInteg State derivative vector.
+ * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
+ */
+static void force_continuous_event(const real &t, const PropSimulation *propSim,
+                                   std::vector<real> &accInteg, STMParameters* allSTMs) {
+    if (!propSim->eventMngr.allConEventDone){
+        const bool forwardProp = propSim->integParams.tf > propSim->integParams.t0;
+        const real propDir = forwardProp ? 1.0 : -1.0;
+        for (size_t i = 0; i < propSim->eventMngr.continuousEvents.size(); i++){
+            if (propSim->eventMngr.continuousEvents[i].hasStarted){
+                const size_t starti =
+                    propSim->eventMngr.continuousEvents[i].xIntegIndex / 2;
+                const real tPastEvent = t - propSim->eventMngr.continuousEvents[i].t;
+                const real postFac = exp(-tPastEvent/propSim->eventMngr.continuousEvents[i].tau) * propDir;
+                accInteg[starti + 0] += propSim->eventMngr.continuousEvents[i].expAccel0[0] *
+                    postFac;
+                accInteg[starti + 1] += propSim->eventMngr.continuousEvents[i].expAccel0[1] *
+                    postFac;
+                accInteg[starti + 2] += propSim->eventMngr.continuousEvents[i].expAccel0[2] *
+                    postFac;
+                const size_t bodyIdx = propSim->eventMngr.continuousEvents[i].bodyIndex;
+                if (propSim->integBodies[bodyIdx].propStm &&
+                    propSim->eventMngr.continuousEvents[i].eventEst) {
+                    stm_continuous_event(allSTMs[bodyIdx], propSim, i,
+                                            tPastEvent, postFac);
+                }
+            }
+        }
+    }
 }

@@ -2,6 +2,7 @@
 import os
 import time
 import gzip
+import requests
 
 __all__ = [ 'default_kernel_path',
             'grss_path',
@@ -10,6 +11,14 @@ __all__ = [ 'default_kernel_path',
 
 grss_path = os.path.dirname(os.path.abspath(__file__))
 default_kernel_path = f'{grss_path}/kernels/'
+
+def _connected_to_internet(url='http://www.google.com/', timeout=5):
+    try:
+        _ = requests.head(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        print("No internet connection available.")
+    return False
 
 def _download_ades_files(file):
     """
@@ -66,6 +75,10 @@ def initialize():
     None : NoneType
         None
     """
+    internet = _connected_to_internet()
+    if not internet:
+        print("Please connect to the internet to download/update the necessary data files.")
+        return None
     # run the get_debiasing_data.py script
     os.system(f'python {grss_path}/debias/get_debiasing_data.py')
     # run the get_kernels.py script

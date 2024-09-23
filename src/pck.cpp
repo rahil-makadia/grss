@@ -750,10 +750,11 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
         if (t0_mjd < ephem.histPck->targets[0].beg || t0_mjd > ephem.predictPck->targets[0].end){
             throw std::runtime_error("get_pck_rotMat: The epoch is outside the range of the binary PCK files.");
         }
-        if (t0_mjd <= ephem.histPck->targets[0].end){
+        const real tSwitchMargin = 0.1;
+        if (t0_mjd <= ephem.histPck->targets[0].end-tSwitchMargin){
             bpc = ephem.histPck;
             // std::cout << "Using histPck" << std::endl;
-        } else if (t0_mjd <= ephem.latestPck->targets[0].end){
+        } else if (t0_mjd <= ephem.latestPck->targets[0].end-tSwitchMargin){
             bpc = ephem.latestPck;
             // std::cout << "Using latestPck" << std::endl;
         } else {

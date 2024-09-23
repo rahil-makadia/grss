@@ -37,26 +37,26 @@ if (not mb440_exists or not mb441_exists or not sb441s_exists or not sb441_exist
 
 # get the earth orientation binary spice kernels and their comments if they are not already present
 # latest earth pck
-latest_earth_pck_exists = os.path.exists(f'{script_dir}/earth_latest_high_prec.bpc')
+latest_earth_pck_exists = os.path.exists(f'{script_dir}/earth_latest.bpc')
 latest_earth_pck_old = (latest_earth_pck_exists and
-                        time.time() - os.path.getmtime(f'{script_dir}/earth_latest_high_prec.bpc')
+                        time.time() - os.path.getmtime(f'{script_dir}/earth_latest.bpc')
                         > 86400)
 if not latest_earth_pck_exists or latest_earth_pck_old:
     print('Downloading latest Earth binary PCK...')
-    os.system((f'curl --silent --show-error -o {script_dir}/earth_latest_high_prec.bpc '
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_latest.bpc '
                 f'{NAIF_SITE}/pck/earth_latest_high_prec.bpc'))
 # historical earth pck
-historical_earth_pck_exists = os.path.exists(f'{script_dir}/earth_720101_230601.bpc')
+historical_earth_pck_exists = os.path.exists(f'{script_dir}/earth_historic.bpc')
 if not historical_earth_pck_exists:
-    print('Downloading historical Earth binary PCK...')
-    os.system((f'curl --silent --show-error -o {script_dir}/earth_720101_230601.bpc '
-                f'{NAIF_SITE}/pck/earth_720101_230601.bpc'))
+    print('Downloading historic Earth binary PCK...')
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_historic.bpc '
+                f'{NAIF_SITE}/pck/earth_620120_240827.bpc'))
 # predicted earth pck
-predicted_earth_pck_exists = os.path.exists(f'{script_dir}/earth_200101_990825_predict.bpc')
+predicted_earth_pck_exists = os.path.exists(f'{script_dir}/earth_predict.bpc')
 if not predicted_earth_pck_exists:
     print('Downloading predicted Earth binary PCK...')
-    os.system((f'curl --silent --show-error -o {script_dir}/earth_200101_990825_predict.bpc '
-                f'{NAIF_SITE}/pck/earth_200101_990825_predict.bpc'))
+    os.system((f'curl --silent --show-error -o {script_dir}/earth_predict.bpc '
+                f'{NAIF_SITE}/pck/earth_200101_990827_predict.bpc'))
 # generic frame kernels
 generic_frame_kernel_exists = os.path.exists(f'{script_dir}/pck00011.tpc')
 if not generic_frame_kernel_exists:
