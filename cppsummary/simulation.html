@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>simulation.h &#8212; GRSS 4.3.1 documentation</title>
+    <title>simulation.h &#8212; GRSS 4.3.2 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="pck.h" href="pck.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 20, 2024"/>
+    <meta name="docbuild:last-update" content="Sep 23, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.3.1 documentation</p>
+    <p class="title logo__title">GRSS v4.3.2 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -231,6 +231,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Constants.html">grss.libgrss.Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Event.html">grss.libgrss.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.ImpactParameters.html">grss.libgrss.ImpactParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.IntegBody.html">grss.libgrss.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.IntegrationParameters.html">grss.libgrss.IntegrationParameters</a></li>
@@ -1216,6 +1217,12 @@ document.write(`
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event5EventEv">
+<span class="target" id="classEvent_1a5a40dd4708297f7031e29b39e039ae10"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Event</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Event5EventEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Empty constructor for the <a class="reference internal" href="#classEvent"><span class="std std-ref">Event</span></a> class. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event15apply_impulsiveEP14PropSimulationRK4realRNSt6vectorI4realEE">
 <span class="target" id="classEvent_1a190b1fcd2201b7d889ade94334e89d51"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply_impulsive</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">t</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xInteg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5Event15apply_impulsiveEP14PropSimulationRK4realRNSt6vectorI4realEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Apply the impulse event to the body. </p>
@@ -1244,6 +1251,16 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event12isContinuousE">
+<span class="target" id="classEvent_1afe67660891a36a1167be46ef5ab9016f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isContinuous</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event12isContinuousE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event8eventEstE">
+<span class="target" id="classEvent_1ab245b3180ff8e3ad530788a07ee97073"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">eventEst</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event8eventEstE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event9bodyIndexE">
 <span class="target" id="classEvent_1a7187a1fdd95716a3e2de8130ebf4437e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bodyIndex</span></span></span><a class="headerlink" href="#_CPPv4N5Event9bodyIndexE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
@@ -1254,13 +1271,23 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event10hasStartedE">
+<span class="target" id="classEvent_1a3125a92f171cc32d293d83f217f78bb6"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasStarted</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event10hasStartedE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event6deltaVE">
-<span class="target" id="classEvent_1a255ebbcfd562f99bd6595f66ac5217d8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaV</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5Event6deltaVE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="classEvent_1a255ebbcfd562f99bd6595f66ac5217d8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaV</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quiet_NaN</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Event6deltaVE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event10multiplierE">
-<span class="target" id="classEvent_1a1e58c5bb9dd303022d15991393b98eb9"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">multiplier</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0L</span></span><a class="headerlink" href="#_CPPv4N5Event10multiplierE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="classEvent_1a1e58c5bb9dd303022d15991393b98eb9"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">multiplier</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quiet_NaN</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Event10multiplierE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5Event9deltaVEstE">
+<span class="target" id="classEvent_1ae383f258f7e28e13333177659bc27575"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltaVEst</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event9deltaVEstE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -1270,22 +1297,22 @@ document.write(`
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event9expAccel0E">
-<span class="target" id="classEvent_1a7001b21544afe5f88259ad1a9e3a3042"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">expAccel0</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5Event9expAccel0E" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="classEvent_1a7001b21544afe5f88259ad1a9e3a3042"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">expAccel0</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quiet_NaN</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Event9expAccel0E" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5Event3tauE">
-<span class="target" id="classEvent_1add97c8b83c1319bd958e127d012b6dcf"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tau</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0L</span></span><a class="headerlink" href="#_CPPv4N5Event3tauE" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="classEvent_1add97c8b83c1319bd958e127d012b6dcf"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tau</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quiet_NaN</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N5Event3tauE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5Event12isContinuousE">
-<span class="target" id="classEvent_1afe67660891a36a1167be46ef5ab9016f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isContinuous</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event12isContinuousE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N5Event12expAccel0EstE">
+<span class="target" id="classEvent_1adb34e89b308d3d06d78df84c58e7290a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">expAccel0Est</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event12expAccel0EstE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5Event11isHappeningE">
-<span class="target" id="classEvent_1a8e00608b8f3954d802cb9abb6d36e707"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isHappening</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event11isHappeningE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N5Event6tauEstE">
+<span class="target" id="classEvent_1a0894b4ed46fa422b78e017b7e321b328"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tauEst</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N5Event6tauEstE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -1999,34 +2026,12 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation9add_eventE9IntegBody4realNSt6vectorI4realEE4real">
-<span class="target" id="classPropSimulation_1ae9009841acef6f07a2bb9d7af4a6963f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">add_event</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49IntegBody" title="IntegBody"><span class="n"><span class="pre">IntegBody</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">body</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tEvent</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">deltaV</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">multiplier</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14PropSimulation9add_eventE9IntegBody4realNSt6vectorI4realEE4real" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Add an impulse event to the simulation. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation9add_eventE5Event">
+<span class="target" id="classPropSimulation_1ab62164d771fc5cad93af843125dbae9a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">add_event</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45Event" title="Event"><span class="n"><span class="pre">Event</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">event</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14PropSimulation9add_eventE5Event" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Add an event to the simulation. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>body</strong> – <strong>[in]</strong> <a class="reference internal" href="#classIntegBody"><span class="std std-ref">IntegBody</span></a> object to apply the ImpulseEvent to. </p></li>
-<li><p><strong>tEvent</strong> – <strong>[in]</strong> Time at which to apply the ImpulseEvent. </p></li>
-<li><p><strong>deltaV</strong> – <strong>[in]</strong> Delta-V for the impulse. </p></li>
-<li><p><strong>multiplier</strong> – <strong>[in]</strong> Multiplier for the Delta-V. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation9add_eventE9IntegBody4realNSt6vectorI4realEE4real4real">
-<span class="target" id="classPropSimulation_1af771801ffa594f4a9edafa36c37b7816"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">add_event</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49IntegBody" title="IntegBody"><span class="n"><span class="pre">IntegBody</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">body</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tEvent</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">expAccel0</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">multiplier</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tau</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N14PropSimulation9add_eventE9IntegBody4realNSt6vectorI4realEE4real4real" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Add an ejecta event to the simulation. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>body</strong> – <strong>[in]</strong> <a class="reference internal" href="#classIntegBody"><span class="std std-ref">IntegBody</span></a> object to apply the EjectaEvent to. </p></li>
-<li><p><strong>tEvent</strong> – <strong>[in]</strong> Time at which to apply the EjectaEvent. </p></li>
-<li><p><strong>expAccel0</strong> – <strong>[in]</strong> Initial exponentiallly decaying acceleration. </p></li>
-<li><p><strong>multiplier</strong> – <strong>[in]</strong> Multiplier for the exponential decay. </p></li>
-<li><p><strong>tau</strong> – <strong>[in]</strong> Time constant for the exponentiallly decaying acceleration. </p></li>
-</ul>
+<dd class="field-odd"><p><strong>event</strong> – <strong>[in]</strong> <a class="reference internal" href="#classEvent"><span class="std std-ref">Event</span></a> object to add to the simulation. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -2390,7 +2395,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 20, 2024.
+  Last updated on Sep 23, 2024.
   <br/>
 </p>
   </div>

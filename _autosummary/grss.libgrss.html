@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss &#8212; GRSS 4.3.1 documentation</title>
+    <title>grss.libgrss &#8212; GRSS 4.3.2 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.fit.fit_utils.parallax_to_lat_lon_alt" href="grss.fit.fit_utils.parallax_to_lat_lon_alt.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 20, 2024"/>
+    <meta name="docbuild:last-update" content="Sep 23, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.3.1 documentation</p>
+    <p class="title logo__title">GRSS v4.3.2 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -231,6 +231,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Constants.html">grss.libgrss.Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Event.html">grss.libgrss.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.ImpactParameters.html">grss.libgrss.ImpactParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.IntegBody.html">grss.libgrss.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.IntegrationParameters.html">grss.libgrss.IntegrationParameters</a></li>
@@ -537,25 +538,28 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.Constants.html#grss.libgrss.Constants" title="grss.libgrss.Constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Constants</span></code></a></p></td>
 <td><p>The Constants class contains physical constants and conversion factors used in the GRSS orbit propagation code.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.ImpactParameters.html#grss.libgrss.ImpactParameters" title="grss.libgrss.ImpactParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImpactParameters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.Event.html#grss.libgrss.Event" title="grss.libgrss.Event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Event</span></code></a></p></td>
+<td><p>The Event class contains the properties of an impulsive or continuous event.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.ImpactParameters.html#grss.libgrss.ImpactParameters" title="grss.libgrss.ImpactParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImpactParameters</span></code></a></p></td>
 <td><p>The ImpactParameters class contains parameters used for calculating the impact between two integrated or SPICE bodies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.IntegBody.html#grss.libgrss.IntegBody" title="grss.libgrss.IntegBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegBody</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.IntegBody.html#grss.libgrss.IntegBody" title="grss.libgrss.IntegBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegBody</span></code></a></p></td>
 <td><p>The IntegBody class contains the properties of an integrated body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.IntegrationParameters.html#grss.libgrss.IntegrationParameters" title="grss.libgrss.IntegrationParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrationParameters</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.IntegrationParameters.html#grss.libgrss.IntegrationParameters" title="grss.libgrss.IntegrationParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IntegrationParameters</span></code></a></p></td>
 <td><p>The IntegrationParameters class contains parameters used in the numerical integration of the equations of motion.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.InterpolationParameters.html#grss.libgrss.InterpolationParameters" title="grss.libgrss.InterpolationParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InterpolationParameters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.InterpolationParameters.html#grss.libgrss.InterpolationParameters" title="grss.libgrss.InterpolationParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InterpolationParameters</span></code></a></p></td>
 <td><p>The InterpolationParameters class contains parameters used for interpolation of the states of the integrated bodies.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.NongravParameters.html#grss.libgrss.NongravParameters" title="grss.libgrss.NongravParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NongravParameters</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.NongravParameters.html#grss.libgrss.NongravParameters" title="grss.libgrss.NongravParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NongravParameters</span></code></a></p></td>
 <td><p>The NongravParameters class contains constants used for calculating the non-gravitational accelerations on integrated bodies.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropSimulation</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropSimulation</span></code></a></p></td>
 <td><p>The PropSimulation class contains the orbit propagation simulation for intgrating solar system small bodies.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="grss.libgrss.SpiceBody.html#grss.libgrss.SpiceBody" title="grss.libgrss.SpiceBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpiceBody</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="grss.libgrss.SpiceBody.html#grss.libgrss.SpiceBody" title="grss.libgrss.SpiceBody"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpiceBody</span></code></a></p></td>
 <td><p>The SpiceBody class contains the properties of a SPICE body.</p></td>
 </tr>
 </tbody>
@@ -628,7 +632,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 20, 2024.
+  Last updated on Sep 23, 2024.
   <br/>
 </p>
   </div>

@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.PropSimulation &#8212; GRSS 4.3.1 documentation</title>
+    <title>grss.libgrss.PropSimulation &#8212; GRSS 4.3.2 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.NongravParameters" href="grss.libgrss.NongravParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 20, 2024"/>
+    <meta name="docbuild:last-update" content="Sep 23, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.3.1 documentation</p>
+    <p class="title logo__title">GRSS v4.3.2 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -231,6 +231,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Constants.html">grss.libgrss.Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Event.html">grss.libgrss.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.ImpactParameters.html">grss.libgrss.ImpactParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.IntegBody.html">grss.libgrss.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.IntegrationParameters.html">grss.libgrss.IntegrationParameters</a></li>
@@ -590,8 +591,8 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.__init__" title="grss.libgrss.PropSimulation.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.add_event" title="grss.libgrss.PropSimulation.add_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_event</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Overloaded function.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.add_event" title="grss.libgrss.PropSimulation.add_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_event</span></code></a>(self, event)</p></td>
+<td><p>Adds an event to the simulation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.PropSimulation.add_integ_body" title="grss.libgrss.PropSimulation.add_integ_body"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_integ_body</span></code></a>(self, body)</p></td>
 <td><p>Adds an integration body to the simulation.</p></td>
@@ -734,44 +735,13 @@ document.write(`
 
 <dl class="py method">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.add_event">
-<span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#grss.libgrss.PropSimulation.add_event" title="Permalink to this definition">#</a></dt>
-<dd><p>Overloaded function.</p>
-<ol class="arabic">
-<li><p>add_event(self: grss.libgrss.PropSimulation, body: grss.libgrss.IntegBody, tEvent: float, deltaV: list[float], multiplier: float) -&gt; None</p>
-<blockquote>
-<div><p>Adds an impulsive delta-V event to the simulation.</p>
-<dl class="simple">
-<dt>body<span class="classifier">str</span></dt><dd><p>Name of the body to apply the delta-V to.</p>
-</dd>
-<dt>tEvent<span class="classifier">real</span></dt><dd><p>MJD Epoch of the event. Must be in TDB.</p>
-</dd>
-<dt>deltaV<span class="classifier">list of real</span></dt><dd><p>Delta-V to apply to the body.</p>
-</dd>
-<dt>multiplier<span class="classifier">real</span></dt><dd><p>Multiplier to apply to the delta-V.</p>
+<span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.libgrss.PropSimulation" title="grss.libgrss.PropSimulation"><span class="pre">grss.libgrss.PropSimulation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="grss.libgrss.Event.html#grss.libgrss.Event" title="grss.libgrss.Event"><span class="pre">grss.libgrss.Event</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.add_event" title="Permalink to this definition">#</a></dt>
+<dd><p>Adds an event to the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<a class="reference internal" href="grss.libgrss.Event.html#grss.libgrss.Event" title="grss.libgrss.Event"><em>libgrss.Event</em></a>) – Event to add to the simulation.</p>
 </dd>
 </dl>
-</div></blockquote>
-</li>
-<li><p>add_event(self: grss.libgrss.PropSimulation, bodyName: grss.libgrss.IntegBody, tEvent: float, expAccel0: list[float], multiplier: float, tau: float) -&gt; None</p>
-<blockquote>
-<div><blockquote>
-<div><p>Adds an ejecta event to the simulation.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>body<span class="classifier">str</span></dt><dd><p>Name of the body to apply the delta-V to.</p>
-</dd>
-<dt>tEvent<span class="classifier">real</span></dt><dd><p>MJD Epoch of the event. Must be in TDB.</p>
-</dd>
-<dt>expAccel0<span class="classifier">list of real</span></dt><dd><p>Initial exponentiallly decaying acceleration.</p>
-</dd>
-<dt>multiplier<span class="classifier">real</span></dt><dd><p>Multiplier for the exponential decay.</p>
-</dd>
-<dt>tau<span class="classifier">real</span></dt><dd><p>Time constant for the exponentiallly decaying acceleration.</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
 </dd></dl>
 
 <dl class="py method">
@@ -780,7 +750,7 @@ document.write(`
 <dd><p>Adds an integration body to the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>body</strong> (<em>PropSimulation.IntegBody</em>) – Integration body to add to the simulation.</p>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="grss.libgrss.IntegBody.html#grss.libgrss.IntegBody" title="grss.libgrss.IntegBody"><em>libgrss.IntegBody</em></a>) – Integration body to add to the simulation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -791,7 +761,7 @@ document.write(`
 <dd><p>Adds a SPICE body to the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>body</strong> (<em>PropSimulation.SpiceBody</em>) – SPICE body to add to the simulation.</p>
+<dd class="field-odd"><p><strong>body</strong> (<a class="reference internal" href="grss.libgrss.SpiceBody.html#grss.libgrss.SpiceBody" title="grss.libgrss.SpiceBody"><em>libgrss.SpiceBody</em></a>) – SPICE body to add to the simulation.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -799,13 +769,13 @@ document.write(`
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.caParams">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">caParams</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.caParams" title="Permalink to this definition">#</a></dt>
-<dd><p>Close approach parameters of the simulation. List of PropSimulation.CloseApproachParameters objects.</p>
+<dd><p>Close approach parameters of the simulation. List of libgrss.CloseApproachParameters objects.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.consts">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">consts</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.consts" title="Permalink to this definition">#</a></dt>
-<dd><p>Constants of the simulation. PropSimulation.Constants object.</p>
+<dd><p>Constants of the simulation. libgrss.Constants object.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -904,19 +874,19 @@ This information should be repeated for radar observations.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.impactParams">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">impactParams</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.impactParams" title="Permalink to this definition">#</a></dt>
-<dd><p>Impact parameters of the simulation. List of PropSimulation.ImpactParameters objects.</p>
+<dd><p>Impact parameters of the simulation. List of libgrss.ImpactParameters objects.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.integBodies">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integBodies</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.integBodies" title="Permalink to this definition">#</a></dt>
-<dd><p>Integration bodies of the simulation. List of PropSimulation.IntegBody objects.</p>
+<dd><p>Integration bodies of the simulation. List of libgrss.IntegBody objects.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.integParams">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integParams</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.integParams" title="Permalink to this definition">#</a></dt>
-<dd><p>Integration parameters of the simulation. PropSimulation.IntegParams object.</p>
+<dd><p>Integration parameters of the simulation. libgrss.IntegParams object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -928,7 +898,7 @@ This information should be repeated for radar observations.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.interpParams">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interpParams</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.interpParams" title="Permalink to this definition">#</a></dt>
-<dd><p>Interpolation parameters of the simulation. PropSimulation.InterpolationParameters object.</p>
+<dd><p>Interpolation parameters of the simulation. libgrss.InterpolationParameters object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1055,7 +1025,7 @@ This information should be repeated for radar observations.</p></li>
 <li><p><strong>tEval</strong> (<em>list</em><em> of </em><em>real</em>) – MJD Times to evaluate the states of the integrated bodies at.
 Can be TDB or UTC based on tEvalUTC.</p></li>
 <li><p><strong>tEvalUTC</strong> (<em>bool</em>) – Whether the MJD evaluation time is in UTC for each value in
-PropSimulation.tEval, as opposed to TDB.</p></li>
+libgrss.tEval, as opposed to TDB.</p></li>
 <li><p><strong>evalApparentState</strong> (<em>bool</em>) – Whether to evaluate the apparent state of the integration bodies.</p></li>
 <li><p><strong>convergedLightTimes</strong> (<em>bool</em>) – Whether to use converged Newtonian light time correction.</p></li>
 <li><p><strong>observerInfo</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – Observer information. Each list at least contains the central body SPICE ID
@@ -1091,7 +1061,7 @@ This information should be repeated for radar observations.</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.PropSimulation.spiceBodies">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spiceBodies</span></span><a class="headerlink" href="#grss.libgrss.PropSimulation.spiceBodies" title="Permalink to this definition">#</a></dt>
-<dd><p>SPICE bodies of the simulation. List of PropSimulation.SpiceBodies objects.</p>
+<dd><p>SPICE bodies of the simulation. List of libgrss.SpiceBodies objects.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1281,7 +1251,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 20, 2024.
+  Last updated on Sep 23, 2024.
   <br/>
 </p>
   </div>

@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>stm.h &#8212; GRSS 4.3.1 documentation</title>
+    <title>stm.h &#8212; GRSS 4.3.2 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="spk.h" href="spk.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 20, 2024"/>
+    <meta name="docbuild:last-update" content="Sep 23, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.3.1 documentation</p>
+    <p class="title logo__title">GRSS v4.3.2 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -231,6 +231,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Constants.html">grss.libgrss.Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Event.html">grss.libgrss.Event</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.ImpactParameters.html">grss.libgrss.ImpactParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.IntegBody.html">grss.libgrss.IntegBody</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.IntegrationParameters.html">grss.libgrss.IntegrationParameters</a></li>
@@ -613,6 +614,23 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420stm_continuous_eventR13STMParametersPK14PropSimulationRK6size_tRK4realRK4real">
+<span class="target" id="stm_8h_1aa82a9871f82c5070e4cb5077a0df81a1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stm_continuous_event</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413STMParameters" title="STMParameters"><span class="n"><span class="pre">STMParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stmParams</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">eventIdx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">tPastEvent</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">postFac</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420stm_continuous_eventR13STMParametersPK14PropSimulationRK6size_tRK4realRK4real" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute the derivatives of a continuous event with respect to position, velocity, and parameters. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stmParams</strong> – <strong>[inout]</strong> Structure containing the STM submatrices and their derivatives. </p></li>
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object. </p></li>
+<li><p><strong>eventIdx</strong> – <strong>[in]</strong> Index of the continuous event. </p></li>
+<li><p><strong>tPastEvent</strong> – <strong>[in]</strong> Time since the continuous event started [days]. </p></li>
+<li><p><strong>postFac</strong> – <strong>[in]</strong> Exponential decay factor for the continuous event. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv413STMParameters">
@@ -767,7 +785,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 20, 2024.
+  Last updated on Sep 23, 2024.
   <br/>
 </p>
   </div>

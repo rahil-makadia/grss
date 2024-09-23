@@ -38,6 +38,7 @@
         Body
         CloseApproachParameters
         Constants
+        Event
         ImpactParameters
         IntegBody
         IntegrationParameters
