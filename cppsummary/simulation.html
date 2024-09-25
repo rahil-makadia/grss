@@ -18,7 +18,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>simulation.h &#8212; GRSS 4.3.2 documentation</title>
+    <title>simulation.h &#8212; GRSS 4.3.3 documentation</title>
   
   
   
@@ -62,7 +62,7 @@
     <link rel="prev" title="pck.h" href="pck.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 23, 2024"/>
+    <meta name="docbuild:last-update" content="Sep 25, 2024"/>
   </head>
   
   
@@ -151,7 +151,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.3.2 documentation</p>
+    <p class="title logo__title">GRSS v4.3.3 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -1753,6 +1753,24 @@ document.write(`
 <em>#include &lt;simulation.h&gt;</em></div>
 <p>Structure to hold interpolation parameters for a <a class="reference internal" href="#classPropSimulation"><span class="std std-ref">PropSimulation</span></a>. </p>
 <dl class="field-list simple">
+<dt class="field-odd">Param interpIdx<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Index of the interpolation parameters. </p>
+</dd>
+<dt class="field-even">Param t0<span class="colon">:</span></dt>
+<dd class="field-even"><p>Initial time of the interpolation window. </p>
+</dd>
+<dt class="field-odd">Param dt0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Timespan of the interpolation window. </p>
+</dd>
+<dt class="field-even">Param b0<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolation coefficients for the interpolation window. </p>
+</dd>
+<dt class="field-odd">Param xInteg0<span class="colon">:</span></dt>
+<dd class="field-odd"><p>States at the initial time of the interpolation window. </p>
+</dd>
+<dt class="field-even">Param accInteg0<span class="colon">:</span></dt>
+<dd class="field-even"><p>Accelerations at the initial time of the interpolation window. </p>
+</dd>
 <dt class="field-odd">Param tStack<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Stack of integrator epochs. </p>
 </dd>
@@ -1768,6 +1786,11 @@ document.write(`
 </dl>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N23InterpolationParameters9interpIdxE">
+<span class="target" id="structInterpolationParameters_1a7cc7c26c517fa8aeb58db2f88096acf2"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">interpIdx</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N23InterpolationParameters9interpIdxE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N23InterpolationParameters2t0E">
 <span class="target" id="structInterpolationParameters_1aa34785c411ea34193bc274a8753dfcc4"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t0</span></span></span><a class="headerlink" href="#_CPPv4N23InterpolationParameters2t0E" title="Permalink to this definition">#</a><br /></dt>
@@ -1829,8 +1852,14 @@ document.write(`
 <dt class="field-even">Param DEkernelPath<span class="colon">:</span></dt>
 <dd class="field-even"><p>Path to DE kernels. </p>
 </dd>
-<dt class="field-odd">Param ephem<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Ephemeris object for the simulation. </p>
+<dt class="field-odd">Param spkEphem<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SPK ephemeris object for the simulation. </p>
+</dd>
+<dt class="field-even">Param pckEphem<span class="colon">:</span></dt>
+<dd class="field-even"><p>PCK ephemeris object for the simulation. </p>
+</dd>
+<dt class="field-odd">Param unsafePersistentMemoryMap<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if ephemeris memory maps should not be unmapped (unsafe, default: false). </p>
 </dd>
 <dt class="field-even">Param consts<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structConstants"><span class="std std-ref">Constants</span></a> object for the simulation. </p>
@@ -1865,56 +1894,53 @@ document.write(`
 <dt class="field-even">Param interpParams<span class="colon">:</span></dt>
 <dd class="field-even"><p>Interpolation parameters for the simulation. </p>
 </dd>
-<dt class="field-odd">Param interpIdx<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Index of the interpolation parameters. </p>
+<dt class="field-odd">Param tEvalUTC<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if the evaluation times are in UTC. </p>
 </dd>
-<dt class="field-even">Param tEvalUTC<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if the evaluation times are in UTC. </p>
+<dt class="field-even">Param evalApparentState<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if the apparent state is evaluated. </p>
 </dd>
-<dt class="field-odd">Param evalApparentState<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Flag to indicate if the apparent state is evaluated. </p>
+<dt class="field-odd">Param evalMeasurements<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if measurements are evaluated. </p>
 </dd>
-<dt class="field-even">Param evalMeasurements<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if measurements are evaluated. </p>
+<dt class="field-even">Param convergedLightTime<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if converged light time needs to be computed. </p>
 </dd>
-<dt class="field-odd">Param convergedLightTime<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Flag to indicate if converged light time needs to be computed. </p>
+<dt class="field-odd">Param xObserver<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Observer states array. </p>
 </dd>
-<dt class="field-even">Param xObserver<span class="colon">:</span></dt>
-<dd class="field-even"><p>Observer states array. </p>
+<dt class="field-even">Param observerInfo<span class="colon">:</span></dt>
+<dd class="field-even"><p>Observer information array. </p>
 </dd>
-<dt class="field-odd">Param observerInfo<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Observer information array. </p>
+<dt class="field-odd">Param tEvalMargin<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Margin for interpolation outside integration arc. </p>
 </dd>
-<dt class="field-even">Param tEvalMargin<span class="colon">:</span></dt>
-<dd class="field-even"><p>Margin for interpolation outside integration arc. </p>
+<dt class="field-even">Param tEval<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of times at which to evaluate the integrated state. </p>
 </dd>
-<dt class="field-odd">Param tEval<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of times at which to evaluate the integrated state. </p>
+<dt class="field-odd">Param obsType<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of observation type flags (0=none, 1=delay, 2=doppler, 3=gaia). </p>
 </dd>
-<dt class="field-even">Param obsType<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of observation type flags (0=none, 1=delay, 2=doppler, 3=gaia). </p>
+<dt class="field-even">Param lightTimeEval<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of computed light times. </p>
 </dd>
-<dt class="field-odd">Param lightTimeEval<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of computed light times. </p>
+<dt class="field-odd">Param xIntegEval<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of integrated states at evaluation times. </p>
 </dd>
-<dt class="field-even">Param xIntegEval<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of integrated states at evaluation times. </p>
+<dt class="field-even">Param opticalObs<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of optical observations. </p>
 </dd>
-<dt class="field-odd">Param opticalObs<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of optical observations. </p>
+<dt class="field-odd">Param opticalPartials<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of optical observation partials. </p>
 </dd>
-<dt class="field-even">Param opticalPartials<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of optical observation partials. </p>
+<dt class="field-even">Param opticalObsCorr<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of photocenter-barycenter corrections for optical observations. </p>
 </dd>
-<dt class="field-odd">Param opticalObsCorr<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of photocenter-barycenter corrections for optical observations. </p>
+<dt class="field-odd">Param radarObs<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vector of radar observations. </p>
 </dd>
-<dt class="field-even">Param radarObs<span class="colon">:</span></dt>
-<dd class="field-even"><p>Vector of radar observations. </p>
-</dd>
-<dt class="field-odd">Param radarPartials<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Vector of radar observation partials. </p>
+<dt class="field-even">Param radarPartials<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vector of radar observation partials. </p>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
@@ -2154,6 +2180,11 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation25unsafePersistentMemoryMapE">
+<span class="target" id="classPropSimulation_1a27067ebdc27a66486f46edf64f3a4daa"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unsafePersistentMemoryMap</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N14PropSimulation25unsafePersistentMemoryMapE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation6constsE">
 <span class="target" id="classPropSimulation_1a3d41fbe87cea6d748f47b8310c3f0f3c"></span><a class="reference internal" href="#_CPPv49Constants" title="Constants"><span class="n"><span class="pre">Constants</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">consts</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation6constsE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
@@ -2201,11 +2232,6 @@ document.write(`
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation12interpParamsE">
 <span class="target" id="classPropSimulation_1a30b71b2df5deb9daca91d15085a7a0c0"></span><a class="reference internal" href="#_CPPv423InterpolationParameters" title="InterpolationParameters"><span class="n"><span class="pre">InterpolationParameters</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">interpParams</span></span></span><a class="headerlink" href="#_CPPv4N14PropSimulation12interpParamsE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N14PropSimulation9interpIdxE">
-<span class="target" id="classPropSimulation_1a4e2ea24fa017e85a6cb6450484b58a72"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">interpIdx</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N14PropSimulation9interpIdxE" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -2395,7 +2421,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 23, 2024.
+  Last updated on Sep 25, 2024.
   <br/>
 </p>
   </div>

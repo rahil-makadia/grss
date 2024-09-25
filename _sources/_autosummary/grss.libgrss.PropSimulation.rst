@@ -66,6 +66,7 @@ grss.libgrss.PropSimulation
         ~PropSimulation.tEval
         ~PropSimulation.tEvalMargin
         ~PropSimulation.tEvalUTC
+        ~PropSimulation.unsafePersistentMemoryMap
         ~PropSimulation.xInteg
         ~PropSimulation.xIntegEval
         ~PropSimulation.xObserver
