@@ -740,6 +740,10 @@ PYBIND11_MODULE(libgrss, m) {
                        R"mydelimiter(
             Path to the SPICE DE kernel.
             )mydelimiter")
+        .def_readwrite("unsafePersistentMemoryMap",
+                       &PropSimulation::unsafePersistentMemoryMap, R"mydelimiter(
+            Whether to use unsafe persistent memory mapping for the simulation.
+            )mydelimiter")
         .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
             Constants of the simulation. libgrss.Constants object.
             )mydelimiter")

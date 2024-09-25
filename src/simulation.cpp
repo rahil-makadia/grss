@@ -1315,7 +1315,7 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->interpParams.xIntegStack.clear();
     this->interpParams.bStack.clear();
     this->interpParams.accIntegStack.clear();
-    this->interpIdx = 0;
+    this->interpParams.interpIdx = 0;
     this->xObserver.clear();
     this->observerInfo.clear();
     this->tEval.clear();
