@@ -12,7 +12,7 @@ __all__ = [ 'default_kernel_path',
 grss_path = os.path.dirname(os.path.abspath(__file__))
 default_kernel_path = f'{grss_path}/kernels/'
 
-def _connected_to_internet(url='http://www.google.com/', timeout=5):
+def _connected_to_internet(url='http://www.google.com/', timeout=30):
     try:
         _ = requests.head(url, timeout=timeout)
         return True

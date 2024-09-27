@@ -167,18 +167,25 @@ PYBIND11_MODULE(libgrss, m) {
         )mydelimiter")
         .def(py::init<>())
         .def_readwrite("t", &CloseApproachParameters::t, R"mydelimiter(
-            Time of the close approach.
+            Time of the close approach or impact.
             )mydelimiter")
         .def_readwrite("xRel", &CloseApproachParameters::xRel,
+                       R"mydelimiter(
+            Relative state of the close approach or impact.
+            )mydelimiter")
+        .def_readwrite("tCA", &CloseApproachParameters::tCA, R"mydelimiter(
+            Time of the close approach.
+            )mydelimiter")
+        .def_readwrite("xRelCA", &CloseApproachParameters::xRelCA,
                        R"mydelimiter(
             Relative state of the close approach.
             )mydelimiter")
         .def_readwrite("tMap", &CloseApproachParameters::tMap, R"mydelimiter(
-            Time of the mapping point.
+            Time of mapping.
             )mydelimiter")
         .def_readwrite("xRelMap", &CloseApproachParameters::xRelMap,
                        R"mydelimiter(
-            Relative state of the mapping point.
+            Relative state at map time.
             )mydelimiter")
         .def_readwrite("dist", &CloseApproachParameters::dist, R"mydelimiter(
             Distance of the close approach.

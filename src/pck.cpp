@@ -589,6 +589,16 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         cdec0 = -6.163;
         cw0 = 302.695;
         cw1 = 56.3625225;
+    } else if (iauFrame == "IAU_BENNU"){
+        // from https://naif.jpl.nasa.gov/pub/naif/pds/pds4/orex/orex_spice/spice_kernels/pck/bennu_v17.tpc
+        // BODY2101955_POLE_RA    = (  85.45864      0.            0. )
+        // BODY2101955_POLE_DEC   = ( -60.36468      0.            0. )
+        // BODY2101955_PM     = ( 150.48977 2011.143058731885 2.0E-06 )
+        cra0 = 85.45864;
+        cdec0 = -60.36468;
+        cw0 = 150.48977;
+        cw1 = 2011.143058731885;
+        cw2 = 2.0e-06;
     } else {
         throw std::runtime_error("iau_to_euler: The IAU frame is not supported.");
     }
@@ -713,7 +723,8 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
                                                 "IAU_EARTH", "IAU_MOON",
                                                 "IAU_MARS", "IAU_JUPITER",
                                                 "IAU_SATURN", "IAU_URANUS",
-                                                "IAU_NEPTUNE", "IAU_PLUTO"};
+                                                "IAU_NEPTUNE", "IAU_PLUTO",
+                                                "IAU_BENNU"};
     // make sure either from or to frame is J2000
     int bodyFrameIdx = -1;
     if (from == "J2000"){
