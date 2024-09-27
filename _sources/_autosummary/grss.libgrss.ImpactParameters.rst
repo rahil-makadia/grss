@@ -48,6 +48,7 @@ grss.libgrss.ImpactParameters
         ~ImpactParameters.opik
         ~ImpactParameters.scaled
         ~ImpactParameters.t
+        ~ImpactParameters.tCA
         ~ImpactParameters.tLin
         ~ImpactParameters.tMap
         ~ImpactParameters.tPeri
@@ -55,6 +56,7 @@ grss.libgrss.ImpactParameters
         ~ImpactParameters.vel
         ~ImpactParameters.xRel
         ~ImpactParameters.xRelBodyFixed
+        ~ImpactParameters.xRelCA
         ~ImpactParameters.xRelMap
     
     

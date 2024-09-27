@@ -45,12 +45,14 @@ grss.libgrss.CloseApproachParameters
         ~CloseApproachParameters.opik
         ~CloseApproachParameters.scaled
         ~CloseApproachParameters.t
+        ~CloseApproachParameters.tCA
         ~CloseApproachParameters.tLin
         ~CloseApproachParameters.tMap
         ~CloseApproachParameters.tPeri
         ~CloseApproachParameters.vInf
         ~CloseApproachParameters.vel
         ~CloseApproachParameters.xRel
+        ~CloseApproachParameters.xRelCA
         ~CloseApproachParameters.xRelMap
     
     

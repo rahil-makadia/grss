@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.Event" href="grss.libgrss.Event.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 25, 2024"/>
+    <meta name="docbuild:last-update" content="Sep 27, 2024"/>
   </head>
   
   
@@ -510,6 +510,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.print_summary"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.print_summary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.scaled"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.scaled</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.t"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.t</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tCA"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tLin"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tLin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tMap"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tMap</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tPeri"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tPeri</span></code></a></li>
@@ -517,6 +518,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.vel"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.vel</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRel"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRel</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRelBodyFixed"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRelBodyFixed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRelCA"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRelCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRelMap"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRelMap</span></code></a></li>
 </ul>
 </li>
@@ -619,31 +621,37 @@ the impact between two integrated or SPICE bodies.</p>
 <td><p>Scaled B-plane parameters of the close approach.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.t" title="grss.libgrss.ImpactParameters.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<td><p>Time of the close approach or impact.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tCA" title="grss.libgrss.ImpactParameters.tCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tCA</span></code></a></p></td>
 <td><p>Time of the close approach.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tLin" title="grss.libgrss.ImpactParameters.tLin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tLin</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tLin" title="grss.libgrss.ImpactParameters.tLin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tLin</span></code></a></p></td>
 <td><p>Linearized time of periapsis</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tMap" title="grss.libgrss.ImpactParameters.tMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tMap</span></code></a></p></td>
-<td><p>Time of the mapping point.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tMap" title="grss.libgrss.ImpactParameters.tMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tMap</span></code></a></p></td>
+<td><p>Time of mapping.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tPeri" title="grss.libgrss.ImpactParameters.tPeri"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tPeri</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.tPeri" title="grss.libgrss.ImpactParameters.tPeri"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tPeri</span></code></a></p></td>
 <td><p>Time of periapsis (according to Keplerian hyperbolic motion).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.vInf" title="grss.libgrss.ImpactParameters.vInf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vInf</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.vInf" title="grss.libgrss.ImpactParameters.vInf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vInf</span></code></a></p></td>
 <td><p>Hyperbolic excess velocity of the close approach.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.vel" title="grss.libgrss.ImpactParameters.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.vel" title="grss.libgrss.ImpactParameters.vel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vel</span></code></a></p></td>
 <td><p>Velocity of the close approach.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.xRel" title="grss.libgrss.ImpactParameters.xRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRel</span></code></a></p></td>
-<td><p>Relative state of the close approach.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.xRel" title="grss.libgrss.ImpactParameters.xRel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRel</span></code></a></p></td>
+<td><p>Relative state of the close approach or impact.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.xRelBodyFixed" title="grss.libgrss.ImpactParameters.xRelBodyFixed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRelBodyFixed</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.xRelBodyFixed" title="grss.libgrss.ImpactParameters.xRelBodyFixed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRelBodyFixed</span></code></a></p></td>
 <td><p>Relative state of the impact in the body-fixed frame of the central body.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.xRelCA" title="grss.libgrss.ImpactParameters.xRelCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRelCA</span></code></a></p></td>
+<td><p>Relative state of the close approach.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.xRelMap" title="grss.libgrss.ImpactParameters.xRelMap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xRelMap</span></code></a></p></td>
-<td><p>Relative state of the mapping point.</p></td>
+<td><p>Relative state at map time.</p></td>
 </tr>
 </tbody>
 </table>
@@ -801,6 +809,12 @@ the impact between two integrated or SPICE bodies.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.t">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.t" title="Permalink to this definition">#</a></dt>
+<dd><p>Time of the close approach or impact.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.tCA">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tCA</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.tCA" title="Permalink to this definition">#</a></dt>
 <dd><p>Time of the close approach.</p>
 </dd></dl>
 
@@ -813,7 +827,7 @@ the impact between two integrated or SPICE bodies.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.tMap">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tMap</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.tMap" title="Permalink to this definition">#</a></dt>
-<dd><p>Time of the mapping point.</p>
+<dd><p>Time of mapping.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -837,7 +851,7 @@ the impact between two integrated or SPICE bodies.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.xRel">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xRel</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.xRel" title="Permalink to this definition">#</a></dt>
-<dd><p>Relative state of the close approach.</p>
+<dd><p>Relative state of the close approach or impact.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -847,9 +861,15 @@ the impact between two integrated or SPICE bodies.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.xRelCA">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xRelCA</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.xRelCA" title="Permalink to this definition">#</a></dt>
+<dd><p>Relative state of the close approach.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.xRelMap">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xRelMap</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.xRelMap" title="Permalink to this definition">#</a></dt>
-<dd><p>Relative state of the mapping point.</p>
+<dd><p>Relative state at map time.</p>
 </dd></dl>
 
 </dd></dl>
@@ -925,6 +945,7 @@ the impact between two integrated or SPICE bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.print_summary"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.print_summary()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.scaled"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.scaled</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.t"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.t</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tCA"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tLin"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tLin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tMap"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tMap</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.tPeri"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.tPeri</span></code></a></li>
@@ -932,6 +953,7 @@ the impact between two integrated or SPICE bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.vel"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.vel</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRel"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRel</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRelBodyFixed"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRelBodyFixed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRelCA"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRelCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.xRelMap"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.xRelMap</span></code></a></li>
 </ul>
 </li>
@@ -968,7 +990,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 25, 2024.
+  Last updated on Sep 27, 2024.
   <br/>
 </p>
   </div>
