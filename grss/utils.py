@@ -16,7 +16,7 @@ def _connected_to_internet(url='http://www.google.com/', timeout=30):
     try:
         _ = requests.head(url, timeout=timeout)
         return True
-    except requests.ConnectionError:
+    except (requests.ConnectionError, requests.Timeout):
         print("No internet connection available.")
     return False
 

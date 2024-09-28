@@ -1055,7 +1055,7 @@ static size_t event_preprocess(PropSimulation *propSim, const std::string &event
     return bodyIndex;
 }
 
-static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const Event &event){
+static void event_stm_handling(PropSimulation *propSim, const Event &event){
     int numEventParams = -1;
     if (!event.isContinuous && !event.deltaVEst && event.multiplierEst) {
         // only multiplier is estimated for an impulsive delta-V
@@ -1080,7 +1080,6 @@ static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const E
     propSim->integBodies[event.bodyIndex].n2Derivs += 3*numEventParams;
     propSim->integParams.n2Derivs += 3*numEventParams;
 
-    const bool backwardProp = propSim->integParams.tf < propSim->integParams.t0;
     std::vector<real> extraVec = std::vector<real>(6*numEventParams, 0.0);
     // add extra vector at the end of stm vector
     for (size_t i = 0; i < extraVec.size(); i++) {
@@ -1091,7 +1090,7 @@ static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const E
 static void event_postprocess(PropSimulation *propSim, Event &event) {
     // modify stm if estimating Delta-V
     if (propSim->integBodies[event.bodyIndex].propStm && event.eventEst) {
-        event_stm_handling(propSim, &propSim->integBodies[event.bodyIndex], event);
+        event_stm_handling(propSim, event);
     }
     // assign event xIntegIndex
     event.xIntegIndex = 0;
