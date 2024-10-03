@@ -3,6 +3,7 @@
 import sys
 import datetime
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from astropy.time import Time
 
@@ -562,7 +563,7 @@ class FitSimulation:
                 self.fixed_propsim_params[key] = nongrav_info[key]
         self.fixed_propsim_params['events'] = events if events is not None else []
         self.prior_est = None
-        self.prior_sigs = None
+        self.prior_sig = None
         self._priors_given = False
         self._xbar0 = None
         self._info0 = None
@@ -574,6 +575,7 @@ class FitSimulation:
         num_auto_rejected = np.sum(sel_ast == 'D')
         num_force_rejected = np.sum(sel_ast == 'd')
         self.num_rejected = num_auto_rejected + num_force_rejected
+        self.info_mats = []
         self.converged = False
         return None
 
@@ -642,10 +644,10 @@ class FitSimulation:
         ValueError
             If the prior estimates and sigmas do not have the same length.
         """
-        # check that the keys in self.x_init are the same as in self.prior_est and self.prior_sigs
-        if self.prior_est is not None and self.prior_sigs is not None:
+        # check that the keys in self.x_init are the same as in self.prior_est and self.prior_sig
+        if self.prior_est is not None and self.prior_sig is not None:
             self._priors_given = True
-            if len(self.prior_est) != len(self.prior_sigs):
+            if len(self.prior_est) != len(self.prior_sig):
                 raise ValueError("Prior estimates and sigmas must have the same length.")
             for key in self.prior_est.keys():
                 if key not in self.x_init:
@@ -654,7 +656,7 @@ class FitSimulation:
             self._xbar0 = np.zeros(self.n_fit)
             for key in self.prior_est.keys():
                 idx = list(self.x_init.keys()).index(key)
-                self._info0[idx, idx] = 1/self.prior_sigs[key]**2
+                self._info0[idx, idx] = 1/self.prior_sig[key]**2
                 self._xbar0[idx] = self.prior_est[key] - self.x_init[key]
             self._prior_constant = list(self.x_nom.values())+self._xbar0
         return None
@@ -693,56 +695,60 @@ class FitSimulation:
             raise ValueError("Simulated observation data must have the same length.")
         perm_id = self.obs['permID'][0]
         prov_id = self.obs['provID'][0]
+        new_sim_obs = []
         for i, time in enumerate(times):
-            idx = len(self.obs)
+            this_obs = {}
             mode = modes[i]
             if mode not in {'SIM_CCD', 'SIM_OCC', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                 raise ValueError(f"Unknown simulated observation mode {mode}.")
             weight = weights[i]
             if isinstance(perm_id, str):
-                self.obs.loc[idx, 'permID'] = f'SIM_{perm_id}'
+                this_obs['permID'] = f'SIM_{perm_id}'
             if isinstance(prov_id, str):
-                self.obs.loc[idx, 'provID'] = f'SIM_{prov_id}'
-            self.obs.loc[idx, 'obsTime'] = f'{time.utc.isot}Z'
-            self.obs.loc[idx, 'obsTimeMJD'] = time.utc.mjd
-            self.obs.loc[idx, 'obsTimeMJDTDB'] = time.tdb.mjd
-            self.obs.loc[idx, 'mode'] = mode
+                this_obs['provID'] = f'SIM_{prov_id}'
+            this_obs['obsTime'] = f'{time.utc.isot}Z'
+            this_obs['obsTimeMJD'] = time.utc.mjd
+            this_obs['obsTimeMJDTDB'] = time.tdb.mjd
+            this_obs['mode'] = mode
             if mode in {'SIM_CCD', 'SIM_OCC'}:
-                self.obs.loc[idx, 'stn'] = 'SIM'
-                self.obs.loc[idx, 'ra'] = np.nan
-                self.obs.loc[idx, 'rmsRA'] = weight[0]
-                self.obs.loc[idx, 'sigRA'] = weight[0]
-                self.obs.loc[idx, 'dec'] = np.nan
-                self.obs.loc[idx, 'rmsDec'] = weight[1]
-                self.obs.loc[idx, 'sigDec'] = weight[1]
-                self.obs.loc[idx, 'rmsCorr'] = weight[2]
-                self.obs.loc[idx, 'sigCorr'] = weight[2]
-                self.obs.loc[idx, 'cosDec'] = 1.0
+                this_obs['stn'] = 'SIM'
+                this_obs['ra'] = np.nan
+                this_obs['rmsRA'] = weight[0]
+                this_obs['sigRA'] = weight[0]
+                this_obs['dec'] = np.nan
+                this_obs['rmsDec'] = weight[1]
+                this_obs['sigDec'] = weight[1]
+                this_obs['rmsCorr'] = weight[2]
+                this_obs['sigCorr'] = weight[2]
+                this_obs['cosDec'] = 1.0
             elif mode in {'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
-                self.obs.loc[idx, 'trx'] = 'SIM'
-                self.obs.loc[idx, 'rcv'] = 'SIM'
-                self.obs.loc[idx, 'com'] = 1
+                this_obs['trx'] = 'SIM'
+                this_obs['rcv'] = 'SIM'
+                this_obs['com'] = 1
                 if mode == 'SIM_RAD_DEL':
-                    self.obs.loc[idx, 'delay'] = np.nan
-                    self.obs.loc[idx, 'rmsDelay'] = weight[0]
-                    self.obs.loc[idx, 'sigDelay'] = weight[0]
-                    self.obs.loc[idx, 'doppler'] = np.nan
-                    self.obs.loc[idx, 'rmsDoppler'] = np.nan
-                    self.obs.loc[idx, 'sigDoppler'] = np.nan
+                    this_obs['delay'] = np.nan
+                    this_obs['rmsDelay'] = weight[0]
+                    this_obs['sigDelay'] = weight[0]
+                    this_obs['doppler'] = np.nan
+                    this_obs['rmsDoppler'] = np.nan
+                    this_obs['sigDoppler'] = np.nan
                 else:
-                    self.obs.loc[idx, 'delay'] = np.nan
-                    self.obs.loc[idx, 'rmsDelay'] = np.nan
-                    self.obs.loc[idx, 'sigDelay'] = np.nan
-                    self.obs.loc[idx, 'doppler'] = np.nan
-                    self.obs.loc[idx, 'rmsDoppler'] = weight[0]
-                    self.obs.loc[idx, 'sigDoppler'] = weight[0]
-                    self.obs.loc[idx, 'frq'] = 8560.0
-            self.obs.loc[idx, 'ctr'] = 399
-            self.obs.loc[idx, 'sys'] = 'ITRF'
-            self.obs.loc[idx, 'pos1'] = 0.0
-            self.obs.loc[idx, 'pos2'] = 0.0
-            self.obs.loc[idx, 'pos3'] = 0.0
-            self.obs.loc[idx, 'selAst'] = 'a'
+                    this_obs['delay'] = np.nan
+                    this_obs['rmsDelay'] = np.nan
+                    this_obs['sigDelay'] = np.nan
+                    this_obs['doppler'] = np.nan
+                    this_obs['rmsDoppler'] = weight[0]
+                    this_obs['sigDoppler'] = weight[0]
+                    this_obs['frq'] = 8560.0
+            this_obs['ctr'] = 399
+            this_obs['sys'] = 'ITRF'
+            this_obs['pos1'] = 0.0
+            this_obs['pos2'] = 0.0
+            this_obs['pos3'] = 0.0
+            this_obs['selAst'] = 'a'
+            new_sim_obs.append(this_obs)
+        sim_obs_df = pd.DataFrame(new_sim_obs)
+        self.obs = pd.concat([self.obs, sim_obs_df], ignore_index=True)
         return None
 
     def _parse_observation_arrays(self, obs_df):
@@ -1759,6 +1765,7 @@ class FitSimulation:
             atwb = np.zeros(self.n_fit)
         j = 0
         sel_ast = self.obs['selAst'].values
+        self.info_mats = []
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
@@ -1768,10 +1775,12 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
             if sel_ast[i] in {'D', 'd'}:
                 j += size
+                self.info_mats.append(atwa.copy())
                 continue
             atwa += partials[j:j+size, :].T @ self.obs_weight[i] @ partials[j:j+size, :]
             atwb += partials[j:j+size, :].T @ self.obs_weight[i] @ residuals[i]
             j += size
+            self.info_mats.append(atwa.copy())
         # use pseudo-inverse if the data arc is less than 7 days
         if self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min() < 7.0:
             self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
@@ -2074,7 +2083,7 @@ class FitSimulation:
                     f.write(f" {units_dict[key[:2]]}")
                 if self._priors_given and key in self.prior_est:
                     p_val = self.prior_est[key]
-                    p_sig = self.prior_sigs[key]
+                    p_sig = self.prior_sig[key]
                     if key in ['om', 'w', 'i']:
                         p_val *= 180/np.pi
                         p_sig *= 180/np.pi
@@ -2114,7 +2123,7 @@ class FitSimulation:
                     f.write(f" {units_dict[key[:2]]}")
                 if self._priors_given and key in self.prior_est:
                     p_val = self.prior_est[key]
-                    p_sig = self.prior_sigs[key]
+                    p_sig = self.prior_sig[key]
                     if key in ['om', 'w', 'i']:
                         p_val *= 180/np.pi
                         p_sig *= 180/np.pi
