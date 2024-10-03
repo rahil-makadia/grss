@@ -65,7 +65,7 @@
     <link rel="prev" title="(66391) Moshup propagation test" href="../prop/moshup.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 28, 2024"/>
+    <meta name="docbuild:last-update" content="Oct 03, 2024"/>
   </head>
   
   
@@ -548,19 +548,19 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Read in 5430 observations from the MPC.
+Read in 5586 observations from the MPC.
         WARNING: At least one unknown observation mode in the data.
         WARNING: At least one deprecated star catalog in the data.
-        Filtered to 5430 observations that satisfy the time range and accepted observatory constraints.
+        Filtered to 5586 observations that satisfy the time range and accepted observatory constraints.
 Applying Eggl et al. (2020) debiasing scheme to the observations.
         Unknown star catalog: UNK
-        No debiasing needed for 4119 observations.
+        No debiasing needed for 4275 observations.
         Debiased 1289 observations.
         No bias information for 22 observations.
 Applying Vereš et al. (2017) weighting scheme to the observations.
-        Using 3260 CCD observations with station-specific weight rules.
+        Using 3412 CCD observations with station-specific weight rules.
 Applying sqrt(N/4) deweighting scheme.
-        Deweighted 2643 observations.
+        Deweighted 2666 observations.
 Read in 459 Gaia observations from gaiafpr
         Filtered to 459 observations that satisfy the time range constraints.
 </pre></div></div>
@@ -588,11 +588,11 @@ Read in 459 Gaia observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.752                   0.484                   2759.663                        0.234
-2                        0.752                   0.484                   2759.641                        0.234
+1                        0.743                   0.481                   2796.509                        0.231
+2                        0.743                   0.481                   2796.493                        0.231
 Converged without rejecting outliers. Starting outlier rejection now...
-3                        0.718                   0.446                   2343.397                        0.200
-Converged after rejecting outliers. Rejected 28 out of 5889 optical observations.
+3                        0.710                   0.444                   2380.245                        0.198
+Converged after rejecting outliers. Rejected 28 out of 6045 optical observations.
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -608,24 +608,24 @@ Converged after rejecting outliers. Rejected 28 out of 5889 optical observations
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Summary of the orbit fit calculations at iteration 3 (of 3):
+Summary of the orbit fit calculations after postfit pass:
 ==============================================================
-RMS unweighted: 0.7178331171368105
-RMS weighted: 0.44605368582662014
-chi-squared: 2343.396703952186
-reduced chi-squared: 0.2000167893438192
-square root of reduced chi-squared: 0.447232366163071
+RMS unweighted: 0.7100073609712477
+RMS weighted: 0.4437084445063534
+chi-squared: 2380.2451512503344
+reduced chi-squared: 0.1978920145701974
+square root of reduced chi-squared: 0.44485055307394794
 --------------------------------------------------------------
-Solution Time: MJD 57961.000 TDB = 2017-07-27 00:00:00.000 TDB
-Solution Observation Arc: 17627.47 days (48.26 years)
+Solution Time: MJD 58109.000 TDB = 2017-12-22 00:00:00.000 TDB
+Solution Observation Arc: 17721.12 days (48.52 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.43913904678e-02               7.35286146464e-10               2.43913903998e-02               7.08282425037e-10               -6.80211095783e-11              -0.093
-q                       2.93690461742e+00               3.42303981575e-09               2.93690461779e+00               3.30423987832e-09               +3.68734376366e-10              +0.108
-tp                      5.87282599431e+04               6.77315762978e-06               5.87282599430e+04               6.54601482069e-06               -1.24840880744e-07              -0.018
-om                      7.80633002818e+01               1.26172827208e-07               7.80633002819e+01               1.18110055369e-07               +7.86286591392e-11              +0.001
-w                       1.83042107662e+02               1.34053726889e-06               1.83042107624e+02               1.29754142562e-06               -3.80959477297e-08              -0.028
-i                       1.11525115179e+01               2.98481831671e-08               1.11525115187e+01               2.84550071222e-08               +7.10189240749e-10              +0.024
+e                       2.44816486409e-02               7.34900205607e-10               2.44816485814e-02               7.08199972529e-10               -5.95493029887e-11              -0.084
+q                       2.93647839282e+00               3.41979009324e-09               2.93647839313e+00               3.30350765028e-09               +3.09278380684e-10              +0.094
+tp                      5.87280922146e+04               6.74725614320e-06               5.87280922144e+04               6.52056400355e-06               -1.99121132027e-07              -0.031
+om                      7.80639799441e+01               1.25578195231e-07               7.80639799398e+01               1.18110127018e-07               -4.26469171089e-09              -0.036
+w                       1.83028382329e+02               1.33596794753e-06               1.83028382285e+02               1.29283963673e-06               -4.46623857897e-08              -0.035
+i                       1.11526213075e+01               2.98302297593e-08               1.11526213090e+01               2.84552962656e-08               +1.55920787392e-09              +0.055
 
 </pre></div></div>
 </div>
@@ -688,10 +688,10 @@ i                       1.11525115179e+01               2.98481831671e-08       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 0.14
-Mahalonobis distance between GRSS and JPL solution: 0.15
-Bhattacharya distance between JPL and GRSS solution: 0.0035
-Bhattacharya coefficient between JPL and GRSS solution: 0.9965
+Mahalonobis distance between JPL and GRSS solution: 0.12
+Mahalonobis distance between GRSS and JPL solution: 0.13
+Bhattacharya distance between JPL and GRSS solution: 0.0033
+Bhattacharya coefficient between JPL and GRSS solution: 0.9967
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -781,7 +781,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 28, 2024.
+  Last updated on Oct 03, 2024.
   <br/>
 </p>
   </div>
