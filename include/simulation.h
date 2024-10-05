@@ -109,11 +109,17 @@ class Body {
     real J2 = 0.0L;
     real poleRA = 0.0L;
     real poleDec = 90.0L;
+    size_t nZon = 0;
+    size_t nTes = 0;
+    std::vector<real> J = {};
+    std::vector<std::vector<real>> C = {};
+    std::vector<std::vector<real>> S = {};
     std::string name;
     int spiceId;
     real pos[3], vel[3], acc[3];
     bool isPPN = false;
     bool isJ2 = false;
+    bool isHarmonic = false;
     bool isNongrav = false;
     bool isMajor = false;
     real caTol = 0.1;
@@ -121,6 +127,12 @@ class Body {
      * @brief Set the J2 for the body.
      */
     void set_J2(real J2, real poleRA, real poleDec);
+    /**
+     * @brief Set the harmonic coefficients for the body.
+     */
+    void set_harmonics(real poleRA, real poleDec, int nZon, int nTes,
+                       std::vector<real> J, std::vector<std::vector<real>> C,
+                       std::vector<std::vector<real>> S);
 };
 
 /**

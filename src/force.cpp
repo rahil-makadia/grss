@@ -27,6 +27,11 @@ static void force_J2(const PropSimulation *propSim,
               std::vector<real> &accInteg, STMParameters* allSTMs);
 
 /**
+ * @brief Compute the acceleration of the system due to a full spherical harmonic model.
+ */
+static void force_harmonics(const PropSimulation *propSim, std::vector<real> &accInteg);
+
+/**
  * @brief Compute the acceleration of the system due to the nongravitational forces.
  */
 static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accInteg,
@@ -119,6 +124,7 @@ void get_state_der(PropSimulation *propSim, const real &t,
     // force_ppn_simple(propSim, accInteg, allSTMs);
     force_ppn_eih(propSim, accInteg, allSTMs);
     force_J2(propSim, accInteg, allSTMs);
+    force_harmonics(propSim, accInteg);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
     force_continuous_event(t, propSim, accInteg, allSTMs);
@@ -526,6 +532,102 @@ static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
     #ifdef PRINT_FORCES
     forceFile.close();
     #endif
+}
+
+// next two functions from Tiger for full gravity models
+// Vallado v4 Page 597, Eq. (8-57)
+static void associated_legendre_function(const real &phi, const size_t &N,
+                                         std::vector<std::vector<real>> &P) {
+    const real gamma = sin(phi);
+    const real cosphi = cos(phi);
+    P[0][0] = 1.0;
+    P[1][0] = gamma;
+    P[1][1] = cosphi;
+    for (size_t n = 2; n <= N; n++) {
+        P[n][0] = ((2 * n - 1) * gamma * P[n - 1][0] - (n - 1) * P[n - 2][0]) / n;
+        for (size_t m = 1; m < n; m++) {
+            P[n][m] = P[n - 2][m] + (2 * n - 1) * cosphi * P[n - 1][m - 1];
+        }
+        P[n][n] = (2 * n - 1) * cosphi * P[n - 1][n - 1];
+    }
+}
+
+// https://ipnpr.jpl.nasa.gov/progress_report/42-196/196C.pdf, Page 13, Eq. (28)
+// note that the -cos(psi) * Pₙ' term is just Pₙ¹ (I think), which can be found in another reference:
+// http://www.amsat-bda.org/files/gtds_math_theory_jul89.pdf, Page 4-12, Eq. (4-31)
+// also helpful is: https://en.wikipedia.org/wiki/Associated_Legendre_polynomials#Recurrence_formula
+// currently showing results in the xi-eta-zeta coordinate system, where
+// xi == extended body -> point mass
+// xi-zeta contains the rotational pole of the extended body
+// eta completes the right-handed system
+// THIS IS UNVALIDATED CODE RIGHT NOW!!!
+static void force_harmonics(const PropSimulation *propSim,
+                            std::vector<real> &accInteg) {
+    const real G = propSim->consts.G;
+    size_t starti = 0;
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+        for (size_t j = 0; j < propSim->integParams.nTotal; j++) {
+            const Body *bodyj;
+            if (j < propSim->integParams.nInteg) {
+                bodyj = &propSim->integBodies[j];
+            } else {
+                bodyj = &propSim->spiceBodies[j - propSim->integParams.nInteg];
+            }
+            const real massj = bodyj->mass;
+            if (i != j && massj != 0.0 && bodyj->isHarmonic) {
+                throw std::runtime_error("force_harmonics not operational");
+                real GM = G * massj;
+                const real dx = propSim->integBodies[i].pos[0] - bodyj->pos[0];
+                const real dy = propSim->integBodies[i].pos[1] - bodyj->pos[1];
+                const real dz = propSim->integBodies[i].pos[2] - bodyj->pos[2];
+                const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
+                const real rRel2 = rRel * rRel;
+                const real poleRA = bodyj->poleRA;
+                const real poleDec = bodyj->poleDec;
+                const real sinRA = sin(poleRA);
+                const real cosRA = cos(poleRA);
+                const real sinDec = sin(poleDec);
+                const real cosDec = cos(poleDec);
+                const real dxBody = -dx * sinRA + dy * cosRA;
+                const real dyBody =
+                    -dx * cosRA * sinDec - dy * sinRA * sinDec + dz * cosDec;
+                const real dzBody =
+                    dx * cosRA * cosDec + dy * sinRA * cosDec + dz * sinDec;
+                const real phi = asin(dzBody / rRel);
+                const real lambda = atan2(dyBody, dxBody);
+
+                // evaluate spherical harmonics for given phi
+                const size_t nZonal = bodyj->nZon;
+                const size_t nTesseral = bodyj->nTes;
+                // initialize 2D vector of size nZonal+1 x nTesseral+1
+                std::vector<std::vector<real>> P(nZonal+1, std::vector<real>(nTesseral+1, 0.0));
+                associated_legendre_function(phi, nZonal, P);
+
+                real axBody = 0.0;  // acceleration in the xi-eta-zeta frame
+                real ayBody = 0.0;
+                real azBody = 0.0;
+                // FIXME: the following two loops need optimization
+                for (size_t n = 2; n <= nZonal; n++) {
+                    axBody -= GM / rRel2 * bodyj->J[n] * pow(bodyj->radius / rRel, n) * (n + 1) * P[n][0];
+                    ayBody -= 0;
+                    azBody -= GM / rRel2 * bodyj->J[n] * pow(bodyj->radius / rRel, n) * P[n][1]; // FIXME: verify that -cos(phi) * Pₙ' is just Pₙ¹; see https://en.wikipedia.org/wiki/Associated_Legendre_polynomials#Definition_for_non-negative_integer_parameters_%E2%84%93_and_m
+                }
+                for (size_t n = 2; n <= nTesseral; n++) {
+                    for (size_t m = 1; m <= n; m++) {
+                        axBody -= GM / rRel2 * pow(bodyj->radius / rRel, n) * (-1) * (n+1)   * P[n][m]                    * ( bodyj->C[n][m] * cos(m * lambda) + bodyj->S[n][m] * sin(m * lambda));
+                        ayBody -= GM / rRel2 * pow(bodyj->radius / rRel, n) * m * 1/cos(phi) * P[n][m]                    * (-bodyj->C[n][m] * sin(m * lambda) + bodyj->S[n][m] * cos(m * lambda));
+                        azBody -= GM / rRel2 * pow(bodyj->radius / rRel, n) * 0.5 * ((n+m)*(n-m+1)*P[n][m-1] - P[n][m+1]) * ( bodyj->C[n][m] * cos(m * lambda) + bodyj->S[n][m] * sin(m * lambda));
+                    }
+                }
+                accInteg[starti + 0] += -axBody * sinRA -
+                    ayBody * cosRA * sinDec + azBody * cosRA * cosDec;
+                accInteg[starti + 1] += axBody * cosRA -
+                    ayBody * sinRA * sinDec + azBody * sinRA * cosDec;
+                accInteg[starti + 2] += ayBody * cosDec + azBody * sinDec;
+            }
+        }
+        starti += propSim->integBodies[i].n2Derivs;
+    }
 }
 
 /**

@@ -128,6 +128,35 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
 }
 
 /** 
+ * @param[in] poleRA Right ascension of the pole.
+ * @param[in] poleDec Declination of the pole.
+ * @param[in] J Zonal coefficient vector.
+ * @param[in] C Sectoral coefficient array.
+ * @param[in] S Tesseral coefficient array.
+*/
+void Body::set_harmonics(real poleRA, real poleDec, int nZon, int nTes,
+                         std::vector<real> J, std::vector<std::vector<real>> C,
+                         std::vector<std::vector<real>> S) {
+    this->isHarmonic = true;
+    if (this->isJ2) {
+        throw std::invalid_argument(
+            "Body::set_harmonics: Cannot set both J2 and spherical harmonics.");
+    }
+    this->poleRA = poleRA * DEG2RAD;
+    this->poleDec = poleDec * DEG2RAD;
+    if (nZon <= 0 || nTes <= 0) {
+        throw std::invalid_argument(
+            "Body::set_harmonics: The degree and order of the spherical harmonics "
+            "must be positive.");
+    }
+    this->nZon = (size_t)nZon;
+    this->nTes = (size_t)nTes;
+    this->J = J;
+    this->C = C;
+    this->S = S;
+}
+
+/** 
  * @param[in] name Name of the body.
  * @param[in] spiceId SPICE ID of the body.
  * @param[in] t0 Initial time [MJD TDB].
