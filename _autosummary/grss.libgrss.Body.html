@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.BPlaneParameters" href="grss.libgrss.BPlaneParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Oct 03, 2024"/>
+    <meta name="docbuild:last-update" content="Oct 05, 2024"/>
   </head>
   
   
@@ -488,18 +488,25 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body"><code class="docutils literal notranslate"><span class="pre">Body</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.__init__"><code class="docutils literal notranslate"><span class="pre">Body.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.C"><code class="docutils literal notranslate"><span class="pre">Body.C</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.J"><code class="docutils literal notranslate"><span class="pre">Body.J</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.J2"><code class="docutils literal notranslate"><span class="pre">Body.J2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.S"><code class="docutils literal notranslate"><span class="pre">Body.S</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.caTol"><code class="docutils literal notranslate"><span class="pre">Body.caTol</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isHarmonic"><code class="docutils literal notranslate"><span class="pre">Body.isHarmonic</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isJ2"><code class="docutils literal notranslate"><span class="pre">Body.isJ2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isMajor"><code class="docutils literal notranslate"><span class="pre">Body.isMajor</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isNongrav"><code class="docutils literal notranslate"><span class="pre">Body.isNongrav</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isPPN"><code class="docutils literal notranslate"><span class="pre">Body.isPPN</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.mass"><code class="docutils literal notranslate"><span class="pre">Body.mass</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.nTes"><code class="docutils literal notranslate"><span class="pre">Body.nTes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.nZon"><code class="docutils literal notranslate"><span class="pre">Body.nZon</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.name"><code class="docutils literal notranslate"><span class="pre">Body.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.poleDec"><code class="docutils literal notranslate"><span class="pre">Body.poleDec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.poleRA"><code class="docutils literal notranslate"><span class="pre">Body.poleRA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.radius"><code class="docutils literal notranslate"><span class="pre">Body.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.set_J2"><code class="docutils literal notranslate"><span class="pre">Body.set_J2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.set_harmonics"><code class="docutils literal notranslate"><span class="pre">Body.set_harmonics()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.t0"><code class="docutils literal notranslate"><span class="pre">Body.t0</span></code></a></li>
 </ul>
 </li>
@@ -535,16 +542,31 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.set_J2" title="grss.libgrss.Body.set_J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_J2</span></code></a>(self, J2, poleRA, poleDec)</p></td>
 <td><p>Set the J2 parameter of the body.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.set_harmonics" title="grss.libgrss.Body.set_harmonics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_harmonics</span></code></a>(self, poleRA, poleDec, nZon, ...)</p></td>
+<td><p>Set the J2 parameter of the body.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
 <table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.C" title="grss.libgrss.Body.C"><code class="xref py py-obj docutils literal notranslate"><span class="pre">C</span></code></a></p></td>
+<td><p>Sectoral coefficients of the spherical harmonics.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.J" title="grss.libgrss.Body.J"><code class="xref py py-obj docutils literal notranslate"><span class="pre">J</span></code></a></p></td>
+<td><p>Zonal coefficients of the spherical harmonics.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.J2" title="grss.libgrss.Body.J2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">J2</span></code></a></p></td>
 <td><p>J2 parameter of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.caTol" title="grss.libgrss.Body.caTol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">caTol</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.S" title="grss.libgrss.Body.S"><code class="xref py py-obj docutils literal notranslate"><span class="pre">S</span></code></a></p></td>
+<td><p>Tesseral coefficients of the spherical harmonics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.caTol" title="grss.libgrss.Body.caTol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">caTol</span></code></a></p></td>
 <td><p>Distance tolerance for close approaches.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.isHarmonic" title="grss.libgrss.Body.isHarmonic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isHarmonic</span></code></a></p></td>
+<td><p>Whether the body has spherical harmonics.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.isJ2" title="grss.libgrss.Body.isJ2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isJ2</span></code></a></p></td>
 <td><p>Whether the body is a J2 body.</p></td>
@@ -560,6 +582,12 @@ document.write(`
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.mass" title="grss.libgrss.Body.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
 <td><p>Mass of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.nTes" title="grss.libgrss.Body.nTes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTes</span></code></a></p></td>
+<td><p>Order of the spherical harmonics.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.Body.nZon" title="grss.libgrss.Body.nZon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nZon</span></code></a></p></td>
+<td><p>Degree of the spherical harmonics.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.Body.name" title="grss.libgrss.Body.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the body.</p></td>
@@ -579,15 +607,39 @@ document.write(`
 </tbody>
 </table>
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.Body.C">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">C</span></span><a class="headerlink" href="#grss.libgrss.Body.C" title="Permalink to this definition">#</a></dt>
+<dd><p>Sectoral coefficients of the spherical harmonics.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.Body.J">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">J</span></span><a class="headerlink" href="#grss.libgrss.Body.J" title="Permalink to this definition">#</a></dt>
+<dd><p>Zonal coefficients of the spherical harmonics.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.Body.J2">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">J2</span></span><a class="headerlink" href="#grss.libgrss.Body.J2" title="Permalink to this definition">#</a></dt>
 <dd><p>J2 parameter of the body.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.Body.S">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">S</span></span><a class="headerlink" href="#grss.libgrss.Body.S" title="Permalink to this definition">#</a></dt>
+<dd><p>Tesseral coefficients of the spherical harmonics.</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="grss.libgrss.Body.caTol">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">caTol</span></span><a class="headerlink" href="#grss.libgrss.Body.caTol" title="Permalink to this definition">#</a></dt>
 <dd><p>Distance tolerance for close approaches.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.Body.isHarmonic">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isHarmonic</span></span><a class="headerlink" href="#grss.libgrss.Body.isHarmonic" title="Permalink to this definition">#</a></dt>
+<dd><p>Whether the body has spherical harmonics.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -618,6 +670,18 @@ document.write(`
 <dt class="sig sig-object py" id="grss.libgrss.Body.mass">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mass</span></span><a class="headerlink" href="#grss.libgrss.Body.mass" title="Permalink to this definition">#</a></dt>
 <dd><p>Mass of the body.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.Body.nTes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nTes</span></span><a class="headerlink" href="#grss.libgrss.Body.nTes" title="Permalink to this definition">#</a></dt>
+<dd><p>Order of the spherical harmonics.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.Body.nZon">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nZon</span></span><a class="headerlink" href="#grss.libgrss.Body.nZon" title="Permalink to this definition">#</a></dt>
+<dd><p>Degree of the spherical harmonics.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -652,8 +716,33 @@ document.write(`
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>J2</strong> (<em>real</em>) – J2 parameter of the body.</p></li>
-<li><p><strong>poleRA</strong> (<em>real</em>) – Right ascension of the pole of the body.</p></li>
-<li><p><strong>poleDec</strong> (<em>real</em>) – Declination of the pole of the body.</p></li>
+<li><p><strong>poleRA</strong> (<em>real</em>) – Right ascension of the pole of the body in degrees.</p></li>
+<li><p><strong>poleDec</strong> (<em>real</em>) – Declination of the pole of the body in degrees.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>None</strong> – None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NoneType</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grss.libgrss.Body.set_harmonics">
+<span class="sig-name descname"><span class="pre">set_harmonics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#grss.libgrss.Body" title="grss.libgrss.Body"><span class="pre">grss.libgrss.Body</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">poleRA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poleDec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nZon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nTes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#grss.libgrss.Body.set_harmonics" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the J2 parameter of the body.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>poleRA</strong> (<em>real</em>) – Right ascension of the pole of the body in degrees.</p></li>
+<li><p><strong>poleDec</strong> (<em>real</em>) – Declination of the pole of the body in degrees.</p></li>
+<li><p><strong>nZon</strong> (<em>int</em>) – Degree of the spherical harmonics.</p></li>
+<li><p><strong>nTes</strong> (<em>int</em>) – Order of the spherical harmonics.</p></li>
+<li><p><strong>J</strong> (<em>list</em><em> of </em><em>real</em>) – Zonal coefficients of the spherical harmonics.</p></li>
+<li><p><strong>C</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – Sectoral coefficients of the spherical harmonics.</p></li>
+<li><p><strong>S</strong> (<em>list</em><em> of </em><em>list</em><em> of </em><em>real</em>) – Tesseral coefficients of the spherical harmonics.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -722,18 +811,25 @@ document.write(`
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body"><code class="docutils literal notranslate"><span class="pre">Body</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.__init__"><code class="docutils literal notranslate"><span class="pre">Body.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.C"><code class="docutils literal notranslate"><span class="pre">Body.C</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.J"><code class="docutils literal notranslate"><span class="pre">Body.J</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.J2"><code class="docutils literal notranslate"><span class="pre">Body.J2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.S"><code class="docutils literal notranslate"><span class="pre">Body.S</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.caTol"><code class="docutils literal notranslate"><span class="pre">Body.caTol</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isHarmonic"><code class="docutils literal notranslate"><span class="pre">Body.isHarmonic</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isJ2"><code class="docutils literal notranslate"><span class="pre">Body.isJ2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isMajor"><code class="docutils literal notranslate"><span class="pre">Body.isMajor</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isNongrav"><code class="docutils literal notranslate"><span class="pre">Body.isNongrav</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.isPPN"><code class="docutils literal notranslate"><span class="pre">Body.isPPN</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.mass"><code class="docutils literal notranslate"><span class="pre">Body.mass</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.nTes"><code class="docutils literal notranslate"><span class="pre">Body.nTes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.nZon"><code class="docutils literal notranslate"><span class="pre">Body.nZon</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.name"><code class="docutils literal notranslate"><span class="pre">Body.name</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.poleDec"><code class="docutils literal notranslate"><span class="pre">Body.poleDec</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.poleRA"><code class="docutils literal notranslate"><span class="pre">Body.poleRA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.radius"><code class="docutils literal notranslate"><span class="pre">Body.radius</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.set_J2"><code class="docutils literal notranslate"><span class="pre">Body.set_J2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.set_harmonics"><code class="docutils literal notranslate"><span class="pre">Body.set_harmonics()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.Body.t0"><code class="docutils literal notranslate"><span class="pre">Body.t0</span></code></a></li>
 </ul>
 </li>
@@ -770,7 +866,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 03, 2024.
+  Last updated on Oct 05, 2024.
   <br/>
 </p>
   </div>

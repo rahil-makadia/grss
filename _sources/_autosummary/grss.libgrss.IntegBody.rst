@@ -19,6 +19,7 @@ grss.libgrss.IntegBody
         ~IntegBody.__init__
         ~IntegBody.prepare_stm
         ~IntegBody.set_J2
+        ~IntegBody.set_harmonics
     
     
 
@@ -28,12 +29,16 @@ grss.libgrss.IntegBody
 
     .. autosummary::
     
+        ~IntegBody.C
+        ~IntegBody.J
         ~IntegBody.J2
+        ~IntegBody.S
         ~IntegBody.caTol
         ~IntegBody.dCartdState
         ~IntegBody.initCart
         ~IntegBody.initState
         ~IntegBody.isCometary
+        ~IntegBody.isHarmonic
         ~IntegBody.isInteg
         ~IntegBody.isJ2
         ~IntegBody.isMajor
@@ -42,6 +47,8 @@ grss.libgrss.IntegBody
         ~IntegBody.isThrusting
         ~IntegBody.mass
         ~IntegBody.n2Derivs
+        ~IntegBody.nTes
+        ~IntegBody.nZon
         ~IntegBody.name
         ~IntegBody.ngParams
         ~IntegBody.poleDec

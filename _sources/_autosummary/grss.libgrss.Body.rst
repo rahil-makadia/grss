@@ -18,6 +18,7 @@ grss.libgrss.Body
     
         ~Body.__init__
         ~Body.set_J2
+        ~Body.set_harmonics
     
     
 
@@ -27,13 +28,19 @@ grss.libgrss.Body
 
     .. autosummary::
     
+        ~Body.C
+        ~Body.J
         ~Body.J2
+        ~Body.S
         ~Body.caTol
+        ~Body.isHarmonic
         ~Body.isJ2
         ~Body.isMajor
         ~Body.isNongrav
         ~Body.isPPN
         ~Body.mass
+        ~Body.nTes
+        ~Body.nZon
         ~Body.name
         ~Body.poleDec
         ~Body.poleRA

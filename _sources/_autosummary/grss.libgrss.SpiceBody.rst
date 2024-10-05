@@ -18,6 +18,7 @@ grss.libgrss.SpiceBody
     
         ~SpiceBody.__init__
         ~SpiceBody.set_J2
+        ~SpiceBody.set_harmonics
     
     
 
@@ -27,14 +28,20 @@ grss.libgrss.SpiceBody
 
     .. autosummary::
     
+        ~SpiceBody.C
+        ~SpiceBody.J
         ~SpiceBody.J2
+        ~SpiceBody.S
         ~SpiceBody.caTol
+        ~SpiceBody.isHarmonic
         ~SpiceBody.isJ2
         ~SpiceBody.isMajor
         ~SpiceBody.isNongrav
         ~SpiceBody.isPPN
         ~SpiceBody.isSpice
         ~SpiceBody.mass
+        ~SpiceBody.nTes
+        ~SpiceBody.nZon
         ~SpiceBody.name
         ~SpiceBody.poleDec
         ~SpiceBody.poleRA
