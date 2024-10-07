@@ -536,27 +536,48 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         lon = None
         lat = None
     impact_any = lon is not None and lat is not None
+    if kizner_nan and opik_nan and scaled_nan and not mtp_nan:
+        print("WARNING: Close approaches have some invalid B-planes but do have MTP. "
+                "Object might be captured.")
     if len(ca_list) >= 100 or sigma_points is not None:
+        # remove nans before converting data to ellipse
         if not kizner_nan:
             kizner_data = data_to_ellipse(kizner_x, kizner_y, n_std, 'kizner',
                                             print_ellipse_params, units, sigma_points)
         else:
-            kizner_data = None
+            print(f"Kizner B-plane nan count: {np.sum(np.isnan(kizner_x))}")
+            non_nan_idx = np.where(~np.isnan(kizner_x) & ~np.isnan(kizner_y))[0]
+            kizner_data = data_to_ellipse(kizner_x[non_nan_idx], kizner_y[non_nan_idx],
+                                            n_std, 'kizner',
+                                            print_ellipse_params, units, sigma_points)
         if not opik_nan:
             opik_data = data_to_ellipse(opik_x, opik_y, n_std, 'opik',
                                         print_ellipse_params, units, sigma_points)
         else:
-            opik_data = None
+            print(f"Opik B-plane nan count: {np.sum(np.isnan(opik_x))}")
+            non_nan_idx = np.where(~np.isnan(opik_x) & ~np.isnan(opik_y))[0]
+            opik_data = data_to_ellipse(opik_x[non_nan_idx], opik_y[non_nan_idx],
+                                        n_std, 'opik',
+                                        print_ellipse_params, units, sigma_points)
         if not scaled_nan:
             scaled_data = data_to_ellipse(scaled_x, scaled_y, n_std, 'scaled',
                                             print_ellipse_params, units, sigma_points)
         else:
-            scaled_data = None
+            print(f"Scaled B-plane nan count: {np.sum(np.isnan(scaled_x))}")
+            non_nan_idx = np.where(~np.isnan(scaled_x) & ~np.isnan(scaled_y))[0]
+            scaled_data = data_to_ellipse(scaled_x[non_nan_idx], scaled_y[non_nan_idx],
+                                            n_std, 'scaled',
+                                            print_ellipse_params, units, sigma_points)
         if not mtp_nan:
             mtp_data = data_to_ellipse(mtp_x, mtp_y, n_std, 'mtp',
                                         print_ellipse_params, units, sigma_points)
         else:
-            mtp_data = None
+            print(f"MTP B-plane nan count: {np.sum(np.isnan(mtp_x))}")
+            non_nan_idx = np.where(~np.isnan(mtp_x) & ~np.isnan(mtp_y))[0]
+            mtp_data = data_to_ellipse(mtp_x[non_nan_idx], mtp_y[non_nan_idx],
+                                        n_std, 'mtp',
+                                        print_ellipse_params, units, sigma_points)
+
     elif len(ca_list[0].xRel) >= 42 and analytic_info is not None:
         all_data = partials_to_ellipse(ca_list[0], au2units, n_std,
                                         print_ellipse_params, units, analytic_info)
@@ -566,9 +587,6 @@ def plot_bplane(ca_list, plot_offset=False, scale_coords=False, n_std=3, units_k
         opik_data = None
         scaled_data = None
         mtp_data = None
-    if kizner_nan and opik_nan and scaled_nan and not mtp_nan:
-        print("WARNING: Close approaches have no valid B-planes but do have MTP. "
-                "Object might be captured.")
     fig, axes = plt.subplots(2, 2, figsize=(9, 9), dpi=250)
     plot_single_bplane(axes[0,0], kizner_x, kizner_y, kizner_data, 'kizner',
                         focus_factor, show_central_body, plot_offset, scale_coords,
