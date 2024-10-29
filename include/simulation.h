@@ -388,6 +388,8 @@ class ImpactParameters : public CloseApproachParameters {
     real lon;
     real lat;
     real alt;
+    std::vector<real> dlon = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
+    std::vector<real> dlat = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
     /**
      * @brief Get the impact parameters.
      */

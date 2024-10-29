@@ -309,6 +309,12 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("alt", &ImpactParameters::alt, R"mydelimiter(
             Altitude of the impact.
             )mydelimiter")
+        .def_readwrite("dlon", &ImpactParameters::dlon, R"mydelimiter(
+            Partial derivatives of the longitude of the impact with respect to the state at the impact.
+            )mydelimiter")
+        .def_readwrite("dlat", &ImpactParameters::dlat, R"mydelimiter(
+            Partial derivatives of the latitude of the impact with respect to the state at the impact.
+            )mydelimiter")
         .def("print_summary", &ImpactParameters::print_summary,
              py::arg("prec") = 8, R"mydelimiter(
             Print a summary of the impact parameters.

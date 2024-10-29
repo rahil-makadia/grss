@@ -27,28 +27,79 @@ static real get_atm_offset(const int &centralBodySpiceId){
  * @param[in] x X-coordinate in body-fixed frame.
  * @param[in] y Y-coordinate in body-fixed frame.
  * @param[in] z Z-coordinate in body-fixed frame.
- * @param[in] a Semi-major axis of the body.
- * @param[in] f Flattening of the body.
  * @param[out] lon Longitude in geodetic frame.
  * @param[out] lat Latitude in geodetic frame.
  * @param[out] h Height above spheroid in geodetic frame.
  */
 static void rec_to_geodetic(const real &x, const real &y, const real &z,
-                            const real &a, const real &f, real &lon, real &lat,
-                            real &h) {
+                            real &lon, real &lat, real &h) {
+    const real a = EARTH_RAD_WGS84;
+    const real f = EARTH_FLAT_WGS84;
+    if (x == 0.0 && y == 0.0) {
+        lon = 0.0;
+    } else {
+        lon = atan2(y, x);
+        if (lon < 0.0) {
+            lon += 2 * PI;
+        }
+    }
     const real xy = sqrt(x*x + y*y);
     const real e2 = 2*f - f*f;
-    real phi = atan(z/(xy*(1-e2)));
+    if (xy == 0.0) {
+        if (z >= 0.0) {
+            lat = PI/2;
+        } else {
+            lat = -PI/2;
+        }
+        h = fabs(z) - a*sqrt(1-e2);
+        return;
+    }
+    lat = atan(z/(xy*(1-e2)));
     real N;
     for (size_t k = 0; k < 5; k++) {
-        N = a/sqrt(1-e2*sin(phi)*sin(phi));
-        h = xy/cos(phi) - N;
-        phi = atan(z*(N+h)/(xy*(N*(1-e2)+h)));
+        N = a/sqrt(1-e2*sin(lat)*sin(lat));
+        h = xy/cos(lat) - N;
+        lat = atan(z*(N+h)/(xy*(N*(1-e2)+h)));
     }
-    lat = phi;
-    lon = atan2(y, x);
-    if (lon < 0.0) {
-        lon += 2 * PI;
+}
+
+static void rec_to_geodetic_jac(const real &lon, const real &lat, const real &h,
+                                std::vector< std::vector<real> > &jac) {
+    // calculate derivatives of geodetic coordinates with respect to the
+    // rectangular coordinates by inversion of the derivatives of the
+    // rectangular coordinates with respect to the geodetic coordinates
+    const real a = EARTH_RAD_WGS84;
+    const real slat = sin(lat);
+    const real clat = cos(lat);
+    const real slon = sin(lon);
+    const real clon = cos(lon);
+    const real flat = 1.0 - EARTH_FLAT_WGS84;
+    const real flat2 = flat * flat;
+    const real g = sqrt(clat*clat + flat2*slat*slat);
+    const real g2 = g * g;
+    const real dg_dlat = (-1.0 + flat2) * slat * clat / g;
+    std::vector< std::vector<real> > jacInv = std::vector< std::vector<real> >(3, std::vector<real>(3, 0.0));
+    // partials of rectangular coordinates w.r.t. geodetic longitude
+    jacInv[0][0] = - (h + a/g) * slon * clat;
+    jacInv[1][0] = (h + a/g) * clon * clat;
+    jacInv[2][0] = 0.0;
+    // partials of rectangular coordinates w.r.t. geodetic latitude
+    jacInv[0][1] = (-a*dg_dlat/g2) * clon * clat - (h + a/g) * clon * slat;
+    jacInv[1][1] = (-a*dg_dlat/g2) * slon * clat - (h + a/g) * slon * slat;
+    jacInv[2][1] = (-flat2*a*dg_dlat/g2) * slat + (h + flat2*a/g) * clat;
+    // partials of rectangular coordinates w.r.t. geodetic altitude
+    jacInv[0][2] = clon * clat;
+    jacInv[1][2] = slon * clat;
+    jacInv[2][2] = slat;
+    // invert the Jacobian
+    std::vector< std::vector<real> > jacSmall = std::vector< std::vector<real> >(3, std::vector<real>(3, 0.0));
+    mat3_inv(jacInv, jacSmall);
+    // fill the full 2x6 Jacobian for just longitude and latitude
+    jac.resize(2, std::vector<real>(6, 0.0));
+    for (size_t i = 0; i < 2; i++) {
+        for (size_t j = 0; j < 3; j++) {
+            jac[i][j] = jacSmall[i][j];
+        }
     }
 }
 
@@ -204,10 +255,8 @@ void impact_r_calc(PropSimulation *propSim, const size_t &i, const size_t &j,
             const real x = xBody[0];
             const real y = xBody[1];
             const real z = xBody[2];
-            const real a = 6378137.0/propSim->consts.du2m;
-            const real f = 1/298.257223563;
             real lon, lat, h;
-            rec_to_geodetic(x, y, z, a, f, lon, lat, h);
+            rec_to_geodetic(x, y, z, lon, lat, h);
             r = h - atmOffset;
             return;
         } else {
@@ -981,11 +1030,10 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     x = this->xRelBodyFixed[0];
     y = this->xRelBodyFixed[1];
     z = this->xRelBodyFixed[2];
+    std::vector<std::vector<real>> jac(2, std::vector<real>(6, 0.0));
     if (this->centralBodySpiceId == 399){
-        const real a = 6378137.0/propSim->consts.du2m;
-        const real f = 1/298.257223563;
-        rec_to_geodetic(x, y, z, a, f, lon, lat, alt);
-        alt *= propSim->consts.du2m/1.0e3L;
+        rec_to_geodetic(x, y, z, lon, lat, alt);
+        rec_to_geodetic_jac(lon, lat, alt, jac);
     } else {
         const real dist = sqrt(x*x + y*y + z*z);
         lat = atan2(z, sqrt(x*x + y*y));
@@ -999,11 +1047,40 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
         } else {
             centralBodyRadius = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
         }
-        alt = (dist-centralBodyRadius)*propSim->consts.du2m/1.0e3L;
+        alt = dist-centralBodyRadius;
+        // calculate derivatives of latitudinal coordinates with respect to the
+        // rectangular coordinates by inversion of the derivatives of the
+        // rectangular coordinates with respect to the latitudinal coordinates
+        std::vector<std::vector<real>> jacInv(3, std::vector<real>(3, 0.0));
+        // partials of rectangular coordinates with respect to longitude
+        jacInv[0][1] = -dist * sin(lon) * cos(lat);
+        jacInv[1][1] = dist * cos(lon) * cos(lat);
+        jacInv[2][1] = 0.0;
+        // partials of rectangular coordinates with respect to latitude
+        jacInv[0][2] = -dist * cos(lon) * sin(lat);
+        jacInv[1][2] = -dist * sin(lon) * sin(lat);
+        jacInv[2][2] = dist * cos(lat);
+        // partials of rectangular coordinates with respect to radius
+        jacInv[0][3] = cos(lon) * cos(lat);
+        jacInv[1][3] = sin(lon) * cos(lat);
+        jacInv[2][3] = sin(lat);
+        std::vector<std::vector<real>> jacSmall(3, std::vector<real>(3, 0.0));
+        mat3_inv(jacInv, jacSmall);
+        for (size_t k = 0; k < 2; k++) {
+            for (size_t k2 = 0; k2 < 3; k2++) {
+                jac[k][k2] = jacSmall[k][k2];
+            }
+        }
     }
     this->lon = lon;
     this->lat = lat;
     this->alt = alt;
+    std::vector<std::vector<real>> jac_inertial(2, std::vector<real>(6, 0.0));
+    mat_mat_mul(jac, rotMat, jac_inertial);
+    for (size_t k = 0; k < 6; k++) {
+        this->dlon[k] = jac_inertial[0][k];
+        this->dlat[k] = jac_inertial[1][k];
+    }
 }
 
 /**
@@ -1014,7 +1091,7 @@ void ImpactParameters::print_summary(int prec){
     std::cout << "MJD " << this->t << " TDB:" << std::endl;
     std::cout << "    " << this->flybyBody << " impacted " << this->centralBody << " with a relative velocity of " << this->vel << " AU/d." << std::endl;
     std::cout << "    Impact location: " << std::endl;
-    std::cout << "        Longitude: " << this->lon*180.0L/PI << " deg" << std::endl;
-    std::cout << "        Latitude: " << this->lat*180.0L/PI << " deg" << std::endl;
-    std::cout << "        Altitude: " << this->alt << " km" << std::endl;
+    std::cout << "        Longitude: " << this->lon*RAD2DEG << " deg" << std::endl;
+    std::cout << "        Latitude: " << this->lat*RAD2DEG << " deg" << std::endl;
+    std::cout << "        Altitude: " << this->alt*1.495978707e8 << " km" << std::endl;
 }

@@ -130,6 +130,8 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
 /** 
  * @param[in] poleRA Right ascension of the pole.
  * @param[in] poleDec Declination of the pole.
+ * @param[in] nZon Degree of the zonal coefficients.
+ * @param[in] nTes Order of the tesseral coefficients.
  * @param[in] J Zonal coefficient vector.
  * @param[in] C Sectoral coefficient array.
  * @param[in] S Tesseral coefficient array.
@@ -1515,9 +1517,9 @@ void PropSimulation::save(std::string filename) {
             file << "MJD " << timeWidth << std::fixed << imp.t << " TDB:" << std::endl;
             file << "  " << imp.flybyBody << " impacted " << imp.centralBody << " with a relative velocity of " << imp.vel << " AU/d." << std::endl;
             file << "  Impact location: " << std::endl;
-            file << "    Longitude: " << imp.lon*180.0L/PI << " deg" << std::endl;
-            file << "    Latitude: " << imp.lat*180.0L/PI << " deg" << std::endl;
-            file << "    Altitude: " << imp.alt << " km" << std::endl;
+            file << "    Longitude: " << imp.lon*RAD2DEG << " deg" << std::endl;
+            file << "    Latitude: " << imp.lat*RAD2DEG << " deg" << std::endl;
+            file << "    Altitude: " << imp.alt*this->consts.du2m/1.0e3 << " km" << std::endl;
         }
     }
 
