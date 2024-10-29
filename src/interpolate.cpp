@@ -152,7 +152,7 @@ std::vector<real> PropSimulation::interpolate(const real t) {
  */
 void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &dt) {
     const real tNext = t + dt;
-    size_t &interpIdx = propSim->interpIdx;
+    size_t &interpIdx = propSim->interpParams.interpIdx;
     const bool forwardProp = propSim->integParams.t0 < propSim->integParams.tf;
     const bool backwardProp = propSim->integParams.t0 > propSim->integParams.tf;
     bool interpIdxInWindow;
@@ -215,7 +215,7 @@ void get_interpIdxInWindow(const PropSimulation *propSim,
                            const bool &backwardProp,
                            bool &interpIdxInWindow) {
     interpIdxInWindow = false;
-    const size_t interpIdx = propSim->interpIdx;
+    const size_t interpIdx = propSim->interpParams.interpIdx;
     real tCheck = propSim->tEval[interpIdx];
     if (propSim->tEvalUTC) {
         tCheck += delta_et_utc(tCheck)/86400.0;

@@ -63,6 +63,16 @@ using std::tanh;
  * 
  */
 #define EARTH_OBLIQUITY 84381.448 / 3600.0 * DEG2RAD
+/**
+ * @brief Value of Earth's WGS84 radius in AU.
+ * 
+ */
+#define EARTH_RAD_WGS84 6378.137 / 1.495978707e8
+/**
+ * @brief Value of Earth's WGS84 flattening.
+ * 
+ */
+#define EARTH_FLAT_WGS84 1.0 / 298.257223563
 
 /**
  * @brief Wrap an angle to the range [0, 2*pi).

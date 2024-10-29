@@ -128,6 +128,37 @@ void Body::set_J2(real J2, real poleRA, real poleDec) {
 }
 
 /** 
+ * @param[in] poleRA Right ascension of the pole.
+ * @param[in] poleDec Declination of the pole.
+ * @param[in] nZon Degree of the zonal coefficients.
+ * @param[in] nTes Order of the tesseral coefficients.
+ * @param[in] J Zonal coefficient vector.
+ * @param[in] C Sectoral coefficient array.
+ * @param[in] S Tesseral coefficient array.
+*/
+void Body::set_harmonics(real poleRA, real poleDec, int nZon, int nTes,
+                         std::vector<real> J, std::vector<std::vector<real>> C,
+                         std::vector<std::vector<real>> S) {
+    this->isHarmonic = true;
+    if (this->isJ2) {
+        throw std::invalid_argument(
+            "Body::set_harmonics: Cannot set both J2 and spherical harmonics.");
+    }
+    this->poleRA = poleRA * DEG2RAD;
+    this->poleDec = poleDec * DEG2RAD;
+    if (nZon <= 0 || nTes <= 0) {
+        throw std::invalid_argument(
+            "Body::set_harmonics: The degree and order of the spherical harmonics "
+            "must be positive.");
+    }
+    this->nZon = (size_t)nZon;
+    this->nTes = (size_t)nTes;
+    this->J = J;
+    this->C = C;
+    this->S = S;
+}
+
+/** 
  * @param[in] name Name of the body.
  * @param[in] spiceId SPICE ID of the body.
  * @param[in] t0 Initial time [MJD TDB].
@@ -1055,7 +1086,7 @@ static size_t event_preprocess(PropSimulation *propSim, const std::string &event
     return bodyIndex;
 }
 
-static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const Event &event){
+static void event_stm_handling(PropSimulation *propSim, const Event &event){
     int numEventParams = -1;
     if (!event.isContinuous && !event.deltaVEst && event.multiplierEst) {
         // only multiplier is estimated for an impulsive delta-V
@@ -1080,7 +1111,6 @@ static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const E
     propSim->integBodies[event.bodyIndex].n2Derivs += 3*numEventParams;
     propSim->integParams.n2Derivs += 3*numEventParams;
 
-    const bool backwardProp = propSim->integParams.tf < propSim->integParams.t0;
     std::vector<real> extraVec = std::vector<real>(6*numEventParams, 0.0);
     // add extra vector at the end of stm vector
     for (size_t i = 0; i < extraVec.size(); i++) {
@@ -1091,7 +1121,7 @@ static void event_stm_handling(PropSimulation *propSim, IntegBody *body, const E
 static void event_postprocess(PropSimulation *propSim, Event &event) {
     // modify stm if estimating Delta-V
     if (propSim->integBodies[event.bodyIndex].propStm && event.eventEst) {
-        event_stm_handling(propSim, &propSim->integBodies[event.bodyIndex], event);
+        event_stm_handling(propSim, event);
     }
     // assign event xIntegIndex
     event.xIntegIndex = 0;
@@ -1315,7 +1345,7 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
     this->interpParams.xIntegStack.clear();
     this->interpParams.bStack.clear();
     this->interpParams.accIntegStack.clear();
-    this->interpIdx = 0;
+    this->interpParams.interpIdx = 0;
     this->xObserver.clear();
     this->observerInfo.clear();
     this->tEval.clear();
@@ -1487,9 +1517,9 @@ void PropSimulation::save(std::string filename) {
             file << "MJD " << timeWidth << std::fixed << imp.t << " TDB:" << std::endl;
             file << "  " << imp.flybyBody << " impacted " << imp.centralBody << " with a relative velocity of " << imp.vel << " AU/d." << std::endl;
             file << "  Impact location: " << std::endl;
-            file << "    Longitude: " << imp.lon*180.0L/PI << " deg" << std::endl;
-            file << "    Latitude: " << imp.lat*180.0L/PI << " deg" << std::endl;
-            file << "    Altitude: " << imp.alt << " km" << std::endl;
+            file << "    Longitude: " << imp.lon*RAD2DEG << " deg" << std::endl;
+            file << "    Latitude: " << imp.lat*RAD2DEG << " deg" << std::endl;
+            file << "    Altitude: " << imp.alt*this->consts.du2m/1.0e3 << " km" << std::endl;
         }
     }
 

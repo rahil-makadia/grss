@@ -29,6 +29,12 @@ std::vector<real> get_rel_state(PropSimulation *propSim, const size_t &i,
                                 const size_t &j, const real &t);
 
 /**
+ * @brief Compute partials of B-plane parameters.
+ */
+void get_bplane_partials(PropSimulation *propSim, CloseApproachParameters *ca,
+                         const real &mu, const real &radius);
+
+/**
  * @brief Compute the time of close approach or impact using Brent's method
  *       for root finding in a bracketed interval.
  */

@@ -16,7 +16,9 @@ void PropSimulation::integrate() {
     this->map_ephemeris();
     this->preprocess();
     gr15(this);
-    this->unmap_ephemeris();
+    if (!this->unsafePersistentMemoryMap) {
+        this->unmap_ephemeris();
+    }
 
     // flip vectors if integration is backwards in time
     if (this->integParams.t0 > this->integParams.tf) {

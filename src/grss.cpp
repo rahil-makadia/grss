@@ -167,18 +167,25 @@ PYBIND11_MODULE(libgrss, m) {
         )mydelimiter")
         .def(py::init<>())
         .def_readwrite("t", &CloseApproachParameters::t, R"mydelimiter(
-            Time of the close approach.
+            Time of the close approach or impact.
             )mydelimiter")
         .def_readwrite("xRel", &CloseApproachParameters::xRel,
+                       R"mydelimiter(
+            Relative state of the close approach or impact.
+            )mydelimiter")
+        .def_readwrite("tCA", &CloseApproachParameters::tCA, R"mydelimiter(
+            Time of the close approach.
+            )mydelimiter")
+        .def_readwrite("xRelCA", &CloseApproachParameters::xRelCA,
                        R"mydelimiter(
             Relative state of the close approach.
             )mydelimiter")
         .def_readwrite("tMap", &CloseApproachParameters::tMap, R"mydelimiter(
-            Time of the mapping point.
+            Time of mapping.
             )mydelimiter")
         .def_readwrite("xRelMap", &CloseApproachParameters::xRelMap,
                        R"mydelimiter(
-            Relative state of the mapping point.
+            Relative state at map time.
             )mydelimiter")
         .def_readwrite("dist", &CloseApproachParameters::dist, R"mydelimiter(
             Distance of the close approach.
@@ -301,6 +308,12 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def_readwrite("alt", &ImpactParameters::alt, R"mydelimiter(
             Altitude of the impact.
+            )mydelimiter")
+        .def_readwrite("dlon", &ImpactParameters::dlon, R"mydelimiter(
+            Partial derivatives of the longitude of the impact with respect to the state at the impact.
+            )mydelimiter")
+        .def_readwrite("dlat", &ImpactParameters::dlat, R"mydelimiter(
+            Partial derivatives of the latitude of the impact with respect to the state at the impact.
             )mydelimiter")
         .def("print_summary", &ImpactParameters::print_summary,
              py::arg("prec") = 8, R"mydelimiter(
@@ -471,6 +484,21 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("poleDec", &Body::poleDec, R"mydelimiter(
             Declination of the pole of the body.
             )mydelimiter")
+        .def_readwrite("nZon", &Body::nZon, R"mydelimiter(
+            Degree of the spherical harmonics.
+            )mydelimiter")
+        .def_readwrite("nTes", &Body::nTes, R"mydelimiter(
+            Order of the spherical harmonics.
+            )mydelimiter")
+        .def_readwrite("J", &Body::J, R"mydelimiter(
+            Zonal coefficients of the spherical harmonics.
+            )mydelimiter")
+        .def_readwrite("C", &Body::C, R"mydelimiter(
+            Sectoral coefficients of the spherical harmonics.
+            )mydelimiter")
+        .def_readwrite("S", &Body::S, R"mydelimiter(
+            Tesseral coefficients of the spherical harmonics.
+            )mydelimiter")
         .def_readwrite("name", &Body::name, R"mydelimiter(
             Name of the body.
             )mydelimiter")
@@ -482,6 +510,9 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def_readwrite("isJ2", &Body::isJ2, R"mydelimiter(
             Whether the body is a J2 body.
+            )mydelimiter")
+        .def_readwrite("isHarmonic", &Body::isHarmonic, R"mydelimiter(
+            Whether the body has spherical harmonics.
             )mydelimiter")
         .def_readwrite("isNongrav", &Body::isNongrav, R"mydelimiter(
             Whether the body has non-gravitational accelerations.
@@ -498,9 +529,36 @@ PYBIND11_MODULE(libgrss, m) {
             J2 : real
                 J2 parameter of the body.
             poleRA : real
-                Right ascension of the pole of the body.
+                Right ascension of the pole of the body in degrees.
             poleDec : real
-                Declination of the pole of the body.
+                Declination of the pole of the body in degrees.
+
+            Returns
+            -------
+            None : NoneType
+                None.
+            )mydelimiter")
+        .def("set_harmonics", &Body::set_harmonics, py::arg("poleRA"),
+             py::arg("poleDec"), py::arg("nZon"), py::arg("nTes"), py::arg("J"),
+             py::arg("C"), py::arg("S"), R"mydelimiter(
+            Set the J2 parameter of the body.
+
+            Parameters
+            ----------
+            poleRA : real
+                Right ascension of the pole of the body in degrees.
+            poleDec : real
+                Declination of the pole of the body in degrees.
+            nZon : int
+                Degree of the spherical harmonics.
+            nTes : int
+                Order of the spherical harmonics.
+            J : list of real
+                Zonal coefficients of the spherical harmonics.
+            C : list of list of real
+                Sectoral coefficients of the spherical harmonics.
+            S : list of list of real
+                Tesseral coefficients of the spherical harmonics.
 
             Returns
             -------
@@ -739,6 +797,10 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("DEkernelPath", &PropSimulation::DEkernelPath,
                        R"mydelimiter(
             Path to the SPICE DE kernel.
+            )mydelimiter")
+        .def_readwrite("unsafePersistentMemoryMap",
+                       &PropSimulation::unsafePersistentMemoryMap, R"mydelimiter(
+            Whether to use unsafe persistent memory mapping for the simulation.
             )mydelimiter")
         .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
             Constants of the simulation. libgrss.Constants object.

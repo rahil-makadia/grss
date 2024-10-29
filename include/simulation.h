@@ -109,11 +109,17 @@ class Body {
     real J2 = 0.0L;
     real poleRA = 0.0L;
     real poleDec = 90.0L;
+    size_t nZon = 0;
+    size_t nTes = 0;
+    std::vector<real> J = {};
+    std::vector<std::vector<real>> C = {};
+    std::vector<std::vector<real>> S = {};
     std::string name;
     int spiceId;
     real pos[3], vel[3], acc[3];
     bool isPPN = false;
     bool isJ2 = false;
+    bool isHarmonic = false;
     bool isNongrav = false;
     bool isMajor = false;
     real caTol = 0.1;
@@ -121,6 +127,12 @@ class Body {
      * @brief Set the J2 for the body.
      */
     void set_J2(real J2, real poleRA, real poleDec);
+    /**
+     * @brief Set the harmonic coefficients for the body.
+     */
+    void set_harmonics(real poleRA, real poleDec, int nZon, int nTes,
+                       std::vector<real> J, std::vector<std::vector<real>> C,
+                       std::vector<std::vector<real>> S);
 };
 
 /**
@@ -376,6 +388,8 @@ class ImpactParameters : public CloseApproachParameters {
     real lon;
     real lat;
     real alt;
+    std::vector<real> dlon = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
+    std::vector<real> dlat = std::vector<real>(6, std::numeric_limits<real>::quiet_NaN());
     /**
      * @brief Get the impact parameters.
      */
@@ -389,12 +403,19 @@ class ImpactParameters : public CloseApproachParameters {
 /**
  * @brief Structure to hold interpolation parameters for a PropSimulation.
  * 
+ * @param interpIdx Index of the interpolation parameters.
+ * @param t0 Initial time of the interpolation window.
+ * @param dt0 Timespan of the interpolation window.
+ * @param b0 Interpolation coefficients for the interpolation window.
+ * @param xInteg0 States at the initial time of the interpolation window.
+ * @param accInteg0 Accelerations at the initial time of the interpolation window.
  * @param tStack Stack of integrator epochs.
  * @param xIntegStack Stack of states at integrator epochs.
  * @param bStack Stack of interpolation coefficients at integrator epochs.
  * @param accIntegStack Stack of accelerations at integrator epochs.
  */
 struct InterpolationParameters {
+    size_t interpIdx = 0;
     real t0;
     real dt0;
     std::vector<real> b0;
@@ -411,7 +432,9 @@ struct InterpolationParameters {
  * 
  * @param name Name of the simulation.
  * @param DEkernelPath Path to DE kernels.
- * @param ephem Ephemeris object for the simulation.
+ * @param spkEphem SPK ephemeris object for the simulation.
+ * @param pckEphem PCK ephemeris object for the simulation.
+ * @param unsafePersistentMemoryMap Flag to indicate if ephemeris memory maps should not be unmapped (unsafe, default: false).
  * @param consts Constants object for the simulation.
  * @param integParams Integration parameters for the simulation.
  * @param spiceBodies Vector of SpiceBody objects in the simulation.
@@ -423,7 +446,6 @@ struct InterpolationParameters {
  * @param t Current time of the simulation.
  * @param xInteg Current state of the simulation.
  * @param interpParams Interpolation parameters for the simulation.
- * @param interpIdx Index of the interpolation parameters.
  * @param tEvalUTC Flag to indicate if the evaluation times are in UTC.
  * @param evalApparentState Flag to indicate if the apparent state is evaluated.
  * @param evalMeasurements Flag to indicate if measurements are evaluated.
@@ -459,6 +481,7 @@ class PropSimulation {
     std::string DEkernelPath;
     SpkEphemeris spkEphem;
     PckEphemeris pckEphem;
+    bool unsafePersistentMemoryMap = false;
     /**
      * @brief Construct a new PropSimulation object.
      */
@@ -490,7 +513,6 @@ class PropSimulation {
     real t;
     std::vector<real> xInteg;
     InterpolationParameters interpParams;
-    size_t interpIdx = 0;
     bool tEvalUTC = false;
     bool evalApparentState = false;
     bool evalMeasurements = false;
