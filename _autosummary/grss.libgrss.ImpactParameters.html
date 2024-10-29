@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.Event" href="grss.libgrss.Event.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Oct 07, 2024"/>
+    <meta name="docbuild:last-update" content="Oct 29, 2024"/>
   </head>
   
   
@@ -495,6 +495,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.centralBodyIdx"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBodyIdx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.centralBodySpiceId"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBodySpiceId</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dist"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dist</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dlat"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dlat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dlon"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dlon</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dt"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dtLin"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dtLin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.flybyBody"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.flybyBody</span></code></a></li>
@@ -583,6 +585,12 @@ the impact between two integrated or SPICE bodies.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.dist" title="grss.libgrss.ImpactParameters.dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dist</span></code></a></p></td>
 <td><p>Distance of the close approach.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.dlat" title="grss.libgrss.ImpactParameters.dlat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dlat</span></code></a></p></td>
+<td><p>Partial derivatives of the latitude of the impact with respect to the state at the impact.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.dlon" title="grss.libgrss.ImpactParameters.dlon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dlon</span></code></a></p></td>
+<td><p>Partial derivatives of the longitude of the impact with respect to the state at the impact.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.ImpactParameters.dt" title="grss.libgrss.ImpactParameters.dt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dt</span></code></a></p></td>
 <td><p>Partials of time of periapsis with respect to CA state.</p></td>
@@ -695,6 +703,18 @@ the impact between two integrated or SPICE bodies.</p>
 <dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.dist">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dist</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.dist" title="Permalink to this definition">#</a></dt>
 <dd><p>Distance of the close approach.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.dlat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dlat</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.dlat" title="Permalink to this definition">#</a></dt>
+<dd><p>Partial derivatives of the latitude of the impact with respect to the state at the impact.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.ImpactParameters.dlon">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dlon</span></span><a class="headerlink" href="#grss.libgrss.ImpactParameters.dlon" title="Permalink to this definition">#</a></dt>
+<dd><p>Partial derivatives of the longitude of the impact with respect to the state at the impact.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -930,6 +950,8 @@ the impact between two integrated or SPICE bodies.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.centralBodyIdx"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBodyIdx</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.centralBodySpiceId"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.centralBodySpiceId</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dist"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dist</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dlat"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dlat</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dlon"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dlon</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dt"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.dtLin"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.dtLin</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.ImpactParameters.flybyBody"><code class="docutils literal notranslate"><span class="pre">ImpactParameters.flybyBody</span></code></a></li>
@@ -990,7 +1012,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Oct 07, 2024.
+  Last updated on Oct 29, 2024.
   <br/>
 </p>
   </div>
