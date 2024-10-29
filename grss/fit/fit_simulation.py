@@ -1641,33 +1641,29 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
             resid = residuals[i]
             # calculate chi-squared for each residual if after the first iteration
-            if self.n_iter > 1:
+            if start_rejecting and size == 2:
                 obs_cov = self.obs_cov[i]
                 obs_partials = partials[j:j+size, :]
                 if sel_ast[i] in {'D', 'd'}:
                     resid_cov = obs_cov + obs_partials @ full_cov @ obs_partials.T
                 else:
                     resid_cov = obs_cov - obs_partials @ full_cov @ obs_partials.T
-                if size == 1:
-                    resid_cov_inv = 1.0/resid_cov
-                else:
-                    resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
-                    resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
-                                                [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
-                residual_chi_squared = resid @ resid_cov_inv @ resid.T
-                res_chisq_vals[i] = residual_chi_squared
-            # outlier rejection, only reject RA/Dec measurements
-            if start_rejecting and size == 2:
-                if abs(residual_chi_squared) > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
+                resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
+                                            [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
+                outlier_chisq = resid @ resid_cov_inv @ resid.T
+                # outlier rejection, only reject RA/Dec measurements
+                if abs(outlier_chisq) > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
                     if sel_ast[i] == 'A':
                         self.num_rejected += 1
                     sel_ast[i] = 'D'
-                elif abs(residual_chi_squared) < chi_recover**2 and sel_ast[i] == 'D':
+                elif abs(outlier_chisq) < chi_recover**2 and sel_ast[i] == 'D':
                     sel_ast[i] = 'A'
                     self.num_rejected -= 1
+            res_chisq_vals[i] = resid @ self.obs_weight[i] @ resid.T
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
-                chi_sq += resid @ self.obs_weight[i] @ resid.T
+                chi_sq += res_chisq_vals[i]
             j += size
         # # write res_chisq_vals to file if any values are negative
         # if np.any(res_chisq_vals < 0):
@@ -2220,7 +2216,7 @@ class FitSimulation:
                         f.write(f'{final_val:18.11e}{half_tab}')
                         f.write(f'{final_unc:18.11e}{half_tab}')
                         f.write(f'{final_val-init_val:+18.11e}{half_tab}')
-                        f.write(f'{(final_val-init_val)/init_unc:+10.3f}\n')
+                        f.write(f'{(final_val-init_val)/final_unc:+10.3f}\n')
                 f.write("\n")
                 if itrn.iter_number <= self.n_iter:
                     f.write(subsection_full + '\n')
