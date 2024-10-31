@@ -12,11 +12,11 @@ authors:
     corresponding: true
     orcid: 0000-0001-9265-2230
     affiliation: 1
-  - name: Steven R. Chesley
-    orcid: 0000-0003-3240-6497
-    affiliation: 2
   - name: Davide Farnocchia
     orcid: 0000-0003-0774-884X
+    affiliation: 2
+  - name: Steven R. Chesley
+    orcid: 0000-0003-3240-6497
     affiliation: 2
   - name: Siegfried Eggl
     orcid: 0000-0002-1398-6302

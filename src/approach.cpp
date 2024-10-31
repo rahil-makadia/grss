@@ -63,46 +63,6 @@ static void rec_to_geodetic(const real &x, const real &y, const real &z,
     }
 }
 
-static void rec_to_geodetic_jac(const real &lon, const real &lat, const real &h,
-                                std::vector< std::vector<real> > &jac) {
-    // calculate derivatives of geodetic coordinates with respect to the
-    // rectangular coordinates by inversion of the derivatives of the
-    // rectangular coordinates with respect to the geodetic coordinates
-    const real a = EARTH_RAD_WGS84;
-    const real slat = sin(lat);
-    const real clat = cos(lat);
-    const real slon = sin(lon);
-    const real clon = cos(lon);
-    const real flat = 1.0 - EARTH_FLAT_WGS84;
-    const real flat2 = flat * flat;
-    const real g = sqrt(clat*clat + flat2*slat*slat);
-    const real g2 = g * g;
-    const real dg_dlat = (-1.0 + flat2) * slat * clat / g;
-    std::vector< std::vector<real> > jacInv = std::vector< std::vector<real> >(3, std::vector<real>(3, 0.0));
-    // partials of rectangular coordinates w.r.t. geodetic longitude
-    jacInv[0][0] = - (h + a/g) * slon * clat;
-    jacInv[1][0] = (h + a/g) * clon * clat;
-    jacInv[2][0] = 0.0;
-    // partials of rectangular coordinates w.r.t. geodetic latitude
-    jacInv[0][1] = (-a*dg_dlat/g2) * clon * clat - (h + a/g) * clon * slat;
-    jacInv[1][1] = (-a*dg_dlat/g2) * slon * clat - (h + a/g) * slon * slat;
-    jacInv[2][1] = (-flat2*a*dg_dlat/g2) * slat + (h + flat2*a/g) * clat;
-    // partials of rectangular coordinates w.r.t. geodetic altitude
-    jacInv[0][2] = clon * clat;
-    jacInv[1][2] = slon * clat;
-    jacInv[2][2] = slat;
-    // invert the Jacobian
-    std::vector< std::vector<real> > jacSmall = std::vector< std::vector<real> >(3, std::vector<real>(3, 0.0));
-    mat3_inv(jacInv, jacSmall);
-    // fill the full 2x6 Jacobian for just longitude and latitude
-    jac.resize(2, std::vector<real>(6, 0.0));
-    for (size_t i = 0; i < 2; i++) {
-        for (size_t j = 0; j < 3; j++) {
-            jac[i][j] = jacSmall[i][j];
-        }
-    }
-}
-
 /**
  * @param[inout] propSim PropSimulation object for the integration.
  * @param[in] tOld Time at the previous integrator epoch.
@@ -1030,13 +990,11 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
     x = this->xRelBodyFixed[0];
     y = this->xRelBodyFixed[1];
     z = this->xRelBodyFixed[2];
-    std::vector<std::vector<real>> jac(2, std::vector<real>(6, 0.0));
     if (this->centralBodySpiceId == 399){
         rec_to_geodetic(x, y, z, lon, lat, alt);
-        rec_to_geodetic_jac(lon, lat, alt, jac);
     } else {
         const real dist = sqrt(x*x + y*y + z*z);
-        lat = atan2(z, sqrt(x*x + y*y));
+        lat = asin(z/dist);
         lon = atan2(y, x);
         if (lon < 0.0) {
             lon += 2 * PI;
@@ -1048,39 +1006,10 @@ void ImpactParameters::get_impact_parameters(PropSimulation *propSim){
             centralBodyRadius = propSim->spiceBodies[this->centralBodyIdx - propSim->integParams.nInteg].radius;
         }
         alt = dist-centralBodyRadius;
-        // calculate derivatives of latitudinal coordinates with respect to the
-        // rectangular coordinates by inversion of the derivatives of the
-        // rectangular coordinates with respect to the latitudinal coordinates
-        std::vector<std::vector<real>> jacInv(3, std::vector<real>(3, 0.0));
-        // partials of rectangular coordinates with respect to longitude
-        jacInv[0][1] = -dist * sin(lon) * cos(lat);
-        jacInv[1][1] = dist * cos(lon) * cos(lat);
-        jacInv[2][1] = 0.0;
-        // partials of rectangular coordinates with respect to latitude
-        jacInv[0][2] = -dist * cos(lon) * sin(lat);
-        jacInv[1][2] = -dist * sin(lon) * sin(lat);
-        jacInv[2][2] = dist * cos(lat);
-        // partials of rectangular coordinates with respect to radius
-        jacInv[0][3] = cos(lon) * cos(lat);
-        jacInv[1][3] = sin(lon) * cos(lat);
-        jacInv[2][3] = sin(lat);
-        std::vector<std::vector<real>> jacSmall(3, std::vector<real>(3, 0.0));
-        mat3_inv(jacInv, jacSmall);
-        for (size_t k = 0; k < 2; k++) {
-            for (size_t k2 = 0; k2 < 3; k2++) {
-                jac[k][k2] = jacSmall[k][k2];
-            }
-        }
     }
     this->lon = lon;
     this->lat = lat;
     this->alt = alt;
-    std::vector<std::vector<real>> jac_inertial(2, std::vector<real>(6, 0.0));
-    mat_mat_mul(jac, rotMat, jac_inertial);
-    for (size_t k = 0; k < 6; k++) {
-        this->dlon[k] = jac_inertial[0][k];
-        this->dlat[k] = jac_inertial[1][k];
-    }
 }
 
 /**
