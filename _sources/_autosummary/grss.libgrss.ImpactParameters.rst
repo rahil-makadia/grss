@@ -35,8 +35,6 @@ grss.libgrss.ImpactParameters
         ~ImpactParameters.centralBodyIdx
         ~ImpactParameters.centralBodySpiceId
         ~ImpactParameters.dist
-        ~ImpactParameters.dlat
-        ~ImpactParameters.dlon
         ~ImpactParameters.dt
         ~ImpactParameters.dtLin
         ~ImpactParameters.flybyBody
