@@ -27,7 +27,7 @@ affiliations:
   - name: Jet Propulsion Laboratory, California Institute of Technology, Pasadena, CA 91109, USA
     index: 2
 date: XX August 2024
-bibliography: joss_paper.bib
+bibliography: paper.bib
 aas-doi: 10.3847/PSJ/xxxxx
 aas-journal: Planetary Science Journal
 ---
