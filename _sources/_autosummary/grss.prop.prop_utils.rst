@@ -14,6 +14,7 @@ grss.prop.prop\_utils
     .. autosummary::
         :toctree:
     
+        compare_earth_impact
         data_to_ellipse
         days_to_dhms
         get_scale_factor
