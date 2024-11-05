@@ -19,6 +19,9 @@ void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
         case 299:
             baseBodyFrame = "IAU_VENUS";
             break;
+        case 301:
+            baseBodyFrame = "IAU_MOON";
+            break;
         case 399:
             baseBodyFrame = "ITRF93";
             // High precision frame is not defined
