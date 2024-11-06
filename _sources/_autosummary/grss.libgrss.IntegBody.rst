@@ -45,6 +45,7 @@ grss.libgrss.IntegBody
         ~IntegBody.isNongrav
         ~IntegBody.isPPN
         ~IntegBody.isThrusting
+        ~IntegBody.logCA
         ~IntegBody.mass
         ~IntegBody.n2Derivs
         ~IntegBody.nTes

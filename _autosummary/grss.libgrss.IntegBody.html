@@ -62,7 +62,7 @@
     <link rel="prev" title="grss.libgrss.ImpactParameters" href="grss.libgrss.ImpactParameters.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 05, 2024"/>
+    <meta name="docbuild:last-update" content="Nov 06, 2024"/>
   </head>
   
   
@@ -505,6 +505,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isNongrav"><code class="docutils literal notranslate"><span class="pre">IntegBody.isNongrav</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isPPN"><code class="docutils literal notranslate"><span class="pre">IntegBody.isPPN</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isThrusting"><code class="docutils literal notranslate"><span class="pre">IntegBody.isThrusting</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.logCA"><code class="docutils literal notranslate"><span class="pre">IntegBody.logCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.mass"><code class="docutils literal notranslate"><span class="pre">IntegBody.mass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegBody.n2Derivs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.nTes"><code class="docutils literal notranslate"><span class="pre">IntegBody.nTes</span></code></a></li>
@@ -657,43 +658,46 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.isThrusting" title="grss.libgrss.IntegBody.isThrusting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isThrusting</span></code></a></p></td>
 <td><p>Whether the body is thrusting.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.mass" title="grss.libgrss.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.logCA" title="grss.libgrss.IntegBody.logCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logCA</span></code></a></p></td>
+<td><p>Boolean for whether to log close approaches of the body.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.mass" title="grss.libgrss.IntegBody.mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mass</span></code></a></p></td>
 <td><p>Mass of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.n2Derivs" title="grss.libgrss.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.n2Derivs" title="grss.libgrss.IntegBody.n2Derivs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">n2Derivs</span></code></a></p></td>
 <td><p>Number of second derivatives of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.nTes" title="grss.libgrss.IntegBody.nTes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTes</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.nTes" title="grss.libgrss.IntegBody.nTes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nTes</span></code></a></p></td>
 <td><p>Order of the spherical harmonics.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.nZon" title="grss.libgrss.IntegBody.nZon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nZon</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.nZon" title="grss.libgrss.IntegBody.nZon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nZon</span></code></a></p></td>
 <td><p>Degree of the spherical harmonics.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.name" title="grss.libgrss.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.name" title="grss.libgrss.IntegBody.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p>Name of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.ngParams" title="grss.libgrss.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.ngParams" title="grss.libgrss.IntegBody.ngParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ngParams</span></code></a></p></td>
 <td><p>Non-gravitational parameters of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleDec" title="grss.libgrss.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleDec" title="grss.libgrss.IntegBody.poleDec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleDec</span></code></a></p></td>
 <td><p>Declination of the pole of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleRA" title="grss.libgrss.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.poleRA" title="grss.libgrss.IntegBody.poleRA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">poleRA</span></code></a></p></td>
 <td><p>Right ascension of the pole of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.propStm" title="grss.libgrss.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.propStm" title="grss.libgrss.IntegBody.propStm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">propStm</span></code></a></p></td>
 <td><p>Boolean for whether to propagate the state transition matrix of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.radius" title="grss.libgrss.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.radius" title="grss.libgrss.IntegBody.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></a></p></td>
 <td><p>Radius of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.spiceId" title="grss.libgrss.IntegBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.spiceId" title="grss.libgrss.IntegBody.spiceId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spiceId</span></code></a></p></td>
 <td><p>SPICE ID of the body.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.stm" title="grss.libgrss.IntegBody.stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stm</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.stm" title="grss.libgrss.IntegBody.stm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stm</span></code></a></p></td>
 <td><p>State transition matrix of the body.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.t0" title="grss.libgrss.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#grss.libgrss.IntegBody.t0" title="grss.libgrss.IntegBody.t0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code></a></p></td>
 <td><p>Initial MJD TDB time of the body.</p></td>
 </tr>
 </tbody>
@@ -792,6 +796,12 @@ document.write(`
 <dt class="sig sig-object py" id="grss.libgrss.IntegBody.isThrusting">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isThrusting</span></span><a class="headerlink" href="#grss.libgrss.IntegBody.isThrusting" title="Permalink to this definition">#</a></dt>
 <dd><p>Whether the body is thrusting.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="grss.libgrss.IntegBody.logCA">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logCA</span></span><a class="headerlink" href="#grss.libgrss.IntegBody.logCA" title="Permalink to this definition">#</a></dt>
+<dd><p>Boolean for whether to log close approaches of the body.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -999,6 +1009,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isNongrav"><code class="docutils literal notranslate"><span class="pre">IntegBody.isNongrav</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isPPN"><code class="docutils literal notranslate"><span class="pre">IntegBody.isPPN</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.isThrusting"><code class="docutils literal notranslate"><span class="pre">IntegBody.isThrusting</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.logCA"><code class="docutils literal notranslate"><span class="pre">IntegBody.logCA</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.mass"><code class="docutils literal notranslate"><span class="pre">IntegBody.mass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.n2Derivs"><code class="docutils literal notranslate"><span class="pre">IntegBody.n2Derivs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#grss.libgrss.IntegBody.nTes"><code class="docutils literal notranslate"><span class="pre">IntegBody.nTes</span></code></a></li>
@@ -1050,7 +1061,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 05, 2024.
+  Last updated on Nov 06, 2024.
   <br/>
 </p>
   </div>
