@@ -635,6 +635,9 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("spiceId", &IntegBody::spiceId, R"mydelimiter(
             SPICE ID of the body.
             )mydelimiter")
+        .def_readwrite("logCA", &IntegBody::logCA, R"mydelimiter(
+            Boolean for whether to log close approaches of the body.
+            )mydelimiter")
         .def_readwrite("isCometary", &IntegBody::isCometary, R"mydelimiter(
             Whether the body is a cometary body.
             )mydelimiter")
