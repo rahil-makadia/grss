@@ -23,6 +23,9 @@ jobs:
           python-version: 3.11
       - name: Install GRSS (including dependencies)
         run: |
+          cd ./extern/
+          python3 get_cspice.py
+          cd ..
           python3 -m pip install --upgrade pip
           pip3 install "pybind11[global]>=2.10.0"
           pip3 install .
