@@ -31,14 +31,17 @@ class CMakeBuild(build_ext):
     """
 
     def build_extension(self, ext: CMakeExtension) -> None:
-        subprocess.run(["./build_cpp.sh"], cwd=ext.sourcedir, check=True)
+        result = subprocess.run(["./build_cpp.sh"], cwd=ext.sourcedir, check=True)
+        # check return code of subprocess
+        if result.returncode != 0:
+            raise subprocess.CalledProcessError(returncode=result.returncode, cmd=result.args)
         binary_created = [f for f in os.listdir(f"{ext.sourcedir}/build/")
                             if f.startswith("libgrss")]
         if not binary_created:
             raise FileNotFoundError("libgrss binary for C++ source code not found "
                                     "in cmake build directory")
         os.system(f"cp {ext.sourcedir}/build/libgrss.* {self.build_lib}/grss/")
-        return
+        return None
 
 setup(
     ext_modules=[CMakeExtension("libgrss")],

@@ -1,4 +1,6 @@
 #!/bin/bash
+# make error stop the script
+set -e
 
 clean=0
 docs=0
