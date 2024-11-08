@@ -23,7 +23,7 @@ static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accI
 /**
  * @brief Compute the acceleration of the system due to the J2 zonal harmonic.
  */
-static void force_J2(const PropSimulation *propSim,
+static void force_J2(const real &t, PropSimulation *propSim,
               std::vector<real> &accInteg, STMParameters* allSTMs);
 
 /**
@@ -123,7 +123,7 @@ void get_state_der(PropSimulation *propSim, const real &t,
     force_newton(propSim, accInteg, allSTMs);
     // force_ppn_simple(propSim, accInteg, allSTMs);
     force_ppn_eih(propSim, accInteg, allSTMs);
-    force_J2(propSim, accInteg, allSTMs);
+    force_J2(t, propSim, accInteg, allSTMs);
     force_harmonics(propSim, accInteg);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
@@ -268,7 +268,7 @@ void force_ppn_simple(const PropSimulation *propSim,
                             dy, dz, dvx, dvy, dvz);
         }
         #ifdef PRINT_FORCES
-        forceFile << std::setw(10) << "PPN_" + std::to_string(bodyj->spiceId) << std::setw(25)
+        forceFile << std::setw(10) << "PPN_" + std::to_string(sun->spiceId) << std::setw(25)
                     << fac1 * (fac2 * dx + fac3 * dvx) << std::setw(25)
                     << fac1 * (fac2 * dy + fac3 * dvy) << std::setw(25)
                     << fac1 * (fac2 * dz + fac3 * dvz) << std::endl;
@@ -445,11 +445,12 @@ static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accI
 }
 
 /**
+ * @param[in] t Time [TDB MJD].
  * @param[in] propSim PropSimulation object.
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
+static void force_J2(const real &t, PropSimulation *propSim, std::vector<real> &accInteg,
               STMParameters* allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;
@@ -489,6 +490,13 @@ static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
                     -dx * cosRA * sinDec - dy * sinRA * sinDec + dz * cosDec;
                 const real dzBody =
                     dx * cosRA * cosDec + dy * sinRA * cosDec + dz * sinDec;
+                // std::string baseBodyFrame;
+                // get_baseBodyFrame(bodyj->spiceId, t, baseBodyFrame);
+                // std::vector<std::vector<real>> rotMat(6, std::vector<real>(6));
+                // get_pck_rotMat("J2000", baseBodyFrame, t, propSim->pckEphem, rotMat);
+                // const real dxBody = rotMat[0][0] * dx + rotMat[0][1] * dy + rotMat[0][2] * dz;
+                // const real dyBody = rotMat[1][0] * dx + rotMat[1][1] * dy + rotMat[1][2] * dz;
+                // const real dzBody = rotMat[2][0] * dx + rotMat[2][1] * dy + rotMat[2][2] * dz;
                 const real fac1 =
                     3 * G * massj * bodyj->J2 * radius * radius / (2 * rRel5);
                 const real fac2 = 5 * dzBody * dzBody / rRel2 - 1;
@@ -510,6 +518,9 @@ static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
                 accInteg[starti + 1] += axBody * cosRA -
                     ayBody * sinRA * sinDec + azBody * sinRA * cosDec;
                 accInteg[starti + 2] += ayBody * cosDec + azBody * sinDec;
+                // accInteg[starti + 0] += rotMat[0][0] * axBody + rotMat[1][0] * ayBody + rotMat[2][0] * azBody;
+                // accInteg[starti + 1] += rotMat[0][1] * axBody + rotMat[1][1] * ayBody + rotMat[2][1] * azBody;
+                // accInteg[starti + 2] += rotMat[0][2] * axBody + rotMat[1][2] * ayBody + rotMat[2][2] * azBody;
                 if (propSim->integBodies[i].propStm && rRel < 0.1) {
                     stm_J2(allSTMs[i], G*massj, bodyj->J2, dxBody,
                            dyBody, dzBody, radius, sinRA, cosRA, sinDec, cosDec,
@@ -524,6 +535,12 @@ static void force_J2(const PropSimulation *propSim, std::vector<real> &accInteg,
                         azBody * sinRA * cosDec
                           << std::setw(25) << ayBody * cosDec + azBody * sinDec
                           << std::endl;
+                        // << rotMat[0][0] * axBody + rotMat[1][0] * ayBody + rotMat[2][0] * azBody
+                        // << std::setw(25)
+                        // << rotMat[0][1] * axBody + rotMat[1][1] * ayBody + rotMat[2][1] * azBody
+                        // << std::setw(25)
+                        // << rotMat[0][2] * axBody + rotMat[1][2] * ayBody + rotMat[2][2] * azBody
+                        // << std::endl;
                 #endif
             }
         }
@@ -690,7 +707,7 @@ static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accI
                             dvx, dvy, dvz, dpos, hRelVec);
             }
             #ifdef PRINT_FORCES
-            forceFile << std::setw(10) << "ng_" + std::to_string(bodyj->spiceId) << std::setw(25)
+            forceFile << std::setw(10) << "ng_" + std::to_string(sun->spiceId) << std::setw(25)
                         << g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0])
                         << std::setw(25)
                         << g * (a1 * eRHat[1] + a2 * eTHat[1] + a3 * eNHat[1])

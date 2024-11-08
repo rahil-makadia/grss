@@ -12,6 +12,7 @@ __all__ = [ 'equat2eclip',
             'plot_ca_summary',
             'plot_bplane',
             'plot_earth_impact',
+            'compare_earth_impact',
 ]
 
 earth_obliq = 84381.448/3600.0*np.pi/180.0
@@ -902,5 +903,97 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
     plt.suptitle('Impact Location at 100km altitude w.r.t Earth: '
                     f'{mean_lat:0.2f}$^o${lat_half}, {mean_lon:0.2f}$^o$E',
                     y=0.93)
+    plt.show()
+    return None
+
+def compare_earth_impact(coord1, coord2, sig1, sig2, labels, zoom_size=5.0e3, save_name=None):
+    """
+    Show two impact circumstances and compare them.
+
+    Parameters
+    ----------
+    coord1 : np.ndarray
+        [time, lon, lat] of the first impact
+    coord2 : np.ndarray
+        [time, lon, lat] of the second impact
+    sig1 : np.ndarray
+        [time, lon, lat] uncertainty of the first impact
+    sig2 : np.ndarray
+        [time, lon, lat] uncertainty of the second impact
+    labels : list
+        List of labels for the two impacts
+    zoom_size : float, optional
+        Size of the zoomed in plot, in km, by default 5.0e3.
+    save_name : str, optional
+        Name to save the plots as, by default None.
+
+    Returns
+    -------
+    None : NoneType
+        None
+    """
+    _, lon1, lat1 = coord1
+    _, lon2, lat2 = coord2
+    fig, ax = plt.subplots(1, 3, figsize=(10, 4), dpi=150, gridspec_kw={'width_ratios': [4, 3, 1]})
+    size = zoom_size*1e3
+    m = Basemap(width=size,height=size,
+                rsphere=(6378137.00,6356752.3142),
+                resolution='i',area_thresh=size/100,projection='lcc',
+                lat_0=lat1,lon_0=lon1,ax=ax[0])
+    m.bluemarble()
+    m.drawcountries()
+    lat_step = lon_step = 3 if zoom_size <= 1e3 else 10
+    if zoom_size <= 500:
+        lat_step = lon_step = 1
+    if zoom_size <= 100:
+        lat_step = lon_step = 0.5
+    if zoom_size > 5e3:
+        lon_step = 20
+        lat_step = 20
+    # draw parallels and meridians.
+    parallels = np.arange(-90, 91, lat_step)
+    # labels = [left,right,top,bottom]
+    m.drawparallels(parallels,labels=[True,False,False,False], color='gray')
+    meridians = np.arange(0, 361, lon_step)
+    m.drawmeridians(meridians,labels=[False,False,False,True], color='gray')
+    x_lon1,y_lat1 = m(lon1,lat1)
+    m.plot(x_lon1,y_lat1,'b.')
+    x_lon2,y_lat2 = m(lon2,lat2)
+    m.plot(x_lon2,y_lat2,'r.')
+    # draw line between two points
+    m.plot([x_lon1,x_lon2], [y_lat1,y_lat2], 'g--')
+
+    # plot error bars for grss solution, and plot GRSS solution
+    n_sig = 1
+    deg2m = np.pi/180*6378137.0
+    sig1[1:] *= deg2m
+    sig2[1:] *= deg2m
+    diff = coord2 - coord1
+    # diff[0] *= 86400*1e3
+    diff[1:] *= deg2m
+    diff[1] *= np.cos(lat1*np.pi/180)
+
+    # add two subplots
+    ax[1].set_xlabel('Longitude Difference [m]')
+    ax[1].set_ylabel('Latitude Difference [m]')
+    ax[1].errorbar(0.0, 0.0, xerr=sig1[1]*n_sig, yerr=sig1[2]*n_sig,
+                    fmt='s', capsize=6, markeredgewidth=1.5, lw=1.5, label=labels[0])
+    ax[1].errorbar(diff[1], diff[2], xerr=sig2[1]*n_sig, yerr=sig2[2]*n_sig,
+                    fmt='o', capsize=6, markeredgewidth=1.5, lw=1.5, label=labels[1])
+    ax[1].legend(ncol=1)
+
+    ax[2].set_ylabel('Time Difference [ms]')
+    ax[2].errorbar(0.0, 0.0, yerr=sig1[0]*n_sig,
+                    fmt='s', capsize=6, markeredgewidth=1.5, lw=1.5, label=labels[0])
+    ax[2].errorbar(0.0, diff[0], yerr=sig2[0]*n_sig,
+                    fmt='o', capsize=6, markeredgewidth=1.5, lw=1.5, label=labels[1])
+    ax[2].set_xticks([])
+    ax[2].yaxis.tick_right()
+    ax[2].yaxis.set_label_position('right')
+
+    fig.tight_layout()
+    if save_name is not None:
+        plt.savefig(save_name, bbox_inches='tight')
+    plt.suptitle(f'Impact Circumstance Comparison ({n_sig}$\\sigma$)', y=1.05)
     plt.show()
     return None

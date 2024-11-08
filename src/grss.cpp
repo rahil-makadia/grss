@@ -309,12 +309,6 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("alt", &ImpactParameters::alt, R"mydelimiter(
             Altitude of the impact.
             )mydelimiter")
-        .def_readwrite("dlon", &ImpactParameters::dlon, R"mydelimiter(
-            Partial derivatives of the longitude of the impact with respect to the state at the impact.
-            )mydelimiter")
-        .def_readwrite("dlat", &ImpactParameters::dlat, R"mydelimiter(
-            Partial derivatives of the latitude of the impact with respect to the state at the impact.
-            )mydelimiter")
         .def("print_summary", &ImpactParameters::print_summary,
              py::arg("prec") = 8, R"mydelimiter(
             Print a summary of the impact parameters.
@@ -640,6 +634,9 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def_readwrite("spiceId", &IntegBody::spiceId, R"mydelimiter(
             SPICE ID of the body.
+            )mydelimiter")
+        .def_readwrite("logCA", &IntegBody::logCA, R"mydelimiter(
+            Boolean for whether to log close approaches of the body.
             )mydelimiter")
         .def_readwrite("isCometary", &IntegBody::isCometary, R"mydelimiter(
             Whether the body is a cometary body.
