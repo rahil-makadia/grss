@@ -66,6 +66,9 @@ dependencies = {file = "requirements.txt"}
 
 [tool.cibuildwheel]
 before-build = [
+    "cd ./extern/",
+    "python3 get_cspice.py",
+    "cd ..",
     "pip install pybind11",
     ". ./build_cpp.sh -clean",
 ]
