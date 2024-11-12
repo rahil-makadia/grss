@@ -138,6 +138,13 @@ void check_ca_or_impact(PropSimulation *propSim, const real &tOld,
                     ca.get_ca_parameters(propSim, ca.t);
                     propSim->caParams.push_back(ca);
                     if (ca.impact){
+                        real rCA;
+                        impact_r_calc(propSim, i, j, ca.t, rCA);
+                        // near miss check
+                        if (rCA > 0){
+                            ca.impact = false;
+                            break;
+                        }
                         ImpactParameters impact;
                         const real maxImpactCaTDiff = 600.0/86400.0; // 10 minutes
                         real tImpStart;

@@ -1,5 +1,6 @@
 # minimum required CMake version
 cmake_minimum_required(VERSION 3.18.0)
+cmake_policy(SET CMP0148 OLD)
 
 # if on a Mac, use any GNU compiler from Homebrew
 if(APPLE)
