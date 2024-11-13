@@ -1778,7 +1778,10 @@ class FitSimulation:
             j += size
             self.info_mats.append(atwa.copy())
         # use pseudo-inverse if the data arc is less than 7 days
-        if self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min() < 7.0:
+        data_arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
+        if data_arc < 1.0:
+            self.covariance = np.linalg.pinv(atwa, rcond=1e-10, hermitian=True)
+        elif data_arc < 7.0:
             self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         else:
             self.covariance = np.array(libgrss.matrix_inverse(atwa))
