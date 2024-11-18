@@ -186,7 +186,7 @@ SpkInfo* spk_init(const std::string &path) {
 
 /**
  * @param[in] bsp SpkInfo structure.
- * @param[in] epoch Epoch to compute the state at (MJD ET).
+ * @param[in] epoch Epoch to compute the state at (MJD TDB).
  * @param[in] spiceId SPICE ID of the body.
  * @param[out] state State+acceleration of the body at the requested epoch [AU, AU/day, AU/day^2].
  */
@@ -248,7 +248,7 @@ void spk_calc(SpkInfo *bsp, double epoch, int spiceId, double *state) {
 
 /**
  * @param[in] spiceId SPICE ID of the body.
- * @param[in] t0_mjd Epoch to compute the state at (MJD ET).
+ * @param[in] t0_mjd Epoch to compute the state at (MJD TDB).
  * @param[in] ephem Ephemeris data from the PropSimulation.
  * @param[out] state State+acceleration of the body at the requested epoch [AU, AU/day, AU/day^2].
  * @param[in] writeCache If true, the state will be written to the cache.
