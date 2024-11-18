@@ -62,7 +62,7 @@
     <link rel="prev" title="Getting Started" href="start.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 13, 2024"/>
+    <meta name="docbuild:last-update" content="Nov 18, 2024"/>
   </head>
   
   
@@ -175,7 +175,6 @@
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="start.html">Getting Started</a></li>
-
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">GRSS Propagator Module (grss.prop)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -516,7 +515,7 @@ document.write(`
 <li><p>J<sub>2</sub> zonal harmonic effects from the Sun and the Earth</p></li>
 <li><p>A<sub>1</sub>, A<sub>2</sub>, A<sub>3</sub> nongravitational  acceleration model <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a></p></li>
 </ol>
-<p>In addition to any integrated bodies defined by the user, the default force model includes effects from the Sun, the planets, the Moon, Pluto, and the Big 16 main-belt asteroids. The states of these bodies are read in from either the JPL DE431 or DE441 ephemerides, based on the user’s choice. The propagator can also interpolate any of the integrated bodies’ states to any time within the integration (or within a margin around the integration time bounds). This interpolation is done via interpolation polynomials based on the Newton divided difference method.</p>
+<p>In addition to any integrated bodies defined by the user, the default force model includes effects from the Sun, the planets, the Moon, Pluto, and the Big 16 main-belt asteroids. The states of these bodies are read in from either the JPL DE431 or DE441 ephemerides, based on the user’s choice. The propagator can also interpolate any of the integrated bodies’ states to any time within the integration (or within a margin around the integration time bounds). This interpolation is done directly via polynomial coefficients computed by IAS15 during propagation.</p>
 <p>The propagator module also has the ability to calculate apparent states of any integrated body. This is done through two methods. The first is the simpler of the two, and uses a simple approximation of the light-time between an observer and the integrated body. The second method is more accurate, and uses an iterative method to calculate the light-time between an observer and the integrated body. The second method is slightly more computationally expensive since it requires a few extra interpolations.</p>
 <p>This ability to calculate apparent states is used to calculate optical observables (Right Ascension and Declination). Furthermore, the propagator suite can also calculate range observables (delay and doppler). The delay measurement is trivially returned from the light-time calculation. The doppler measurable, however, is calculated using a dedicated doppler measurement model. This entire codebase is written in C++ and a Python binding is using <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>.</p>
 <p class="rubric">References</p>
@@ -606,7 +605,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 13, 2024.
+  Last updated on Nov 18, 2024.
   <br/>
 </p>
   </div>

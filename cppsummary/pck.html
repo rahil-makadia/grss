@@ -62,7 +62,7 @@
     <link rel="prev" title="parallel.h" href="parallel.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 13, 2024"/>
+    <meta name="docbuild:last-update" content="Nov 18, 2024"/>
   </head>
   
   
@@ -158,7 +158,6 @@
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../start.html">Getting Started</a></li>
-
 <li class="toctree-l1"><a class="reference internal" href="../prop.html">GRSS Propagator Module (grss.prop)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -535,7 +534,7 @@ document.write(`
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bpc</strong> – <strong>[in]</strong> <a class="reference internal" href="#structPckInfo"><span class="std std-ref">PckInfo</span></a> structure. </p></li>
-<li><p><strong>epoch</strong> – <strong>[in]</strong> Epoch to compute the state at (MJD ET). </p></li>
+<li><p><strong>epoch</strong> – <strong>[in]</strong> Epoch to compute the state at (MJD TDB). </p></li>
 <li><p><strong>spiceId</strong> – <strong>[in]</strong> SPICE ID of the frame. </p></li>
 <li><p><strong>rotMat</strong> – <strong>[out]</strong> Rotation matrix </p></li>
 <li><p><strong>rotMatDot</strong> – <strong>[out]</strong> Derivative of the rotation matrix </p></li>
@@ -551,7 +550,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>t0_mjd</strong> – <strong>[in]</strong> Epoch to compute the rotation matrix at (MJD ET). </p></li>
+<li><p><strong>t0_mjd</strong> – <strong>[in]</strong> Epoch to compute the rotation matrix at (MJD TDB). </p></li>
 <li><p><strong>iauFrame</strong> – <strong>[in]</strong> IAU frame name. </p></li>
 <li><p><strong>euler</strong> – <strong>[out]</strong> Real array of 6 elements containing the 313 Euler angles and their derivatives. </p></li>
 </ul>
@@ -583,7 +582,7 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>from</strong> – <strong>[in]</strong> Frame to rotate from. </p></li>
 <li><p><strong>to</strong> – <strong>[in]</strong> Frame to rotate to. </p></li>
-<li><p><strong>t0_mjd</strong> – <strong>[in]</strong> t0_mjd Epoch to compute the rotation matrix at (MJD ET). </p></li>
+<li><p><strong>t0_mjd</strong> – <strong>[in]</strong> t0_mjd Epoch to compute the rotation matrix at (MJD TDB). </p></li>
 <li><p><strong>ephem</strong> – <strong>[in]</strong> <a class="reference internal" href="#structPckEphemeris"><span class="std std-ref">PckEphemeris</span></a> structure. </p></li>
 <li><p><strong>xformMat</strong> – <strong>[out]</strong> Rotation matrix from ‘from’ to ‘to’. </p></li>
 </ul>
@@ -859,7 +858,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 13, 2024.
+  Last updated on Nov 18, 2024.
   <br/>
 </p>
   </div>

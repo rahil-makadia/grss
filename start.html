@@ -62,7 +62,7 @@
     <link rel="prev" title="Welcome to the GRSS docs!" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Nov 13, 2024"/>
+    <meta name="docbuild:last-update" content="Nov 18, 2024"/>
   </head>
   
   
@@ -175,7 +175,6 @@
     <div class="bd-toc-item navbar-nav active">
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Getting Started</a></li>
-
 <li class="toctree-l1"><a class="reference internal" href="prop.html">GRSS Propagator Module (grss.prop)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="fit.html">GRSS Orbit Determination Module (grss.fit)</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -504,15 +503,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Getting Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-pypi">Install via PyPI</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-python">Install via source code (Python)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-c-reduced-functionality">Install via source code (C++, reduced functionality)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
-</ul>
-
             </nav>
         </div>
     </div>
@@ -570,14 +565,14 @@ document.write(`
 <p>You will need to have CMake installed on your system to build the C++ library. Once the build script has completed, you can use the resulting static/shared library from the <cite>build</cite> directory in your C++ projects.</p>
 <p>Keep in mind the C++ library only contains support for propagating orbits and calculating observables. If you want to use the orbit fitting functionality, you will need to install the full Python library.</p>
 </section>
-</section>
 <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h1>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
 <p>Once the GRSS library has been installed, it can be imported into a Python script using the following command:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">grss</span>
 </pre></div>
 </div>
 <p>The first time the library is imported, it will download some data files such as NAIF SPICE kernels and the data needed to debias optical astrometry. This should should take a few minutes. Once these files are available to the library, you are ready to use GRSS to its full potential!</p>
+</section>
 </section>
 
 
@@ -625,15 +620,11 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Getting Started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-pypi">Install via PyPI</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-python">Install via source code (Python)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-via-source-code-c-reduced-functionality">Install via source code (C++, reduced functionality)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
 </ul>
-</li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
-</ul>
-
   </nav></div>
 
 </div></div>
@@ -666,7 +657,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Nov 13, 2024.
+  Last updated on Nov 18, 2024.
   <br/>
 </p>
   </div>
