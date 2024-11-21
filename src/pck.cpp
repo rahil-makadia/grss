@@ -189,7 +189,7 @@ PckInfo* pck_init(const std::string &path) {
 
 /**
  * @param[in] bpc PckInfo structure.
- * @param[in] epoch Epoch to compute the state at (MJD ET).
+ * @param[in] epoch Epoch to compute the state at (MJD TDB).
  * @param[in] spiceId SPICE ID of the frame.
  * @param[out] rotMat Rotation matrix
  * @param[out] rotMatDot Derivative of the rotation matrix
@@ -264,7 +264,7 @@ void pck_calc(PckInfo *bpc, real epoch, int spiceId, real *rotMat,
 }
 
 /**
- * @param[in] t0_mjd Epoch to compute the rotation matrix at (MJD ET).
+ * @param[in] t0_mjd Epoch to compute the rotation matrix at (MJD TDB).
  * @param[in] iauFrame IAU frame name.
  * @param[out] euler Real array of 6 elements containing the 313 Euler angles and their derivatives.
  */
@@ -700,7 +700,7 @@ void euler313_to_rotMat(const real euler[6], real *rotMat, real *rotMatDot){
 /**
  * @param[in] from Frame to rotate from.
  * @param[in] to Frame to rotate to.
- * @param[in] t0_mjd t0_mjd Epoch to compute the rotation matrix at (MJD ET).
+ * @param[in] t0_mjd t0_mjd Epoch to compute the rotation matrix at (MJD TDB).
  * @param[in] ephem PckEphemeris structure.
  * @param[out] xformMat Rotation matrix from 'from' to 'to'.
  */

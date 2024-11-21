@@ -60,8 +60,9 @@ You will need to have CMake installed on your system to build the C++ library. O
 
 Keep in mind the C++ library only contains support for propagating orbits and calculating observables. If you want to use the orbit fitting functionality, you will need to install the full Python library.
 
+-----
 Usage
-=====
+-----
 Once the GRSS library has been installed, it can be imported into a Python script using the following command:
 
 .. code-block:: python

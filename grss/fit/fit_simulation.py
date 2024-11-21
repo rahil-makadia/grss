@@ -223,7 +223,7 @@ class IterationParams:
         """
         # sourcery skip: extract-duplicate-method
         rejected_idx = self.rejected_idx
-        fig = plt.figure(figsize=(21,6), dpi=150)
+        fig = plt.figure(figsize=(15,6), dpi=150)
         if self.iter_number == 0:
             iter_string = f'Iteration {self.iter_number} (prefit)'
         else:
@@ -237,9 +237,9 @@ class IterationParams:
         ax1.plot(t_arr, dec_residuals, '.', label='Dec', markersize=markersize,
                     color='C0', alpha=0.5)
         ax1.plot(t_arr[rejected_idx], ra_residuals[rejected_idx], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
+                    markersize=2*markersize, markerfacecolor='none', alpha=0.25)
         ax1.plot(t_arr[rejected_idx], dec_residuals[rejected_idx], 'ro',
-                    markersize=2*markersize, markerfacecolor='none')
+                    markersize=2*markersize, markerfacecolor='none', alpha=0.25)
         ax1.legend()
         ax1.set_xlabel('Time [UTC]')
         ax1.set_ylabel('Residuals, O-C [arcsec]')
@@ -254,7 +254,7 @@ class IterationParams:
         self._scatter_hist(ra_residuals, dec_residuals, ax2main, ax2histx, ax2histy,
                             markersize, show_logarithmic)
         ax2main.plot(ra_residuals[rejected_idx], dec_residuals[rejected_idx], 'ro',
-                        markersize=2*markersize, markerfacecolor='none')
+                        markersize=2*markersize, markerfacecolor='none', alpha=0.25)
         ax2main.set_xlabel('RA cos(Dec) Residuals, O-C [arcsec]')
         ax2main.set_ylabel('Dec Residuals, O-C [arcsec]')
         ax2main.grid(True, which='both', axis='both', alpha=0.2, zorder=-100)
@@ -338,7 +338,7 @@ class IterationParams:
         rejected_idx = self.rejected_idx
         accepted_idx = self.accepted_idx
         # plot chi values
-        factor = 3 if plot_chi_squared else 1
+        factor = 2.5 if plot_chi_squared else 1
         plt.figure(figsize=(factor*7,6), dpi=150)
         if self.iter_number == 0:
             iter_string = f'Iteration {self.iter_number} (prefit)'
@@ -365,9 +365,9 @@ class IterationParams:
             plt.plot(t_arr, dec_chi, '.', markersize=markersize,
                         label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[rejected_idx], ra_chi[rejected_idx], 'ro',
-                        markersize=2*markersize, markerfacecolor='none', label='Rejected')
+                        markersize=2*markersize, markerfacecolor='none', alpha=0.25, label='Rejected')
             plt.plot(t_arr[rejected_idx], dec_chi[rejected_idx], 'ro',
-                        markersize=2*markersize, markerfacecolor='none')
+                        markersize=2*markersize, markerfacecolor='none', alpha=0.25)
         if not np.all(np.isnan(doppler_chi)):
             plt.plot(t_arr, doppler_chi, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
@@ -394,9 +394,9 @@ class IterationParams:
             plt.plot(t_arr, dec_chi_squared, '.', markersize=markersize,
                         label='Dec', color='C0', alpha=0.5)
             plt.plot(t_arr[rejected_idx], ra_chi_squared[rejected_idx], 'ro',
-                        markersize=2*markersize, markerfacecolor='none')
+                        markersize=2*markersize, markerfacecolor='none', alpha=0.25)
             plt.plot(t_arr[rejected_idx], dec_chi_squared[rejected_idx], 'ro',
-                        markersize=2*markersize, markerfacecolor='none')
+                        markersize=2*markersize, markerfacecolor='none', alpha=0.25)
             plt.plot(t_arr, doppler_chi_squared, '.', mfc='C3', mec='C3',
                         markersize=radar_scale*markersize, label='Doppler')
             plt.plot(t_arr, delay_chi_squared, '.', mfc='C2', mec='C2',
@@ -1778,7 +1778,10 @@ class FitSimulation:
             j += size
             self.info_mats.append(atwa.copy())
         # use pseudo-inverse if the data arc is less than 7 days
-        if self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min() < 7.0:
+        data_arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
+        if data_arc < 1.0:
+            self.covariance = np.linalg.pinv(atwa, rcond=1e-10, hermitian=True)
+        elif data_arc < 7.0:
             self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
         else:
             self.covariance = np.array(libgrss.matrix_inverse(atwa))
