@@ -796,7 +796,8 @@ PYBIND11_MODULE(libgrss, m) {
             Path to the SPICE DE kernel.
             )mydelimiter")
         .def_readwrite("unsafePersistentMemoryMap",
-                       &PropSimulation::unsafePersistentMemoryMap, R"mydelimiter(
+                       &PropSimulation::unsafePersistentMemoryMap,
+                       R"mydelimiter(
             Whether to use unsafe persistent memory mapping for the simulation.
             )mydelimiter")
         .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
@@ -966,7 +967,7 @@ PYBIND11_MODULE(libgrss, m) {
                 Name of the body to remove.
             )mydelimiter")
         .def("add_event", &PropSimulation::add_event, py::arg("event"),
-            R"mydelimiter(
+             R"mydelimiter(
             Adds an event to the simulation.
 
             Parameters
@@ -1107,6 +1108,7 @@ PYBIND11_MODULE(libgrss, m) {
                 This information should be repeated for radar observations.
             )mydelimiter")
         .def("save", &PropSimulation::save, py::arg("filename"),
+             py::arg("onlyMachineData") = false,
              R"mydelimiter(
             Saves the simulation to a file.
 

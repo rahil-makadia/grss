@@ -590,7 +590,7 @@ class PropSimulation {
     /**
      * @brief Save the simulation to a file.
      */
-    void save(std::string filename);
+    void save(std::string filename, bool onlyMachineData = false);
 };
 
 #endif

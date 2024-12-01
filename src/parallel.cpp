@@ -54,6 +54,6 @@ void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
         std::string num = std::to_string(i);
         std::string zeros = std::string(std::to_string(numBodies-1).size()-num.size(), '0');
         std::string filename = "./logdir_"+saveDir+"/"+zeros+num+".log";
-        sim.save(filename);
+        sim.save(filename, true);
     }
 }
