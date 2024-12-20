@@ -1,5 +1,27 @@
-#ifndef GR15_H
-#define GR15_H
+/**
+ * @file    ias15.h
+ * @brief   Header file for the IAS15 integrator.
+ * @author  Rahil Makadia <makadia2@illinois.edu>
+ *
+ * @section     LICENSE
+ * Copyright (C) 2022-2025 Rahil Makadia
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <https://www.gnu.org/licenses>.
+ */
+
+#ifndef IAS15_H
+#define IAS15_H
 
 #include "approach.h"
 
@@ -102,6 +124,6 @@ void event_timestep_check(PropSimulation *propSim, real &dt);
 /**
  * @brief 15th-order Gauss-Radau integrator for the PropSimulation.
  */
-void gr15(PropSimulation *propSim);
+void ias15(PropSimulation *propSim);
 
 #endif
