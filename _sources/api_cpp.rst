@@ -7,7 +7,7 @@ C++ API
    cppsummary/approach
    cppsummary/elements
    cppsummary/force
-   cppsummary/gr15
+   cppsummary/ias15
    cppsummary/interpolate
    cppsummary/observe
    cppsummary/parallel
@@ -32,7 +32,7 @@ C++ API
    <tr class="row-odd"><td><p><a class="reference internal" href="cppsummary/force.html" title="force.h"><code class="xref py py-obj docutils literal notranslate"><span class="pre">force.h</span></code></a></p></td>
    <td><p>GRSS C++ force function submodule</p></td>
    </tr>
-   <tr class="row-even"><td><p><a class="reference internal" href="cppsummary/gr15.html" title="gr15.h"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gr15.h</span></code></a></p></td>
+   <tr class="row-even"><td><p><a class="reference internal" href="cppsummary/ias15.html" title="ias15.h"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ias15.h</span></code></a></p></td>
    <td><p>GRSS C++ Gauss-Radau 15<sup>th</sup> order integrator submodule</p></td>
    </tr>
    <tr class="row-odd"><td><p><a class="reference internal" href="cppsummary/interpolate.html" title="interpolate.h"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate.h</span></code></a></p></td>

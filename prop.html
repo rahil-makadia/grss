@@ -295,7 +295,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/approach.html">approach.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/elements.html">elements.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/force.html">force.h</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cppsummary/gr15.html">gr15.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cppsummary/ias15.html">ias15.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/interpolate.html">interpolate.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/observe.html">observe.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cppsummary/parallel.html">parallel.h</a></li>
@@ -518,6 +518,13 @@ document.write(`
 <p>In addition to any integrated bodies defined by the user, the default force model includes effects from the Sun, the planets, the Moon, Pluto, and the Big 16 main-belt asteroids. The states of these bodies are read in from either the JPL DE431 or DE441 ephemerides, based on the user’s choice. The propagator can also interpolate any of the integrated bodies’ states to any time within the integration (or within a margin around the integration time bounds). This interpolation is done directly via polynomial coefficients computed by IAS15 during propagation.</p>
 <p>The propagator module also has the ability to calculate apparent states of any integrated body. This is done through two methods. The first is the simpler of the two, and uses a simple approximation of the light-time between an observer and the integrated body. The second method is more accurate, and uses an iterative method to calculate the light-time between an observer and the integrated body. The second method is slightly more computationally expensive since it requires a few extra interpolations.</p>
 <p>This ability to calculate apparent states is used to calculate optical observables (Right Ascension and Declination). Furthermore, the propagator suite can also calculate range observables (delay and doppler). The delay measurement is trivially returned from the light-time calculation. The doppler measurable, however, is calculated using a dedicated doppler measurement model. This entire codebase is written in C++ and a Python binding is using <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/">pybind11</a>.</p>
+<p>Current and previous versions of the integrator are a hybrid amalgamation of the work done in the following sources:</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://doi.org/10.1017/S0252921100083913">An efficient integrator that uses Gauss-Radau spacings</a></p></li>
+<li><p><a class="reference external" href="https://doi.org/10.1093/mnras/stu2164">IAS15: a fast, adaptive, high-order integrator for gravitational dynamics, accurate to machine precision over a billion orbits</a></p></li>
+<li><p><a class="reference external" href="https://mitpress.mit.edu/9780262539340/moving-planets-around/">Moving Planets Around: An Introduction to N-Body Simulations Applied to Exoplanetary Systems</a></p></li>
+<li><p><a class="reference external" href="https://doi.org/10.21105/astro.2401.02849">A new timestep criterion for N-body simulations</a></p></li>
+</ol>
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id5" role="note">
@@ -535,6 +542,18 @@ document.write(`
 <aside class="footnote brackets" id="id8" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Marsden, B.G., Sekanina, Z., and Yeomans, D.K., “Comets and nongravitational forces. V”, The Astronomical Journal, Volume 78, Issue 2, Pages 211-225, 1973. <a class="reference external" href="https://doi.org/10.1086/111402">https://doi.org/10.1086/111402</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id9" role="note">
+<span class="label"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></span>
+<p>Everhart, E., “An efficient integrator that uses Gauss-Radau spacings”, Dynamics of Comets: Their Origin and Evolution, Proceedings of IAU Colloquium 83, Pages 185-202, 1985. <a class="reference external" href="https://doi.org/10.1017/S0252921100083913">https://doi.org/10.1017/S0252921100083913</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id10" role="note">
+<span class="label"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></span>
+<p>Roa, J., Hamers, A.S., Cai, M.X., and Leigh, N.W.C., “Moving Planets Around: An Introduction to N-Body Simulations Applied to Exoplanetary Systems”, MIT Press, 2020. <a class="reference external" href="https://mitpress.mit.edu/9780262539340/moving-planets-around/">https://mitpress.mit.edu/9780262539340/moving-planets-around/</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id11" role="note">
+<span class="label"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></span>
+<p>Pham, D., Rein, H., and Spiegel, D.S., “A new timestep criterion for N-body simulations”, The Open Journal of Astrophysics 7, 2024. <a class="reference external" href="https://doi.org/10.21105/astro.2401.02849">https://doi.org/10.21105/astro.2401.02849</a>.</p>
 </aside>
 </aside>
 </section>
