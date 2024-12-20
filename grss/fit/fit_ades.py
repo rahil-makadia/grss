@@ -21,7 +21,8 @@ ades_keep_columns = {
     'rmsDelay': 'float', 'rmsDoppler': 'float', 'com': 'Int64', 'frq': 'float',
     'raStar': 'float', 'decStar': 'float', 'deltaRA': 'float', 'deltaDec': 'float',
     'sys': 'str', 'ctr': 'Int64', 'pos1': 'float', 'pos2': 'float', 'pos3': 'float',
-    'vel1': 'float', 'vel2': 'float', 'vel3': 'float',
+    'vel1': 'float', 'vel2': 'float', 'vel3': 'float', 'posCov11': 'float', 'posCov12': 'float',
+    'posCov13': 'float', 'posCov22': 'float', 'posCov23': 'float', 'posCov33': 'float'
 }
 ades_add_columns = {
     'resRA': 'float', 'resDec': 'float', 'selAst': 'str',
@@ -110,7 +111,7 @@ prog_codes = R"""0123456789!"#$%&'()*+,-./[\]^_`{|}~:;<=>?@ABCDEFGHIJKLMNOPQRSTU
 special_codes = {
     'gaia': {'258'},
     'occultation': {'275'},
-    'spacecraft': {'S/C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
+    'spacecraft': {'S/C', 'S_C', '245', '249', '250', '274', 'C49', 'C50', 'C51',
                    'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C59', },
     'roving': {'247', '270'},
 }
