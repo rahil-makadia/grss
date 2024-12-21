@@ -43,7 +43,9 @@ def get_mpc_raw_data(tdes):
     if response.ok:
         obs_data = response.json()[0]["XML"]
     else:
-        print("Error getting MPC XML data: ", response.status_code, response.content)
+        print(f"Error {response.status_code}:")
+        print(response.content.decode(encoding='utf-8'))
+        raise ValueError("Error getting MPC XML data.")
     return StringIO(obs_data)
 
 def _ades_mode_check(df):

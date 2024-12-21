@@ -1,3 +1,25 @@
+/**
+ * @file    simulation.cpp
+ * @brief   Source file for the PropSimulation class and related structures.
+ * @author  Rahil Makadia <makadia2@illinois.edu>
+ *
+ * @section     LICENSE
+ * Copyright (C) 2022-2025 Rahil Makadia
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <https://www.gnu.org/licenses>.
+ */
+
 #include "simulation.h"
 
 /**
@@ -1371,8 +1393,9 @@ void PropSimulation::extend(real tf, std::vector<real> tEvalNew,
 
 /**
  * @param[in] filename Name of the file to save the simulation to.
+ * @param[in] onlyMachineData Flag to save only machine-readable data (default: false).
  */
-void PropSimulation::save(std::string filename) {
+void PropSimulation::save(std::string filename, bool onlyMachineData) {
     struct stat fileExistsBuffer;
     if (stat(filename.c_str(), &fileExistsBuffer) == 0) {
         throw std::invalid_argument("Cannot save PropSimulation '" + this->name +
@@ -1413,6 +1436,10 @@ void PropSimulation::save(std::string filename) {
     std::string nextSubsection = this->name;
     file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
     file << subsectionFull << std::endl;
+    size_t starti = 0;
+    if (onlyMachineData) {
+        goto machineData;
+    }
     file << "Integration from MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.t0
          << " to MJD " << timeWidth << std::fixed << timeFloatPrec << this->integParams.tf << " [TDB]"
          << std::endl;
@@ -1423,7 +1450,7 @@ void PropSimulation::save(std::string filename) {
     nextSubsection = std::to_string(this->integParams.nInteg) + " Integration bodies";
     file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
     file << subsectionFull << std::endl;
-    size_t starti = 0;
+    starti = 0;
     for (size_t i = 0; i < this->integBodies.size(); i++) {
         file << this->integBodies[i].name << std::endl;
         file << "Initial time : MJD " << timeWidth << std::fixed << timeFloatPrec << this->integBodies[i].t0
@@ -1541,6 +1568,7 @@ void PropSimulation::save(std::string filename) {
     }
 
     // insert machine readable data for close approach and impact parameters
+    machineData : {
     file.precision(18);
     if (this->impactParams.size() > 0) {
         file << std::endl;
@@ -1700,6 +1728,7 @@ void PropSimulation::save(std::string filename) {
         }
         file << "$$CA_END" << std::endl;
     }
+    } // end of machine data
 
     file << std::endl;
     file << sectionFull << std::endl;

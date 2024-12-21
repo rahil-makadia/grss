@@ -229,7 +229,7 @@ def _reconstruct_ca_and_impact(lines):
                     parsed_info = raw_info[1:].split(',')[:-1]
                     data[i] = [float(num) for num in parsed_info if num]
                 elif col in bool_cols:
-                    data[i] = raw_info == 'true'
+                    data[i] = raw_info in {'1', 'T', 'True', 'true'}
                 elif col in int_cols:
                     data[i] = int(raw_info)
                 elif col in float_cols:

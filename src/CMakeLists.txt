@@ -2,7 +2,7 @@ add_library(${PROJECT_NAME}
 approach.cpp
 elements.cpp
 force.cpp
-gr15.cpp
+ias15.cpp
 interpolate.cpp
 observe.cpp
 parallel.cpp

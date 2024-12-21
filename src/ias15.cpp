@@ -1,4 +1,34 @@
-#include "gr15.h"
+/**
+ * @file    ias15.cpp
+ * @brief   IAS15 integrator.
+ * @author  Rahil Makadia <makadia2@illinois.edu>
+ * @details This file implements the integration scheme for GRSS.
+ * The integratior used here is based mostly on the IAS15 integrator published
+ * by Rein and Spiegel in 2014. Current and previous versions of the integrator
+ * are a hybrid amalgamation of the work done in the following sources:
+ * 1. The original RADAU code by Everhart (1985)
+ * 2. The IAS15 modifications by Rein and Spiegel (2014)
+ * 3. A version of IAS15 used in the book Moving Planets Around (2020)
+ * 4. The new timestepping criterion introduced by Pham et al. (2024)
+ *
+ * @section     LICENSE
+ * Copyright (C) 2022-2025 Rahil Makadia
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <https://www.gnu.org/licenses>.
+ */
+
+#include "ias15.h"
 
 /**
  * @param[in] propSim PropSimulation object for the integration.
@@ -401,7 +431,7 @@ static real get_adaptive_timestep(PropSimulation *propSim, const real &dt,
 /**
  * @param[inout] propSim PropSimulation object for the integration.
  */
-void gr15(PropSimulation *propSim) {
+void ias15(PropSimulation *propSim) {
     real t = propSim->t;
     std::vector<real> xInteg = propSim->xInteg;
     if (!std::isfinite(t)) {

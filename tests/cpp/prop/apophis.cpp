@@ -1,3 +1,8 @@
+/**
+ * Apophis propagation unit test inspired by the ASSIST library
+ * See https://github.com/matthewholman/assist/tree/main/unit_tests/apophis
+ */
+
 #include "grss.h"
 #include <sys/time.h>
 #include <assert.h>
@@ -19,8 +24,8 @@ int main() {
 
     int DEkernel = 440;
     std::string DEkernelPath = "../../../grss/kernels/";
-    real t0SimMjd = 2.4621385359989386E+06L - 2400000.5L;
-    real tfSimMjd = 2.4625030372426095E+06L - 2400000.5L;
+    const real t0SimMjd = 2462130.5L - 2400000.5L;
+    const real tfSimMjd = 2462495.5L - 2400000.5L;
     PropSimulation simTest("simTest", t0SimMjd, DEkernel, DEkernelPath);
 
     std::vector<real> tEval = {};
@@ -29,15 +34,15 @@ int main() {
     bool convergedLightTime = false;
     simTest.set_integration_parameters(
         tfSimMjd, tEval, tEvalUTC, evalApparentState, convergedLightTime);
-    std::vector<real> pos = {-5.58232604283634858966e-01,
-                             8.55200571132647247019e-01,
-                             3.03631949052953764578e-01};
-    std::vector<real> vel = {-1.38187429130724199339e-02,
-                             -6.00401017433447106719e-03,
-                             -2.57842571752728202256e-03};
+    const std::vector<real> pos = {
+        -0.4430312741660833, 0.8965062452933791, 0.3218771965080118
+    };
+    const std::vector<real> vel = {
+        -0.0148212842112486, -0.0042500259738234, -0.0019519585329488
+    };
     NongravParameters ngPrms;
-    ngPrms.a1 = 4.999999873689E-13L;
-    ngPrms.a2 = -2.901085508711E-14;
+    ngPrms.a1 = 5.E-13L;
+    ngPrms.a2 = -2.901085583204654E-14L;
     ngPrms.a3 = 0.0L;
     ngPrms.alpha = 1.0L;
     ngPrms.k = 0.0L;
@@ -53,28 +58,28 @@ int main() {
         << "/////////////////////// Apophis comparison ///////////////////////"
         << std::endl
         << std::endl;
-    std::vector<real> jplFromAssist = {
-        1.75755421201475581228e-02, 1.21966728504766619423e+00,
-        4.78396516543700689450e-01, -1.35392833847556674776e-02,
-        5.35536634997958596940e-04, -1.50699043360527989245e-05};
+    const std::vector<real> df = {
+            0.1194303822347949, 1.2110683438150556, 0.4767184664960469,
+           -0.0134714830959050, 0.0017461826766498, 0.0004605752588853
+    };
     std::vector<real> rm = simTest.xInteg;
     std::cout << "difference between JPL code and GRSS: " << std::endl;
     std::cout << "Position (m): [";
     for (size_t i = 0; i < 3; i++) {
-        std::cout << (jplFromAssist[i] - rm[i]) * simTest.consts.du2m << ", ";
+        std::cout << (df[i] - rm[i]) * simTest.consts.du2m << ", ";
     }
     std::cout << "]" << std::endl;
 
     std::cout << "Velocity (m/s): [";
     for (size_t i = 3; i < 6; i++) {
-        std::cout << (jplFromAssist[i] - rm[i]) * simTest.consts.duptu2mps
+        std::cout << (df[i] - rm[i]) * simTest.consts.duptu2mps
                   << ", ";
     }
     std::cout << "]" << std::endl;
 
-    real distDiff = sqrt(pow(jplFromAssist[0] - rm[0], 2) +
-                         pow(jplFromAssist[1] - rm[1], 2) +
-                         pow(jplFromAssist[2] - rm[2], 2)) *
+    real distDiff = sqrt(pow(df[0] - rm[0], 2) +
+                         pow(df[1] - rm[1], 2) +
+                         pow(df[2] - rm[2], 2)) *
         simTest.consts.du2m;
     std::cout << "Distance (m): " << distDiff << std::endl;
     // make sure the difference is less than 10km

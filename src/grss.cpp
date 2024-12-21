@@ -1,3 +1,25 @@
+/**
+ * @file    grss.cpp
+ * @brief   Python bindings for GRSS
+ * @author  Rahil Makadia <makadia2@illinois.edu>
+ *
+ * @section     LICENSE
+ * Copyright (C) 2022-2025 Rahil Makadia
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <https://www.gnu.org/licenses>.
+ */
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
@@ -796,7 +818,8 @@ PYBIND11_MODULE(libgrss, m) {
             Path to the SPICE DE kernel.
             )mydelimiter")
         .def_readwrite("unsafePersistentMemoryMap",
-                       &PropSimulation::unsafePersistentMemoryMap, R"mydelimiter(
+                       &PropSimulation::unsafePersistentMemoryMap,
+                       R"mydelimiter(
             Whether to use unsafe persistent memory mapping for the simulation.
             )mydelimiter")
         .def_readwrite("consts", &PropSimulation::consts, R"mydelimiter(
@@ -966,7 +989,7 @@ PYBIND11_MODULE(libgrss, m) {
                 Name of the body to remove.
             )mydelimiter")
         .def("add_event", &PropSimulation::add_event, py::arg("event"),
-            R"mydelimiter(
+             R"mydelimiter(
             Adds an event to the simulation.
 
             Parameters
@@ -1107,6 +1130,7 @@ PYBIND11_MODULE(libgrss, m) {
                 This information should be repeated for radar observations.
             )mydelimiter")
         .def("save", &PropSimulation::save, py::arg("filename"),
+             py::arg("onlyMachineData") = false,
              R"mydelimiter(
             Saves the simulation to a file.
 
