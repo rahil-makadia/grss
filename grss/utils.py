@@ -38,7 +38,7 @@ def _download_ades_files(file):
     outname = f'{grss_path}/fit/{file}'
     if file == "codes.json":
         outname += ".gz"
-    cmd = f'curl --silent --show-error -o {outname} {files[file]}'
+    cmd = f'curl --connect-timeout 30 --silent --show-error -o {outname} {files[file]}'
     os.system(cmd)
     if file == "codes.json":
         with gzip.open(f'{outname}', 'rb') as f_in:
