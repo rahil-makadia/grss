@@ -42,7 +42,7 @@ void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
  */
 void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
                   const real &GM, real &M, real &E, real &nu,
-                  const real &tol = 1.0e-12L, const int &max_iter = 100);
+                  const real &tol = 1.0e-12L, const int &max_iter = 250);
 
 /**
  * @brief Convert Cometary elements to Keplerian elements.

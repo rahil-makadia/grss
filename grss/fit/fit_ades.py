@@ -14,7 +14,7 @@ __all__ = [ 'ades_keep_columns',
 # comments correspond to future GRSS capabilities.
 ades_keep_columns = {
     'permID':'str', 'provID': 'str', 'mode': 'str', 'stn': 'str', 'prog': 'str',
-    'obsTime': 'str', #'rmsTime': 'float',
+    'obsTime': 'str', 'rmsTime': 'float',
     'ra': 'float', 'dec': 'float',
     'rmsRA': 'float', 'rmsDec': 'float', 'rmsCorr': 'float', 'astCat': 'str',
     'trx': 'str', 'rcv': 'str', 'delay': 'float', 'doppler': 'float',

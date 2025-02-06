@@ -46,8 +46,8 @@ void kepler_solve_elliptic(const real &M, const real &e, real &E, const real &to
         iter++;
     }
     if (iter == max_iter) {
-        std::cout << "utilities.cpp: WARNING: kepler_solve did not converge in "
-                  << max_iter << " iterations!!!"
+        std::cout << "elements.cpp: WARNING: kepler_solve did not converge in "
+                  << max_iter << " iterations. This may lead to instability!!!"
                   << " F: " << F << std::endl;
     }
 }
@@ -72,9 +72,9 @@ void kepler_solve_hyperbolic(const real &M, const real &e, real &EHyp,
         iter++;
     }
     if (iter == max_iter) {
-        std::cout << "utilities.cpp: WARNING: kepler_solve_hyperbolic did not "
+        std::cout << "elements.cpp: WARNING: kepler_solve_hyperbolic did not "
                      "converge in "
-                  << max_iter << " iterations!!!"
+                  << max_iter << " iterations. This may lead to instability!!!"
                   << " F: " << F << std::endl;
     }
 }
