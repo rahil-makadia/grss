@@ -19,9 +19,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Build GRSS library
         run: |
-          cd ./extern/
-          python3 get_cspice.py
-          cd ..
           source initialize.sh
           source build_cpp.sh -clean
       - name: Run tests
