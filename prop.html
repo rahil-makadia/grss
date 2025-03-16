@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" data-theme="light">
+<html lang="en" data-content_root="./" data-theme="light">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="_static/favicon.ico" rel="icon" type="image/x-icon">
     <link href="_static/favicon-32x32.png" sizes="32x32" rel="icon" type="image/png">
     <link href="_static/favicon-16x16.png" sizes="16x16" rel="icon" type="image/png">
@@ -38,21 +37,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="_static/documentation_options.js?v=7e6c2ed9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'prop';</script>
@@ -62,7 +61,7 @@
     <link rel="prev" title="Getting Started" href="start.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 19, 2025"/>
+    <meta name="docbuild:last-update" content="Mar 16, 2025"/>
   </head>
   
   
@@ -506,7 +505,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="grss-propagator-module-grss-prop">
-<h1>GRSS Propagator Module (grss.prop)<a class="headerlink" href="#grss-propagator-module-grss-prop" title="Permalink to this heading">#</a></h1>
+<h1>GRSS Propagator Module (grss.prop)<a class="headerlink" href="#grss-propagator-module-grss-prop" title="Link to this heading">#</a></h1>
 <p>The propagator within GRSS is based on the IAS15 algorithm <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, which is a 15th-order integrator based on Gauss-Radau quadrature. The algorithm is adaptive, meaning that the step size is adjusted to ensure that the error is below a certain threshold. However, the integrator can also be run in fixed-step mode, where a user-defined fixed time step is used until the end of the integration.</p>
 <p>The force model includes the following effects:</p>
 <ol class="arabic simple">
@@ -527,31 +526,31 @@ document.write(`
 </ol>
 <p class="rubric">References</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="note">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Rein, H. and Spiegel D.S., “IAS15: a fast, adaptive, high-order integrator for gravitational dynamics, accurate to machine precision over a billion orbits”, Monthly Notices of the Royal Astronomical Society, Volume 446, Issue 2, Pages 1424-1437, 2015. <a class="reference external" href="https://doi.org/10.1093/mnras/stu2164">https://doi.org/10.1093/mnras/stu2164</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id6" role="note">
+<aside class="footnote brackets" id="id6" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Einstein, A., Infeld, L., and Hoffmann, B., “The Gravitational Equations and the Problem of Motion”, Annals of Mathematics, Volume 39, Issue 1, Pages 65-100, 1938. <a class="reference external" href="https://doi.org/10.2307/1968714">https://doi.org/10.2307/1968714</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id7" role="note">
+<aside class="footnote brackets" id="id7" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
 <p>Moyer, T.D., “Mathematical formulation of the Double Precision Orbit Determination Program (DPODP)”, Jet Propulsion Laboratory Technical Report 32-1527, 1971. <a class="reference external" href="https://ntrs.nasa.gov/citations/19710017134">https://ntrs.nasa.gov/citations/19710017134</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id8" role="note">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
 <p>Marsden, B.G., Sekanina, Z., and Yeomans, D.K., “Comets and nongravitational forces. V”, The Astronomical Journal, Volume 78, Issue 2, Pages 211-225, 1973. <a class="reference external" href="https://doi.org/10.1086/111402">https://doi.org/10.1086/111402</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id9" role="note">
+<aside class="footnote brackets" id="id9" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></span>
 <p>Everhart, E., “An efficient integrator that uses Gauss-Radau spacings”, Dynamics of Comets: Their Origin and Evolution, Proceedings of IAU Colloquium 83, Pages 185-202, 1985. <a class="reference external" href="https://doi.org/10.1017/S0252921100083913">https://doi.org/10.1017/S0252921100083913</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id10" role="note">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></span>
 <p>Roa, J., Hamers, A.S., Cai, M.X., and Leigh, N.W.C., “Moving Planets Around: An Introduction to N-Body Simulations Applied to Exoplanetary Systems”, MIT Press, 2020. <a class="reference external" href="https://mitpress.mit.edu/9780262539340/moving-planets-around/">https://mitpress.mit.edu/9780262539340/moving-planets-around/</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id11" role="note">
+<aside class="footnote brackets" id="id11" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></span>
 <p>Pham, D., Rein, H., and Spiegel, D.S., “A new timestep criterion for N-body simulations”, The Open Journal of Astrophysics 7, 2024. <a class="reference external" href="https://doi.org/10.21105/astro.2401.02849">https://doi.org/10.21105/astro.2401.02849</a>.</p>
 </aside>
@@ -624,7 +623,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 19, 2025.
+  Last updated on Mar 16, 2025.
   <br/>
 </p>
   </div>

@@ -28,9 +28,9 @@
     :template: custom-module.rst
     :recursive:
 
-    grss.fit.fit_ades
-    grss.fit.fit_optical
-    grss.fit.fit_radar
-    grss.fit.fit_simulation
-    grss.fit.fit_utils
+    fit_ades
+    fit_optical
+    fit_radar
+    fit_simulation
+    fit_utils
 

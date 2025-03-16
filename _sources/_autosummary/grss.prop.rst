@@ -28,7 +28,7 @@
     :template: custom-module.rst
     :recursive:
 
-    grss.prop.prop_parallel
-    grss.prop.prop_unscented
-    grss.prop.prop_utils
+    prop_parallel
+    prop_unscented
+    prop_utils
 

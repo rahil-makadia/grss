@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" data-theme="light">
+<html lang="en" data-content_root="../../../" data-theme="light">
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="../../../_static/favicon.ico" rel="icon" type="image/x-icon">
     <link href="../../../_static/favicon-32x32.png" sizes="32x32" rel="icon" type="image/png">
     <link href="../../../_static/favicon-16x16.png" sizes="16x16" rel="icon" type="image/png">
@@ -38,22 +37,22 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" href="../../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/clipboard.min.js"></script>
-    <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/documentation_options.js?v=7e6c2ed9"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
@@ -65,7 +64,7 @@
     <link rel="prev" title="(84100) Farnocchia orbit determination test" href="farnocchia.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 19, 2025"/>
+    <meta name="docbuild:last-update" content="Mar 16, 2025"/>
   </head>
   
   
@@ -466,7 +465,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -482,6 +483,19 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Let's-start-by-importing-the-necessary-libraries">Let’s start by importing the necessary libraries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#We'll-then-retrieve-the-cometary-state-of-the-asteroid-(from-JPL-SBDB)-plus-any-nongravitational-accelerations-acting-on-it.">We’ll then retrieve the cometary state of the asteroid (from JPL SBDB) plus any nongravitational accelerations acting on it.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Next,-we'll-retrieve-the-observations-from-different-sources-(MPC,-JPL,-Gaia-Data-Releases)-and-prepare-them-for-the-orbit-determination-process.">Next, we’ll retrieve the observations from different sources (MPC, JPL, Gaia Data Releases) and prepare them for the orbit determination process.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#All-we-need-to-do-now-is-initialize-the-OD-simulation-and-run-the-filter.">All we need to do now is initialize the OD simulation and run the filter.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Let's-print-some-summary-statistics-and-plot-some-results.">Let’s print some summary statistics and plot some results.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Finally,-we'll-make-sure-the-GRSS-solution-is-statistically-consistent-with-the-JPL-SBDB-solution">Finally, we’ll make sure the GRSS solution is statistically consistent with the JPL SBDB solution</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -492,7 +506,9 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="(11468)-Shantanunaidu-orbit-determination-test">
-<h1>(11468) Shantanunaidu orbit determination test<a class="headerlink" href="#(11468)-Shantanunaidu-orbit-determination-test" title="Permalink to this heading">#</a></h1>
+<h1>(11468) Shantanunaidu orbit determination test<a class="headerlink" href="#(11468)-Shantanunaidu-orbit-determination-test" title="Link to this heading">#</a></h1>
+<section id="Let's-start-by-importing-the-necessary-libraries">
+<h2>Let’s start by importing the necessary libraries<a class="headerlink" href="#Let's-start-by-importing-the-necessary-libraries" title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -503,6 +519,9 @@ document.write(`
 </pre></div>
 </div>
 </div>
+</section>
+<section id="We'll-then-retrieve-the-cometary-state-of-the-asteroid-(from-JPL-SBDB)-plus-any-nongravitational-accelerations-acting-on-it.">
+<h2>We’ll then retrieve the cometary state of the asteroid (from JPL SBDB) plus any nongravitational accelerations acting on it.<a class="headerlink" href="#We'll-then-retrieve-the-cometary-state-of-the-asteroid-(from-JPL-SBDB)-plus-any-nongravitational-accelerations-acting-on-it." title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
@@ -522,6 +541,9 @@ document.write(`
 </pre></div>
 </div>
 </div>
+</section>
+<section id="Next,-we'll-retrieve-the-observations-from-different-sources-(MPC,-JPL,-Gaia-Data-Releases)-and-prepare-them-for-the-orbit-determination-process.">
+<h2>Next, we’ll retrieve the observations from different sources (MPC, JPL, Gaia Data Releases) and prepare them for the orbit determination process.<a class="headerlink" href="#Next,-we'll-retrieve-the-observations-from-different-sources-(MPC,-JPL,-Gaia-Data-Releases)-and-prepare-them-for-the-orbit-determination-process." title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -548,24 +570,27 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Read in 1751 observations from the MPC.
+Read in 1755 observations from the MPC.
         WARNING: At least one unknown observation mode in the data.
         WARNING: At least one deprecated star catalog in the data.
-        Filtered to 1751 observations that satisfy the time range and accepted observatory constraints.
+        Filtered to 1755 observations that satisfy the time range and accepted observatory constraints.
 Applying Eggl et al. (2020) debiasing scheme to the observations.
         Unknown star catalog: GSC
         Unknown star catalog: UNK
-        No debiasing needed for 727 observations.
+        No debiasing needed for 731 observations.
         Debiased 984 observations.
         No bias information for 40 observations.
 Applying Vereš et al. (2017) weighting scheme to the observations.
-        Using 1552 CCD observations with station-specific weight rules.
+        Using 1556 CCD observations with station-specific weight rules.
 Applying sqrt(N/4) deweighting scheme.
         Deweighted 484 observations.
 Read in 308 Gaia observations from gaiafpr
         Filtered to 308 observations that satisfy the time range constraints.
 </pre></div></div>
 </div>
+</section>
+<section id="All-we-need-to-do-now-is-initialize-the-OD-simulation-and-run-the-filter.">
+<h2>All we need to do now is initialize the OD simulation and run the filter.<a class="headerlink" href="#All-we-need-to-do-now-is-initialize-the-OD-simulation-and-run-the-filter." title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -589,14 +614,17 @@ Read in 308 Gaia observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.430                   0.567                   1321.936                        0.321
-2                        0.430                   0.567                   1321.832                        0.321
+1                        0.430                   0.567                   1328.394                        0.322
+2                        0.430                   0.567                   1328.290                        0.322
 Converged without rejecting outliers. Starting outlier rejection now...
-3                        0.396                   0.545                   1222.259                        0.298
-4                        0.396                   0.545                   1222.211                        0.298
-Converged after rejecting outliers. Rejected 6 out of 2059 optical observations.
+3                        0.396                   0.546                   1228.714                        0.299
+4                        0.396                   0.546                   1228.666                        0.299
+Converged after rejecting outliers. Rejected 6 out of 2063 optical observations.
 </pre></div></div>
 </div>
+</section>
+<section id="Let's-print-some-summary-statistics-and-plot-some-results.">
+<h2>Let’s print some summary statistics and plot some results.<a class="headerlink" href="#Let's-print-some-summary-statistics-and-plot-some-results." title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -612,22 +640,22 @@ Converged after rejecting outliers. Rejected 6 out of 2059 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations after postfit pass:
 ==============================================================
-RMS unweighted: 0.39604552022124734
-RMS weighted: 0.5447909449735425
-chi-squared: 1222.2107614002311
-reduced chi-squared: 0.29810018570737346
-square root of reduced chi-squared: 0.5459855178549825
+RMS unweighted: 0.39615156178420524
+RMS weighted: 0.5456979091410805
+chi-squared: 1228.6658943769469
+reduced chi-squared: 0.2990910161579715
+square root of reduced chi-squared: 0.5468921430757362
 --------------------------------------------------------------
-Solution Time: MJD 57700.000 TDB = 2016-11-08 00:00:00.000 TDB
-Solution Observation Arc: 15800.49 days (43.26 years)
+Solution Time: MJD 57705.000 TDB = 2016-11-13 00:00:00.000 TDB
+Solution Observation Arc: 16011.87 days (43.84 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       1.66658960206e-01               2.25799628222e-09               1.66658960547e-01               2.27127785234e-09               +3.41507933044e-10              +0.150
-q                       2.56494502971e+00               2.92925632622e-09               2.56494502968e+00               2.94348291231e-09               -2.94808621959e-11              -0.010
-tp                      5.75112237351e+04               4.22566998374e-06               5.75112237357e+04               4.24910817464e-06               +5.80439518671e-07              +0.137
-om                      2.06375171960e+02               6.73376313990e-06               2.06375171950e+02               6.76776543604e-06               -9.32419652599e-09              -0.001
-w                       1.53990533467e+02               6.80555902001e-06               1.53990533611e+02               6.84004223742e-06               +1.44254272527e-07              +0.021
-i                       7.88980995904e-01               8.48419637423e-08               7.88981001462e-01               8.50627397661e-08               +5.55799106738e-09              +0.065
+e                       1.66657894909e-01               2.25803501501e-09               1.66657895249e-01               2.27082797542e-09               +3.40328487614e-10              +0.150
+q                       2.56494181058e+00               2.93186689373e-09               2.56494181055e+00               2.94264435411e-09               -2.73483458102e-11              -0.009
+tp                      5.75112207046e+04               4.22648850546e-06               5.75112207052e+04               4.24849047875e-06               +5.80948835704e-07              +0.137
+om                      2.06375221086e+02               6.74062921881e-06               2.06375221066e+02               6.76577424404e-06               -2.00732301892e-08              -0.003
+w                       1.53989698777e+02               6.81235669305e-06               1.53989698932e+02               6.83803263417e-06               +1.55106931743e-07              +0.023
+i                       7.88982675264e-01               8.49038260981e-08               7.88982680757e-01               8.50447328290e-08               +5.49360601454e-09              +0.065
 
 </pre></div></div>
 </div>
@@ -643,7 +671,7 @@ i                       7.88980995904e-01               8.48419637423e-08       
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tests_python_fit_shantanunaidu_8_0.png" src="../../../_images/tests_python_fit_shantanunaidu_8_0.png" />
+<img alt="../../../_images/tests_python_fit_shantanunaidu_13_0.png" src="../../../_images/tests_python_fit_shantanunaidu_13_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -658,14 +686,14 @@ i                       7.88980995904e-01               8.48419637423e-08       
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tests_python_fit_shantanunaidu_9_0.png" src="../../../_images/tests_python_fit_shantanunaidu_9_0.png" />
+<img alt="../../../_images/tests_python_fit_shantanunaidu_14_0.png" src="../../../_images/tests_python_fit_shantanunaidu_14_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tests_python_fit_shantanunaidu_9_1.png" src="../../../_images/tests_python_fit_shantanunaidu_9_1.png" />
+<img alt="../../../_images/tests_python_fit_shantanunaidu_14_1.png" src="../../../_images/tests_python_fit_shantanunaidu_14_1.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
@@ -692,10 +720,13 @@ i                       7.88980995904e-01               8.48419637423e-08       
 <div class="highlight"><pre>
 Mahalonobis distance between JPL and GRSS solution: 0.19
 Mahalonobis distance between GRSS and JPL solution: 0.19
-Bhattacharya distance between JPL and GRSS solution: 0.0001
-Bhattacharya coefficient between JPL and GRSS solution: 0.9999
+Bhattacharya distance between JPL and GRSS solution: 0.0000
+Bhattacharya coefficient between JPL and GRSS solution: 1.0000
 </pre></div></div>
 </div>
+</section>
+<section id="Finally,-we'll-make-sure-the-GRSS-solution-is-statistically-consistent-with-the-JPL-SBDB-solution">
+<h2>Finally, we’ll make sure the GRSS solution is statistically consistent with the JPL SBDB solution<a class="headerlink" href="#Finally,-we'll-make-sure-the-GRSS-solution-is-statistically-consistent-with-the-JPL-SBDB-solution" title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -715,6 +746,7 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.9999
 </pre></div>
 </div>
 </div>
+</section>
 </section>
 
 
@@ -753,7 +785,25 @@ Bhattacharya coefficient between JPL and GRSS solution: 0.9999
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"></div>
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Let's-start-by-importing-the-necessary-libraries">Let’s start by importing the necessary libraries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#We'll-then-retrieve-the-cometary-state-of-the-asteroid-(from-JPL-SBDB)-plus-any-nongravitational-accelerations-acting-on-it.">We’ll then retrieve the cometary state of the asteroid (from JPL SBDB) plus any nongravitational accelerations acting on it.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Next,-we'll-retrieve-the-observations-from-different-sources-(MPC,-JPL,-Gaia-Data-Releases)-and-prepare-them-for-the-orbit-determination-process.">Next, we’ll retrieve the observations from different sources (MPC, JPL, Gaia Data Releases) and prepare them for the orbit determination process.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#All-we-need-to-do-now-is-initialize-the-OD-simulation-and-run-the-filter.">All we need to do now is initialize the OD simulation and run the filter.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Let's-print-some-summary-statistics-and-plot-some-results.">Let’s print some summary statistics and plot some results.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Finally,-we'll-make-sure-the-GRSS-solution-is-statistically-consistent-with-the-JPL-SBDB-solution">Finally, we’ll make sure the GRSS solution is statistically consistent with the JPL SBDB solution</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
@@ -783,7 +833,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 19, 2025.
+  Last updated on Mar 16, 2025.
   <br/>
 </p>
   </div>
