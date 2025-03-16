@@ -84,6 +84,10 @@ The first time the library is imported, it will download some data files such as
 
 Check out the [examples](https://rahil-makadia.github.io/grss/examples.html) on the [GRSS website](https://rahil-makadia.github.io/grss/) to get started.
 
+## Contributing
+
+If you would like to contribute to the GRSS library or raise an issue, please see the [contributing file](https://github.com/rahil-makadia/grss/blob/main/contributing.md).
+
 ## Acknowledgements
 
 GRSS Development Team:
