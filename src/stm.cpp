@@ -322,7 +322,16 @@ void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
         if (depth > smoothing_threshold){
             smoothing = 0.0;
         }
-        if (smoothing != 0.0){
+        dfBodydposBody[0] *= smoothing;
+        dfBodydposBody[1] *= smoothing;
+        dfBodydposBody[2] *= smoothing;
+        dfBodydposBody[3] *= smoothing;
+        dfBodydposBody[4] *= smoothing;
+        dfBodydposBody[5] *= smoothing;
+        dfBodydposBody[6] *= smoothing;
+        dfBodydposBody[7] *= smoothing;
+        dfBodydposBody[8] *= smoothing;
+        if (depth <= smoothing_threshold){
             const real dsmoothingdxBody =
                 sin(PI * depth / (2 * smoothing_threshold)) * PI * dxBody /
                 (2 * smoothing_threshold * r);
@@ -332,23 +341,14 @@ void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
             const real dsmoothingdzBody =
                 sin(PI * depth / (2 * smoothing_threshold)) * PI * dzBody /
                 (2 * smoothing_threshold * r);
-            dfBodydposBody[0] *= smoothing;
             dfBodydposBody[0] += fac1*fac2*dxBody*dsmoothingdxBody;
-            dfBodydposBody[1] *= smoothing;
             dfBodydposBody[1] += fac1*fac2*dxBody*dsmoothingdyBody;
-            dfBodydposBody[2] *= smoothing;
             dfBodydposBody[2] += fac1*fac2*dxBody*dsmoothingdzBody;
-            dfBodydposBody[3] *= smoothing;
             dfBodydposBody[3] += fac1*fac2*dyBody*dsmoothingdxBody;
-            dfBodydposBody[4] *= smoothing;
             dfBodydposBody[4] += fac1*fac2*dyBody*dsmoothingdyBody;
-            dfBodydposBody[5] *= smoothing;
             dfBodydposBody[5] += fac1*fac2*dyBody*dsmoothingdzBody;
-            dfBodydposBody[6] *= smoothing;
             dfBodydposBody[6] += fac1*(fac2-2)*dzBody*dsmoothingdxBody;
-            dfBodydposBody[7] *= smoothing;
             dfBodydposBody[7] += fac1*(fac2-2)*dzBody*dsmoothingdyBody;
-            dfBodydposBody[8] *= smoothing;
             dfBodydposBody[8] += fac1*(fac2-2)*dzBody*dsmoothingdzBody;
         }
     }

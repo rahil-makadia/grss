@@ -3,10 +3,10 @@ title: 'Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Plan
 tags:
   - Python
   - C++
-  - Asteroids
-  - Comets
-  - Orbit Determination
-  - Orbit Propagation
+  - asteroids
+  - comets
+  - orbit determination
+  - orbit propagation
 authors:
   - name: Rahil Makadia
     corresponding: true
@@ -27,21 +27,21 @@ affiliations:
   - name: Jet Propulsion Laboratory, California Institute of Technology, Pasadena, CA 91109, USA
     index: 2
 bibliography: paper.bib
-aas-doi: 10.3847/PSJ/xxxxx
+aas-doi: 10.3847/PSJ/adbc88
 aas-journal: Planetary Science Journal
 ---
 
 # Statement of Need
 
-Modeling the motion of small solar system bodies is of utmost importance when looking at the problem in the context of planetary defense. Reliably computing the orbit of an asteroid or a comet from various observations, and then predicting its trajectory in the future is critical in assessing the associated Earth-impact hazard. The NASA Center for Near-Earth Object Studies at the Jet Propulsion Laboratory (JPL) has developed a suite of state-of-the-art tools over the course of decades for this specific purpose. However, these tools are not publicly available. With the expected increase in the number of Near-Earth Object observations as well as discoveries when new observatories such as the Vera C. Rubin Observatory come online [@Schwamb2023], there is a need for a publicly available library that can reliably perform both orbit determination and propagation for small bodies in the solar system. Such a publicly available library will enable community efforts in planetary defense research.
+Modeling the motion of small Solar System bodies is of utmost importance when looking at the problem in the context of planetary defense. Reliably computing the orbit of an asteroid or a comet from various observations, and then predicting its trajectory in the future is critical in assessing the associated Earth-impact hazard. The NASA Center for Near-Earth Object Studies at the Jet Propulsion Laboratory (JPL) has developed a suite of state-of-the-art tools over the course of decades for this specific purpose. However, these tools are not publicly available. With the expected increase in the number of Near-Earth Object observations as well as discoveries when new observatories such as the Vera C. Rubin Observatory come online [@Schwamb2023], there is a need for a publicly available library that can reliably perform both orbit determination and propagation for small bodies in the solar system. Such a publicly available library will enable community efforts in planetary defense research.
 
 # Summary
 
-In this paper, we present ``GRSS``, the Gauss-Radau Small-body Simulator, an open-source library for orbit determination and propagation of small bodies in the solar system. ``GRSS`` is an open-source software library with a C++11 foundation and a Python binding. The propagator is based on the ``IAS15`` algorithm, a 15<sup>th</sup> order integrator based on Gauss-Radau quadrature [@Rein2014]. Only the particles of interest are integrated within ``GRSS`` to reduce computational cost. The states for the planets and 16 largest main-belt asteroids are computed using memory-mapped JPL digital ephemeris kernels [@Park2021] as done in the ``ASSIST`` orbit propagator library [@Holman2023]. In addition to the propagator, the C++ portion of the library also has the ability to predict impacts and calculate close encounter circumstances using various formulations of the B-plane [@Kizner1961; @Opik1976; @Chodas1999; @Milani1999; @Farnocchia2019].
+In this paper, we present `GRSS`, the Gauss-Radau Small-body Simulator, an open-source library for orbit determination and propagation of small bodies in the solar system. `GRSS` is an open-source software library with a C++11 foundation and a Python binding. The propagator is based on the `IAS15` algorithm, a 15<sup>th</sup> order integrator based on Gauss-Radau quadrature [@Rein2014]. Only the particles of interest are integrated within `GRSS` to reduce computational cost. The states for the planets and 16 largest main-belt asteroids are computed using memory-mapped JPL digital ephemeris kernels [@Park2021] as done in the `ASSIST` orbit propagator library [@Holman2023]. In addition to the propagator, the C++ portion of the library also has the ability to predict impacts and calculate close encounter circumstances using various formulations of the B-plane [@Kizner1961; @Opik1976; @Chodas1999; @Milani1999; @Farnocchia2019].
 
-The C++ functionality is exposed to Python through a binding generated using [``pybind11``](https://github.com/pybind/pybind11). The Python layer of ``GRSS`` uses the propagator as the foundation to compute the orbits of small bodies from a given set of optical and/or radar astrometry from the [Minor Planet Center](https://minorplanetcenter.net), the [JPL Small Body Radar Astrometry database](https://ssd.jpl.nasa.gov/sb/radar.html), and the [Gaia Focused Product Release solar system observations database](https://www.cosmos.esa.int/web/gaia/fpr#SSOs). Additionally, the orbit determination modules also have the ability to fit especially demanding measurements such as stellar occultations. These capabilities of the ``GRSS`` library have already been used to study the the heliocentric changes in the orbit of the (65803) Didymos binary asteroid system as a result of the DART impact [@Makadia2022; @Makadia2024] and for analyzing the impact locations of two asteroids, 2024 BX<sub>1</sub> and 2024 RW<sub>1</sub> [@Makadia2024b].
+The C++ functionality is exposed to Python through a binding generated using [`pybind11`](https://github.com/pybind/pybind11). The Python layer of `GRSS` uses the propagator as the foundation to compute the orbits of small bodies from a given set of optical and/or radar astrometry from the [Minor Planet Center](https://minorplanetcenter.net), the [JPL Small Body Radar Astrometry database](https://ssd.jpl.nasa.gov/sb/radar.html), and the [Gaia Focused Product Release solar system observations database](https://www.cosmos.esa.int/web/gaia/fpr#SSOs). Additionally, the orbit determination modules also have the ability to fit especially demanding measurements such as stellar occultations. These capabilities of the `GRSS` library have already been used to study the the heliocentric changes in the orbit of the (65803) Didymos binary asteroid system as a result of the DART impact [@Makadia2022; @Makadia2024] and for analyzing the impact locations of two asteroids, 2024 BX<sub>1</sub> and 2024 RW<sub>1</sub> [@Makadia2025].
 
-``GRSS`` will continue to be developed in the future, with anticipated contributions including the ability to perform mission studies for future asteroid deflections. ``GRSS`` is publicly available to the community through the Python Package Index and the [source code](https://github.com/rahil-makadia/grss) is available on GitHub. Therefore, ``GRSS`` is a reliable and efficient tool that the community has access to for studying the dynamics of small bodies in the solar system.
+`GRSS` will continue to be developed in the future, with anticipated applications including the ability to perform mission studies for future asteroid deflections. `GRSS` is publicly available to the community through the Python Package Index and the [source code](https://github.com/rahil-makadia/grss) is available on GitHub. Therefore, `GRSS` is a reliable and efficient tool that the community has access to for studying the dynamics of small bodies in the solar system.
 
 # Acknowledgements
 

@@ -759,8 +759,8 @@ def plot_single_bplane(axis, x_coord, y_coord, ellipse_data, bplane_type,
             ellipse[1,:] += y_mean
     else:
         ellipse = None
-    msize = 5
-    malpha = 0.5
+    msize = 2.5
+    malpha = 0.25
     mspec = 'b.'
     rotation = 30
     axis.plot(x_coord, y_coord, mspec,

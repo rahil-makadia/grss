@@ -3,6 +3,11 @@
 # get pybind11
 pip3 install "pybind11[global]>=2.10.0"
 
+# get cspice
+cd ./extern/
+python3 get_cspice.py
+cd ..
+
 # get debiasing data and kernels
 cd grss/debias/
 python3 get_debiasing_data.py
