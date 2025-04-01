@@ -1,17 +1,18 @@
 # GRSS
 
-[![PyPi Version](https://img.shields.io/pypi/v/grss?color=green)](https://pypi.python.org/pypi/grss/)
-[![Build Sphinx docs)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml)
+[![PyPI](https://img.shields.io/pypi/v/grss?color=green)](https://pypi.python.org/pypi/grss/)
+[![Build docs)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml)
 [![Python tests)](https://github.com/rahil-makadia/grss/actions/workflows/python_tests.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/python_tests.yml)
 [![C++ tests)](https://github.com/rahil-makadia/grss/actions/workflows/cpp_tests.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/cpp_tests.yml)
-[![MIT](https://img.shields.io/badge/license-GPLv3-green.svg?style=flat)](https://github.com/rahil-makadia/grss/blob/main/LICENSE)
+[![GPLv3](https://img.shields.io/badge/license-GPLv3-green.svg?style=flat)](https://github.com/rahil-makadia/grss/blob/main/LICENSE)
+[![JOSS](https://joss.theoj.org/papers/10.21105/joss.07861/status.svg)](https://doi.org/10.21105/joss.07861)
 
 **GRSS** (pronounced "grass"), the *Gauss-Radau Small-body Simulator* is a Python package with a C++ binding for propagating and fitting the orbits of small bodies in the solar system, such as asteroids and comets.
 
 If you use GRSS in your research, please cite at least one of the following:
 
-* Makadia et al. (2024), "Measurability of the Heliocentric Momentum Enhancement from a Kinetic Impact: The Double Asteroid Redirection Test (DART) Mission", [Planetary Science Journal, 5, 38.](https://doi.org/10.3847/PSJ/ad1bce)
-* Makadia et al. (2023), "GRSS: An open-source small-body science tool for planetary defense", [55th Annual Meeting of the Division for Planetary Sciences.](https://ui.adsabs.harvard.edu/abs/2023DPS....5540502M/abstract)
+* Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [Planetary Defense Journal, 6.](https://doi.org/10.3847/PSJ/adbc88)
+* Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [Journal of Open Source Software, 10(107), 7861.](https://doi.org/10.21105/joss.07861)
 
 ## Getting Started
 

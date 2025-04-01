@@ -10,8 +10,8 @@ Welcome to the GRSS docs!
 
 If you use GRSS in your research, please cite at least one of the following:
 
-* Makadia et al. (2024), "Measurability of the Heliocentric Momentum Enhancement from a Kinetic Impact: The Double Asteroid Redirection Test (DART) Mission", `Planetary Science Journal, 5, 38. <https://doi.org/10.3847/PSJ/ad1bce>`_
-* Makadia et al. (2023), "GRSS: An open-source small-body science tool for planetary defense", `55th Annual Meeting of the Division for Planetary Sciences. <https://ui.adsabs.harvard.edu/abs/2023DPS....5540502M/abstract>`_
+* Makadia et al. (2025). "Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense", `Planetary Defense Journal, 6. <https://doi.org/10.3847/PSJ/adbc88>`_
+* Makadia et al. (2025). "Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense", `Journal of Open Source Software, 10(107), 7861. <https://doi.org/10.21105/joss.07861>`_
 
 Continue reading on the following pages to learn more about the library:
 
