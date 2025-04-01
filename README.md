@@ -11,7 +11,7 @@
 
 If you use GRSS in your research, please cite at least one of the following:
 
-* Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [Planetary Defense Journal, 6.](https://doi.org/10.3847/PSJ/adbc88)
+* Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [The Planetary Science Journal, 6.](https://doi.org/10.3847/PSJ/adbc88)
 * Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [Journal of Open Source Software, 10(107), 7861.](https://doi.org/10.21105/joss.07861)
 
 ## Getting Started
