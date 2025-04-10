@@ -1,17 +1,18 @@
 # GRSS
 
-[![PyPI](https://img.shields.io/pypi/v/grss?color=green)](https://pypi.python.org/pypi/grss/)
+[![PyPI](https://img.shields.io/pypi/v/grss?label=PyPI&color=[41,171,71])](https://pypi.python.org/pypi/grss/)
 [![Build docs)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/docs.yml)
 [![Python tests)](https://github.com/rahil-makadia/grss/actions/workflows/python_tests.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/python_tests.yml)
 [![C++ tests)](https://github.com/rahil-makadia/grss/actions/workflows/cpp_tests.yml/badge.svg)](https://github.com/rahil-makadia/grss/actions/workflows/cpp_tests.yml)
-[![GPLv3](https://img.shields.io/badge/license-GPLv3-green.svg?style=flat)](https://github.com/rahil-makadia/grss/blob/main/LICENSE)
+[![PSJ](https://img.shields.io/badge/PSJ-10.3847/PSJ/adbc88-[41,171,71])](https://doi.org/10.3847/PSJ/adbc88)
 [![JOSS](https://joss.theoj.org/papers/10.21105/joss.07861/status.svg)](https://doi.org/10.21105/joss.07861)
+[![GPLv3](https://img.shields.io/badge/license-GPLv3-[41,171,71])](https://github.com/rahil-makadia/grss/blob/main/LICENSE)
 
 **GRSS** (pronounced "grass"), the *Gauss-Radau Small-body Simulator* is a Python package with a C++ binding for propagating and fitting the orbits of small bodies in the solar system, such as asteroids and comets.
 
 If you use GRSS in your research, please cite at least one of the following:
 
-* Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [The Planetary Science Journal, 6.](https://doi.org/10.3847/PSJ/adbc88)
+* Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [The Planetary Science Journal, 6(4), 85.](https://doi.org/10.3847/PSJ/adbc88)
 * Makadia et al. (2025). Gauss-Radau Small-body Simulator (GRSS): An Open-Source Library for Planetary Defense. [Journal of Open Source Software, 10(107), 7861.](https://doi.org/10.21105/joss.07861)
 
 ## Getting Started
