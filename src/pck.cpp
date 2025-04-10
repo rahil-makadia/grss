@@ -621,6 +621,16 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         cw0 = 150.48977;
         cw1 = 2011.143058731885;
         cw2 = 2.0e-06;
+    } else if (iauFrame == "IAU_ITOKAWA"){
+        // from https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc
+        // from Celest Mech Dyn Astr (2018) 130:22 https://doi.org/10.1007/s10569-017-9805-5
+        // BODY2025143_POLE_RA       = (   90.53       0.           0. )
+        // BODY2025143_POLE_DEC      = (  -66.30       0.           0. )
+        // BODY2025143_PM            = (  000.0      712.143        0. )
+        cra0 = 90.53;
+        cdec0 = -66.30;
+        cw0 = 0.0;
+        cw1 = 712.143;
     } else {
         throw std::runtime_error("iau_to_euler: The IAU frame is not supported.");
     }
@@ -740,13 +750,13 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
     }
     bool bodyToInertial = true;
     std::vector<std::string> fromTo = {from, to};
-    std::vector<std::string> validBodyFrames = {"ITRF93", "IAU_SUN",
-                                                "IAU_MERCURY", "IAU_VENUS",
-                                                "IAU_EARTH", "IAU_MOON",
-                                                "IAU_MARS", "IAU_JUPITER",
-                                                "IAU_SATURN", "IAU_URANUS",
-                                                "IAU_NEPTUNE", "IAU_PLUTO",
-                                                "IAU_BENNU"};
+    std::vector<std::string> validBodyFrames = {
+        "IAU_SUN", "IAU_MERCURY", "IAU_VENUS",
+        "ITRF93", "IAU_EARTH", "IAU_MOON",
+        "IAU_MARS", "IAU_JUPITER", "IAU_SATURN",
+        "IAU_URANUS", "IAU_NEPTUNE", "IAU_PLUTO",
+        "IAU_BENNU", "IAU_ITOKAWA"
+    };
     // make sure either from or to frame is J2000
     int bodyFrameIdx = -1;
     if (from == "J2000"){

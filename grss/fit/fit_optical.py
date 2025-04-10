@@ -220,6 +220,7 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
         t_max_tdb = np.inf
     psv_df = pd.read_csv(psv_obs_file, sep='|', skipinitialspace=True)
     psv_df.columns = psv_df.columns.str.strip()
+    psv_df = psv_df[[col for col in psv_df.columns if col in ades_column_types]]
     psv_column_types = {col: ades_column_types[col] for col in psv_df.columns}
     psv_df = psv_df.astype(psv_column_types)
     occ_idx = psv_df.query("mode == 'OCC'").index
@@ -229,6 +230,11 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
         psv_df.loc[occ_idx,'cosDec'] = np.cos(psv_df.loc[occ_idx,'dec']*np.pi/180)
         psv_df.loc[occ_idx,'ra'] = psv_df.loc[occ_idx,'raStar']
         psv_df.loc[occ_idx,'ra'] += psv_df.loc[occ_idx,'deltaRA']/3600/psv_df.loc[occ_idx,'cosDec']
+    # if biasRA and biasDec are not present, set them to 0
+    if 'biasRA' not in psv_df:
+        psv_df['biasRA'] = 0.0
+    if 'biasDec' not in psv_df:
+        psv_df['biasDec'] = 0.0
     psv_df['cosDec'] = np.cos(psv_df['dec']*np.pi/180)
     psv_df['sigRA'] = psv_df['rmsRA']
     psv_df['sigDec'] = psv_df['rmsDec']
@@ -568,199 +574,199 @@ def apply_station_weight_rules(group, obs_df, cols, verbose):
     """
     # sourcery skip: low-code-quality
     default_weight_counter = 0
-    for info in group[['obsTimeMJD', 'stn', 'astCat', 'prog']].itertuples():
-        i, time, stn, cat, prog = info
+    all_times = obs_df.loc[group.index, 'obsTimeMJD'].values
+    all_stns = obs_df.loc[group.index, 'stn'].values
+    all_cats = obs_df.loc[group.index, 'astCat'].values
+    all_progs = obs_df.loc[group.index, 'prog'].values
+    ccd_weight_arr = np.ones((len(group), 2))*np.nan
+    for i in range(len(group)):
+        time = all_times[i]
+        stn = all_stns[i]
+        cat = all_cats[i]
+        prog = all_progs[i]
         # star catalog and program code need to be switched back to old 80-column format
         cat = ades_catalog_map[cat]
         if isinstance(prog, str):
             prog = get_packed_prog_id(prog)
         if stn in {'F51', 'F52'}:
-            obs_df.loc[i, cols] = 0.2
+            ccd_weight_arr[i,:] = 0.2
             if prog in {'Z'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
         elif stn in {'G96'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'Z'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
         elif stn in {'703'}:
             # until 2014-01-01
-            obs_df.loc[i, cols] = 1.0 if time <= 56658.0 else 0.8
+            ccd_weight_arr[i,:] = 1.0 if time <= 56658.0 else 0.8
             if prog in {'Z'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
         elif stn in {'E12'}:
-            obs_df.loc[i, cols] = 0.75
+            ccd_weight_arr[i,:] = 0.75
         elif stn in {'704'}:
-            obs_df.loc[i, cols] = 1.0
+            ccd_weight_arr[i,:] = 1.0
         elif stn in {'691', '291'}:
             # until 2003-01-01
-            obs_df.loc[i, cols] = 0.6 if time <= 56240.0 else 0.5
+            ccd_weight_arr[i,:] = 0.6 if time <= 56240.0 else 0.5
         elif stn in {'644'}:
             # until 2003-09-01
-            obs_df.loc[i, cols] = 0.6 if time <= 52883.0 else 0.4
+            ccd_weight_arr[i,:] = 0.6 if time <= 52883.0 else 0.4
         elif stn in {'699'}:
-            obs_df.loc[i, cols] = 0.8
+            ccd_weight_arr[i,:] = 0.8
         elif stn in {'G45'}:
-            obs_df.loc[i, cols] = 0.6
+            ccd_weight_arr[i,:] = 0.6
         elif stn in {'D29'}:
-            obs_df.loc[i, cols] = 0.75
+            ccd_weight_arr[i,:] = 0.75
         elif stn in {'T05', 'T08', 'T07', 'M22', 'W68'}:
-            obs_df.loc[i, cols] = 0.8
+            ccd_weight_arr[i,:] = 0.8
         elif stn in {'568'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'_'}:
                 if cat in {'t', 'q'}:
-                    obs_df.loc[i, cols] = 0.25
+                    ccd_weight_arr[i,:] = 0.25
                 elif cat in {'U', 'V', 'W', 'X'}:
-                    obs_df.loc[i, cols] = 0.15
+                    ccd_weight_arr[i,:] = 0.15
             elif prog in {'^'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
             elif prog in {'2'}:
                 if cat in {'o', 's'}:
-                    obs_df.loc[i, cols] = 0.5
+                    ccd_weight_arr[i,:] = 0.5
                 elif cat in {'t'}:
-                    obs_df.loc[i, cols] = 0.2
+                    ccd_weight_arr[i,:] = 0.2
                 elif cat in {'U', 'V', 'W', 'X'}:
-                    obs_df.loc[i, cols] = 0.1
+                    ccd_weight_arr[i,:] = 0.1
             elif prog in {'0'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
         elif stn in {'T09'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'0'}:
-                obs_df.loc[i, cols] = 0.1
+                ccd_weight_arr[i,:] = 0.1
             elif prog in {'1', '4'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
             elif prog in {'2', '3'}:
-                obs_df.loc[i, cols] = 0.5
+                ccd_weight_arr[i,:] = 0.5
             if time <= 59858.0: # until 2022-10-06
-                obs_df.loc[i, cols] = 0.1
+                ccd_weight_arr[i,:] = 0.1
         elif stn in {'T10', 'T11', 'T13', 'T16', 'T17'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
         elif stn in {'T12'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'0'}:
-                obs_df.loc[i, cols] = 0.1
+                ccd_weight_arr[i,:] = 0.1
             elif prog in {'1'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
             elif prog in {'2', '3'}:
-                obs_df.loc[i, cols] = 0.5
+                ccd_weight_arr[i,:] = 0.5
             if time <= 59858.0: # until 2022-10-06
-                obs_df.loc[i, cols] = 0.1
+                ccd_weight_arr[i,:] = 0.1
         elif stn in {'T14'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'0', '7'}:
-                obs_df.loc[i, cols] = 0.1
+                ccd_weight_arr[i,:] = 0.1
             elif prog in {'1', '2', '4', '6', '8'}:
-                obs_df.loc[i, cols] = 0.5
+                ccd_weight_arr[i,:] = 0.5
             elif prog in {'3'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
             elif prog in {'5'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
             if time <= 59858.0: # until 2022-10-06
-                obs_df.loc[i, cols] = 0.1
+                ccd_weight_arr[i,:] = 0.1
         elif stn in {'T15'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'2'}:
-                obs_df.loc[i, cols] = 1.0
-        elif stn in {'H01'}:
-            if cat in {'L', 't', 'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.3
-        elif stn in {'673'}:
-            if prog in {'1'}:
-                obs_df.loc[i, cols] = 0.3
+                ccd_weight_arr[i,:] = 1.0
+        elif stn in {'H01'} and cat in {'L', 't', 'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.3
+        elif stn in {'673'} and prog in {'1'}:
+                ccd_weight_arr[i,:] = 0.3
         elif stn in {'645'}:
-            obs_df.loc[i, cols] = 0.3
+            ccd_weight_arr[i,:] = 0.3
         elif stn in {'689'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
         elif stn in {'J04', 'Z84'}:
+            ccd_weight_arr[i,:] = 1.0
             if cat in {'U', 'V', 'W', 'X', 't', 'L', 'q', 'r', 'u', 'e'}:
-                obs_df.loc[i, cols] = 0.5
+                ccd_weight_arr[i,:] = 0.5
             if stn in {'J04'}:
                 if prog in {'2', '$'} and cat in {'t', 'q', 'U', 'V', 'W', 'X'}:
-                    obs_df.loc[i, cols] = 0.3
+                    ccd_weight_arr[i,:] = 0.3
                 elif prog in {'#'}:
-                    obs_df.loc[i, cols] = 1.0
+                    ccd_weight_arr[i,:] = 1.0
             elif stn in {'Z84'}:
                 if prog in {'1', '7'} and cat in {'U', 'V', 'W', 'X'}:
-                    obs_df.loc[i, cols] = 0.3
+                    ccd_weight_arr[i,:] = 0.3
         elif stn in {'608'}:
-            obs_df.loc[i, cols] = 0.6
+            ccd_weight_arr[i,:] = 0.6
         elif stn in {'W84'}:
-            obs_df.loc[i, cols] = 0.5
+            ccd_weight_arr[i,:] = 0.5
             if prog in {'&'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
         elif stn in {'950'}:
+            ccd_weight_arr[i,:] = 1.0
             if cat in {'U', 'V', 'W', 'X', 't', 'L', 'q', 'r', 'u', 'e'}:
-                obs_df.loc[i, cols] = 0.5
+                ccd_weight_arr[i,:] = 0.5
             if prog in {'@'}:
-                obs_df.loc[i, cols] = 1.0
+                ccd_weight_arr[i,:] = 1.0
         elif stn in {'E10'}:
-            obs_df.loc[i, cols] = 0.4
+            ccd_weight_arr[i,:] = 0.4
             if prog in {'(', '.'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
         elif stn in {'F65'}:
-            obs_df.loc[i, cols] = 0.4
+            ccd_weight_arr[i,:] = 0.4
             if prog in {'8'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
             elif prog in {'9'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
         elif stn in {'K91', 'K92', 'K93', 'Q63', 'Q64', 'V39',
                     'W85', 'W86', 'W87', 'Z24', 'Z31'}:
-            obs_df.loc[i, cols] = 0.4
+            ccd_weight_arr[i,:] = 0.4
             if prog in {'0', '3'}:
-                obs_df.loc[i, cols] = 0.3
+                ccd_weight_arr[i,:] = 0.3
         elif stn in {'V37'}:
-            obs_df.loc[i, cols] = 0.4
+            ccd_weight_arr[i,:] = 0.4
             if prog in {'0', '6'}:
-                obs_df.loc[i, cols] = 0.3
-        elif stn in {'Y28'}:
-            if cat in {'t', 'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.3
+                ccd_weight_arr[i,:] = 0.3
+        elif stn in {'Y28'} and cat in {'t', 'U', 'V', 'W', 'X'}:
+            ccd_weight_arr[i,:] = 0.3
         elif stn in {'309'}:
+            ccd_weight_arr[i,:] = 1.0
             if cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
+                ccd_weight_arr[i,:] = 0.2
                 if prog in {'&', '%'}:
-                    obs_df.loc[i, cols] = 0.1
+                    ccd_weight_arr[i,:] = 0.1
             elif cat in {'t', 'q'}:
-                obs_df.loc[i, cols] = 0.3
+                ccd_weight_arr[i,:] = 0.3
                 if prog in {'&', '%'}:
-                    obs_df.loc[i, cols] = 0.3
-        elif stn in {'G83'}:
-            if prog in {'2'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
-        elif stn in {'C65'}:
-            if prog in {'3'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
-        elif stn in {'094'}:
-            if prog in {'9'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.5
-        elif stn in {'Z18'}:
-            if prog in {'1'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.1
-        elif stn in {'181'}:
-            if prog in {'1'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.5
-        elif stn in {'D20'}:
-            if prog in {'1', '4'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.5
-        elif stn in {'G37'}:
-            if prog in {'5'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.2
-        elif stn in {'N50'}:
-            if prog in {'2'} and cat in {'U', 'V', 'W', 'X'}:
-                obs_df.loc[i, cols] = 0.3
-        elif stn in {'I41'}:
-            if prog in {'Z'}:
-                obs_df.loc[i, cols] = 1.0
-        elif stn in {'W57'}:
-            if prog in {'0', '1'}:
-                obs_df.loc[i, cols] = 0.4
+                    ccd_weight_arr[i,:] = 0.3
+        elif stn in {'G83'} and prog in {'2'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.2
+        elif stn in {'C65'} and prog in {'3'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.2
+        elif stn in {'094'} and prog in {'9'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.5
+        elif stn in {'Z18'} and prog in {'1'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.1
+        elif stn in {'181'} and prog in {'1'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.5
+        elif stn in {'D20'} and prog in {'1', '4'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.5
+        elif stn in {'G37'} and prog in {'5'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.2
+        elif stn in {'N50'} and prog in {'2'} and cat in {'U', 'V', 'W', 'X'}:
+                ccd_weight_arr[i,:] = 0.3
+        elif stn in {'I41'} and prog in {'Z'}:
+            ccd_weight_arr[i,:] = 1.0
+        elif stn in {'W57'} and prog in {'0', '1'}:
+                ccd_weight_arr[i,:] = 0.4
         elif stn in {'M28'}:
-            obs_df.loc[i, cols] = 3.0
+            ccd_weight_arr[i,:] = 3.0
         elif stn in {'247', '270'}:
-            obs_df.loc[i, cols] = 2.0
+            ccd_weight_arr[i,:] = 2.0
         else:
-            obs_df.loc[i, cols] = 1.0
+            ccd_weight_arr[i,:] = 1.0
             default_weight_counter += 1
+    # set the values in obs_df to values from ccd_weight_arr
+    obs_df.loc[group.index, cols] = ccd_weight_arr
     if verbose:
         print(f"\tUsing {len(group)-default_weight_counter} CCD",
                 "observations with station-specific weight rules.")
