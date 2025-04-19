@@ -631,6 +631,16 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         cdec0 = -66.30;
         cw0 = 0.0;
         cw1 = 712.143;
+    } else if (iauFrame == "IAU_GOLEVKA"){
+        // from https://doi.org/10.1006/icar.2000.6483
+        // from Celest Mech Dyn Astr (2005) 91: 203-215 https://doi.org/10.1007/s10569-004-3115-4
+        // BODY2006489_POLE_RA       = (  228.0       0.           0. )
+        // BODY2006489_POLE_DEC      = (   33.0       0.           0. )
+        // BODY2006489_PM            = (  000.0      59.712        0. )
+        cra0 = 228.0;
+        cdec0 = 33.0;
+        cw0 = 0.0;
+        cw1 = 59.712;
     } else {
         throw std::runtime_error("iau_to_euler: The IAU frame is not supported.");
     }
@@ -755,7 +765,7 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
         "ITRF93", "IAU_EARTH", "IAU_MOON",
         "IAU_MARS", "IAU_JUPITER", "IAU_SATURN",
         "IAU_URANUS", "IAU_NEPTUNE", "IAU_PLUTO",
-        "IAU_BENNU", "IAU_ITOKAWA"
+        "IAU_BENNU", "IAU_ITOKAWA", "IAU_GOLEVKA"
     };
     // make sure either from or to frame is J2000
     int bodyFrameIdx = -1;
