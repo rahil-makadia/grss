@@ -636,11 +636,11 @@ void iau_to_euler(const real t0_mjd, std::string iauFrame, real *euler){
         // from Celest Mech Dyn Astr (2005) 91: 203-215 https://doi.org/10.1007/s10569-004-3115-4
         // BODY2006489_POLE_RA       = (  228.0       0.           0. )
         // BODY2006489_POLE_DEC      = (   33.0       0.           0. )
-        // BODY2006489_PM            = (  000.0      59.712        0. )
+        // BODY2006489_PM            = (  000.0      59.712        0. ) THIS IS WRONG IN IAU REPORT????
         cra0 = 228.0;
         cdec0 = 33.0;
         cw0 = 0.0;
-        cw1 = 59.712;
+        cw1 = 360/6.0289 * 24; // degrees per hour -> degrees per day
     } else {
         throw std::runtime_error("iau_to_euler: The IAU frame is not supported.");
     }
