@@ -298,9 +298,9 @@ def _get_gaia_query_results(body_id, release):
     res.sort('epoch_utc')
     return res
 
-def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verbose=False):
+def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verbose=False):
     """
-    Assemble the optical observations for a given body from Gaia DR3.
+    Assemble the optical observations for a given body from Gaia FPR.
 
     Parameters
     ----------
@@ -312,7 +312,7 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
     t_max_tdb : float, optional
         Maximum time (MJD TDB) for observations to be included, by default None
     gaia_dr : str, optional
-        Gaia data release version database name, by default 'gaiadr3'
+        Gaia data release version database name, by default 'gaiafpr'
     verbose : bool, optional
         Flag to print out information about the observations, by default False
 
@@ -377,16 +377,18 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'sigRA'] = ra_sig
         obs_df.loc[idx, 'sigDec'] = dec_sig
         obs_df.loc[idx, 'sigCorr'] = corr
+        # obs_df.loc[idx, 'sigTime'] = data['epoch_err']*86400.0
         obs_df.loc[idx, 'biasRA'] = 0.0
         obs_df.loc[idx, 'biasDec'] = 0.0
         obs_df.loc[idx, 'ctr'] = ctr
         obs_df.loc[idx, 'sys'] = sys
-        obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']
-        obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']
-        obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']
-        obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']
-        obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']
-        obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']
+        tcb_tdb_fac = 1 - 1.550519768e-8
+        obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']*tcb_tdb_fac
     if verbose:
         print(f"\tFiltered to {gaia_add_counter} observations that",
                 "satisfy the time range constraints.")
@@ -889,10 +891,9 @@ def deweight_obs(obs_df, eff_obs_per_night, verbose):
     times = obs_df['obsTimeMJD'].values
     stations = obs_df['stn'].values
     weights = obs_df[['sigRA', 'sigDec']].values
+    batch_first_time = times[0]
     for i in range(1, len(obs_df)):
-        curr_jd_night = np.floor(times[i]+2400000.5)
-        prev_jd_night = np.floor(times[i-1]+2400000.5)
-        night_match = curr_jd_night == prev_jd_night
+        night_match = times[i] - batch_first_time < 8/24
         curr_observatory = stations[i]
         prev_observatory = stations[i-1]
         observatory_match = curr_observatory == prev_observatory
@@ -904,6 +905,7 @@ def deweight_obs(obs_df, eff_obs_per_night, verbose):
                 factor = night_count**0.5/eff_obs_per_night**0.5
                 weights[i-night_count:i] *= factor
             night_count = 1
+            batch_first_time = times[i]
     # edge case where last observation is part of a batch that needs deweighting
     if night_count > eff_obs_per_night:
         deweight_count += night_count
@@ -939,10 +941,9 @@ def eliminate_obs(obs_df, max_obs_per_night, verbose):
         print(f"Applying {max_obs_per_night}-observation per night elimination scheme.")
     times = obs_df['obsTimeMJD'].values
     stations = obs_df['stn'].values
+    batch_first_time = times[0]
     for i in range(1, len(obs_df)):
-        curr_jd_night = np.floor(times[i]+2400000.5)
-        prev_jd_night = np.floor(times[i-1]+2400000.5)
-        night_match = curr_jd_night == prev_jd_night
+        night_match = times[i] - batch_first_time < 8/24
         curr_observatory = stations[i]
         prev_observatory = stations[i-1]
         observatory_match = curr_observatory == prev_observatory
@@ -953,6 +954,7 @@ def eliminate_obs(obs_df, max_obs_per_night, verbose):
                 idx_to_drop.append(i)
         else:
             night_count = 1
+            batch_first_time = times[i]
     obs_df.drop(idx_to_drop, inplace=True)
     obs_df.reset_index(drop=True, inplace=True)
     if verbose:

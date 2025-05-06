@@ -43,6 +43,11 @@ class CMakeBuild(build_ext):
         os.system(f"cp {ext.sourcedir}/build/libgrss.* {self.build_lib}/grss/")
         return None
 
+# if os is windows, throw error and exit
+if os.name == "nt":
+    raise OSError("Windows is not supported.",
+                    "Please use the Windows Subsystem for if you do not have access to another OS.")
+
 setup(
     ext_modules=[CMakeExtension("libgrss")],
     cmdclass={"build_ext": CMakeBuild}
