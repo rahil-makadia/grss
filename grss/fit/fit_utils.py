@@ -92,13 +92,8 @@ def get_mpc_observatory_info():
         dictionary of observatory codes and their corresponding longitude,
         rho*cos(latitude), and rho*sin(latitude)
     """
-    fpath = f'{grss_path}/fit/codes.json'
-    with open(fpath, 'r', encoding='utf-8') as f:
-        codes = json.load(f)
-    mpc_info_dict = {}
-    for key, val in codes.items():
-        if 'Longitude' in val and 'cos' in val and 'sin' in val:
-            mpc_info_dict[key] = val['Longitude'], val['cos'], val['sin']
+    with open(f'{grss_path}/fit/codes.json', 'r', encoding='utf-8') as f:
+        mpc_info_dict = json.load(f)
     return mpc_info_dict
 
 def get_radar_codes_dict():
