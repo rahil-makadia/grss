@@ -61,7 +61,7 @@
     <link rel="prev" title="ias15.h" href="ias15.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="May 06, 2025"/>
+    <meta name="docbuild:last-update" content="May 09, 2025"/>
   </head>
   
   
@@ -493,6 +493,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv421get_interpIdxInWindowPK14PropSimulationRK4realRK4realRKbRKbRb"><code class="docutils literal notranslate"><span class="pre">get_interpIdxInWindow()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv427get_lightTime_and_xRelativeP14PropSimulationK6size_tK4realRKNSt6vectorI4realEERNSt6vectorI4realEERNSt6vectorI4realEE"><code class="docutils literal notranslate"><span class="pre">get_lightTime_and_xRelative()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv420get_lightTimeOneBodyP14PropSimulationRK6size_tK4realNSt6vectorI4realEENSt6vectorI4realEEKbR4real"><code class="docutils literal notranslate"><span class="pre">get_lightTimeOneBody()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv424apply_stellar_aberrationP14PropSimulationK6size_tRNSt6vectorI4realEE"><code class="docutils literal notranslate"><span class="pre">apply_stellar_aberration()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -650,6 +651,21 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424apply_stellar_aberrationP14PropSimulationK6size_tRNSt6vectorI4realEE">
+<span class="target" id="interpolate_8h_1a3e28b1f0c0ee47a9734e29a932d766ad"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply_stellar_aberration</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="simulation.html#_CPPv414PropSimulation" title="PropSimulation"><span class="n"><span class="pre">PropSimulation</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">propSim</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">interpIdx</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">xInterpApparent</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424apply_stellar_aberrationP14PropSimulationK6size_tRNSt6vectorI4realEE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Apply stellar aberration correction to the apparent position of the target body. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>propSim</strong> – <strong>[in]</strong> <a class="reference internal" href="simulation.html#classPropSimulation"><span class="std std-ref">PropSimulation</span></a> object for the integration. </p></li>
+<li><p><strong>interpIdx</strong> – <strong>[in]</strong> Index of the next interpolation time. </p></li>
+<li><p><strong>xInterpApparent</strong> – <strong>[inout]</strong> Apparent state vector of the target body. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </section>
 
@@ -706,6 +722,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv421get_interpIdxInWindowPK14PropSimulationRK4realRK4realRKbRKbRb"><code class="docutils literal notranslate"><span class="pre">get_interpIdxInWindow()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv427get_lightTime_and_xRelativeP14PropSimulationK6size_tK4realRKNSt6vectorI4realEERNSt6vectorI4realEERNSt6vectorI4realEE"><code class="docutils literal notranslate"><span class="pre">get_lightTime_and_xRelative()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv420get_lightTimeOneBodyP14PropSimulationRK6size_tK4realNSt6vectorI4realEENSt6vectorI4realEEKbR4real"><code class="docutils literal notranslate"><span class="pre">get_lightTimeOneBody()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv424apply_stellar_aberrationP14PropSimulationK6size_tRNSt6vectorI4realEE"><code class="docutils literal notranslate"><span class="pre">apply_stellar_aberration()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -739,7 +756,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on May 06, 2025.
+  Last updated on May 09, 2025.
   <br/>
 </p>
   </div>
