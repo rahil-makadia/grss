@@ -93,4 +93,11 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                           std::vector<real> xObserver,
                           const bool bouncePointAtCenterOfMass, real &lightTimeOneBody);
 
+/**
+ * @brief Apply stellar aberration correction to the apparent position of the target
+ * body.
+ */
+void apply_stellar_aberration(PropSimulation *propSim, const size_t interpIdx,
+                             std::vector<real> &xInterpApparent);
+
 #endif

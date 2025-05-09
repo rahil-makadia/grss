@@ -195,6 +195,11 @@ void interpolate_on_the_fly(PropSimulation *propSim, const real &t, const real &
             propSim->lightTimeEval.push_back(lightTime);
             propSim->xIntegEval.push_back(xInterpApparent);
             if (propSim->evalMeasurements) {
+                // // THIS IS NOT NECESSARY, IT WAS ADDED FOR TESTING
+                // if (propSim->obsType[interpIdx] == 3) {  // gaia
+                //     // check stellar aberration necessity for gaia
+                //     apply_stellar_aberration(propSim, interpIdx, xInterpApparent);
+                // }
                 get_measurement(propSim, interpIdx, tInterpGeom, xInterpGeom,
                                 xInterpApparent);
             }
@@ -381,5 +386,84 @@ void get_lightTimeOneBody(PropSimulation *propSim, const size_t &i,
                 << ", change from previous iteration was "
                 << fabs(lightTimeOneBody - lightTimeOneBodyPrev) << std::endl;
         }
+    }
+}
+
+/**
+ * @param[in] propSim PropSimulation object for the integration.
+ * @param[in] interpIdx Index of the next interpolation time.
+ * @param[inout] xInterpApparent Apparent state vector of the target body.
+ */
+void apply_stellar_aberration(PropSimulation *propSim, const size_t interpIdx,
+                              std::vector<real> &xInterpApparent) {
+    // ref: https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/abcorr.html#If%20correction%20for%20stellar%20aberration%20is%20requested
+    const std::vector<real> xObserver = propSim->xObserver[interpIdx];
+    const std::vector<real> velObserver = {xObserver[3], xObserver[4], xObserver[5]};
+    real vObserver;
+    vnorm(velObserver, vObserver);
+
+    size_t starti = 0;
+    for (size_t i = 0; i < propSim->integParams.nInteg; i++) {
+        // // START LOGGING to compare with SPICE zzstelab.f
+        // std::cout.precision(16);
+        // std::cout << 
+        // "VOBS(1) = " << velObserver[0] << std::endl <<
+        // "VOBS(2) = " << velObserver[1] << std::endl <<
+        // "VOBS(3) = " << velObserver[2] << std::endl << std::endl <<
+        // "STARG(1) = " << xInterpApparent[starti] << std::endl <<
+        // "STARG(2) = " << xInterpApparent[starti+1] << std::endl <<
+        // "STARG(3) = " << xInterpApparent[starti+2] << std::endl <<
+        // "STARG(4) = " << xInterpApparent[starti+3] << std::endl <<
+        // "STARG(5) = " << xInterpApparent[starti+4] << std::endl <<
+        // "STARG(6) = " << xInterpApparent[starti+5] << std::endl << std::endl;
+        const std::vector<real> posApparent = {xInterpApparent[starti],
+                                                xInterpApparent[starti+1],
+                                                xInterpApparent[starti+2]};
+        real rApparent;
+        vnorm(posApparent, rApparent);
+        std::vector<real> posApparentHat(3, 0.0);
+        vunit(posApparent, posApparentHat);
+        real velObserverDotPosApparentHat;
+        vdot(velObserver, posApparentHat, velObserverDotPosApparentHat);
+        std::vector<real> vp(3, 0.0);
+        for (size_t j = 0; j < 3; j++) {
+            vp[j] = velObserver[j] - velObserverDotPosApparentHat * posApparentHat[j];
+        }
+        real vpNorm;
+        vnorm(vp, vpNorm);
+        const real sinPhi = vpNorm / propSim->consts.clight;
+        const real cosPhi = fmax(0.0, sqrt(1.0 - sinPhi*sinPhi));
+        // // for testing whether i'm doing the rotation in the wrong direction (I wasn't)
+        // const real phi = asin(vpNorm / propSim->consts.clight);
+        // const real sinPhi = sin(phi);
+        // const real cosPhi = cos(phi);
+        std::vector<real> vpHat(3, 0.0);
+        vunit(vp, vpHat);
+        for (size_t j = 0; j < 3; j++) {
+            xInterpApparent[starti+j] = rApparent * (sinPhi * vpHat[j] +
+                                                cosPhi * posApparentHat[j]);
+        }
+        // std::cout << "VP(1) = " << vp[0] << std::endl <<
+        //     "VP(2) = " << vp[1] << std::endl <<
+        //     "VP(3) = " << vp[2] << std::endl <<
+        //     "VPMAG = " << vpNorm << std::endl <<
+        //     "PTGMAG = " << rApparent << std::endl <<
+        //     "VPHAT(1) = " << vpHat[0] << std::endl <<
+        //     "VPHAT(2) = " << vpHat[1] << std::endl <<
+        //     "VPHAT(3) = " << vpHat[2] << std::endl <<
+        //     "RHAT(1) = " << posApparentHat[0] << std::endl <<
+        //     "RHAT(2) = " << posApparentHat[1] << std::endl <<
+        //     "RHAT(3) = " << posApparentHat[2] << std::endl <<
+        //     "C = " << cosPhi << std::endl <<
+        //     "S = " << sinPhi << std::endl <<
+        //     "STARG(1) = " << xInterpApparent[starti] << std::endl <<
+        //     "STARG(2) = " << xInterpApparent[starti+1] << std::endl <<
+        //     "STARG(3) = " << xInterpApparent[starti+2] << std::endl <<
+        //     "STARG(4) = " << xInterpApparent[starti+3] << std::endl <<
+        //     "STARG(5) = " << xInterpApparent[starti+4] << std::endl <<
+        //     "STARG(6) = " << xInterpApparent[starti+5] << std::endl << std::endl;
+        // throw std::runtime_error(
+        //     "apply_stellar_aberration: Not implemented yet");
+        starti += 2*propSim->integBodies[i].n2Derivs;
     }
 }
