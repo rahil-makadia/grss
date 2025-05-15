@@ -67,8 +67,6 @@ def _ades_mode_check(df):
     if not df['mode'].isin(valid_modes).all():
         raise ValueError(f"Invalid mode in the data: {df['mode'].unique()}.\n"
                         f"Acceptable modes are {valid_modes}.")
-    if df['mode'].isin(['UNK']).any():
-        print("\tWARNING: At least one unknown observation mode in the data.")
     return None
 
 def _ades_ast_cat_check(df):
@@ -102,8 +100,6 @@ def _ades_ast_cat_check(df):
         'ACRS', 'LickGas', 'Ida93', 'Perth70', 'COSMOS',
         'Yale', 'ZZCAT', 'IHW', 'GZ', 'UNK']
     df_cats = df['astCat']
-    if df_cats.isin(deprecated_cats).any():
-        print("\tWARNING: At least one deprecated star catalog in the data.")
     if not df_cats.isin(valid_cats).all():
         invalid_cats = np.setdiff1d(df_cats.unique(), valid_cats)
         print("\tWARNING: At least one unrecognized astCat in the data. "
@@ -1006,7 +1002,7 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     """
     if eliminate and deweight:
         raise ValueError('Cannot deweight and eliminate observations at the same time.')
-    if not eliminate and not deweight:
+    if not eliminate and not deweight and verbose:
         print("WARNING: No deweighting or elimination scheme applied",
                 "for observations during the same night.")
     obs_df = create_optical_obs_df(body_id, optical_obs_file,
@@ -1014,8 +1010,9 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     if debias_lowres is not None:
         obs_df = apply_debiasing_scheme(obs_df, debias_lowres, verbose)
     else:
-        print("WARNING: No debiasing scheme applied to the observations.",
-                "Setting biases to zero.")
+        if verbose:
+            print("WARNING: No debiasing scheme applied to the observations.",
+                    "Setting biases to zero.")
         opt_idx = obs_df.query("mode != 'RAD'").index
         obs_df.loc[opt_idx, ['biasRA', 'biasDec']] = 0.0
     if not accept_weights:

@@ -29,9 +29,9 @@ def _handle_one_cloned_sim(sol, ref_nongrav):
     """
     mass = sol.get('mass', 0.0)
     radius = sol.get('radius', 0.0)
-    a1 = sol['a1'] if ref_nongrav.a1Est else ref_nongrav.a1
-    a2 = sol['a2'] if ref_nongrav.a2Est else ref_nongrav.a2
-    a3 = sol['a3'] if ref_nongrav.a3Est else ref_nongrav.a3
+    a1 = sol.get('a1', ref_nongrav.a1)
+    a2 = sol.get('a2', ref_nongrav.a2)
+    a3 = sol.get('a3', ref_nongrav.a3)
     alpha = ref_nongrav.alpha
     k = ref_nongrav.k
     m = ref_nongrav.m
