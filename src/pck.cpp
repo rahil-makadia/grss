@@ -272,6 +272,11 @@ void pck_calc(PckInfo *bpc, real epoch, int spiceId, real *rotMat,
     euler[4] = (real)angleDot[1];
     euler[5] = (real)angleDot[0];
 
+    if (spiceId == 31008){
+        // Moon PA frame is stored relative to J2000 already
+        euler313_to_rotMat(euler, rotMat, rotMatDot);
+        return;
+    }
     real rotMatEclip[3][3], rotMatEclipDot[3][3];
     euler313_to_rotMat(euler, *rotMatEclip, *rotMatEclipDot);
     // We have ecliptic to body rotation matrix and its derivative
@@ -762,7 +767,8 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
     std::vector<std::string> fromTo = {from, to};
     std::vector<std::string> validBodyFrames = {
         "IAU_SUN", "IAU_MERCURY", "IAU_VENUS",
-        "ITRF93", "IAU_EARTH", "IAU_MOON",
+        "ITRF93", "IAU_EARTH",
+        "MOON_PA_DE440", "MOON_ME_DE440_ME421", "IAU_MOON",
         "IAU_MARS", "IAU_JUPITER", "IAU_SATURN",
         "IAU_URANUS", "IAU_NEPTUNE", "IAU_PLUTO",
         "IAU_BENNU", "IAU_ITOKAWA", "IAU_GOLEVKA"
@@ -793,18 +799,34 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
         iau_to_euler(t0_mjd, fromTo[bodyFrameIdx], euler);
         euler313_to_rotMat(euler, *rotMat, *rotMatDot);
     } else {
-        if (ephem.histPck == nullptr || ephem.latestPck == nullptr || ephem.predictPck == nullptr){
-        throw std::invalid_argument(
-            "get_pck_rotMat: PCK kernels are not loaded. Memory map "
-            "the ephemeris using PropSimulation.map_ephemeris() method first.");
+        if (ephem.histPck == nullptr || ephem.latestPck == nullptr ||
+            ephem.predictPck == nullptr || ephem.moonPck == nullptr){
+            throw std::invalid_argument(
+                "get_pck_rotMat: PCK kernels are not loaded. Memory map "
+                "the ephemeris using PropSimulation.map_ephemeris() method first.");
+        }
+        int BinaryFrameSpiceId;
+        if (fromTo[bodyFrameIdx] == "ITRF93"){
+            BinaryFrameSpiceId = 3000;
+            if (t0_mjd < ephem.histPck->targets[0].beg || t0_mjd > ephem.predictPck->targets[0].end){
+                throw std::runtime_error("get_pck_rotMat: The epoch is outside the range of the binary PCK files.");
+            }
+        } else if (fromTo[bodyFrameIdx].substr(0, 5) == "MOON_"){
+            BinaryFrameSpiceId = 31008;
+            if (t0_mjd < ephem.moonPck->targets[0].beg || t0_mjd > ephem.moonPck->targets[0].end){
+                throw std::runtime_error("get_pck_rotMat: The epoch is outside the range of the binary PCK files.");
+            }
+        } else {
+            throw std::runtime_error("get_pck_rotMat: The binary body frame is not recognized.");
         }
         // pick the correct PCK file memory map based on the epoch
         PckInfo *bpc;
-        if (t0_mjd < ephem.histPck->targets[0].beg || t0_mjd > ephem.predictPck->targets[0].end){
-            throw std::runtime_error("get_pck_rotMat: The epoch is outside the range of the binary PCK files.");
-        }
         const real tSwitchMargin = 0.1;
-        if (t0_mjd <= ephem.histPck->targets[0].end-tSwitchMargin){
+        if (fromTo[bodyFrameIdx].substr(0, 5) == "MOON_"){
+            bpc = ephem.moonPck;
+            // std::cout << "Using moonPck" << std::endl;
+        }
+        else if (t0_mjd <= ephem.histPck->targets[0].end-tSwitchMargin){
             bpc = ephem.histPck;
             // std::cout << "Using histPck" << std::endl;
         } else if (t0_mjd <= ephem.latestPck->targets[0].end-tSwitchMargin){
@@ -814,13 +836,25 @@ void get_pck_rotMat(const std::string &from, const std::string &to,
             bpc = ephem.predictPck;
             // std::cout << "Using predictPck" << std::endl;
         }
-        int BinaryFrameSpiceId;
-        if (fromTo[bodyFrameIdx] == "ITRF93"){
-            BinaryFrameSpiceId = 3000;
-        } else {
-            throw std::runtime_error("get_pck_rotMat: The binary body frame is not recognized.");
-        }
         pck_calc(bpc, t0_mjd, BinaryFrameSpiceId, *rotMat, *rotMatDot);
+        if (fromTo[bodyFrameIdx] == "MOON_ME_DE440_ME421"){
+            real rotMatCopy[3][3];
+            real rotMatDotCopy[3][3];
+            for (int i = 0; i < 3; i++){
+                for (int j = 0; j < 3; j++){
+                    rotMatCopy[i][j] = rotMat[i][j];
+                    rotMatDotCopy[i][j] = rotMatDot[i][j];
+                }
+            }
+            // from https://doi.org/10.3847/1538-3881/abd414, eqn. 19
+            const real pa_to_me[3][3] = {
+                {9.9999987311387650e-01 , -3.2895865791419379e-04 ,  3.8152120821145725e-04},
+                {3.2895919698748533e-04 ,  9.9999994589201047e-01 , -1.3502060036227025e-06},
+                {-3.8152074340615683e-04,   1.4757107425872328e-06 ,  9.9999992721986974e-01}
+            };
+            mat3_mat3_mul(*pa_to_me, *rotMatCopy, *rotMat);
+            mat3_mat3_mul(*pa_to_me, *rotMatDotCopy, *rotMatDot);
+        }
     }
     // Okay, assemble the state rotation matrix
     if (bodyToInertial){

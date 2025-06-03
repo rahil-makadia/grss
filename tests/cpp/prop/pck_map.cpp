@@ -21,30 +21,66 @@ int main(){
         << std::endl;
     std::cout.precision(8);
     SpiceDouble mjd = dis(gen);
-    std::string from = "ITRF93";
+    std::string from = "MOON_ME_DE440_ME421";
     std::string to = "J2000";
+    if (from.substr(0,5) == "MOON_" || to.substr(0,5) == "MOON_"){
+        std::uniform_real_distribution<> dis(-112816.0L, 288976.0L);
+        mjd = dis(gen);
+    }
     std::string pck_text = "../../../grss/kernels/pck00011.tpc";
     std::string pck_hist = "../../../grss/kernels/earth_historic.bpc";
     std::string pck_latest = "../../../grss/kernels/earth_latest.bpc";
     std::string pck_predict = "../../../grss/kernels/earth_predict.bpc";
+    std::string pck_moon = "../../../grss/kernels/moon_pa_de440.bpc";
 
     //////////// GRSS ////////////
     PckEphemeris pckEphem;
     pckEphem.histPckPath = pck_hist;
     pckEphem.latestPckPath = pck_latest;
     pckEphem.predictPckPath = pck_predict;
+    pckEphem.moonPckPath = pck_moon;
     pckEphem.histPck = pck_init(pck_hist);
     pckEphem.latestPck = pck_init(pck_latest);
     pckEphem.predictPck = pck_init(pck_predict);
+    pckEphem.moonPck = pck_init(pck_moon);
     std::vector<std::vector<real>> mapMat(6, std::vector<real>(6, 0.0));
     get_pck_rotMat(from, to, mjd, pckEphem, mapMat);
     pck_free(pckEphem.histPck);
     pck_free(pckEphem.latestPck);
     pck_free(pckEphem.predictPck);
+    pck_free(pckEphem.moonPck);
 
     //////////// SPICE ////////////
+    // following variable defined from https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/a_old_versions/moon_de440_220930.tf
+    SpiceInt center = 301;
+    SpiceInt frclass = 2;
+    SpiceInt frclsid = 31008;
+    SpiceInt frcode = 31008;
+    pipool_c("FRAME_MOON_PA_DE440", 1, &frcode);
+    pcpool_c("FRAME_31008_NAME", 1, 14, "MOON_PA_DE440");
+    pipool_c("FRAME_31008_CLASS", 1, &frclass);
+    pipool_c("FRAME_31008_CLASS_ID", 1, &frclsid);
+    pipool_c("FRAME_31008_CENTER", 1, &center);
+    center = 301;
+    frclass = 4;
+    frclsid = 31009;
+    frcode = 31009;
+    pipool_c("FRAME_MOON_ME_DE440_ME421", 1, &frcode);
+    pcpool_c("FRAME_31009_NAME", 1, 20, "MOON_ME_DE440_ME421");
+    pipool_c("FRAME_31009_CLASS", 1, &frclass);
+    pipool_c("FRAME_31009_CLASS_ID", 1, &frclsid);
+    pipool_c("FRAME_31009_CENTER", 1, &center);
+    pcpool_c("TKFRAME_31009_SPEC", 1, 6, "ANGLES");
+    pcpool_c("TKFRAME_31009_RELATIVE", 1, 14, "MOON_PA_DE440");
+    pcpool_c("TKFRAME_31009_UNITS", 1, 11, "ARCSECONDS");
+    SpiceDouble angles[3] = {67.8526, 78.6944, 0.2785};
+    SpiceInt axes[3] = {3, 2, 1};
+    pipool_c("TKFRAME_31009_AXES", 3, axes);
+    pdpool_c("TKFRAME_31009_ANGLES", 3, angles);
+
     // the kernel furninshing order matters, don't mess with it
     furnsh_c(pck_text.c_str());
+    furnsh_c(pck_moon.c_str());
     furnsh_c(pck_predict.c_str());
     furnsh_c(pck_latest.c_str());
     furnsh_c(pck_hist.c_str());

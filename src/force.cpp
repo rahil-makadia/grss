@@ -45,7 +45,9 @@ static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accI
 /**
  * @brief Compute the acceleration of the system due to the J2 zonal harmonic.
  */
-static void force_J2(const real &t, PropSimulation *propSim,
+// static void force_J2(const real &t, PropSimulation *propSim,
+//               std::vector<real> &accInteg, STMParameters* allSTMs);
+static void force_J2(PropSimulation *propSim,
               std::vector<real> &accInteg, STMParameters* allSTMs);
 
 /**
@@ -145,7 +147,8 @@ void get_state_der(PropSimulation *propSim, const real &t,
     force_newton(propSim, accInteg, allSTMs);
     // force_ppn_simple(propSim, accInteg, allSTMs);
     force_ppn_eih(propSim, accInteg, allSTMs);
-    force_J2(t, propSim, accInteg, allSTMs);
+    // force_J2(t, propSim, accInteg, allSTMs);
+    force_J2(propSim, accInteg, allSTMs);
     force_harmonics(propSim, accInteg);
     force_nongrav(propSim, accInteg, allSTMs);
     force_thruster(propSim, accInteg);
@@ -467,12 +470,14 @@ static void force_ppn_eih(const PropSimulation *propSim, std::vector<real> &accI
 }
 
 /**
- * @param[in] t Time [TDB MJD].
+ * param[in] t Time [TDB MJD]. // add this back in if this subroutine is modified
  * @param[in] propSim PropSimulation object.
  * @param[inout] accInteg State derivative vector.
  * @param[in] allSTMs STMParameters vector for IntegBodies in the simulation.
  */
-static void force_J2(const real &t, PropSimulation *propSim, std::vector<real> &accInteg,
+// static void force_J2(const real &t, PropSimulation *propSim, std::vector<real> &accInteg,
+//               STMParameters* allSTMs) {
+static void force_J2(PropSimulation *propSim, std::vector<real> &accInteg,
               STMParameters* allSTMs) {
 #ifdef PRINT_FORCES
     std::ofstream forceFile;

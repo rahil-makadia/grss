@@ -283,7 +283,8 @@ def _get_gaia_query_results(body_id, release):
         + "ra_error_systematic,dec_error_systematic,ra_dec_correlation_systematic,"
         + "ra_error_random,dec_error_random,ra_dec_correlation_random,"
         + "x_gaia_geocentric,y_gaia_geocentric,z_gaia_geocentric,"
-        + "vx_gaia_geocentric,vy_gaia_geocentric,vz_gaia_geocentric"
+        + "vx_gaia_geocentric,vy_gaia_geocentric,vz_gaia_geocentric,"
+        + "astrometric_outcome_ccd, astrometric_outcome_transit"
         + f" FROM {release}.{table} {match_str} ORDER BY epoch_utc ASC"
     )
     job = Gaia.launch_job_async(query, dump_to_file=False,background=True)
@@ -335,6 +336,10 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verb
     curr_transit = int(-1e6)
     gaia_add_counter = 0
     for i, data in enumerate(res):
+        # # print(data["astrometric_outcome_ccd"], data["astrometric_outcome_transit"])
+        # # print(type(data["astrometric_outcome_ccd"]), type(data["astrometric_outcome_transit"]))
+        # if data['astrometric_outcome_ccd'] != 1 or data['astrometric_outcome_transit'] != 1:
+        #     continue
         if curr_transit != data['transit_id']:
             curr_transit = data['transit_id']
             transit_count = 1
@@ -382,9 +387,18 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verb
         obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']*tcb_tdb_fac
         obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']*tcb_tdb_fac
         obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']*tcb_tdb_fac
-        obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']*tcb_tdb_fac
-        obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']*tcb_tdb_fac
-        obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']*tcb_tdb_fac
+        # obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']*tcb_tdb_fac
+        # obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']*tcb_tdb_fac
+        # obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']*tcb_tdb_fac
+        # # add some position uncertainty (testing)
+        # au2km = 149597870.7
+        # pos_sig = 1.0/au2km
+        # obs_df.loc[idx, 'posCov11'] = pos_sig**2
+        # obs_df.loc[idx, 'posCov12'] = 0.0
+        # obs_df.loc[idx, 'posCov13'] = 0.0
+        # obs_df.loc[idx, 'posCov22'] = pos_sig**2
+        # obs_df.loc[idx, 'posCov23'] = 0.0
+        # obs_df.loc[idx, 'posCov33'] = pos_sig**2
     if verbose:
         print(f"\tFiltered to {gaia_add_counter} observations that",
                 "satisfy the time range constraints.")

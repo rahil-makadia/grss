@@ -24,7 +24,7 @@ def _download_codes_file():
     """
     Download the observatory codes file from the Minor Planet Center.
     """
-    print("Downloading observatory codes file from the MPC...")
+    print("Updating observatory codes from the MPC...")
     url = "https://data.minorplanetcenter.net/api/obscodes"
     response = requests.get(url, json={}, timeout=30)
     if not response.ok:
