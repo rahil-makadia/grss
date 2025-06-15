@@ -828,9 +828,6 @@ def plot_earth_impact(impact_list, print_ellipse_params=False, sigma_points=None
             raise ValueError("Not all impactParameters objects supplied in list impact Earth")
 
     lon = np.array([impact.lon for impact in impact_list])*180.0/np.pi
-    # check if the longitude needs to be shifted to [-180, 180]
-    if np.any(lon > 180):
-        lon[lon > 180] -= 360
     lat = np.array([impact.lat for impact in impact_list])*180.0/np.pi
 
     impact_mean, impact_ell = data_to_ellipse(lon, lat, n_std=3.0, bplane_type='Impact',
