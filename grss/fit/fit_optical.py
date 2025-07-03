@@ -214,11 +214,24 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
         t_min_tdb = -np.inf
     if t_max_tdb is None:
         t_max_tdb = np.inf
-    psv_df = pd.read_csv(psv_obs_file, sep='|', skipinitialspace=True)
+    # read file and skip header rows starting with '#' or '!'
+    skip_count = 0
+    with open(psv_obs_file, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith('#') or line.startswith('!'):
+                skip_count += 1
+            else:
+                break
+    psv_df = pd.read_csv(psv_obs_file, sep='|', skipinitialspace=True, skiprows=skip_count)
     psv_df.columns = psv_df.columns.str.strip()
     psv_df = psv_df[[col for col in psv_df.columns if col in ades_column_types]]
     psv_column_types = {col: ades_column_types[col] for col in psv_df.columns}
     psv_df = psv_df.astype(psv_column_types)
+    psv_df['permID'] = obs_df.iloc[-1]['permID']
+    psv_df['provID'] = obs_df.iloc[-1]['provID']
+    # strip every entry in a column of leading and trailing whitespace
+    psv_df = psv_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     occ_idx = psv_df.query("mode == 'OCC'").index
     if len(occ_idx) > 0:
         psv_df.loc[occ_idx,'dec'] = psv_df.loc[occ_idx,'decStar']
@@ -234,7 +247,10 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
     psv_df['cosDec'] = np.cos(psv_df['dec']*np.pi/180)
     psv_df['sigRA'] = psv_df['rmsRA']
     psv_df['sigDec'] = psv_df['rmsDec']
-    psv_df['sigCorr'] = psv_df['rmsCorr']
+    if 'rmsCorr' not in psv_df:
+        psv_df['sigCorr'] = 0.0
+    if 'rmsTime' not in psv_df:
+        psv_df['sigTime'] = 1.0
     times = Time(psv_df['obsTime'].to_list(), format='isot', scale='utc')
     psv_df['obsTimeMJD'] = times.utc.mjd
     psv_df['obsTimeMJDTDB'] = times.tdb.mjd
