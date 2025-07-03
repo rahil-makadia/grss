@@ -92,13 +92,8 @@ def get_mpc_observatory_info():
         dictionary of observatory codes and their corresponding longitude,
         rho*cos(latitude), and rho*sin(latitude)
     """
-    fpath = f'{grss_path}/fit/codes.json'
-    with open(fpath, 'r', encoding='utf-8') as f:
-        codes = json.load(f)
-    mpc_info_dict = {}
-    for key, val in codes.items():
-        if 'Longitude' in val and 'cos' in val and 'sin' in val:
-            mpc_info_dict[key] = val['Longitude'], val['cos'], val['sin']
+    with open(f'{grss_path}/fit/codes.json', 'r', encoding='utf-8') as f:
+        mpc_info_dict = json.load(f)
     return mpc_info_dict
 
 def get_radar_codes_dict():
@@ -287,7 +282,9 @@ def get_sbdb_elems(tdes, cov_elems=True):
         print("get_radar_obs_array: ERROR. ", response.status_code, response.content)
         raise ValueError("Failed to get JPL orbit data")
     raw_data = get_sbdb_raw_data(tdes)
-    if cov_elems:
+    # check that covariance exists
+    cov_exists = raw_data['orbit']['covariance'] is not None
+    if cov_elems and cov_exists:
         # epoch of orbital elements at reference time [JD -> MJD]
         epoch_mjd = float(raw_data['orbit']['covariance']['epoch']) - 2400000.5
         # cometary elements at epoch_mjd
@@ -345,11 +342,16 @@ def get_sbdb_info(tdes):
     # cometary elements corresponding to the covariance on JPL SBDB
     elements = get_sbdb_elems(tdes, cov_elems=True)
     # covariance matrix for cometary orbital elements
-    cov_keys = raw_data['orbit']['covariance']['labels']
-    cov_mat = (np.array(raw_data['orbit']['covariance']['data'])).astype(float)
-    # convert covariance matrix angle blocks from degrees to radians
-    cov_mat[3:6, :] *= np.pi/180
-    cov_mat[:, 3:6] *= np.pi/180
+    cov_exists = raw_data['orbit']['covariance'] is not None
+    cov_keys = raw_data['orbit']['covariance']['labels'] if cov_exists else []
+    if cov_exists:
+        cov_mat = (np.array(raw_data['orbit']['covariance']['data'])).astype(float)
+        # convert covariance matrix angle blocks from degrees to radians
+        cov_mat[3:6, :] *= np.pi/180
+        cov_mat[:, 3:6] *= np.pi/180
+    else:
+        print(f"WARNING: No covariance data available for {tdes}")
+        cov_mat = np.zeros((6, 6))
     # nongravitatinoal constants for target body
     nongrav_data = raw_data['orbit']['model_pars']
     hdr = [param['name'] for param in nongrav_data]

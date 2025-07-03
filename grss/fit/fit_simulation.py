@@ -1366,14 +1366,24 @@ class FitSimulation:
         sig_ra_vals = self.obs.sigRA.values
         sig_dec_vals = self.obs.sigDec.values
         sig_corr_vals = self.obs.sigCorr.values
+        sys_vals = self.obs.sys.values
+        p11_vals = self.obs.posCov11.values
+        p12_vals = self.obs.posCov12.values
+        p13_vals = self.obs.posCov13.values
+        p22_vals = self.obs.posCov22.values
+        p23_vals = self.obs.posCov23.values
+        p33_vals = self.obs.posCov33.values
         if self.past_obs_exist and self.future_obs_exist:
             optical_obs_dot = prop_sim_past.opticalObsDot + prop_sim_future.opticalObsDot
+            optical_obs_partials = prop_sim_past.opticalPartials + prop_sim_future.opticalPartials
             state_eval = prop_sim_past.xIntegEval + prop_sim_future.xIntegEval
         elif self.past_obs_exist:
             optical_obs_dot = prop_sim_past.opticalObsDot
+            optical_obs_partials = prop_sim_past.opticalPartials
             state_eval = prop_sim_past.xIntegEval
         elif self.future_obs_exist:
             optical_obs_dot = prop_sim_future.opticalObsDot
+            optical_obs_partials = prop_sim_future.opticalPartials
             state_eval = prop_sim_future.xIntegEval
         computed_obs_dot = np.array(optical_obs_dot)[:,0:2]
         computed_obs_dot[:, 0] *= self.obs.cosDec.values
@@ -1399,6 +1409,7 @@ class FitSimulation:
                 cov = np.array([[sig_ra**2, off_diag],
                                 [off_diag, sig_dec**2]])
                 time_uncert = sig_times[i]
+                # apply time uncertainties to the optical observations
                 if time_uncert != 0.0 and stations[i] not in no_time_uncert:
                     ra_dot_cos_dec = computed_obs_dot[i, 0]
                     dec_dot = computed_obs_dot[i, 1]
@@ -1407,10 +1418,28 @@ class FitSimulation:
                                         [off_diag_time, dec_dot**2]])*(time_uncert/86400)**2
                     cov += cov_time
                     sig_times[i] = time_uncert
+                # apply Gaia astrometric handling
                 if radius_nonzero and stations[i] == '258':
                     cov_fac = np.array([[fac[i], 0.0],
                                         [0.0, fac[i]]])
                     cov += cov_fac
+                # apply station position uncertainties
+                if np.isfinite(p11_vals[i]):
+                    cov_stn_pos = np.array([
+                        [p11_vals[i], p12_vals[i], p13_vals[i]],
+                        [p12_vals[i], p22_vals[i], p23_vals[i]],
+                        [p13_vals[i], p23_vals[i], p33_vals[i]]])
+                    # make sure all cov values are finite
+                    if not np.isfinite(cov_stn_pos).all():
+                        raise ValueError("Station position covariance matrix is not finite.")
+                    if sys_vals[i] not in {'ICRF_AU', 'ICRF_KM'}:
+                        raise ValueError("Station position covariance matrix system not defined/recognized.")
+                    conv = 1 if sys_vals[i] == 'ICRF_AU' else 1/1.495978707e8
+                    cov_stn_pos *= conv**2
+                    partials = np.array(optical_obs_partials[i]).reshape(2, 6)[:, :3]
+                    partials[0, :] *= self.obs.cosDec.values[i]
+                    cov_stn_unc = partials @ cov_stn_pos @ partials.T
+                    cov += cov_stn_unc
                 det = cov[0, 0]*cov[1, 1] - cov[0, 1]*cov[1, 0]
                 inv = np.array([[cov[1, 1], -cov[0, 1]],
                                 [-cov[1, 0], cov[0, 0]]])/det

@@ -67,8 +67,6 @@ def _ades_mode_check(df):
     if not df['mode'].isin(valid_modes).all():
         raise ValueError(f"Invalid mode in the data: {df['mode'].unique()}.\n"
                         f"Acceptable modes are {valid_modes}.")
-    if df['mode'].isin(['UNK']).any():
-        print("\tWARNING: At least one unknown observation mode in the data.")
     return None
 
 def _ades_ast_cat_check(df):
@@ -102,8 +100,6 @@ def _ades_ast_cat_check(df):
         'ACRS', 'LickGas', 'Ida93', 'Perth70', 'COSMOS',
         'Yale', 'ZZCAT', 'IHW', 'GZ', 'UNK']
     df_cats = df['astCat']
-    if df_cats.isin(deprecated_cats).any():
-        print("\tWARNING: At least one deprecated star catalog in the data.")
     if not df_cats.isin(valid_cats).all():
         invalid_cats = np.setdiff1d(df_cats.unique(), valid_cats)
         print("\tWARNING: At least one unrecognized astCat in the data. "
@@ -218,11 +214,24 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
         t_min_tdb = -np.inf
     if t_max_tdb is None:
         t_max_tdb = np.inf
-    psv_df = pd.read_csv(psv_obs_file, sep='|', skipinitialspace=True)
+    # read file and skip header rows starting with '#' or '!'
+    skip_count = 0
+    with open(psv_obs_file, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith('#') or line.startswith('!'):
+                skip_count += 1
+            else:
+                break
+    psv_df = pd.read_csv(psv_obs_file, sep='|', skipinitialspace=True, skiprows=skip_count)
     psv_df.columns = psv_df.columns.str.strip()
     psv_df = psv_df[[col for col in psv_df.columns if col in ades_column_types]]
     psv_column_types = {col: ades_column_types[col] for col in psv_df.columns}
     psv_df = psv_df.astype(psv_column_types)
+    psv_df['permID'] = obs_df.iloc[-1]['permID']
+    psv_df['provID'] = obs_df.iloc[-1]['provID']
+    # strip every entry in a column of leading and trailing whitespace
+    psv_df = psv_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     occ_idx = psv_df.query("mode == 'OCC'").index
     if len(occ_idx) > 0:
         psv_df.loc[occ_idx,'dec'] = psv_df.loc[occ_idx,'decStar']
@@ -238,7 +247,10 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
     psv_df['cosDec'] = np.cos(psv_df['dec']*np.pi/180)
     psv_df['sigRA'] = psv_df['rmsRA']
     psv_df['sigDec'] = psv_df['rmsDec']
-    psv_df['sigCorr'] = psv_df['rmsCorr']
+    if 'rmsCorr' not in psv_df:
+        psv_df['sigCorr'] = 0.0
+    if 'rmsTime' not in psv_df:
+        psv_df['sigTime'] = 1.0
     times = Time(psv_df['obsTime'].to_list(), format='isot', scale='utc')
     psv_df['obsTimeMJD'] = times.utc.mjd
     psv_df['obsTimeMJDTDB'] = times.tdb.mjd
@@ -287,7 +299,8 @@ def _get_gaia_query_results(body_id, release):
         + "ra_error_systematic,dec_error_systematic,ra_dec_correlation_systematic,"
         + "ra_error_random,dec_error_random,ra_dec_correlation_random,"
         + "x_gaia_geocentric,y_gaia_geocentric,z_gaia_geocentric,"
-        + "vx_gaia_geocentric,vy_gaia_geocentric,vz_gaia_geocentric"
+        + "vx_gaia_geocentric,vy_gaia_geocentric,vz_gaia_geocentric,"
+        + "astrometric_outcome_ccd, astrometric_outcome_transit"
         + f" FROM {release}.{table} {match_str} ORDER BY epoch_utc ASC"
     )
     job = Gaia.launch_job_async(query, dump_to_file=False,background=True)
@@ -298,9 +311,9 @@ def _get_gaia_query_results(body_id, release):
     res.sort('epoch_utc')
     return res
 
-def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verbose=False):
+def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verbose=False):
     """
-    Assemble the optical observations for a given body from Gaia DR3.
+    Assemble the optical observations for a given body from Gaia FPR.
 
     Parameters
     ----------
@@ -312,7 +325,7 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
     t_max_tdb : float, optional
         Maximum time (MJD TDB) for observations to be included, by default None
     gaia_dr : str, optional
-        Gaia data release version database name, by default 'gaiadr3'
+        Gaia data release version database name, by default 'gaiafpr'
     verbose : bool, optional
         Flag to print out information about the observations, by default False
 
@@ -339,6 +352,10 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
     curr_transit = int(-1e6)
     gaia_add_counter = 0
     for i, data in enumerate(res):
+        # # print(data["astrometric_outcome_ccd"], data["astrometric_outcome_transit"])
+        # # print(type(data["astrometric_outcome_ccd"]), type(data["astrometric_outcome_transit"]))
+        # if data['astrometric_outcome_ccd'] != 1 or data['astrometric_outcome_transit'] != 1:
+        #     continue
         if curr_transit != data['transit_id']:
             curr_transit = data['transit_id']
             transit_count = 1
@@ -377,16 +394,27 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiadr3', verb
         obs_df.loc[idx, 'sigRA'] = ra_sig
         obs_df.loc[idx, 'sigDec'] = dec_sig
         obs_df.loc[idx, 'sigCorr'] = corr
+        # obs_df.loc[idx, 'sigTime'] = data['epoch_err']*86400.0
         obs_df.loc[idx, 'biasRA'] = 0.0
         obs_df.loc[idx, 'biasDec'] = 0.0
         obs_df.loc[idx, 'ctr'] = ctr
         obs_df.loc[idx, 'sys'] = sys
-        obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']
-        obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']
-        obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']
-        obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']
-        obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']
-        obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']
+        tcb_tdb_fac = 1 - 1.550519768e-8
+        obs_df.loc[idx, 'pos1'] = data['x_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'pos2'] = data['y_gaia_geocentric']*tcb_tdb_fac
+        obs_df.loc[idx, 'pos3'] = data['z_gaia_geocentric']*tcb_tdb_fac
+        # obs_df.loc[idx, 'vel1'] = data['vx_gaia_geocentric']*tcb_tdb_fac
+        # obs_df.loc[idx, 'vel2'] = data['vy_gaia_geocentric']*tcb_tdb_fac
+        # obs_df.loc[idx, 'vel3'] = data['vz_gaia_geocentric']*tcb_tdb_fac
+        # # add some position uncertainty (testing)
+        # au2km = 149597870.7
+        # pos_sig = 1.0/au2km
+        # obs_df.loc[idx, 'posCov11'] = pos_sig**2
+        # obs_df.loc[idx, 'posCov12'] = 0.0
+        # obs_df.loc[idx, 'posCov13'] = 0.0
+        # obs_df.loc[idx, 'posCov22'] = pos_sig**2
+        # obs_df.loc[idx, 'posCov23'] = 0.0
+        # obs_df.loc[idx, 'posCov33'] = pos_sig**2
     if verbose:
         print(f"\tFiltered to {gaia_add_counter} observations that",
                 "satisfy the time range constraints.")
@@ -889,10 +917,9 @@ def deweight_obs(obs_df, eff_obs_per_night, verbose):
     times = obs_df['obsTimeMJD'].values
     stations = obs_df['stn'].values
     weights = obs_df[['sigRA', 'sigDec']].values
+    batch_first_time = times[0]
     for i in range(1, len(obs_df)):
-        curr_jd_night = np.floor(times[i]+2400000.5)
-        prev_jd_night = np.floor(times[i-1]+2400000.5)
-        night_match = curr_jd_night == prev_jd_night
+        night_match = times[i] - batch_first_time < 8/24
         curr_observatory = stations[i]
         prev_observatory = stations[i-1]
         observatory_match = curr_observatory == prev_observatory
@@ -904,6 +931,7 @@ def deweight_obs(obs_df, eff_obs_per_night, verbose):
                 factor = night_count**0.5/eff_obs_per_night**0.5
                 weights[i-night_count:i] *= factor
             night_count = 1
+            batch_first_time = times[i]
     # edge case where last observation is part of a batch that needs deweighting
     if night_count > eff_obs_per_night:
         deweight_count += night_count
@@ -939,10 +967,9 @@ def eliminate_obs(obs_df, max_obs_per_night, verbose):
         print(f"Applying {max_obs_per_night}-observation per night elimination scheme.")
     times = obs_df['obsTimeMJD'].values
     stations = obs_df['stn'].values
+    batch_first_time = times[0]
     for i in range(1, len(obs_df)):
-        curr_jd_night = np.floor(times[i]+2400000.5)
-        prev_jd_night = np.floor(times[i-1]+2400000.5)
-        night_match = curr_jd_night == prev_jd_night
+        night_match = times[i] - batch_first_time < 8/24
         curr_observatory = stations[i]
         prev_observatory = stations[i-1]
         observatory_match = curr_observatory == prev_observatory
@@ -953,6 +980,7 @@ def eliminate_obs(obs_df, max_obs_per_night, verbose):
                 idx_to_drop.append(i)
         else:
             night_count = 1
+            batch_first_time = times[i]
     obs_df.drop(idx_to_drop, inplace=True)
     obs_df.reset_index(drop=True, inplace=True)
     if verbose:
@@ -1004,7 +1032,7 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     """
     if eliminate and deweight:
         raise ValueError('Cannot deweight and eliminate observations at the same time.')
-    if not eliminate and not deweight:
+    if not eliminate and not deweight and verbose:
         print("WARNING: No deweighting or elimination scheme applied",
                 "for observations during the same night.")
     obs_df = create_optical_obs_df(body_id, optical_obs_file,
@@ -1012,8 +1040,9 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     if debias_lowres is not None:
         obs_df = apply_debiasing_scheme(obs_df, debias_lowres, verbose)
     else:
-        print("WARNING: No debiasing scheme applied to the observations.",
-                "Setting biases to zero.")
+        if verbose:
+            print("WARNING: No debiasing scheme applied to the observations.",
+                    "Setting biases to zero.")
         opt_idx = obs_df.query("mode != 'RAD'").index
         obs_df.loc[opt_idx, ['biasRA', 'biasDec']] = 0.0
     if not accept_weights:

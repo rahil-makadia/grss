@@ -42,7 +42,13 @@ void get_baseBodyFrame(const int &spiceId, const real &tMjdTDB,
             baseBodyFrame = "IAU_VENUS";
             break;
         case 301:
-            baseBodyFrame = "IAU_MOON";
+            baseBodyFrame = "MOON_ME_DE440_ME421";
+            // High precision frame is not defined
+            // before 1549 DEC 31 00:00:00.000 or
+            // after 2650 JAN 25 00:00:00.000 TDB
+            if (tMjdTDB < -112816.0L || tMjdTDB > 288976.0L) {
+                baseBodyFrame = "IAU_MOON";
+            }
             break;
         case 399:
             baseBodyFrame = "ITRF93";
@@ -790,6 +796,7 @@ PropSimulation::PropSimulation(std::string name, real t0,
     this->pckEphem.histPckPath = DEkernelPath + "earth_historic.bpc";
     this->pckEphem.latestPckPath = DEkernelPath + "earth_latest.bpc";
     this->pckEphem.predictPckPath = DEkernelPath + "earth_predict.bpc";
+    this->pckEphem.moonPckPath = DEkernelPath + "moon_pa_de440.bpc";
 }
 
 /**
@@ -806,9 +813,11 @@ PropSimulation::PropSimulation(std::string name, const PropSimulation& simRef) {
     this->pckEphem.histPckPath = simRef.pckEphem.histPckPath;
     this->pckEphem.latestPckPath = simRef.pckEphem.latestPckPath;
     this->pckEphem.predictPckPath = simRef.pckEphem.predictPckPath;
+    this->pckEphem.moonPckPath = simRef.pckEphem.moonPckPath;
     this->pckEphem.histPck = nullptr;
     this->pckEphem.latestPck = nullptr;
     this->pckEphem.predictPck = nullptr;
+    this->pckEphem.moonPck = nullptr;
     this->consts = simRef.consts;
     this->integParams = simRef.integParams;
     this->integParams.nInteg = 0;
@@ -959,6 +968,9 @@ void PropSimulation::map_ephemeris(){
     if (this->pckEphem.predictPck == nullptr){
         this->pckEphem.predictPck = pck_init(this->pckEphem.predictPckPath);
     }
+    if (this->pckEphem.moonPck == nullptr){
+        this->pckEphem.moonPck = pck_init(this->pckEphem.moonPckPath);
+    }
 }
 
 void PropSimulation::unmap_ephemeris(){
@@ -981,6 +993,10 @@ void PropSimulation::unmap_ephemeris(){
     if (this->pckEphem.predictPck != nullptr){
         pck_free(this->pckEphem.predictPck);
         this->pckEphem.predictPck = nullptr;
+    }
+    if (this->pckEphem.moonPck != nullptr){
+        pck_free(this->pckEphem.moonPck);
+        this->pckEphem.moonPck = nullptr;
     }
 }
 

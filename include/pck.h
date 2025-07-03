@@ -90,17 +90,21 @@ PckInfo* pck_init(const std::string &path);
  * @param histPckPath Path to the historical PCK file.
  * @param latestPckPath Path to the latest PCK file.
  * @param predictPckPath Path to the predicted PCK file.
+ * @param moonPckPath Path to the Moon PCK file.
  * @param histPck PckInfo structure for the historical PCK file.
  * @param latestPck PckInfo structure for the latest PCK file.
  * @param predictPck PckInfo structure for the predicted PCK file.
+ * @param moonPck PckInfo structure for the Moon PCK file.
  */
 struct PckEphemeris {
     std::string histPckPath;
     std::string latestPckPath;
     std::string predictPckPath;
+    std::string moonPckPath;
     PckInfo* histPck = nullptr;
     PckInfo* latestPck = nullptr;
     PckInfo* predictPck = nullptr;
+    PckInfo* moonPck = nullptr;
 };
 
 /**
