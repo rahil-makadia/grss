@@ -1344,8 +1344,8 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
         nom_body = integ_body_idx == 0
         if nom_body:
-            self._inflate_uncertainties(prop_sim_past, prop_sim_future)
-        return computed_obs
+            computed_obs_dot = self._inflate_uncertainties(prop_sim_past, prop_sim_future)
+        return computed_obs, computed_obs_dot
 
     def _inflate_uncertainties(self, prop_sim_past, prop_sim_future):
         """
@@ -1353,13 +1353,15 @@ class FitSimulation:
 
         Parameters
         ----------
-        computed_obs_dot : array
-            Computed optical observations dot.
+        prop_sim_past : libgrss.PropSimulation object
+            PropSimulation object for the past observations.
+        prop_sim_future : libgrss.PropSimulation object
+            PropSimulation object for the future observations.
 
         Returns
         -------
-        None : NoneType
-            None
+        computed_obs_dot : array
+            Computed optical observations time derivatives.
         """
         stations = self.obs.stn.values
         sig_times = self.obs.sigTime.values
@@ -1446,7 +1448,7 @@ class FitSimulation:
                 self.obs_cov[i] = cov
                 self.obs_weight[i] = inv
         self.obs.sigTime = sig_times
-        return None
+        return computed_obs_dot
 
     def _get_analytic_partials(self, prop_sim_past, prop_sim_future):
         """
@@ -1532,9 +1534,9 @@ class FitSimulation:
             _ = list(self.x_nom.keys())[i]
             _, _, _, _, _, _, fd_delta = perturbation_info[i]
             # get computed_obs for perturbed states
-            computed_obs_plus = self._get_computed_obs(prop_sim_past, prop_sim_future,
+            computed_obs_plus, _ = self._get_computed_obs(prop_sim_past, prop_sim_future,
                                                         integ_body_idx=2*i+1)
-            computed_obs_minus = self._get_computed_obs(prop_sim_past, prop_sim_future,
+            computed_obs_minus, _ = self._get_computed_obs(prop_sim_past, prop_sim_future,
                                                         integ_body_idx=2*i+2)
             computed_obs_plus = self._flatten_and_clean(computed_obs_plus)
             computed_obs_minus = self._flatten_and_clean(computed_obs_minus)
@@ -1586,10 +1588,13 @@ class FitSimulation:
         # get partials
         partials = self._get_partials(prop_sim_past, prop_sim_future, perturbation_info)
         # get residuals
-        computed_obs = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
+        computed_obs, computed_obs_dot = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
         residuals = [None]*len(self.obs)
         ra_res = self.obs['resRA'].values
         dec_res = self.obs['resDec'].values
+        at_res = [np.nan]*len(ra_res)
+        at_sec_res = [np.nan]*len(ra_res)
+        ct_res = [np.nan]*len(ra_res)
         delay_res = self.obs['resDelay'].values
         doppler_res = self.obs['resDoppler'].values
         fields = ['mode', 'ra', 'dec', 'cosDec', 'biasRA', 'biasDec', 'delay', 'doppler']
@@ -1611,8 +1616,17 @@ class FitSimulation:
                 ra_res[i] = ra*3600*cos_dec - bias_ra - computed_obs[i, 0]
                 dec_res[i] = dec*3600 - bias_dec - computed_obs[i, 1]
                 residuals[i] = np.array([ra_res[i], dec_res[i]])
+                # rotation angle from RA/Dec to along/cross-track
+                obs_dot = computed_obs_dot[i, :]
+                rot_angle = np.arctan2(obs_dot[1], obs_dot[0])
+                at_res[i] = (ra_res[i]*np.cos(rot_angle) + dec_res[i]*np.sin(rot_angle))
+                ct_res[i] = (-ra_res[i]*np.sin(rot_angle) + dec_res[i]*np.cos(rot_angle))
+                at_sec_res[i] = at_res[i]/np.linalg.norm(obs_dot)*86400.0 # convert to seconds
         self.obs['resRA'] = ra_res
         self.obs['resDec'] = dec_res
+        self.obs['resAT'] = at_res
+        self.obs['resCT'] = ct_res
+        self.obs['resATsec'] = at_sec_res
         self.obs['resDelay'] = delay_res
         self.obs['resDoppler'] = doppler_res
         return residuals, partials
@@ -2176,10 +2190,11 @@ class FitSimulation:
             widths = {
                 'obsTime': 29, 'stn': 7, 'ra': 16, 'dec': 18,
                 'sigRA': 16, 'sigDec': 17, 'resRA': 16, 'resDec': 15,
+                'resAT': 16, 'resCT': 16, 'resATsec': 16
             }
             f.write(f'|{"Observations".center(69)}|')
             f.write(f'{"Sigmas".center(32)}|')
-            f.write(f'{"Residuals".center(29)}|')
+            f.write(f'{"Residuals".center(77)}|')
             f.write("\n")
             f.write(f'{"Time [UTC]".center(widths["obsTime"])}')
             f.write(f'{"Obs".center(widths["stn"])}')
@@ -2189,6 +2204,9 @@ class FitSimulation:
             f.write(f'{"Dec[as]/Dop[Hz]".center(widths["sigDec"])}')
             f.write(f'{f"RA[as]/Del[{chr(0x00b5)}s]".center(widths["resRA"])}')
             f.write(f'{"Dec[as]/Dop[Hz]".center(widths["resDec"])}')
+            f.write(f'{"AT[as]".center(widths["resAT"])}')
+            f.write(f'{"CT[as]".center(widths["resCT"])}')
+            f.write(f'{"ATsec[s]".center(widths["resATsec"])}')
             f.write("\n")
             for i, obs in self.obs[::-1].iterrows():
                 f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
@@ -2208,6 +2226,9 @@ class FitSimulation:
                     f.write(f'{obs["sigDec"]:^{widths["sigDec"]}.4f}')
                     f.write(f'{obs["resRA"]:^+{widths["resRA"]}.7f}')
                     f.write(f'{obs["resDec"]:^+{widths["resDec"]}.7f}')
+                f.write(f'{obs["resAT"]:^+{widths["resAT"]}.7f}')
+                f.write(f'{obs["resCT"]:^+{widths["resCT"]}.7f}')
+                f.write(f'{obs["resATsec"]:^+{widths["resATsec"]}.7f}')
                 f.write("\n")
             f.write("\n")
 
