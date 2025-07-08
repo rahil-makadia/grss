@@ -562,7 +562,6 @@ document.write(`
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Read in 1066 observations from the MPC.
-        WARNING: At least one deprecated star catalog in the data.
         Filtered to 1066 observations that satisfy the time range and accepted observatory constraints.
 Applying Eggl et al. (2020) debiasing scheme to the observations.
         Unknown star catalog: UNK
@@ -572,7 +571,7 @@ Applying Eggl et al. (2020) debiasing scheme to the observations.
 Applying Vereš et al. (2017) weighting scheme to the observations.
         Using 928 CCD observations with station-specific weight rules.
 Applying sqrt(N/4) deweighting scheme.
-        Deweighted 170 observations.
+        Deweighted 165 observations.
 Read in 191 Gaia observations from gaiafpr
         Filtered to 191 observations that satisfy the time range constraints.
 </pre></div></div>
@@ -603,11 +602,11 @@ Read in 191 Gaia observations from gaiafpr
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Iteration               Unweighted RMS          Weighted RMS            Chi-squared             Reduced Chi-squared
-1                        0.390                   0.560                   787.444                         0.314
-2                        0.390                   0.559                   786.914                         0.314
+1                        0.390                   0.561                   791.001                         0.315
+2                        0.390                   0.561                   790.489                         0.315
 Converged without rejecting outliers. Starting outlier rejection now...
-3                        0.370                   0.531                   707.921                         0.283
-4                        0.369                   0.530                   707.149                         0.283
+3                        0.370                   0.532                   711.478                         0.285
+4                        0.369                   0.532                   710.705                         0.285
 Converged after rejecting outliers. Rejected 5 out of 1257 optical observations.
 </pre></div></div>
 </div>
@@ -629,22 +628,22 @@ Converged after rejecting outliers. Rejected 5 out of 1257 optical observations.
 <div class="highlight"><pre>
 Summary of the orbit fit calculations after postfit pass:
 ==============================================================
-RMS unweighted: 0.36946099654472164
-RMS weighted: 0.5303623344988073
-chi-squared: 707.1484935195322
-reduced chi-squared: 0.2830858661006934
-square root of reduced chi-squared: 0.5320581416543623
+RMS unweighted: 0.369456547326613
+RMS weighted: 0.531694378992771
+chi-squared: 710.7050664084062
+reduced chi-squared: 0.2845096342707791
+square root of reduced chi-squared: 0.5333944452942673
 --------------------------------------------------------------
 Solution Time: MJD 58293.000 TDB = 2018-06-24 00:00:00.000 TDB
 Solution Observation Arc: 10856.90 days (29.72 years)
 --------------------------------------------------------------
 Fitted Variable         Initial Value                   Uncertainty                     Fitted Value                    Uncertainty                     Change                          Change (sigma)
-e                       2.02454518255e-01               1.40679721887e-09               2.02454518318e-01               1.41317731424e-09               +6.21012685720e-11              +0.044
-q                       2.17771395357e+00               4.95647771455e-09               2.17771395471e+00               4.98725373183e-09               +1.13494236231e-09              +0.228
-tp                      5.90657522397e+04               1.11963525625e-05               5.90657522433e+04               1.12644716119e-05               +3.57488170266e-06              +0.317
-om                      1.52352438968e+02               1.14823095924e-06               1.52352438978e+02               1.16994701360e-06               +1.06002175926e-08              +0.009
-w                       2.08317637638e+02               2.29596260037e-06               2.08317638198e+02               2.31137637201e-06               +5.60166370178e-07              +0.242
-i                       5.81734038604e+00               1.28497749429e-07               5.81734041334e+00               1.29261744390e-07               +2.73032680909e-08              +0.211
+e                       2.02454518255e-01               1.40679721887e-09               2.02454518327e-01               1.41317622181e-09               +7.17414183615e-11              +0.051
+q                       2.17771395357e+00               4.95647771455e-09               2.17771395474e+00               4.98668875415e-09               +1.16643006365e-09              +0.234
+tp                      5.90657522397e+04               1.11963525625e-05               5.90657522435e+04               1.12633536767e-05               +3.77366814064e-06              +0.335
+om                      1.52352438968e+02               1.14823095924e-06               1.52352438972e+02               1.16994806898e-06               +4.56003590443e-09              +0.004
+w                       2.08317637638e+02               2.29596260037e-06               2.08317638239e+02               2.31128284444e-06               +6.01586719995e-07              +0.260
+i                       5.81734038604e+00               1.28497749429e-07               5.81734041366e+00               1.29258963746e-07               +2.76243286024e-08              +0.214
 
 </pre></div></div>
 </div>
@@ -707,8 +706,8 @@ i                       5.81734038604e+00               1.28497749429e-07       
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Mahalonobis distance between JPL and GRSS solution: 0.35
-Mahalonobis distance between GRSS and JPL solution: 0.34
+Mahalonobis distance between JPL and GRSS solution: 0.36
+Mahalonobis distance between GRSS and JPL solution: 0.36
 Bhattacharya distance between JPL and GRSS solution: 0.0003
 Bhattacharya coefficient between JPL and GRSS solution: 0.9997
 </pre></div></div>
