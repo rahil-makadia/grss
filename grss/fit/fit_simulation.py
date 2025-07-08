@@ -1345,6 +1345,8 @@ class FitSimulation:
         nom_body = integ_body_idx == 0
         if nom_body:
             computed_obs_dot = self._inflate_uncertainties(prop_sim_past, prop_sim_future)
+        else:
+            computed_obs_dot = np.nan*np.ones((len(self.obs), 2))
         return computed_obs, computed_obs_dot
 
     def _inflate_uncertainties(self, prop_sim_past, prop_sim_future):
