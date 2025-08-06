@@ -1344,8 +1344,10 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
         nom_body = integ_body_idx == 0
         if nom_body:
-            self._inflate_uncertainties(prop_sim_past, prop_sim_future)
-        return computed_obs
+            computed_obs_dot = self._inflate_uncertainties(prop_sim_past, prop_sim_future)
+        else:
+            computed_obs_dot = np.nan*np.ones((len(self.obs), 2))
+        return computed_obs, computed_obs_dot
 
     def _inflate_uncertainties(self, prop_sim_past, prop_sim_future):
         """
@@ -1353,13 +1355,15 @@ class FitSimulation:
 
         Parameters
         ----------
-        computed_obs_dot : array
-            Computed optical observations dot.
+        prop_sim_past : libgrss.PropSimulation object
+            PropSimulation object for the past observations.
+        prop_sim_future : libgrss.PropSimulation object
+            PropSimulation object for the future observations.
 
         Returns
         -------
-        None : NoneType
-            None
+        computed_obs_dot : array
+            Computed optical observations time derivatives.
         """
         stations = self.obs.stn.values
         sig_times = self.obs.sigTime.values
@@ -1446,7 +1450,7 @@ class FitSimulation:
                 self.obs_cov[i] = cov
                 self.obs_weight[i] = inv
         self.obs.sigTime = sig_times
-        return None
+        return computed_obs_dot
 
     def _get_analytic_partials(self, prop_sim_past, prop_sim_future):
         """
@@ -1532,9 +1536,9 @@ class FitSimulation:
             _ = list(self.x_nom.keys())[i]
             _, _, _, _, _, _, fd_delta = perturbation_info[i]
             # get computed_obs for perturbed states
-            computed_obs_plus = self._get_computed_obs(prop_sim_past, prop_sim_future,
+            computed_obs_plus, _ = self._get_computed_obs(prop_sim_past, prop_sim_future,
                                                         integ_body_idx=2*i+1)
-            computed_obs_minus = self._get_computed_obs(prop_sim_past, prop_sim_future,
+            computed_obs_minus, _ = self._get_computed_obs(prop_sim_past, prop_sim_future,
                                                         integ_body_idx=2*i+2)
             computed_obs_plus = self._flatten_and_clean(computed_obs_plus)
             computed_obs_minus = self._flatten_and_clean(computed_obs_minus)
@@ -1586,10 +1590,13 @@ class FitSimulation:
         # get partials
         partials = self._get_partials(prop_sim_past, prop_sim_future, perturbation_info)
         # get residuals
-        computed_obs = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
+        computed_obs, computed_obs_dot = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
         residuals = [None]*len(self.obs)
         ra_res = self.obs['resRA'].values
         dec_res = self.obs['resDec'].values
+        at_res = [np.nan]*len(ra_res)
+        at_sec_res = [np.nan]*len(ra_res)
+        ct_res = [np.nan]*len(ra_res)
         delay_res = self.obs['resDelay'].values
         doppler_res = self.obs['resDoppler'].values
         fields = ['mode', 'ra', 'dec', 'cosDec', 'biasRA', 'biasDec', 'delay', 'doppler']
@@ -1611,8 +1618,17 @@ class FitSimulation:
                 ra_res[i] = ra*3600*cos_dec - bias_ra - computed_obs[i, 0]
                 dec_res[i] = dec*3600 - bias_dec - computed_obs[i, 1]
                 residuals[i] = np.array([ra_res[i], dec_res[i]])
+                # rotation angle from RA/Dec to along/cross-track
+                obs_dot = computed_obs_dot[i, :]
+                rot_angle = np.arctan2(obs_dot[1], obs_dot[0])
+                at_res[i] = (ra_res[i]*np.cos(rot_angle) + dec_res[i]*np.sin(rot_angle))
+                ct_res[i] = (-ra_res[i]*np.sin(rot_angle) + dec_res[i]*np.cos(rot_angle))
+                at_sec_res[i] = at_res[i]/np.linalg.norm(obs_dot)*86400.0 # convert to seconds
         self.obs['resRA'] = ra_res
         self.obs['resDec'] = dec_res
+        self.obs['resAT'] = at_res
+        self.obs['resCT'] = ct_res
+        self.obs['resATsec'] = at_sec_res
         self.obs['resDelay'] = delay_res
         self.obs['resDoppler'] = doppler_res
         return residuals, partials
@@ -1656,11 +1672,9 @@ class FitSimulation:
                                 "Default values are chi_reject=3.0 and chi_recover=2.8 "
                                 "(Implemented as FitSimulation.reject_criteria=[3.0, 2.8])")
         full_cov = self.covariance
-        rms_u = 0
-        chi_sq = 0
         j = 0
         sel_ast = self.obs['selAst'].values
-        res_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
+        outlier_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
@@ -1680,20 +1694,34 @@ class FitSimulation:
                 resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
                 resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
                                             [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
-                outlier_chisq = resid @ resid_cov_inv @ resid.T
-                # outlier rejection, only reject RA/Dec measurements
-                if abs(outlier_chisq) > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                outlier_chisq_vals[i] = resid @ resid_cov_inv @ resid.T
+            j += size
+        if start_rejecting:
+            idx_to_check = np.where((sel_ast == 'A') | (sel_ast == 'a'))[0]
+            if len(idx_to_check) == 0:
+                raise ValueError("No accepted observations in fit.")
+            max_outlier_chisq = np.nanmax(outlier_chisq_vals[idx_to_check])
+            rej_chisq_thresh = max(chi_reject**2, 0.25*max_outlier_chisq)
+            rec_chisq_thresh = chi_recover**2
+        # outlier rejection, only reject RA/Dec measurements
+        rms_u = 0
+        chi_sq = 0
+        res_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
+        for i in range(len(self.observer_info_lengths)):
+            if start_rejecting:
+                outlier_chisq = outlier_chisq_vals[i]
+                if abs(outlier_chisq) > rej_chisq_thresh and sel_ast[i] not in {'a', 'd'}:
                     if sel_ast[i] == 'A':
                         self.num_rejected += 1
                     sel_ast[i] = 'D'
-                elif abs(outlier_chisq) < chi_recover**2 and sel_ast[i] == 'D':
+                elif abs(outlier_chisq) < rec_chisq_thresh and sel_ast[i] == 'D':
                     sel_ast[i] = 'A'
                     self.num_rejected -= 1
+            resid = residuals[i]
             res_chisq_vals[i] = resid @ self.obs_weight[i] @ resid.T
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
                 chi_sq += res_chisq_vals[i]
-            j += size
         # # write res_chisq_vals to file if any values are negative
         # if np.any(res_chisq_vals < 0):
         #     print("WARNING: Negative outlier rejection chi-squared values detected. "
@@ -1806,12 +1834,12 @@ class FitSimulation:
             atwb += partials[j:j+size, :].T @ self.obs_weight[i] @ residuals[i]
             j += size
             self.info_mats.append(atwa.copy())
-        # use pseudo-inverse if the data arc is less than 7 days
+        # use pseudo-inverse if the information matrix is ill-conditioned
         data_arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
-        if data_arc < 1.0:
-            self.covariance = np.linalg.pinv(atwa, rcond=1e-10, hermitian=True)
-        elif data_arc < 7.0:
-            self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+        cond_num = np.linalg.cond(atwa)
+        if data_arc < 10.0 and cond_num > 1e15:
+            # print(f"Condition number of the information matrix: {cond_num:.2e}")
+            self.covariance = np.linalg.pinv(atwa, rcond=1e3/cond_num, hermitian=True)
         else:
             self.covariance = np.array(libgrss.matrix_inverse(atwa))
         delta_x = self.covariance @ atwb
@@ -2176,10 +2204,11 @@ class FitSimulation:
             widths = {
                 'obsTime': 29, 'stn': 7, 'ra': 16, 'dec': 18,
                 'sigRA': 16, 'sigDec': 17, 'resRA': 16, 'resDec': 15,
+                'resAT': 16, 'resCT': 16, 'resATsec': 16
             }
             f.write(f'|{"Observations".center(69)}|')
             f.write(f'{"Sigmas".center(32)}|')
-            f.write(f'{"Residuals".center(29)}|')
+            f.write(f'{"Residuals".center(77)}|')
             f.write("\n")
             f.write(f'{"Time [UTC]".center(widths["obsTime"])}')
             f.write(f'{"Obs".center(widths["stn"])}')
@@ -2189,6 +2218,9 @@ class FitSimulation:
             f.write(f'{"Dec[as]/Dop[Hz]".center(widths["sigDec"])}')
             f.write(f'{f"RA[as]/Del[{chr(0x00b5)}s]".center(widths["resRA"])}')
             f.write(f'{"Dec[as]/Dop[Hz]".center(widths["resDec"])}')
+            f.write(f'{"AT[as]".center(widths["resAT"])}')
+            f.write(f'{"CT[as]".center(widths["resCT"])}')
+            f.write(f'{"ATsec[s]".center(widths["resATsec"])}')
             f.write("\n")
             for i, obs in self.obs[::-1].iterrows():
                 f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
@@ -2208,6 +2240,9 @@ class FitSimulation:
                     f.write(f'{obs["sigDec"]:^{widths["sigDec"]}.4f}')
                     f.write(f'{obs["resRA"]:^+{widths["resRA"]}.7f}')
                     f.write(f'{obs["resDec"]:^+{widths["resDec"]}.7f}')
+                f.write(f'{obs["resAT"]:^+{widths["resAT"]}.7f}')
+                f.write(f'{obs["resCT"]:^+{widths["resCT"]}.7f}')
+                f.write(f'{obs["resATsec"]:^+{widths["resATsec"]}.7f}')
                 f.write("\n")
             f.write("\n")
 
