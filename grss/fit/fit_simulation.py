@@ -1672,11 +1672,9 @@ class FitSimulation:
                                 "Default values are chi_reject=3.0 and chi_recover=2.8 "
                                 "(Implemented as FitSimulation.reject_criteria=[3.0, 2.8])")
         full_cov = self.covariance
-        rms_u = 0
-        chi_sq = 0
         j = 0
         sel_ast = self.obs['selAst'].values
-        res_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
+        outlier_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
         for i, obs_info_len in enumerate(self.observer_info_lengths):
             if obs_info_len in {4, 7}:
                 size = 2
@@ -1696,20 +1694,34 @@ class FitSimulation:
                 resid_cov_det = resid_cov[0,0]*resid_cov[1,1] - resid_cov[0,1]*resid_cov[1,0]
                 resid_cov_inv = np.array([[resid_cov[1,1], -resid_cov[0,1]],
                                             [-resid_cov[1,0], resid_cov[0,0]]])/resid_cov_det
-                outlier_chisq = resid @ resid_cov_inv @ resid.T
-                # outlier rejection, only reject RA/Dec measurements
-                if abs(outlier_chisq) > chi_reject**2 and sel_ast[i] not in {'a', 'd'}:
+                outlier_chisq_vals[i] = resid @ resid_cov_inv @ resid.T
+            j += size
+        if start_rejecting:
+            idx_to_check = np.where((sel_ast == 'A') | (sel_ast == 'a'))[0]
+            if len(idx_to_check) == 0:
+                raise ValueError("No accepted observations in fit.")
+            max_outlier_chisq = np.nanmax(outlier_chisq_vals[idx_to_check])
+            rej_chisq_thresh = max(chi_reject**2, 0.25*max_outlier_chisq)
+            rec_chisq_thresh = chi_recover**2
+        # outlier rejection, only reject RA/Dec measurements
+        rms_u = 0
+        chi_sq = 0
+        res_chisq_vals = np.nan*np.ones(len(self.observer_info_lengths))
+        for i in range(len(self.observer_info_lengths)):
+            if start_rejecting:
+                outlier_chisq = outlier_chisq_vals[i]
+                if abs(outlier_chisq) > rej_chisq_thresh and sel_ast[i] not in {'a', 'd'}:
                     if sel_ast[i] == 'A':
                         self.num_rejected += 1
                     sel_ast[i] = 'D'
-                elif abs(outlier_chisq) < chi_recover**2 and sel_ast[i] == 'D':
+                elif abs(outlier_chisq) < rec_chisq_thresh and sel_ast[i] == 'D':
                     sel_ast[i] = 'A'
                     self.num_rejected -= 1
+            resid = residuals[i]
             res_chisq_vals[i] = resid @ self.obs_weight[i] @ resid.T
             if sel_ast[i] not in {'D', 'd'}:
                 rms_u += resid @ resid.T
                 chi_sq += res_chisq_vals[i]
-            j += size
         # # write res_chisq_vals to file if any values are negative
         # if np.any(res_chisq_vals < 0):
         #     print("WARNING: Negative outlier rejection chi-squared values detected. "
@@ -1822,12 +1834,12 @@ class FitSimulation:
             atwb += partials[j:j+size, :].T @ self.obs_weight[i] @ residuals[i]
             j += size
             self.info_mats.append(atwa.copy())
-        # use pseudo-inverse if the data arc is less than 7 days
+        # use pseudo-inverse if the information matrix is ill-conditioned
         data_arc = self.obs.obsTimeMJD.max() - self.obs.obsTimeMJD.min()
-        if data_arc < 1.0:
-            self.covariance = np.linalg.pinv(atwa, rcond=1e-10, hermitian=True)
-        elif data_arc < 7.0:
-            self.covariance = np.linalg.pinv(atwa, rcond=1e-20, hermitian=True)
+        cond_num = np.linalg.cond(atwa)
+        if data_arc < 10.0 and cond_num > 1e15:
+            # print(f"Condition number of the information matrix: {cond_num:.2e}")
+            self.covariance = np.linalg.pinv(atwa, rcond=1e3/cond_num, hermitian=True)
         else:
             self.covariance = np.array(libgrss.matrix_inverse(atwa))
         delta_x = self.covariance @ atwb
