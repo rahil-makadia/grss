@@ -20,6 +20,7 @@
         delta_at_utc
         delta_et_tdb
         delta_et_utc
+        get_elements_partials
         matrix_inverse
         propSim_parallel_omp
         reconstruct_stm
