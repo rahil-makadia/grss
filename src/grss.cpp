@@ -399,6 +399,35 @@ PYBIND11_MODULE(libgrss, m) {
         )mydelimiter");
 
     m.def(
+        "get_elements_partials",
+        [](real epochMjd, std::vector<real> elems, std::string conversion, real GM) {
+            std::vector<std::vector<real>> partials(6, std::vector<real>(6));
+            get_elements_partials(epochMjd, elems, conversion, partials, GM);
+            return partials;
+        },
+        py::arg("epochMjd"), py::arg("elems"), py::arg("conversion"),
+        py::arg("GM") = 2.9591220828559115e-4L, R"mydelimiter(
+        Calculate the partial derivatives of input ecliptic orbital elements with respect to
+        the corresponding ecliptic Cartesian state vector.
+
+        Parameters
+        ----------
+        epochMjd : real
+            Epoch in modified Julian date.
+        elems : list of real
+            Orbital elements vector (either Keplerian [a,e,i,OM,om,nu] or cometary [e,q,tp,OM,om,i]) with angles in radians.
+        conversion : str
+            Conversion type (must be either "kep2cart" or "com2cart").
+        GM : real, optional
+            Gravitational parameter of the central body, by default 0.00029591220828559115L.
+
+        Returns
+        -------
+        partials : list of list of real
+            Partial derivatives of orbital elements.
+        )mydelimiter");
+
+    m.def(
         "matrix_inverse",
         [](std::vector<std::vector<real>> mat, const real &tol) {
             std::vector<std::vector<real>> invMat(
