@@ -450,7 +450,7 @@ void get_elements_partials(const real &epochMjd, const std::vector<real> &elems,
             M = std::numeric_limits<real>::quiet_NaN();
         }
     } else {
-        throw std::invalid_argument("get_cartesian_partials: invalid conversion "
+        throw std::invalid_argument("get_elements_partials: invalid conversion "
                                     "type, must be com2cart or kep2cart");
     }
     const std::vector<real> kep = {a, e, i, om, w, nu};
