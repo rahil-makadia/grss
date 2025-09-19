@@ -33,92 +33,73 @@ eliminate = False
 num_obs_per_night = 4
 verbose = True
 accept_weights = False
-print('getting obs')
-# obs_df = fit.get_optical_obs(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_lowres, deweight, eliminate, num_obs_per_night, verbose)
 
-from grss.fit.fit_optical import create_optical_obs_df, apply_debiasing_scheme, apply_weighting_scheme, deweight_obs, eliminate_obs
+print('getting obs')
+from grss.fit.fit_optical import ades_column_types, _ades_mode_check, _ades_ast_cat_check, get_mpc_raw_data
 if eliminate and deweight:
     raise ValueError('Cannot deweight and eliminate observations at the same time.')
 if not eliminate and not deweight and verbose:
     print("WARNING: No deweighting or elimination scheme applied",
             "for observations during the same night.")
 print('creating obs df')
-obs_df = create_optical_obs_df(body_id, optical_obs_file,
-                                t_min_tdb, t_max_tdb, verbose)
-print('created obs df')
-# if debias_lowres is not None:
-#     print('applying debiasing scheme')
-#     obs_df = apply_debiasing_scheme(obs_df, debias_lowres, verbose)
-#     print('applied debiasing scheme')
-# else:
-#     if verbose:
-#         print("WARNING: No debiasing scheme applied to the observations.",
-#                 "Setting biases to zero.")
-#     opt_idx = obs_df.query("mode != 'RAD'").index
-#     obs_df.loc[opt_idx, ['biasRA', 'biasDec']] = 0.0
-# if not accept_weights:
-#     print('applying weighting scheme')
-#     obs_df = apply_weighting_scheme(obs_df, verbose)
-#     print('applied weighting scheme')
-# if deweight:
-#     print('deweighting obs')
-#     obs_df = deweight_obs(obs_df, num_obs_per_night, verbose)
-#     print('deweighted obs')
-# elif eliminate:
-#     print('eliminating obs')
-#     obs_df = eliminate_obs(obs_df, num_obs_per_night, verbose)
-#     print('eliminated obs')
-# print('got obs')
+# obs_df = create_optical_obs_df(body_id, optical_obs_file,
+#                                 t_min_tdb, t_max_tdb, verbose)
 
-# obs_df = fit.add_radar_obs(obs_df, t_min_tdb, t_max_tdb, verbose)
-# if add_gaia_obs:
-#     gaia_dr = 'gaiafpr'
-#     obs_df = fit.add_gaia_obs(obs_df, t_min_tdb, t_max_tdb, gaia_dr, verbose)
+import os
+from astropy.time import Time
+import numpy as np
+import pandas as pd
 
-# # %% [markdown]
-# # #### All we need to do now is initialize the OD simulation and run the filter.
+if t_min_tdb is None:
+    t_min_utc = -np.inf
+else:
+    t_min_utc = Time(t_min_tdb, format='mjd', scale='tdb').utc.mjd
+if t_max_tdb is None:
+    t_max_utc = np.inf
+else:
+    t_max_utc = Time(t_max_tdb, format='mjd', scale='tdb').utc.mjd
+if optical_obs_file is None:
+    obs_data = get_mpc_raw_data(body_id)
+else:
+    obs_data = optical_obs_file
+    if not os.path.exists(obs_data):
+        raise FileNotFoundError(f"File {obs_data} does not exist.")
+# # read in the data and add extra columns if not present
+# obs_df = pd.read_xml(obs_data, dtype=ades_column_types)
+# obs_times = Time(obs_df['obsTime'].to_list(), format='isot', scale='utc')
+# obs_df['obsTimeMJD'] = obs_times.utc.mjd
+# obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
+# if 'deprecated' in obs_df:
+#     # drop rows with deprecated discovery observations
+#     obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
+# # add columns if they are not present
+# str_cols = ['trx', 'rcv', 'sys', 'selAst']
+# for col in str_cols:
+#     if col not in obs_df:
+#         obs_df[col] = str(np.nan)
+# for col in ades_column_types:
+#     if col not in obs_df:
+#         obs_df[col] = np.nan
+# # remove any columns that are not in ades_column_types
+# obs_df = obs_df[ades_column_types.keys()]
+# if verbose:
+#     source = "MPC" if optical_obs_file is None else "file"
+#     print(f"Read in {len(obs_df)} observations from the {source}.")
+# _ades_mode_check(obs_df)
+# obs_df = _ades_ast_cat_check(obs_df)
+# # filter the data based on the time range
+# obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
+# # reindex the data frame
+# obs_df.reset_index(drop=True, inplace=True)
+# # for all indices with OCC mode compute ra and dec as raStar+deltaRA and decStar+deltaDec
+# occ_idx = obs_df.query("mode == 'OCC'").index
+# obs_df.loc[occ_idx, 'dec'] = obs_df.loc[occ_idx, 'decStar']
+# obs_df.loc[occ_idx, 'dec'] += obs_df.loc[occ_idx, 'deltaDec']/3600
+# obs_df['cosDec'] = np.cos(obs_df['dec']*np.pi/180)
+# obs_df.loc[occ_idx, 'ra'] = obs_df.loc[occ_idx, 'raStar']
+# obs_df.loc[occ_idx, 'ra'] += obs_df.loc[occ_idx, 'deltaRA']/3600/obs_df.loc[occ_idx, 'cosDec']
+# if verbose:
+#     print(f"\tFiltered to {len(obs_df)} observations that satisfy the "
+#             "time range and accepted observatory constraints.")
 
-# # %%
-# n_iter_max = 10
-# fit_sim = fit.FitSimulation(init_sol, obs_df, init_cov, n_iter_max=n_iter_max, de_kernel=de_kernel, nongrav_info=nongrav_info)
-
-# # %%
-# fit_sim.filter_lsq()
-
-# # %% [markdown]
-# # #### Let's print some summary statistics and plot some results.
-
-# # %%
-# fit_sim.print_summary()
-
-# # %%
-# fit_sim.plot_summary(auto_close=True)
-
-# # %%
-# fit_sim.iters[-1].plot_iteration_summary(title='Postfit Residuals', auto_close=True)
-
-# # %%
-# mean_0 = np.array(list(init_sol.values())[1:])
-# cov_0 = init_cov
-# mean_f = np.array(list(fit_sim.x_nom.values()))
-# cov_f = fit_sim.covariance
-
-# maha_dist_f, maha_dist_0, bhattacharya, bhatt_coeff = fit.get_similarity_stats(mean_0, cov_0, mean_f, cov_f)
-# print(f'Mahalonobis distance between JPL and GRSS solution: {maha_dist_f:0.2f}')
-# print(f'Mahalonobis distance between GRSS and JPL solution: {maha_dist_0:0.2f}')
-# print(f'Bhattacharya distance between JPL and GRSS solution: {bhattacharya:0.4f}')
-# print(f'Bhattacharya coefficient between JPL and GRSS solution: {bhatt_coeff:0.4f}')
-
-# # %% [markdown]
-# # #### Finally, we'll make sure the GRSS solution is statistically consistent with the JPL SBDB solution
-
-# # %%
-# assert maha_dist_f < 5.0
-# assert maha_dist_0 < 5.0
-# assert bhattacharya < 0.10
-# assert bhatt_coeff > 0.90
-
-# # %%
-
-
-
+# print('created obs df')
