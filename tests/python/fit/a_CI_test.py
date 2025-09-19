@@ -73,18 +73,13 @@ obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
 if 'deprecated' in obs_df:
     # drop rows with deprecated discovery observations
     obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
-# add columns if they are not present
-str_cols = ['trx', 'rcv', 'sys', 'selAst']
-for col in str_cols:
-    if col not in obs_df:
-        obs_df[col] = str(np.nan)
-for col in ades_column_types:
-    if col not in obs_df:
-        obs_df[col] = np.nan
-# remove any columns that are not in ades_column_types
-obs_df = obs_df[ades_column_types.keys()]
-# if verbose:
-#     source = "MPC" if optical_obs_file is None else "file"
-#     print(f"Read in {len(obs_df)} observations from the {source}.")
-# _ades_mode_check(obs_df)
-
+# # add columns if they are not present
+# str_cols = ['trx', 'rcv', 'sys', 'selAst']
+# for col in str_cols:
+#     if col not in obs_df:
+#         obs_df[col] = str(np.nan)
+# for col in ades_column_types:
+#     if col not in obs_df:
+#         obs_df[col] = np.nan
+# # remove any columns that are not in ades_column_types
+# obs_df = obs_df[ades_column_types.keys()]
