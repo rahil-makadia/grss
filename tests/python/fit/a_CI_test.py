@@ -86,11 +86,14 @@ if verbose:
     source = "MPC" if optical_obs_file is None else "file"
     print(f"Read in {len(obs_df)} observations from the {source}.")
 _ades_mode_check(obs_df)
-obs_df = _ades_ast_cat_check(obs_df)
-# filter the data based on the time range
-obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
-# reindex the data frame
-obs_df.reset_index(drop=True, inplace=True)
+# obs_df = _ades_ast_cat_check(obs_df)
+# # filter the data based on the time range
+# obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
+# # reindex the data frame
+# obs_df.reset_index(drop=True, inplace=True)
+
+
+
 # # for all indices with OCC mode compute ra and dec as raStar+deltaRA and decStar+deltaDec
 # occ_idx = obs_df.query("mode == 'OCC'").index
 # obs_df.loc[occ_idx, 'dec'] = obs_df.loc[occ_idx, 'decStar']
