@@ -12,13 +12,14 @@ fi
 cd $1
 
 # for each file in the directory, run the test
-jupyter nbconvert --to script *.ipynb
-for file in *.py
-do
-    echo "Running $file..."
-    python $file
-done
-rm *.py
+# jupyter nbconvert --to script *.ipynb
+# for file in *.py
+# do
+#     echo "Running $file..."
+#     python $file
+# done
+# rm *.py
+jupyter nbconvert --to notebook --execute --inplace *.ipynb
 
 # return to the original directory
 cd ..
