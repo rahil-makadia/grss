@@ -10,7 +10,7 @@ on:
       - 'include/**'
       - 'src/**'
       - 'grss/**'
-      - 'tests/python/**'
+      - 'tests/python/**/*.*py*'
 
 jobs:
   sphinx:

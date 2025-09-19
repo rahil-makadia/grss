@@ -19,25 +19,25 @@ body_id = '12104'
 init_sol, init_cov, nongrav_info = fit.get_sbdb_info(body_id)
 de_kernel = 440
 
-# %% [markdown]
-# #### Next, we'll retrieve the observations from different sources (MPC, JPL, Gaia Data Releases) and prepare them for the orbit determination process.
+# # %% [markdown]
+# # #### Next, we'll retrieve the observations from different sources (MPC, JPL, Gaia Data Releases) and prepare them for the orbit determination process.
 
-# %%
-add_gaia_obs = True
-optical_obs_file = None
-t_min_tdb = None
-t_max_tdb = None
-debias_lowres = True
-deweight = True
-eliminate = False
-num_obs_per_night = 4
-verbose = True
-print('getting obs')
-obs_df = fit.get_optical_obs(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_lowres, deweight, eliminate, num_obs_per_night, verbose)
-obs_df = fit.add_radar_obs(obs_df, t_min_tdb, t_max_tdb, verbose)
-if add_gaia_obs:
-    gaia_dr = 'gaiafpr'
-    obs_df = fit.add_gaia_obs(obs_df, t_min_tdb, t_max_tdb, gaia_dr, verbose)
+# # %%
+# add_gaia_obs = True
+# optical_obs_file = None
+# t_min_tdb = None
+# t_max_tdb = None
+# debias_lowres = True
+# deweight = True
+# eliminate = False
+# num_obs_per_night = 4
+# verbose = True
+# print('getting obs')
+# obs_df = fit.get_optical_obs(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_lowres, deweight, eliminate, num_obs_per_night, verbose)
+# obs_df = fit.add_radar_obs(obs_df, t_min_tdb, t_max_tdb, verbose)
+# if add_gaia_obs:
+#     gaia_dr = 'gaiafpr'
+#     obs_df = fit.add_gaia_obs(obs_df, t_min_tdb, t_max_tdb, gaia_dr, verbose)
 
 # # %% [markdown]
 # # #### All we need to do now is initialize the OD simulation and run the filter.
