@@ -66,43 +66,23 @@ else:
         raise FileNotFoundError(f"File {obs_data} does not exist.")
 # read in the data and add extra columns if not present
 obs_df = pd.read_xml(obs_data, dtype=ades_column_types)
-obs_times = Time(obs_df['obsTime'].to_list(), format='isot', scale='utc')
-obs_df['obsTimeMJD'] = obs_times.utc.mjd
-obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
-if 'deprecated' in obs_df:
-    # drop rows with deprecated discovery observations
-    obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
-# add columns if they are not present
-str_cols = ['trx', 'rcv', 'sys', 'selAst']
-for col in str_cols:
-    if col not in obs_df:
-        obs_df[col] = str(np.nan)
-for col in ades_column_types:
-    if col not in obs_df:
-        obs_df[col] = np.nan
-# remove any columns that are not in ades_column_types
-obs_df = obs_df[ades_column_types.keys()]
-if verbose:
-    source = "MPC" if optical_obs_file is None else "file"
-    print(f"Read in {len(obs_df)} observations from the {source}.")
-_ades_mode_check(obs_df)
-# obs_df = _ades_ast_cat_check(obs_df)
-# # filter the data based on the time range
-# obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
-# # reindex the data frame
-# obs_df.reset_index(drop=True, inplace=True)
-
-
-
-# # for all indices with OCC mode compute ra and dec as raStar+deltaRA and decStar+deltaDec
-# occ_idx = obs_df.query("mode == 'OCC'").index
-# obs_df.loc[occ_idx, 'dec'] = obs_df.loc[occ_idx, 'decStar']
-# obs_df.loc[occ_idx, 'dec'] += obs_df.loc[occ_idx, 'deltaDec']/3600
-# obs_df['cosDec'] = np.cos(obs_df['dec']*np.pi/180)
-# obs_df.loc[occ_idx, 'ra'] = obs_df.loc[occ_idx, 'raStar']
-# obs_df.loc[occ_idx, 'ra'] += obs_df.loc[occ_idx, 'deltaRA']/3600/obs_df.loc[occ_idx, 'cosDec']
+# obs_times = Time(obs_df['obsTime'].to_list(), format='isot', scale='utc')
+# obs_df['obsTimeMJD'] = obs_times.utc.mjd
+# obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
+# if 'deprecated' in obs_df:
+#     # drop rows with deprecated discovery observations
+#     obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
+# # add columns if they are not present
+# str_cols = ['trx', 'rcv', 'sys', 'selAst']
+# for col in str_cols:
+#     if col not in obs_df:
+#         obs_df[col] = str(np.nan)
+# for col in ades_column_types:
+#     if col not in obs_df:
+#         obs_df[col] = np.nan
+# # remove any columns that are not in ades_column_types
+# obs_df = obs_df[ades_column_types.keys()]
 # if verbose:
-#     print(f"\tFiltered to {len(obs_df)} observations that satisfy the "
-#             "time range and accepted observatory constraints.")
-
-# print('created obs df')
+#     source = "MPC" if optical_obs_file is None else "file"
+#     print(f"Read in {len(obs_df)} observations from the {source}.")
+# _ades_mode_check(obs_df)
