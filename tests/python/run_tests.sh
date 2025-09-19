@@ -5,6 +5,8 @@ set -e
 # raise error if no arguments are provided
 if [ $# -eq 0 ]; then
     echo "No arguments provided. Please provide the name of the directory containing the test files."
+    exit 1
+fi
 
 # first argument is the path to the directory containing the test files
 cd $1
