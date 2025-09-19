@@ -15,6 +15,7 @@ cd $1
 jupyter nbconvert --to script *.ipynb
 for file in *.py
 do
+    echo "Running $file..."
     python $file
 done
 rm *.py
