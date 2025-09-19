@@ -13,7 +13,7 @@ on:
 
 jobs:
   prop-and-fit:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
