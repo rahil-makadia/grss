@@ -32,8 +32,44 @@ deweight = True
 eliminate = False
 num_obs_per_night = 4
 verbose = True
+accept_weights = False
 print('getting obs')
-obs_df = fit.get_optical_obs(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_lowres, deweight, eliminate, num_obs_per_night, verbose)
+# obs_df = fit.get_optical_obs(body_id, optical_obs_file, t_min_tdb, t_max_tdb, debias_lowres, deweight, eliminate, num_obs_per_night, verbose)
+
+from grss.fit.fit_optical import create_optical_obs_df, apply_debiasing_scheme, apply_weighting_scheme, deweight_obs, eliminate_obs
+if eliminate and deweight:
+    raise ValueError('Cannot deweight and eliminate observations at the same time.')
+if not eliminate and not deweight and verbose:
+    print("WARNING: No deweighting or elimination scheme applied",
+            "for observations during the same night.")
+print('creating obs df')
+obs_df = create_optical_obs_df(body_id, optical_obs_file,
+                                t_min_tdb, t_max_tdb, verbose)
+print('created obs df')
+# if debias_lowres is not None:
+#     print('applying debiasing scheme')
+#     obs_df = apply_debiasing_scheme(obs_df, debias_lowres, verbose)
+#     print('applied debiasing scheme')
+# else:
+#     if verbose:
+#         print("WARNING: No debiasing scheme applied to the observations.",
+#                 "Setting biases to zero.")
+#     opt_idx = obs_df.query("mode != 'RAD'").index
+#     obs_df.loc[opt_idx, ['biasRA', 'biasDec']] = 0.0
+# if not accept_weights:
+#     print('applying weighting scheme')
+#     obs_df = apply_weighting_scheme(obs_df, verbose)
+#     print('applied weighting scheme')
+# if deweight:
+#     print('deweighting obs')
+#     obs_df = deweight_obs(obs_df, num_obs_per_night, verbose)
+#     print('deweighted obs')
+# elif eliminate:
+#     print('eliminating obs')
+#     obs_df = eliminate_obs(obs_df, num_obs_per_night, verbose)
+#     print('eliminated obs')
+# print('got obs')
+
 # obs_df = fit.add_radar_obs(obs_df, t_min_tdb, t_max_tdb, verbose)
 # if add_gaia_obs:
 #     gaia_dr = 'gaiafpr'
