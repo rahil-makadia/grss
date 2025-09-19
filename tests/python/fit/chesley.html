@@ -511,10 +511,11 @@ document.write(`
 <section id="Let's-start-by-importing-the-necessary-libraries">
 <h2>Let’s start by importing the necessary libraries<a class="headerlink" href="#Let's-start-by-importing-the-necessary-libraries" title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">grss</span><span class="w"> </span><span class="kn">import</span> <span class="n">fit</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;imported grss.fit&#39;</span><span class="p">)</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 </pre></div>
@@ -524,7 +525,7 @@ document.write(`
 <section id="We'll-then-retrieve-the-cometary-state-of-the-asteroid-(from-JPL-SBDB)-plus-any-nongravitational-accelerations-acting-on-it.">
 <h2>We’ll then retrieve the cometary state of the asteroid (from JPL SBDB) plus any nongravitational accelerations acting on it.<a class="headerlink" href="#We'll-then-retrieve-the-cometary-state-of-the-asteroid-(from-JPL-SBDB)-plus-any-nongravitational-accelerations-acting-on-it." title="Link to this heading">#</a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;12104&#39;</span>
@@ -537,7 +538,7 @@ document.write(`
 <section id="Next,-we'll-retrieve-the-observations-from-different-sources-(MPC,-JPL,-Gaia-Data-Releases)-and-prepare-them-for-the-orbit-determination-process.">
 <h2>Next, we’ll retrieve the observations from different sources (MPC, JPL, Gaia Data Releases) and prepare them for the orbit determination process.<a class="headerlink" href="#Next,-we'll-retrieve-the-observations-from-different-sources-(MPC,-JPL,-Gaia-Data-Releases)-and-prepare-them-for-the-orbit-determination-process." title="Link to this heading">#</a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">add_gaia_obs</span> <span class="o">=</span> <span class="kc">True</span>
@@ -549,6 +550,7 @@ document.write(`
 <span class="n">eliminate</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="n">num_obs_per_night</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;getting obs&#39;</span><span class="p">)</span>
 <span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_optical_obs</span><span class="p">(</span><span class="n">body_id</span><span class="p">,</span> <span class="n">optical_obs_file</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">debias_lowres</span><span class="p">,</span> <span class="n">deweight</span><span class="p">,</span> <span class="n">eliminate</span><span class="p">,</span> <span class="n">num_obs_per_night</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 <span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">add_radar_obs</span><span class="p">(</span><span class="n">obs_df</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">add_gaia_obs</span><span class="p">:</span>
