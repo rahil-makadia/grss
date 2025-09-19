@@ -67,9 +67,6 @@ else:
 # read in the data and add extra columns if not present
 obs_df = pd.read_xml(obs_data, dtype=ades_column_types)
 
-obs_times = Time(obs_df['obsTime'].to_list(), format='isot', scale='utc')
-obs_df['obsTimeMJD'] = obs_times.utc.mjd
-obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
-# if 'deprecated' in obs_df:
-#     # drop rows with deprecated discovery observations
-#     obs_df.query("deprecated != 'x' and deprecated != 'X'", inplace=True)
+# obs_times = Time(obs_df['obsTime'].to_list(), format='isot', scale='utc')
+# obs_df['obsTimeMJD'] = obs_times.utc.mjd
+# obs_df['obsTimeMJDTDB'] = obs_times.tdb.mjd
