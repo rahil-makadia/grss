@@ -72,7 +72,7 @@ def initialize():
     """
     internet = _connected_to_internet()
     if not internet:
-        print("Please connect to the internet to download/update the necessary data files.")
+        print("Internet connection is required to download/update the necessary data files.")
         return None
     # run the get_debiasing_data.py script
     os.system(f'python {grss_path}/debias/get_debiasing_data.py')
