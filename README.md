@@ -82,7 +82,7 @@ Once the GRSS library has been installed, it can be imported into a Python scrip
    import grss
 ```
 
-The first time the library is imported, it will download some data files such as NAIF SPICE kernels and the data needed to debias optical astrometry. This should should take a few minutes. Once these files are available to the library, you are ready to use GRSS to its full potential!
+The first time the library is imported, it will download some data files such as NAIF SPICE kernels and the data needed to debias optical astrometry. This should take a few minutes. Once these files are available to the library, you are ready to use GRSS to its full potential!
 
 Check out the [examples](https://rahil-makadia.github.io/grss/examples.html) on the [GRSS website](https://rahil-makadia.github.io/grss/) to get started.
 
