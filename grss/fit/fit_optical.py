@@ -90,24 +90,15 @@ def _ades_ast_cat_check(df):
     """
     # from https://www.minorplanetcenter.net/iau/info/ADESFieldValues.html
     valid_cats = list(ades_catalog_map.keys())
-    deprecated_cats = [
-        'UCAC3', 'UCAC2', 'UCAC1',
-        'USNOB1', 'USNOA2', 'USNOSA2', 'USNOA1', 'USNOSA1',
-        'Tyc2', 'Tyc1', 'Hip2', 'Hip1', 'ACT',
-        'GSCACT', 'GSC2.3', 'GSC2.2', 'GSC1.2', 'GSC1.1', 'GSC1.0', 'GSC',
-        'SDSS8', 'SDSS7', 'CMC15', 'CMC14', 'SSTRC4', 'SSTRC1',
-        'MPOSC3', 'PPM', 'AC', 'SAO1984', 'SAO', 'AGK3', 'FK4',
-        'ACRS', 'LickGas', 'Ida93', 'Perth70', 'COSMOS',
-        'Yale', 'ZZCAT', 'IHW', 'GZ', 'UNK']
-    df_cats = df['astCat']
+    df_cats = df['astCat'].str.lower()
     if not df_cats.isin(valid_cats).all():
         invalid_cats = np.setdiff1d(df_cats.unique(), valid_cats)
         print("\tWARNING: At least one unrecognized astCat in the data. "
                 f"Unrecognized values are {invalid_cats}. "
-                "Force deleting corresponding observations and setting catalog to UNK...")
-        delete_idx = df[df['astCat'].isin(invalid_cats)].index
+                "Force deleting corresponding observations. "
+                "This can still lead to errors in processing the data...")
+        delete_idx = df[df_cats.isin(invalid_cats)].index
         df.loc[delete_idx, 'selAst'] = 'd'
-        df.loc[delete_idx, 'astCat'] = 'UNK'
     return df
 
 def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
@@ -508,7 +499,7 @@ def apply_debiasing_scheme(obs_df, lowres, verbose):
         print("Applying Eggl et al. (2020) debiasing scheme to the observations.")
     df_groups = obs_df.groupby('astCat')
     for cat, group in df_groups:
-        cat_code = ades_catalog_map[cat]
+        cat_code = ades_catalog_map[cat.lower()]
         if cat_code in unbiased_catalogs:
             obs_df.loc[group.index, 'biasRA'] = 0.0
             obs_df.loc[group.index, 'biasDec'] = 0.0
@@ -604,7 +595,7 @@ def apply_station_weight_rules(group, obs_df, cols, verbose):
     default_weight_counter = 0
     all_times = obs_df.loc[group.index, 'obsTimeMJD'].values
     all_stns = obs_df.loc[group.index, 'stn'].values
-    all_cats = obs_df.loc[group.index, 'astCat'].values
+    all_cats = obs_df.loc[group.index, 'astCat'].str.lower().values
     all_progs = obs_df.loc[group.index, 'prog'].values
     ccd_weight_arr = np.ones((len(group), 2))*np.nan
     for i in range(len(group)):

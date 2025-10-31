@@ -101,7 +101,7 @@ ades_catalog_map = {
     '6': 'Gaia_2016', 
 }
 # flip the dictionary to get the catalog codes
-ades_catalog_map = {v: k for k, v in ades_catalog_map.items()}
+ades_catalog_map = {v.lower(): k for k, v in ades_catalog_map.items()}
 
 # from ADES-Master/Python/bin/packUtil.py
 pack_letters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
