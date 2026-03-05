@@ -1788,7 +1788,7 @@ class FitSimulation:
         sigmas = np.sqrt(np.diag(self.covariance))
         corrections = np.abs(delta_x/sigmas)
         max_correction = np.max(corrections)
-        if max_correction < 1e-2:
+        if max_correction < 1e-3:
             # print("Converged based on magnitude of corrections.")
             self.converged = True
         return None
