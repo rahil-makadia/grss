@@ -238,10 +238,8 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
     psv_df['cosDec'] = np.cos(psv_df['dec']*np.pi/180)
     psv_df['sigRA'] = psv_df['rmsRA']
     psv_df['sigDec'] = psv_df['rmsDec']
-    if 'rmsCorr' not in psv_df:
-        psv_df['sigCorr'] = 0.0
-    if 'rmsTime' not in psv_df:
-        psv_df['sigTime'] = 1.0
+    psv_df['sigCorr'] = 0.0 if 'rmsCorr' not in psv_df else psv_df['rmsCorr']
+    psv_df['sigTime'] = 1.0 if 'rmsTime' not in psv_df else psv_df['rmsTime']
     times = Time(psv_df['obsTime'].to_list(), format='isot', scale='utc')
     psv_df['obsTimeMJD'] = times.utc.mjd
     psv_df['obsTimeMJDTDB'] = times.tdb.mjd
