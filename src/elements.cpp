@@ -118,6 +118,85 @@ void kepler_solve(const real &epochMjD, const std::vector<real> &cometaryState,
 }
 
 /** 
+ * @brief Stumpff functions C(z) and S(z).
+ * 
+ * @param[in] z parameter for the Stumpff functions.
+ * @param[out] C Stumpff function C(z).
+ * @param[out] S Stumpff function S(z).
+ */
+static void stumpff_CS(const real &z, real &C, real &S) {
+    if (z > 0) {
+        const real sqrt_z = sqrt(z);
+        C = (1 - cos(sqrt_z)) / z;
+        S = (sqrt_z - sin(sqrt_z)) / pow(z, 1.5L);
+    } else if (z < 0) {
+        const real sqrt_neg_z = sqrt(-z);
+        C = (cosh(sqrt_neg_z) - 1) / (-z);
+        S = (sinh(sqrt_neg_z) - sqrt_neg_z) / pow(-z, 1.5L);
+    } else {
+        C = 0.5L;
+        S = 1.0L / 6.0L;
+    }
+}
+
+/**
+ * @param[in] state0 Initial Cartesian state [x, y, z, vx, vy, vz].
+ * @param[in] dt Time of flight in days.
+ * @param[in] GM Gravitational parameter.
+ * @param[in] tol Tolerance for the Newton-Raphson solver.
+ * @param[in] max_iter Maximum number of iterations for the Newton-Raphson solver.
+ * @return Propagated Cartesian state [x, y, z, vx, vy, vz] plus the lagrange coefficients [f, g, fdot, gdot].
+ */
+std::vector<real> universal_propagator(const std::vector<real> &state0, const real &dt,
+                                       const real &GM, const real &tol, const int &max_iter){
+    real r0_norm, v0_norm_sq, rDot, alpha, chi;
+    vnorm({state0[0], state0[1], state0[2]}, r0_norm);
+    v0_norm_sq = state0[3]*state0[3] + state0[4]*state0[4] + state0[5]*state0[5];
+    vdot({state0[0], state0[1], state0[2]}, {state0[3], state0[4], state0[5]}, rDot);
+    rDot /= r0_norm;
+    alpha = (2.0L / r0_norm) - (v0_norm_sq / GM);
+    if (alpha > 0) {
+        chi = sqrt(GM) * dt * alpha;
+    } else {
+        chi = copysign(1.0L, dt) * sqrt(-1/alpha) * log(
+            (-2 * GM * alpha * dt) /
+            (rDot + copysign(1.0L, dt) * sqrt(-GM / alpha) * (1 - r0_norm * alpha))
+        );
+    }
+    int iter = 0;
+    real z, C, S, func, dfunc, ratio;
+    while (iter < max_iter) {
+        z = alpha * chi * chi;
+        stumpff_CS(z, C, S);
+        func = r0_norm * rDot / sqrt(GM) * chi * chi * C + (1 - alpha * r0_norm) * chi * chi * chi * S + r0_norm * chi - sqrt(GM) * dt;
+        dfunc = r0_norm * rDot / sqrt(GM) * chi * (1 - z * S) + (1 - alpha * r0_norm) * chi * chi * C + r0_norm;
+        ratio = func / dfunc;
+        chi -= ratio;
+        if (fabs(ratio) < tol) break;
+        iter++;
+    }
+    z = alpha * chi * chi;
+    stumpff_CS(z, C, S);
+    const real f = 1 - chi * chi / r0_norm * C;
+    const real g = dt - chi * chi * chi / sqrt(GM) * S;
+    std::vector<real> state_plus_info(10, 0.0);
+    for (size_t i = 0; i < 3; i++) {
+        state_plus_info[i] = f * state0[i] + g * state0[i + 3];
+    }
+    const real r_norm = sqrt(state_plus_info[0] * state_plus_info[0] + state_plus_info[1] * state_plus_info[1] + state_plus_info[2] * state_plus_info[2]);
+    const real fdot = sqrt(GM) / (r_norm * r0_norm) * (alpha * chi * chi * chi * S - chi);
+    const real gdot = 1 - chi * chi / r_norm * C;
+    for (size_t i = 0; i < 3; i++) {
+        state_plus_info[i + 3] = fdot * state0[i] + gdot * state0[i + 3];
+    }
+    state_plus_info[6] = f;
+    state_plus_info[7] = g;
+    state_plus_info[8] = fdot;
+    state_plus_info[9] = gdot;
+    return state_plus_info;
+}
+
+/** 
  * @param[in] epochMjd Epoch in TDB Modified Julian Date.
  * @param[in] cometaryState Cometary elements.
  * @param[out] keplerianState Keplerian elements.

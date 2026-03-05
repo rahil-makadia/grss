@@ -148,6 +148,12 @@ def get_scale_factor(body_id):
     elif body_id in {4,499,"Mars Barycenter"}:
         scale_factor = 3396.19
         units = "R$_{Mars}$"
+    elif body_id in {5, 599,"Jupiter Barycenter"}:
+        scale_factor = 71492.0
+        units = "R$_{Jupiter}$"
+    elif body_id in {6, 699,"Saturn Barycenter"}:
+        scale_factor = 60268.0
+        units = "R$_{Saturn}$"
     else:
         raise ValueError("Unknown body ID")
     return scale_factor, units

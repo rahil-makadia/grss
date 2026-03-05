@@ -555,7 +555,7 @@ class FitSimulation:
         self.de_kernel_path = default_kernel_path
         self.analytic_partials = False
         self.prop_sims = [None, None]
-        self.fixed_propsim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0,
+        self.fixed_propsim_params = {'a1': 0.0, 'a2': 0.0, 'a3': 0.0, 'dt': 0.0,
                                         'alpha': 1.0, 'k': 0.0, 'm': 2.0, 'n': 0.0,
                                         'r0_au': 1.0, 'radius': 0.0, 'mass': 0.0}
         if nongrav_info is not None:
@@ -1001,15 +1001,14 @@ class FitSimulation:
         """
         # pylint: disable=no-member
         nongrav_params = libgrss.NongravParameters()
-        a1_est = 'a1' in x_dict.keys()
-        a2_est = 'a2' in x_dict.keys()
-        a3_est = 'a3' in x_dict.keys()
-        nongrav_params.a1 = x_dict['a1'] if a1_est else self.fixed_propsim_params['a1']
-        nongrav_params.a2 = x_dict['a2'] if a2_est else self.fixed_propsim_params['a2']
-        nongrav_params.a3 = x_dict['a3'] if a3_est else self.fixed_propsim_params['a3']
-        nongrav_params.a1Est = a1_est
-        nongrav_params.a2Est = a2_est
-        nongrav_params.a3Est = a3_est
+        nongrav_params.a1 = x_dict.get('a1', self.fixed_propsim_params['a1'])
+        nongrav_params.a1Est = 'a1' in x_dict
+        nongrav_params.a2 = x_dict.get('a2', self.fixed_propsim_params['a2'])
+        nongrav_params.a2Est = 'a2' in x_dict
+        nongrav_params.a3 = x_dict.get('a3', self.fixed_propsim_params['a3'])
+        nongrav_params.a3Est = 'a3' in x_dict
+        nongrav_params.dt = x_dict.get('dt', self.fixed_propsim_params['dt'])
+        nongrav_params.dtEst = 'dt' in x_dict
         nongrav_params.alpha = self.fixed_propsim_params['alpha']
         nongrav_params.k = self.fixed_propsim_params['k']
         nongrav_params.m = self.fixed_propsim_params['m']
@@ -1042,15 +1041,15 @@ class FitSimulation:
             event = [None]*5
             event[0] = fixed_event[0] # time of delta-v
             if fixed_event_impulsive:
-                event[1] = x_dict[f"dvx{i}"] if f"dvx{i}" in x_dict.keys() else fixed_event[1]
-                event[2] = x_dict[f"dvy{i}"] if f"dvy{i}" in x_dict.keys() else fixed_event[2]
-                event[3] = x_dict[f"dvz{i}"] if f"dvz{i}" in x_dict.keys() else fixed_event[3]
-                event[4] = x_dict[f"mult{i}"] if f"mult{i}" in x_dict.keys() else fixed_event[4]
+                event[1] = x_dict.get(f"dvx{i}", fixed_event[1])
+                event[2] = x_dict.get(f"dvy{i}", fixed_event[2])
+                event[3] = x_dict.get(f"dvz{i}", fixed_event[3])
+                event[4] = x_dict.get(f"mult{i}", fixed_event[4])
             elif fixed_event_continuous:
-                event[1] = x_dict[f"ax{i}"] if f"ax{i}" in x_dict.keys() else fixed_event[1]
-                event[2] = x_dict[f"ay{i}"] if f"ay{i}" in x_dict.keys() else fixed_event[2]
-                event[3] = x_dict[f"az{i}"] if f"az{i}" in x_dict.keys() else fixed_event[3]
-                event[4] = x_dict[f"dt{i}"] if f"dt{i}" in x_dict.keys() else fixed_event[4]
+                event[1] = x_dict.get(f"ax{i}", fixed_event[1])
+                event[2] = x_dict.get(f"ay{i}", fixed_event[2])
+                event[3] = x_dict.get(f"az{i}", fixed_event[3])
+                event[4] = x_dict.get(f"dt{i}", fixed_event[4])
                 event.append(fixed_event[5])
             events.append(tuple(event))
         return events
@@ -1164,7 +1163,7 @@ class FitSimulation:
         if key[:2] in {'ax', 'ay', 'az'}:
             fd_pert = 1e-11
         if key[:2] == 'dt':
-            # 10 percent of the time constant
+            # 10 percent of the time constant / perihelion time offset
             fd_pert = 0.1*self.x_nom[key]
         if fd_pert == np.inf:
             raise ValueError("Finite difference perturbation not defined"
@@ -1898,7 +1897,9 @@ class FitSimulation:
                         print("WARNING: Eccentricity is negative per least squares "
                                 "state correction. Setting to 0.0. This solution "
                                 "may not be trustworthy.")
-                if key[:2] == 'dt':
+                # this one is just for the time constant, 
+                # not the peak nongrav perihelion time offset
+                if len(key) > 2 and key[:2] == 'dt':
                     idx = list(self.x_nom.keys()).index(key)
                     if curr_state[idx] + delta_x[idx] < 0.1:
                         delta_x[idx] = 0.1 - curr_state[idx]
@@ -2152,7 +2153,9 @@ class FitSimulation:
                     f.write(")")
                 f.write("\n")
             f.write("\n")
-            f.write("Initial Covariance Matrix:\n")
+            base_units = 'AU, day, rad' if self.fit_cometary else 'AU, AU/day'
+            cov_units_str = f'({base_units}{", AU/day^2" if "a1" in self.x_init or "a2" in self.x_init or "a3" in self.x_init else ""})'
+            f.write(f"Initial Covariance Matrix {cov_units_str}:\n")
             for row in self.covariance_init:
                 f.write(half_tab.join([f"{val:18.11e}" for val in row]) + '\n')
             f.write("\n")
@@ -2192,7 +2195,7 @@ class FitSimulation:
                     f.write(")")
                 f.write("\n")
             f.write("\n")
-            f.write("Final Covariance Matrix:\n")
+            f.write(f"Final Covariance Matrix {cov_units_str}:\n")
             for row in self.covariance:
                 f.write(half_tab.join([f"{val:18.11e}" for val in row]) + '\n')
             f.write("\n")
@@ -2223,7 +2226,8 @@ class FitSimulation:
             f.write(f'{"ATsec[s]".center(widths["resATsec"])}')
             f.write("\n")
             for i, obs in self.obs[::-1].iterrows():
-                f.write(f'{obs["selAst"]+obs["obsTime"]:<{widths["obsTime"]}}')
+                sel_field = " " if obs["selAst"] == 'A' else obs["selAst"]
+                f.write(f'{sel_field+obs["obsTime"]:<{widths["obsTime"]}}')
                 if obs['mode'] in {'RAD', 'SIM_RAD_DEL', 'SIM_RAD_DOP'}:
                     f.write(f'{obs["trx"]+"/"+obs["rcv"]:^{widths["stn"]}}')
                     f.write(f'{obs["delay"]:^{widths["ra"]}.13g}')

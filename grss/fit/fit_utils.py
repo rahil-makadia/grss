@@ -352,16 +352,16 @@ def get_sbdb_info(tdes):
     else:
         print(f"WARNING: No covariance data available for {tdes}")
         cov_mat = np.zeros((6, 6))
-    # nongravitatinoal constants for target body
+    # nongravitational constants for target body
     nongrav_data = raw_data['orbit']['model_pars']
     hdr = [param['name'] for param in nongrav_data]
     val = [float(param['value']) for param in nongrav_data]
     nongrav_data_dict = dict(zip(hdr, val))
-    nongrav_keys = ['A1', 'A2', 'A3', 'ALN', 'NK', 'NM', 'NN', 'R0']
+    nongrav_keys = ['A1', 'A2', 'A3', 'DT', 'ALN', 'NK', 'NM', 'NN', 'R0']
     # from https://ssd.jpl.nasa.gov/horizons/manual.html
-    nongrav_default_vals = [0.0, 0.0, 0.0, 0.1112620426, 4.6142, 2.15, 5.093, 2.808]
+    nongrav_default_vals = [0.0, 0.0, 0.0, 0.0, 0.1112620426, 4.6142, 2.15, 5.093, 2.808]
     nongrav_default_dict = dict(zip(nongrav_keys, nongrav_default_vals))
-    nongrav_key_map = { 'A1': 'a1', 'A2': 'a2', 'A3': 'a3', 'ALN': 'alpha',
+    nongrav_key_map = { 'A1': 'a1', 'A2': 'a2', 'A3': 'a3', 'DT': 'dt', 'ALN': 'alpha',
                         'NK': 'k', 'NM': 'm', 'NN': 'n', 'R0': 'r0_au'}
     nongrav_params = {}
     for key in nongrav_keys:
@@ -398,7 +398,7 @@ def get_similarity_stats(sol_1, cov_1, sol_2, cov_2):
         Covariance matrix 1
     sol_2 : vector
         Mean solution 2
-    cov_2 : _type_
+    cov_2 : array
         Covariance matrix 2
 
     Returns

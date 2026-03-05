@@ -95,6 +95,11 @@ using std::tanh;
  * 
  */
 #define EARTH_FLAT_WGS84 1.0 / 298.257223563
+/**
+ * @brief Value of the Sun's gravitational parameter in AU^3/day^2 from DE440/441.
+ * 
+ */
+#define SUN_GM 2.9591220828411956E-04L
 
 /**
  * @brief Wrap an angle to the range [0, 2*pi).

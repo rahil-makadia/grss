@@ -32,12 +32,13 @@ def _handle_one_cloned_sim(sol, ref_nongrav):
     a1 = sol.get('a1', ref_nongrav.a1)
     a2 = sol.get('a2', ref_nongrav.a2)
     a3 = sol.get('a3', ref_nongrav.a3)
+    dt = sol.get('dt', ref_nongrav.dt)
     alpha = ref_nongrav.alpha
     k = ref_nongrav.k
     m = ref_nongrav.m
     n = ref_nongrav.n
     r0_au = ref_nongrav.r0_au
-    ng_list = [a1, a2, a3, alpha, k, m, n, r0_au]
+    ng_list = [a1, a2, a3, dt, alpha, k, m, n, r0_au]
     cometary = False
     cart = False
     if all(key in sol for key in ['e', 'q', 'tp', 'om', 'w', 'i']):

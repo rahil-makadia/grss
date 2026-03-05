@@ -121,6 +121,9 @@ PYBIND11_MODULE(libgrss, m) {
         .def_readwrite("a3", &NongravParameters::a3, R"mydelimiter(
             Normal non-gravitational parameter a3.
             )mydelimiter")
+        .def_readwrite("dt", &NongravParameters::dt, R"mydelimiter(
+            Perihelion time offset for peak non-gravitational acceleration.
+            )mydelimiter")
         .def_readwrite("a1Est", &NongravParameters::a1Est, R"mydelimiter(
             Flag for whether to estimate a1 (used when propagating STM).
             )mydelimiter")
@@ -129,6 +132,9 @@ PYBIND11_MODULE(libgrss, m) {
             )mydelimiter")
         .def_readwrite("a3Est", &NongravParameters::a3Est, R"mydelimiter(
             Flag for whether to estimate a3 (used when propagating STM).
+            )mydelimiter")
+        .def_readwrite("dtEst", &NongravParameters::dtEst, R"mydelimiter(
+            Flag for whether to estimate dt (used when propagating STM).
             )mydelimiter")
         .def_readwrite("alpha", &NongravParameters::alpha, R"mydelimiter(
             Non-gravitational parameter alpha from Marsden et al. (1973).
@@ -346,6 +352,30 @@ PYBIND11_MODULE(libgrss, m) {
                 None.
             )mydelimiter");
 
+    m.def("universal_propagator", &universal_propagator, py::arg("state0"), py::arg("dt"),
+          py::arg("GM") = SUN_GM, py::arg("tol") = 1.0e-12L,
+          py::arg("max_iter") = 250, R"mydelimiter(
+        Universal variable two-body propagator.
+
+        Parameters
+        ----------
+        state0 : list of real
+            Initial Cartesian state [x, y, z, vx, vy, vz].
+        dt : real
+            Time of flight in days.
+        GM : real, optional
+            Gravitational parameter, by default Sun.
+        tol : real, optional
+            Tolerance for the Newton-Raphson solver, by default 1.0e-12.
+        max_iter : int, optional
+            Maximum number of iterations for the Newton-Raphson solver, by default 250.
+
+        Returns
+        -------
+        state_plus_info : list of real
+            Propagated Cartesian state [x, y, z, vx, vy, vz] plus the lagrange coefficients [f, g, fdot, gdot].
+        )mydelimiter");
+
     m.def(
         "cometary_to_cartesian",
         [](real epochMjd, std::vector<real> cometaryState, real GM) {
@@ -354,7 +384,7 @@ PYBIND11_MODULE(libgrss, m) {
             return cartesianState;
         },
         py::arg("epochMjd"), py::arg("cometaryState"),
-        py::arg("GM") = 2.9591220828559115e-4L, R"mydelimiter(
+        py::arg("GM") = SUN_GM, R"mydelimiter(
         Convert cometary state to cartesian state.
 
         Parameters
@@ -364,7 +394,7 @@ PYBIND11_MODULE(libgrss, m) {
         cometaryState : list of real
             Cometary state vector.
         GM : real, optional
-            Gravitational parameter of the central body, by default 0.00029591220828559115L.
+            Gravitational parameter of the central body, by default Sun.
         
         Returns
         -------
@@ -380,7 +410,7 @@ PYBIND11_MODULE(libgrss, m) {
             return cometaryState;
         },
         py::arg("epochMjd"), py::arg("cartesianState"),
-        py::arg("GM") = 2.9591220828559115e-4L, R"mydelimiter(
+        py::arg("GM") = SUN_GM, R"mydelimiter(
         Convert cartesian state to cometary state.
 
         Parameters
@@ -390,7 +420,7 @@ PYBIND11_MODULE(libgrss, m) {
         cartesianState : list of real
             Cartesian state vector.
         GM : real, optional
-            Gravitational parameter of the central body, by default 0.00029591220828559115L.
+            Gravitational parameter of the central body, by default Sun.
 
         Returns
         -------
@@ -406,7 +436,7 @@ PYBIND11_MODULE(libgrss, m) {
             return partials;
         },
         py::arg("epochMjd"), py::arg("elems"), py::arg("conversion"),
-        py::arg("GM") = 2.9591220828559115e-4L, R"mydelimiter(
+        py::arg("GM") = SUN_GM, R"mydelimiter(
         Calculate the partial derivatives of input ecliptic orbital elements with respect to
         the corresponding ecliptic Cartesian state vector.
 
@@ -419,7 +449,7 @@ PYBIND11_MODULE(libgrss, m) {
         conversion : str
             Conversion type (must be either "kep2cart" or "com2cart").
         GM : real, optional
-            Gravitational parameter of the central body, by default 0.00029591220828559115L.
+            Gravitational parameter of the central body, by default Sun.
 
         Returns
         -------

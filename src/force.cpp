@@ -712,9 +712,7 @@ static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accI
             const real dvx = propSim->integBodies[i].vel[0] - sun->vel[0];
             const real dvy = propSim->integBodies[i].vel[1] - sun->vel[1];
             const real dvz = propSim->integBodies[i].vel[2] - sun->vel[2];
-            const real rRel = sqrt(dx * dx + dy * dy + dz * dz);
-            const real g =
-                alpha * pow(rRel / r0, -m) * pow(1 + pow(rRel / r0, n), -k);
+            real rRel = sqrt(dx * dx + dy * dy + dz * dz);
             real dpos[3] = {dx, dy, dz};
             real dvel[3] = {dvx, dvy, dvz};
             real hRelVec[3], eTHat[3], eNHat[3];
@@ -722,6 +720,18 @@ static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accI
             vcross(dpos, dvel, hRelVec);
             vunit(hRelVec, 3, eNHat);
             vcross(eNHat, eRHat, eTHat);
+            const real dt = propSim->integBodies[i].ngParams.dt;
+            real dtParams[4] = {0.0, 0.0, 0.0, 0.0};
+            if (dt != 0.0 || propSim->integBodies[i].ngParams.dtEst) {
+                std::vector<real> stateAtDt = universal_propagator({dx, dy, dz, dvx, dvy, dvz}, -dt);
+                rRel = sqrt(stateAtDt[0] * stateAtDt[0] + stateAtDt[1] * stateAtDt[1] + stateAtDt[2] * stateAtDt[2]);
+                // dtParams is distance at t-dt, fg lagrange coefficients to go from t to t-dt, and the radial velocity at t-dt
+                dtParams[0] = rRel;
+                dtParams[1] = stateAtDt[6];
+                dtParams[2] = stateAtDt[7];
+                dtParams[3] = (stateAtDt[0] * stateAtDt[3] + stateAtDt[1] * stateAtDt[4] + stateAtDt[2] * stateAtDt[5]) / rRel;
+            }
+            const real g = alpha * pow(rRel/r0, -m) * pow(1 + pow(rRel/r0, n), -k);
             accInteg[starti + 0] +=
                 g * (a1 * eRHat[0] + a2 * eTHat[0] + a3 * eNHat[0]);
             accInteg[starti + 1] +=
@@ -731,7 +741,7 @@ static void force_nongrav(const PropSimulation *propSim, std::vector<real> &accI
             if (propSim->integBodies[i].propStm) {
                 stm_nongrav(allSTMs[i], g,
                             propSim->integBodies[i].ngParams, dx, dy, dz,
-                            dvx, dvy, dvz, dpos, hRelVec);
+                            dvx, dvy, dvz, dtParams, hRelVec);
             }
             #ifdef PRINT_FORCES
             forceFile << std::setw(10) << "ng_" + std::to_string(sun->spiceId) << std::setw(25)

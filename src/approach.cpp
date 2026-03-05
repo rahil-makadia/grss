@@ -866,6 +866,11 @@ void get_bplane_partials(PropSimulation *propSim, CloseApproachParameters *ca,
  * @param[in] tMap Time of the B-plane map.
  */
 void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const real &tMap) {
+    bool nullStart = false;
+    if (propSim->spkEphem.mb == nullptr || propSim->spkEphem.sb == nullptr){
+        nullStart = true;
+        propSim->map_ephemeris();
+    }
     // Calculate the parameters of a close approach
     const size_t i = this->flybyBodyIdx;
     const size_t j = this->centralBodyIdx;
@@ -993,6 +998,7 @@ void CloseApproachParameters::get_ca_parameters(PropSimulation *propSim, const r
     if (propSim->integBodies[i].propStm){
         get_bplane_partials(propSim, this, mu, radius);
     }
+    if (nullStart) propSim->unmap_ephemeris();
 }
 
 /**
