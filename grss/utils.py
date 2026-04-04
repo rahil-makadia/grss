@@ -37,12 +37,29 @@ def _download_codes_file():
             float(val['rhosinphi']),
         )
         for key, val in all_data.items()
-            if all_data[key]['observations_type'] not in {'satellite', 'roving'} and key != '275'
+            if all_data[key]['observations_type'] in {'optical', 'radar'} or key == '244'
     }
+    # make a list of all satellite, occultation, and roving codes for use in fit_ades.py
+    sat_codes = [key for key in all_data.keys()
+                if all_data[key]['observations_type'] == 'satellite']
+    sat_codes.extend(['S/C', 'S_C'])
+    occ_codes = [key for key in all_data.keys()
+                if all_data[key]['observations_type'] == 'occultation']
+    roving_codes = [key for key in all_data.keys()
+                    if all_data[key]['observations_type'] == 'roving']
     fpath = f'{grss_path}/fit/codes.json'
     # write mpc_info_dict to file
     with open(fpath, 'w', encoding='utf-8') as f:
         json.dump(mpc_info_dict, f, indent=4)
+    special_codes = {
+        'gaia': ['258'],
+        'occultation': occ_codes,
+        'spacecraft': sat_codes,
+        'roving': roving_codes
+    }
+    fpath = f'{grss_path}/fit/special_codes.json'
+    with open(fpath, 'w', encoding='utf-8') as f:
+        json.dump(special_codes, f, indent=4)
     return None
 
 def check_and_get_codes_file():

@@ -1,4 +1,5 @@
 """ADES (Astrometric Data Exchange Standard) data handling for the GRSS orbit determination code"""
+from ..utils import json, grss_path
 
 __all__ = [ 'ades_keep_columns',
             'ades_add_columns',
@@ -108,10 +109,9 @@ pack_letters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 unpack_letters = {pack_letters[i]: i for i in range(len(pack_letters))}
 prog_codes = R"""0123456789!"#$%&'()*+,-./[\]^_`{|}~:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz£"""
 
-special_codes = {
-    'gaia': {'258'},
-    'occultation': {'244', '275'},
-    'spacecraft': {'S/C', 'S_C', '245', '249', '250', '273', '274',
-                   'C49', 'C50', 'C51', 'C52', 'C53', 'C54', 'C55', 'C56', 'C57', 'C58', 'C59', },
-    'roving': {'247', '270'},
-}
+# read special_codes from file
+with open(f'{grss_path}/fit/special_codes.json', 'r', encoding='utf-8') as f:
+    special_codes = json.load(f)
+# convert lists to sets
+for key in special_codes:
+    special_codes[key] = set(special_codes[key])
