@@ -647,17 +647,22 @@ class FitSimulation:
         # check that the keys in self.x_init are the same as in self.prior_est and self.prior_sig
         if self.prior_est is not None and self.prior_sig is not None:
             self._priors_given = True
-            if len(self.prior_est) != len(self.prior_sig):
-                raise ValueError("Prior estimates and sigmas must have the same length.")
+            # even if full prior info is given, check that priors belong to fitted parameters
+            # and that each prior has a corresponding sigma (even for the full prior info)
             for key in self.prior_est.keys():
                 if key not in self.x_init:
                     raise ValueError(f"Key {key} not found in initial state vector.")
+                if key not in self.prior_sig:
+                    raise ValueError(f"Key {key} not found in prior sigmas.")
             self._info0 = np.zeros_like(self.covariance_init)
             self._xbar0 = np.zeros(self.n_fit)
             for key in self.prior_est.keys():
                 idx = list(self.x_init.keys()).index(key)
                 self._info0[idx, idx] = 1/self.prior_sig[key]**2
                 self._xbar0[idx] = self.prior_est[key] - self.x_init[key]
+            # if full prior info matrix is given, use it instead of the diagonals
+            if 'full_prior_info' in self.prior_sig:
+                self._info0 = self.prior_sig['full_prior_info']
             self._prior_constant = list(self.x_nom.values())+self._xbar0
         return None
 
