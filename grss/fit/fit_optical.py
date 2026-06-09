@@ -854,14 +854,15 @@ def apply_weighting_scheme(obs_df, verbose):
             #     print(f"\tUsing {len(ccd_rms)} {mode} observations with provided "
             #             "RA/Dec RMS and correlation values.")
         elif mode in {'OCC'}: # Occultations
-            obs_df.loc[group.index, cols] = 0.01
-            # if rmsRA and rmsDec are not nan, use them
-            occ_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec and rmsCorr == rmsCorr")
-            obs_df.loc[occ_rms.index, cols] = occ_rms[['rmsRA', 'rmsDec']].values
-            obs_df.loc[occ_rms.index, 'sigCorr'] = occ_rms['rmsCorr'].values
-            if verbose:
-                print(f"\tUsing {len(occ_rms)} {mode} observations with provided "
-                        "RA/Dec RMS values.")
+            obs_df.loc[group.index, cols] = 0.05
+            # if rmsCorr is not nan, use it
+            occ_corr = group.query("rmsCorr == rmsCorr")
+            obs_df.loc[occ_corr.index, 'sigCorr'] = occ_corr['rmsCorr'].values
+            # # if rmsRA and rmsDec are not nan, use them
+            # occ_rms = group.query("rmsRA == rmsRA and rmsDec == rmsDec")
+            # obs_df.loc[occ_rms.index, cols] = occ_rms[['rmsRA', 'rmsDec']].values
+            # if verbose:
+            #     print(f"\tUsing {len(occ_rms)} {mode} observations with provided RA/Dec RMS values.")
         elif mode in {'PMT'}: # Hipparcos
             obs_df.loc[group.index, cols] = 0.2
         elif mode in {'MER'}: # Transit circle
