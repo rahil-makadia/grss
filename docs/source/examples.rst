@@ -15,4 +15,5 @@ Examples
    tests/python/fit/chesley.ipynb
    tests/python/fit/eggl.ipynb
    tests/python/fit/farnocchia.ipynb
+   tests/python/fit/makadia.ipynb
    tests/python/fit/shantanunaidu.ipynb
