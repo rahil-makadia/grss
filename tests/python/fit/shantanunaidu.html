@@ -17,7 +17,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 4.5.7 documentation</title>
+    <title>(11468) Shantanunaidu orbit determination test &#8212; GRSS 4.5.8 documentation</title>
   
   
   
@@ -48,7 +48,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=95b4f626"></script>
+    <script src="../../../_static/documentation_options.js?v=ec904942"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="(84100) Farnocchia orbit determination test" href="farnocchia.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Jun 10, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 28, 2026"/>
   </head>
   
   
@@ -153,7 +153,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.5.7 documentation</p>
+    <p class="title logo__title">GRSS v4.5.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -527,7 +527,7 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;11468&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">'11468'</span>
 <span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">nongrav_info</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_sbdb_info</span><span class="p">(</span><span class="n">body_id</span><span class="p">)</span>
 <span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">440</span>
 </pre></div>
@@ -552,7 +552,7 @@ document.write(`
 <span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_optical_obs</span><span class="p">(</span><span class="n">body_id</span><span class="p">,</span> <span class="n">optical_obs_file</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">debias_lowres</span><span class="p">,</span> <span class="n">deweight</span><span class="p">,</span> <span class="n">eliminate</span><span class="p">,</span> <span class="n">num_obs_per_night</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 <span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">add_radar_obs</span><span class="p">(</span><span class="n">obs_df</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 <span class="k">if</span> <span class="n">add_gaia_obs</span><span class="p">:</span>
-    <span class="n">gaia_dr</span> <span class="o">=</span> <span class="s1">&#39;gaiafpr&#39;</span>
+    <span class="n">gaia_dr</span> <span class="o">=</span> <span class="s1">'gaiafpr'</span>
     <span class="n">obs_df</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">add_gaia_obs</span><span class="p">(</span><span class="n">obs_df</span><span class="p">,</span> <span class="n">t_min_tdb</span><span class="p">,</span> <span class="n">t_max_tdb</span><span class="p">,</span> <span class="n">gaia_dr</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -668,7 +668,7 @@ i                       7.89092453408e-01               8.48980314059e-08       
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fit_sim</span><span class="o">.</span><span class="n">iters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot_iteration_summary</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Postfit Residuals&#39;</span><span class="p">,</span> <span class="n">auto_close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fit_sim</span><span class="o">.</span><span class="n">iters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot_iteration_summary</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Postfit Residuals'</span><span class="p">,</span> <span class="n">auto_close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -696,10 +696,10 @@ i                       7.89092453408e-01               8.48980314059e-08       
 <span class="n">cov_f</span> <span class="o">=</span> <span class="n">fit_sim</span><span class="o">.</span><span class="n">covariance</span>
 
 <span class="n">maha_dist_f</span><span class="p">,</span> <span class="n">maha_dist_0</span><span class="p">,</span> <span class="n">bhattacharya</span><span class="p">,</span> <span class="n">bhatt_coeff</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_similarity_stats</span><span class="p">(</span><span class="n">mean_0</span><span class="p">,</span> <span class="n">cov_0</span><span class="p">,</span> <span class="n">mean_f</span><span class="p">,</span> <span class="n">cov_f</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mahalonobis distance between JPL and GRSS solution: </span><span class="si">{</span><span class="n">maha_dist_f</span><span class="si">:</span><span class="s1">0.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Mahalonobis distance between GRSS and JPL solution: </span><span class="si">{</span><span class="n">maha_dist_0</span><span class="si">:</span><span class="s1">0.2f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bhattacharya distance between JPL and GRSS solution: </span><span class="si">{</span><span class="n">bhattacharya</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bhattacharya coefficient between JPL and GRSS solution: </span><span class="si">{</span><span class="n">bhatt_coeff</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Mahalonobis distance between JPL and GRSS solution: </span><span class="si">{</span><span class="n">maha_dist_f</span><span class="si">:</span><span class="s1">0.2f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Mahalonobis distance between GRSS and JPL solution: </span><span class="si">{</span><span class="n">maha_dist_0</span><span class="si">:</span><span class="s1">0.2f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Bhattacharya distance between JPL and GRSS solution: </span><span class="si">{</span><span class="n">bhattacharya</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Bhattacharya coefficient between JPL and GRSS solution: </span><span class="si">{</span><span class="n">bhatt_coeff</span><span class="si">:</span><span class="s1">0.4f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -823,7 +823,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jun 10, 2026.
+  Last updated on Aug 28, 2026.
   <br/>
 </p>
   </div>

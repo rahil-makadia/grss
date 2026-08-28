@@ -17,7 +17,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>(66391) Moshup propagation test &#8212; GRSS 4.5.7 documentation</title>
+    <title>(66391) Moshup propagation test &#8212; GRSS 4.5.8 documentation</title>
   
   
   
@@ -48,7 +48,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=95b4f626"></script>
+    <script src="../../../_static/documentation_options.js?v=ec904942"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="(1566) Icarus propagation test" href="icarus.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Jun 10, 2026"/>
+    <meta name="docbuild:last-update" content="Aug 28, 2026"/>
   </head>
   
   
@@ -153,7 +153,7 @@
     <script>document.write(`<img src="../../../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.5.7 documentation</p>
+    <p class="title logo__title">GRSS v4.5.8 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -535,7 +535,7 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">&#39;66391&#39;</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">body_id</span> <span class="o">=</span> <span class="s1">'66391'</span>
 <span class="n">init_sol</span><span class="p">,</span> <span class="n">init_cov</span><span class="p">,</span> <span class="n">nongrav_info</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">get_sbdb_info</span><span class="p">(</span><span class="n">body_id</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -544,20 +544,20 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t0</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
-<span class="n">e</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span>
-<span class="n">q</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;q&#39;</span><span class="p">]</span>
-<span class="n">tp</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;tp&#39;</span><span class="p">]</span>
-<span class="n">om</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;om&#39;</span><span class="p">]</span>
-<span class="n">w</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span>
-<span class="n">i</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">]</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t0</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'t'</span><span class="p">]</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'e'</span><span class="p">]</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'q'</span><span class="p">]</span>
+<span class="n">tp</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'tp'</span><span class="p">]</span>
+<span class="n">om</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'om'</span><span class="p">]</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'w'</span><span class="p">]</span>
+<span class="n">i</span> <span class="o">=</span> <span class="n">init_sol</span><span class="p">[</span><span class="s1">'i'</span><span class="p">]</span>
 
 <span class="n">cometary_elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">tp</span><span class="p">,</span> <span class="n">om</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
 <span class="n">ng_params</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">NongravParameters</span><span class="p">()</span>
-<span class="n">ng_params</span><span class="o">.</span><span class="n">a1</span> <span class="o">=</span> <span class="n">init_sol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-<span class="n">ng_params</span><span class="o">.</span><span class="n">a2</span> <span class="o">=</span> <span class="n">init_sol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-<span class="n">ng_params</span><span class="o">.</span><span class="n">a3</span> <span class="o">=</span> <span class="n">init_sol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;a3&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-<span class="n">moshup</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">IntegBody</span><span class="p">(</span><span class="s2">&quot;(66391) Moshup&quot;</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">cometary_elements</span><span class="p">,</span> <span class="n">ng_params</span><span class="p">)</span>
+<span class="n">ng_params</span><span class="o">.</span><span class="n">a1</span> <span class="o">=</span> <span class="n">init_sol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'a1'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">ng_params</span><span class="o">.</span><span class="n">a2</span> <span class="o">=</span> <span class="n">init_sol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'a2'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">ng_params</span><span class="o">.</span><span class="n">a3</span> <span class="o">=</span> <span class="n">init_sol</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'a3'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">moshup</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">IntegBody</span><span class="p">(</span><span class="s2">"(66391) Moshup"</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">cometary_elements</span><span class="p">,</span> <span class="n">ng_params</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -571,7 +571,7 @@ document.write(`
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">de_kernel</span> <span class="o">=</span> <span class="mi">440</span>
 <span class="n">de_kernel_path</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">default_kernel_path</span>
 <span class="n">tf</span> <span class="o">=</span> <span class="n">t0</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">*</span> <span class="mf">365.25</span>
-<span class="n">prop_sim</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">PropSimulation</span><span class="p">(</span><span class="s2">&quot;(66391) Moshup propagation test&quot;</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">de_kernel</span><span class="p">,</span> <span class="n">de_kernel_path</span><span class="p">)</span>
+<span class="n">prop_sim</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">PropSimulation</span><span class="p">(</span><span class="s2">"(66391) Moshup propagation test"</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">de_kernel</span><span class="p">,</span> <span class="n">de_kernel_path</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -624,10 +624,10 @@ document.write(`
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
 <span class="n">prop</span><span class="o">.</span><span class="n">plot_solar_system</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="n">xy_plane</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">axs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">arr</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Moshup&#39;</span><span class="p">)</span>
-<span class="n">axs</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x [AU]&quot;</span><span class="p">)</span>
-<span class="n">axs</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y [AU]&quot;</span><span class="p">)</span>
-<span class="n">axs</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arr</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">arr</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">'-'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'Moshup'</span><span class="p">)</span>
+<span class="n">axs</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"x [AU]"</span><span class="p">)</span>
+<span class="n">axs</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"y [AU]"</span><span class="p">)</span>
+<span class="n">axs</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">'equal'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -736,7 +736,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jun 10, 2026.
+  Last updated on Aug 28, 2026.
   <br/>
 </p>
   </div>
