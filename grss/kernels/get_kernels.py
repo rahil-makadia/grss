@@ -51,10 +51,10 @@ if not latest_earth_pck_exists or latest_earth_pck_old:
     check_and_download(f'{NAIF_SITE}/pck/earth_latest_high_prec.bpc',
                        f'{script_dir}/earth_latest.bpc', 'latest Earth binary PCK', force=True)
 # historical earth pck
-check_and_download(f'{NAIF_SITE}/pck/earth_620120_250826.bpc',
+check_and_download(f'{NAIF_SITE}/pck/earth_620120_260806.bpc',
                     f'{script_dir}/earth_historic.bpc', 'historic Earth binary PCK')
 # predicted earth pck
-check_and_download(f'{NAIF_SITE}/pck/earth_2025_250826_2125_predict.bpc',
+check_and_download(f'{NAIF_SITE}/pck/earth_2026_260806_2126_predict.bpc',
                     f'{script_dir}/earth_predict.bpc', 'predicted Earth binary PCK')
 # moon pck
 check_and_download(f'{NAIF_SITE}/pck/moon_pa_de440_200625.bpc',
