@@ -9,6 +9,16 @@ __all__ = [
     'parallel_propagate',
     'cluster_ca_or_impacts',
     'reconstruct_all_log_files',
+    '_handle_one_cloned_sim',
+    '_reconstruct_one_log_file',
+    '_reconstruct_ca_and_impact',
+    '_reconstruct_ca_params',
+    '_reconstruct_impact_params',
+    'handle_one_cloned_sim',
+    'reconstruct_one_log_file',
+    'reconstruct_ca_and_impact',
+    'reconstruct_ca_params',
+    'reconstruct_impact_params',
 ]
 
 def _handle_one_cloned_sim(sol, ref_nongrav):
@@ -209,7 +219,7 @@ def _reconstruct_ca_and_impact(lines):
             start = None
             end = None
         # if start and end keys do not exist, return None
-        if not start or not end:
+        if start is None or end is None:
             continue
         # first line is the header
         header = lines[start+1].strip().split(delimiter)
@@ -390,3 +400,11 @@ def cluster_ca_or_impacts(full_list, max_duration=45, central_body=399):
     ss = duration % 60
     print(f'Clustering took {mm:02d} minute(s) and {ss:.6f} seconds')
     return tuple(all_clusters)
+
+
+# Public helper names; the historical private spellings remain callable.
+handle_one_cloned_sim = _handle_one_cloned_sim
+reconstruct_one_log_file = _reconstruct_one_log_file
+reconstruct_ca_and_impact = _reconstruct_ca_and_impact
+reconstruct_ca_params = _reconstruct_ca_params
+reconstruct_impact_params = _reconstruct_impact_params

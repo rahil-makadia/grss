@@ -4,7 +4,8 @@ import requests
 from astropy.time import Time
 import numpy as np
 
-__all__ = [ 'add_radar_obs',
+__all__ = [ 'get_radar_raw_data',
+            'add_radar_obs',
 ]
 
 def get_radar_raw_data(tdes):

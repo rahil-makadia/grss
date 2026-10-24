@@ -23,6 +23,7 @@ Continue reading on the following pages to learn more about the library:
    fit
    examples
    api_py
+   python_helpers
    api_cpp
    genindex
 

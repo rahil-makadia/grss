@@ -9,8 +9,13 @@ from .fit_ades import special_codes
 
 __all__ = [ 'mjd2et',
             'et2mjd',
+            'parallax_to_lat_lon_alt',
+            'get_mpc_observatory_info',
+            'get_radar_codes_dict',
             'get_codes_dict',
             'get_observer_info',
+            'get_sbdb_raw_data',
+            'get_sbdb_elems',
             'get_sbdb_info',
             'get_similarity_stats',
 ]

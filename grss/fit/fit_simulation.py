@@ -12,8 +12,28 @@ from ..utils import default_kernel_path, grss_path
 from .fit_utils import get_observer_info, get_similarity_stats
 from .fit_ades import special_codes
 
-__all__ = [ 'FitSimulation',
+__all__ = [
+    'flatten_valid_observations',
+    'IterationParams',
+    'FitSimulation',
 ]
+
+def flatten_valid_observations(arr):
+    """
+    Flatten an observation array and remove NaN values.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        Array of computed observations.
+
+    Returns
+    -------
+    numpy.ndarray
+        One-dimensional array containing the non-NaN values, in row order.
+    """
+    flat = np.asarray(arr).ravel()
+    return flat[~np.isnan(flat)]
 
 class IterationParams:
     """
@@ -484,9 +504,23 @@ class IterationParams:
                         show_logarithmic, title, savefig, figname, auto_close)
         return None
 
+    # Public stage names and compatibility aliases share the same callable.
+    calculate_chis = _calculate_chis
+    assemble_info = _assemble_info
+    scatter_hist = _scatter_hist
+    plot_residuals = _plot_residuals
+    plot_chi = _plot_chi
+
 class FitSimulation:
     """
     Class to perform an orbit fit simulation.
+
+    Public setup helpers update this instance's cached observation or orbit
+    state. The constructor calls ``check_initial_solution``,
+    ``parse_observation_arrays``, and ``compute_obs_weights`` in order. If
+    observations are replaced after construction, repeat parsing and weight
+    construction before propagation. The propagation and measurement helpers
+    require an initialized instance and, where noted, integrated simulations.
     """
     def __init__(self, x_init, obs_df, cov_init=None, n_iter_max=10,
                     de_kernel=441, nongrav_info=None, events=None,
@@ -530,7 +564,7 @@ class FitSimulation:
         self.fit_cartesian = False
         self.fit_cometary = False
         self.n_fit = None
-        self._check_initial_solution(x_init, cov_init)
+        self.check_initial_solution(x_init, cov_init)
         self.constraint_dir = None
         self.obs = None
         self.observer_info = None
@@ -544,10 +578,10 @@ class FitSimulation:
         self.future_obs_idx = None
         self.future_obs_exist = None
         self.simulated_obs = simulated_obs
-        self._parse_observation_arrays(obs_df)
+        self.parse_observation_arrays(obs_df)
         self.obs_cov = None
         self.obs_weight = None
-        self._compute_obs_weights()
+        self.compute_obs_weights()
         self.n_iter = 0
         self.n_iter_max = n_iter_max
         self.iters = [[]]
@@ -579,10 +613,14 @@ class FitSimulation:
         self.converged = False
         return None
 
-    def _check_initial_solution(self, x_init, cov_init):
+    def check_initial_solution(self, x_init, cov_init):
         """
         Check the initial solution provided by the user and make 
         sure it is valid.
+
+        This also sets the epoch, nominal state, coordinate type, and number
+        of fitted parameters. It is normally called by the constructor; when
+        called later, observation partitions and weights must be rebuilt.
 
         Parameters
         ----------
@@ -629,10 +667,13 @@ class FitSimulation:
             raise ValueError(msg)
         return None
 
-    def _check_priors(self):
+    def prepare_priors(self):
         """
-        Check the prior estimates and sigmas provided by the user
-        and make sure they are valid.
+        Validate and prepare any prior estimates and sigmas for fitting.
+
+        Call this after setting ``prior_est`` and ``prior_sig`` and before
+        solving a state correction outside ``filter_lsq``. The method updates
+        the internal prior information matrix and offset.
 
         Returns
         -------
@@ -661,27 +702,13 @@ class FitSimulation:
             self._prior_constant = list(self.x_nom.values())+self._xbar0
         return None
 
-    def _flatten_and_clean(self, arr):
-        """
-        Flatten an array and remove any NaN values.
-
-        Parameters
-        ----------
-        arr : array
-            Array to flatten and clean.
-
-        Returns
-        -------
-        arr : array
-            Flattened and cleaned array.
-        """
-        arr = arr.flatten()
-        arr = arr[~np.isnan(arr)]
-        return arr
-
-    def _add_simulated_obs(self):
+    def add_simulated_obs(self):
         """
         Add the simulated observation data to the observation data.
+
+        Uses ``self.simulated_obs`` and appends rows to ``self.obs``. The
+        constructor calls this through ``parse_observation_arrays``. A direct
+        call does not refresh observer indices or weight matrices.
 
         Returns
         -------
@@ -751,9 +778,13 @@ class FitSimulation:
         self.obs = pd.concat([self.obs, sim_obs_df], ignore_index=True)
         return None
 
-    def _parse_observation_arrays(self, obs_df):
+    def parse_observation_arrays(self, obs_df):
         """
         Parse the observation data for the orbit fit.
+
+        Sets the observation table, observer metadata, and past/future index
+        partitions. It may append ``self.simulated_obs``; call
+        ``compute_obs_weights`` afterward if used outside the constructor.
 
         Returns
         -------
@@ -764,7 +795,7 @@ class FitSimulation:
         sel_ast_map = {'': 'A', ' ': 'A', np.nan: 'A', 'nan': 'A'}
         self.obs['selAst'] = self.obs['selAst'].replace(sel_ast_map)
         if self.simulated_obs is not None:
-            self._add_simulated_obs()
+            self.add_simulated_obs()
         self.obs.sort_values(by='obsTimeMJD', inplace=True, ignore_index=True)
         self.observer_info = get_observer_info(self.obs)
         self.optical_idx = []
@@ -789,10 +820,13 @@ class FitSimulation:
         self.future_obs_exist = len(self.future_obs_idx) > 0
         return None
 
-    def _compute_obs_weights(self):
+    def compute_obs_weights(self):
         """
         Assembles the weight matrix for the orbit fit based
         on observation uncertainties and correlations.
+
+        Replaces ``self.obs_cov`` and ``self.obs_weight`` using the current
+        observation table. Call after parsing or changing observation sigmas.
 
         Returns
         -------
@@ -824,10 +858,13 @@ class FitSimulation:
                 self.obs_weight.append(inv)
         return None
 
-    def _get_prop_sim_past(self, name, t_eval_utc, eval_apparent_state,
+    def get_prop_sim_past(self, name, t_eval_utc, eval_apparent_state,
                                 converged_light_time, observer_info):
         """
         Get a propSim object for the past observations.
+
+        Requires past observations already parsed by this fitter. Returns a
+        configured, unintegrated native propagation object.
 
         Parameters
         ----------
@@ -868,10 +905,13 @@ class FitSimulation:
         prop_sim_past.obsType = obs_types
         return prop_sim_past
 
-    def _get_prop_sim_future(self, name, t_eval_utc, eval_apparent_state,
+    def get_prop_sim_future(self, name, t_eval_utc, eval_apparent_state,
                                 converged_light_time, observer_info):
         """
         Get a propSim object for the future observations.
+
+        Requires future observations already parsed by this fitter. Returns a
+        configured, unintegrated native propagation object.
 
         Parameters
         ----------
@@ -909,14 +949,12 @@ class FitSimulation:
         prop_sim_future.obsType = obs_types
         return prop_sim_future
 
-    def _get_prop_sims(self):
+    def get_prop_sims(self):
         """
         Get propSim objects for the past and future observations.
 
-        Parameters
-        ----------
-        name : str
-            Name of the propSim objects.
+        Returns ``None`` for either time direction with no observations.
+        The returned simulations are configured but not yet integrated.
 
         Returns
         -------
@@ -934,18 +972,21 @@ class FitSimulation:
         prop_sim_past = None
         prop_sim_future = None
         if self.past_obs_exist:
-            prop_sim_past = self._get_prop_sim_past(f"{self.name}_past", t_eval_utc,
+            prop_sim_past = self.get_prop_sim_past(f"{self.name}_past", t_eval_utc,
                                                     eval_apparent_state, converged_light_time,
                                                     observer_info_past)
         if self.future_obs_exist:
-            prop_sim_future = self._get_prop_sim_future(f"{self.name}_future", t_eval_utc,
+            prop_sim_future = self.get_prop_sim_future(f"{self.name}_future", t_eval_utc,
                                                         eval_apparent_state, converged_light_time,
                                                         observer_info_future)
         return prop_sim_past, prop_sim_future
 
-    def _x_dict_to_state(self, x_dict):
+    def solution_to_state(self, x_dict):
         """
-        Convert a dictionary of nominal state to a state vector.
+        Convert a solution dictionary to the six-element state used by GRSS.
+
+        The coordinate type (Cartesian or cometary) is selected when this
+        ``FitSimulation`` is initialized. This method does not change the fit.
 
         Parameters
         ----------
@@ -985,9 +1026,12 @@ class FitSimulation:
             raise ValueError("fit_cartesian or fit_cometary must be True")
         return state
 
-    def _x_dict_to_nongrav_params(self, x_dict):
+    def solution_to_nongrav_params(self, x_dict):
         """
-        Convert a dictionary of nominal state to non-gravitational parameters.
+        Build non-gravitational parameters from a solution dictionary.
+
+        Parameters absent from ``x_dict`` use this fitter's fixed propagation
+        parameters. This method does not change the fit.
 
         Parameters
         ----------
@@ -1017,9 +1061,13 @@ class FitSimulation:
         nongrav_params.r0_au = self.fixed_propsim_params['r0_au']
         return nongrav_params
 
-    def _x_dict_to_events(self, x_dict):
+    def solution_to_events(self, x_dict):
         """
-        Convert a dictionary of nominal state to events.
+        Build the fitted body's events from a solution dictionary.
+
+        Event definitions come from ``fixed_propsim_params['events']``;
+        fitted values in ``x_dict`` override their corresponding fixed values.
+        This method does not change the fit.
 
         Parameters
         ----------
@@ -1055,9 +1103,12 @@ class FitSimulation:
             events.append(tuple(event))
         return events
 
-    def _check_and_add_events(self, prop_sim_past, prop_sim_future, integ_body, events):
+    def check_and_add_events(self, prop_sim_past, prop_sim_future, integ_body, events):
         """
         Check if events are in the past or future and add them to the appropriate prop_sim.
+
+        Mutates the supplied native simulations by adding event objects. A
+        past/future simulation must exist for every event assigned to it.
 
         Parameters
         ----------
@@ -1115,9 +1166,13 @@ class FitSimulation:
                 prop_sim_future.add_event(event)
         return prop_sim_past, prop_sim_future
 
-    def _get_perturbed_state(self, key):
+    def get_perturbed_state(self, key):
         """
-        Get the perturbed state for a given nominal state parameter.
+        Get positive and negative finite-difference solutions for one parameter.
+
+        Uses the current nominal solution and the fit's coordinate type. The
+        returned tuples are inputs to numerical partial-derivative propagation;
+        this method does not change the nominal solution.
 
         Parameters
         ----------
@@ -1174,19 +1229,22 @@ class FitSimulation:
         # fd_pert = finite difference perturbation to nominal state for calculating derivatives
         fd_delta = fd_pert
         x_plus[key] = self.x_nom[key]+fd_delta
-        state_plus = self._x_dict_to_state(x_plus)
-        ng_params_plus = self._x_dict_to_nongrav_params(x_plus)
-        events_plus = self._x_dict_to_events(x_plus)
+        state_plus = self.solution_to_state(x_plus)
+        ng_params_plus = self.solution_to_nongrav_params(x_plus)
+        events_plus = self.solution_to_events(x_plus)
         x_minus[key] = self.x_nom[key]-fd_delta
-        state_minus = self._x_dict_to_state(x_minus)
-        ng_params_minus = self._x_dict_to_nongrav_params(x_minus)
-        events_minus = self._x_dict_to_events(x_minus)
+        state_minus = self.solution_to_state(x_minus)
+        ng_params_minus = self.solution_to_nongrav_params(x_minus)
+        events_minus = self.solution_to_events(x_minus)
         return (state_plus, ng_params_plus, events_plus, state_minus,
                     ng_params_minus, events_minus, fd_delta)
 
-    def _get_perturbation_info(self):
+    def get_perturbation_info(self):
         """
-        Get the perturbation information for all nominal state parameters.
+        Get finite-difference solutions for all fitted parameters.
+
+        Results follow the insertion order of ``x_nom`` and use the tuple
+        layout described by ``get_perturbed_state``.
 
         Returns
         -------
@@ -1196,13 +1254,18 @@ class FitSimulation:
         """
         perturbation_info = []
         for key in self.x_nom:
-            pert_result = self._get_perturbed_state(key)
+            pert_result = self.get_perturbed_state(key)
             perturbation_info.append(tuple(pert_result))
         return perturbation_info
 
-    def _assemble_and_propagate_bodies(self, perturbation_info):
+    def assemble_and_propagate_bodies(self, perturbation_info):
         """
         Assemble and propagate the body for the orbit fit.
+
+        Builds nominal and, when numerical partials are used, perturbed bodies;
+        integrates the past/future simulations and returns them. Obtain
+        ``perturbation_info`` from ``get_perturbation_info`` for numerical
+        partials; pass ``None`` for analytic partials.
 
         Parameters
         ----------
@@ -1220,11 +1283,11 @@ class FitSimulation:
         # sourcery skip: low-code-quality
         # pylint: disable=no-member
         # get propagated states
-        prop_sim_past, prop_sim_future = self._get_prop_sims()
+        prop_sim_past, prop_sim_future = self.get_prop_sims()
         # create nominal integ_body object
-        state_nom = self._x_dict_to_state(self.x_nom)
-        ng_params_nom = self._x_dict_to_nongrav_params(self.x_nom)
-        events_nom = self._x_dict_to_events(self.x_nom)
+        state_nom = self.solution_to_state(self.x_nom)
+        ng_params_nom = self.solution_to_nongrav_params(self.x_nom)
+        events_nom = self.solution_to_events(self.x_nom)
         if self.fit_cartesian:
             integ_body_nom = libgrss.IntegBody("integ_body_nom", self.t_sol,
                                             self.fixed_propsim_params['mass'],
@@ -1243,7 +1306,7 @@ class FitSimulation:
             prop_sim_past.add_integ_body(integ_body_nom)
         if self.future_obs_exist:
             prop_sim_future.add_integ_body(integ_body_nom)
-        prop_sim_past, prop_sim_future = self._check_and_add_events(prop_sim_past, prop_sim_future,
+        prop_sim_past, prop_sim_future = self.check_and_add_events(prop_sim_past, prop_sim_future,
                                                                     integ_body_nom, events_nom)
         # add the perturbed IntegBodies for numerical derivatives
         if not self.analytic_partials and perturbation_info is not None:
@@ -1279,11 +1342,11 @@ class FitSimulation:
                 if self.future_obs_exist:
                     prop_sim_future.add_integ_body(integ_body_plus)
                     prop_sim_future.add_integ_body(integ_body_minus)
-                prop_sim_past, prop_sim_future = self._check_and_add_events(prop_sim_past,
+                prop_sim_past, prop_sim_future = self.check_and_add_events(prop_sim_past,
                                                                             prop_sim_future,
                                                                             integ_body_plus,
                                                                             events_plus)
-                prop_sim_past, prop_sim_future = self._check_and_add_events(prop_sim_past,
+                prop_sim_past, prop_sim_future = self.check_and_add_events(prop_sim_past,
                                                                             prop_sim_future,
                                                                             integ_body_minus,
                                                                             events_minus)
@@ -1293,9 +1356,15 @@ class FitSimulation:
             prop_sim_future.integrate()
         return prop_sim_past, prop_sim_future
 
-    def _get_computed_obs(self, prop_sim_past, prop_sim_future, integ_body_idx):
+    def get_computed_obs(self, prop_sim_past, prop_sim_future, integ_body_idx):
         """
         Computes the optical and radar observations from the propagated states.
+
+        Requires integrated simulations returned by
+        ``assemble_and_propagate_bodies``. Index 0 selects the nominal body;
+        positive indices select finite-difference bodies. For the nominal
+        body, this also calls ``inflate_uncertainties`` and updates the fit's
+        observation covariance and weight matrices.
 
         Parameters
         ----------
@@ -1310,6 +1379,9 @@ class FitSimulation:
         -------
         computed_obs : array
             The computed observations from the propagated states.
+        computed_obs_dot : array
+            Time derivatives of the nominal optical observations; NaN entries
+            for non-nominal bodies.
 
         Raises
         ------
@@ -1344,14 +1416,17 @@ class FitSimulation:
                 raise ValueError("Observer info length not recognized.")
         nom_body = integ_body_idx == 0
         if nom_body:
-            computed_obs_dot = self._inflate_uncertainties(prop_sim_past, prop_sim_future)
+            computed_obs_dot = self.inflate_uncertainties(prop_sim_past, prop_sim_future)
         else:
             computed_obs_dot = np.nan*np.ones((len(self.obs), 2))
         return computed_obs, computed_obs_dot
 
-    def _inflate_uncertainties(self, prop_sim_past, prop_sim_future):
+    def inflate_uncertainties(self, prop_sim_past, prop_sim_future):
         """
         Apply time uncertainties to the optical observations weights.
+
+        Requires integrated simulations and updates ``self.obs_cov`` and
+        ``self.obs_weight`` for applicable optical observations.
 
         Parameters
         ----------
@@ -1452,10 +1527,12 @@ class FitSimulation:
         self.obs.sigTime = sig_times
         return computed_obs_dot
 
-    def _get_analytic_partials(self, prop_sim_past, prop_sim_future):
+    def get_analytic_partials(self, prop_sim_past, prop_sim_future):
         """
         Computes the analytic partials of the observations with respect to the
         initial nominal state.
+
+        Requires integrated simulations with state transition matrices.
 
         Parameters
         ----------
@@ -1510,10 +1587,13 @@ class FitSimulation:
             partials_idx += size
         return partials
 
-    def _get_numeric_partials(self, prop_sim_past, prop_sim_future, perturbation_info):
+    def get_numeric_partials(self, prop_sim_past, prop_sim_future, perturbation_info):
         """
         Computes the numeric partials of the observations with respect to the
         initial nominal state.
+
+        Requires integrated simulations containing the plus/minus bodies from
+        ``perturbation_info`` in fitted-parameter order.
 
         Parameters
         ----------
@@ -1536,20 +1616,24 @@ class FitSimulation:
             _ = list(self.x_nom.keys())[i]
             _, _, _, _, _, _, fd_delta = perturbation_info[i]
             # get computed_obs for perturbed states
-            computed_obs_plus, _ = self._get_computed_obs(prop_sim_past, prop_sim_future,
+            computed_obs_plus, _ = self.get_computed_obs(prop_sim_past, prop_sim_future,
                                                         integ_body_idx=2*i+1)
-            computed_obs_minus, _ = self._get_computed_obs(prop_sim_past, prop_sim_future,
+            computed_obs_minus, _ = self.get_computed_obs(prop_sim_past, prop_sim_future,
                                                         integ_body_idx=2*i+2)
-            computed_obs_plus = self._flatten_and_clean(computed_obs_plus)
-            computed_obs_minus = self._flatten_and_clean(computed_obs_minus)
+            computed_obs_plus = flatten_valid_observations(computed_obs_plus)
+            computed_obs_minus = flatten_valid_observations(computed_obs_minus)
             # get partials
             partials[:, i] = (computed_obs_plus - computed_obs_minus)/(2*fd_delta)
         return partials
 
-    def _get_partials(self, prop_sim_past, prop_sim_future, perturbation_info):
+    def get_partials(self, prop_sim_past, prop_sim_future, perturbation_info):
         """
         Computes the partials of the observations with respect to the
         initial nominal state.
+
+        Dispatches to analytic or numeric partials according to
+        ``self.analytic_partials``. Requires integrated simulations and
+        numerical perturbations when analytic partials are disabled.
 
         Parameters
         ----------
@@ -1568,13 +1652,16 @@ class FitSimulation:
             initial nominal state.
         """
         if self.analytic_partials:
-            return self._get_analytic_partials(prop_sim_past, prop_sim_future)
-        return self._get_numeric_partials(prop_sim_past, prop_sim_future, perturbation_info)
+            return self.get_analytic_partials(prop_sim_past, prop_sim_future)
+        return self.get_numeric_partials(prop_sim_past, prop_sim_future, perturbation_info)
 
-    def _get_residuals_and_partials(self):
+    def compute_residuals_and_partials(self):
         """
-        Computes the residuals and partials of the observations with respect to the
-        initial nominal state.
+        Compute residuals and partial derivatives for the current nominal state.
+
+        This method propagates the current orbit, stores the propagation results
+        in ``prop_sims``, and updates residual columns in ``obs``. It does not
+        apply a least-squares state correction.
 
         Returns
         -------
@@ -1584,13 +1671,13 @@ class FitSimulation:
             The partials of the observations with respect to the
             initial nominal state.
         """
-        perturbation_info = None if self.analytic_partials else self._get_perturbation_info()
-        prop_sim_past, prop_sim_future = self._assemble_and_propagate_bodies(perturbation_info)
+        perturbation_info = None if self.analytic_partials else self.get_perturbation_info()
+        prop_sim_past, prop_sim_future = self.assemble_and_propagate_bodies(perturbation_info)
         self.prop_sims = (prop_sim_past, prop_sim_future)
         # get partials
-        partials = self._get_partials(prop_sim_past, prop_sim_future, perturbation_info)
+        partials = self.get_partials(prop_sim_past, prop_sim_future, perturbation_info)
         # get residuals
-        computed_obs, computed_obs_dot = self._get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
+        computed_obs, computed_obs_dot = self.get_computed_obs(prop_sim_past, prop_sim_future, integ_body_idx=0)
         residuals = [None]*len(self.obs)
         ra_res = self.obs['resRA'].values
         dec_res = self.obs['resDec'].values
@@ -1633,10 +1720,14 @@ class FitSimulation:
         self.obs['resDoppler'] = doppler_res
         return residuals, partials
 
-    def _get_rms_and_reject_outliers(self, partials, residuals, start_rejecting):
+    def compute_fit_statistics(self, partials, residuals, start_rejecting=False):
         # sourcery skip: low-code-quality
         """
-        Outlier rejection algorithm for the residuals.
+        Compute fit statistics and optionally apply outlier rejection.
+
+        When ``start_rejecting`` is True, a covariance from a prior state
+        correction must be available. The method updates observation selection
+        and chi-squared columns as well as the rejected-observation count.
 
         Parameters
         ----------
@@ -1645,8 +1736,8 @@ class FitSimulation:
             initial nominal state.
         residuals : array
             The residuals of the observations
-        start_rejecting : bool
-            Flag for whether to start rejecting outliers.
+        start_rejecting : bool, optional
+            Whether to start rejecting outliers, by default False.
 
         Returns
         -------
@@ -1737,9 +1828,12 @@ class FitSimulation:
         rms_w = np.sqrt(chi_sq/self.n_obs)
         return rms_u, rms_w, chi_sq
 
-    def _add_iteration(self, iter_number, rms_u, rms_w, chi_sq):
+    def add_iteration(self, iter_number, rms_u, rms_w, chi_sq):
         """
         Adds an iteration to the list of iterations in the FitSimulation object.
+
+        Requires a current covariance, nominal state, and observation table.
+        Appends an ``IterationParams`` snapshot to ``self.iters``.
 
         Parameters
         ----------
@@ -1761,9 +1855,13 @@ class FitSimulation:
                                             self.obs, rms_u, rms_w, chi_sq))
         return None
 
-    def _check_convergence(self, delta_x):
+    def check_convergence(self, delta_x):
         """
         Checks if the orbit fit has converged.
+
+        Requires a current covariance and an iteration snapshot. Sets
+        ``self.converged`` to True when a stopping criterion is met; it does
+        not reset an already-True value.
 
         Parameters
         ----------
@@ -1793,9 +1891,13 @@ class FitSimulation:
             self.converged = True
         return None
 
-    def _get_lsq_state_correction(self, partials, residuals):
+    def solve_state_correction(self, partials, residuals):
         """
-        Get the state correction using least-squares.
+        Solve the linearized least-squares state correction.
+
+        Call ``prepare_priors`` first if prior constraints are set. This method
+        updates ``covariance`` and ``info_mats`` but does not apply the returned
+        correction to ``x_nom``.
 
         Parameters
         ----------
@@ -1859,7 +1961,7 @@ class FitSimulation:
         None : NoneType
             None
         """
-        self._check_priors()
+        self.prepare_priors()
         start_rejecting = False
         if verbose:
             print("Iteration\t\tUnweighted RMS\t\tWeighted RMS",
@@ -1877,14 +1979,14 @@ class FitSimulation:
                     print(dict(zip(self.x_nom.keys(), a_priori_constant-self._prior_constant)))
             self.n_iter = i+1
             # get residuals and partials
-            residuals, partials = self._get_residuals_and_partials()
+            residuals, partials = self.compute_residuals_and_partials()
             # calculate rms and reject outliers here if desired
-            rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
+            rms_u, rms_w, chi_sq = self.compute_fit_statistics(partials, residuals,
                                                                             start_rejecting)
             # get current state
             curr_state = list(self.x_nom.values())
             # get state correction
-            delta_x = self._get_lsq_state_correction(partials, residuals)
+            delta_x = self.solve_state_correction(partials, residuals)
             if self.constraint_dir is not None:
                 constr_hat = self.constraint_dir/np.linalg.norm(self.constraint_dir)
                 delta_x -= np.dot(delta_x, constr_hat)*constr_hat
@@ -1906,14 +2008,14 @@ class FitSimulation:
             next_state = curr_state + delta_x
             self.x_nom = dict(zip(self.x_nom.keys(), next_state))
             # add iteration
-            self._add_iteration(i+1, rms_u, rms_w, chi_sq)
+            self.add_iteration(i+1, rms_u, rms_w, chi_sq)
             if verbose:
                 print(f"{self.iters[-1].iter_number}\t\t\t",
                         f"{self.iters[-1].unweighted_rms:.3f}\t\t\t",
                         f"{self.iters[-1].weighted_rms:.3f}\t\t\t",
                         f"{self.iters[-1].chi_squared:.3f}\t\t\t",
                         f"{self.iters[-1].reduced_chi_squared:.3f}")
-            self._check_convergence(delta_x)
+            self.check_convergence(delta_x)
             if self.converged:
                 if self.reject_outliers and start_rejecting:
                     if verbose:
@@ -1931,10 +2033,10 @@ class FitSimulation:
                     break
         # add postfit iteration if converged
         if self.converged:
-            residuals, partials = self._get_residuals_and_partials()
-            rms_u, rms_w, chi_sq = self._get_rms_and_reject_outliers(partials, residuals,
+            residuals, partials = self.compute_residuals_and_partials()
+            rms_u, rms_w, chi_sq = self.compute_fit_statistics(partials, residuals,
                                                                         start_rejecting)
-            self._add_iteration(self.n_iter+1, rms_u, rms_w, chi_sq)
+            self.add_iteration(self.n_iter+1, rms_u, rms_w, chi_sq)
         if self.n_iter == self.n_iter_max and not self.converged:
             print("WARNING: Maximum number of iterations reached without converging.")
         return None
@@ -2307,3 +2409,38 @@ class FitSimulation:
             f.write(f"{header_section_half} END OF FILE {header_section_half}" + '\n')
             f.write(section_full + '\n')
         return None
+
+
+    def flatten_and_clean(self, arr):
+        """Return flattened, non-NaN observations; does not change fitter state."""
+        return flatten_valid_observations(arr)
+
+    # Preserve legacy private spellings for callers that used them directly.
+    _check_initial_solution = check_initial_solution
+    _add_simulated_obs = add_simulated_obs
+    _parse_observation_arrays = parse_observation_arrays
+    _compute_obs_weights = compute_obs_weights
+    _get_prop_sim_past = get_prop_sim_past
+    _get_prop_sim_future = get_prop_sim_future
+    _get_prop_sims = get_prop_sims
+    _check_and_add_events = check_and_add_events
+    _assemble_and_propagate_bodies = assemble_and_propagate_bodies
+    _get_computed_obs = get_computed_obs
+    _inflate_uncertainties = inflate_uncertainties
+    _get_analytic_partials = get_analytic_partials
+    _get_numeric_partials = get_numeric_partials
+    _get_partials = get_partials
+    _add_iteration = add_iteration
+    _check_convergence = check_convergence
+
+    # Public stage names and compatibility aliases share the same callable.
+    _check_priors = prepare_priors
+    _x_dict_to_state = solution_to_state
+    _x_dict_to_nongrav_params = solution_to_nongrav_params
+    _x_dict_to_events = solution_to_events
+    _get_perturbed_state = get_perturbed_state
+    _get_perturbation_info = get_perturbation_info
+    _get_residuals_and_partials = compute_residuals_and_partials
+    _get_rms_and_reject_outliers = compute_fit_statistics
+    _get_lsq_state_correction = solve_state_correction
+    _flatten_and_clean = flatten_and_clean
