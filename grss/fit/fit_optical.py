@@ -19,22 +19,26 @@ from .fit_ades import (
     special_codes,
 )
 
-__all__ = [ 'get_mpc_raw_data',
-            'validate_ades_mode',
-            'flag_unrecognized_ades_catalogs',
-            'create_optical_obs_df',
-            'add_psv_obs',
-            'get_gaia_query_results',
-            'add_gaia_obs',
-            'debias_obs',
-            'apply_debiasing_scheme',
-            'get_packed_prog_id',
-            'get_unpacked_prog_id',
-            'apply_station_weight_rules',
-            'apply_weighting_scheme',
-            'deweight_obs',
-            'eliminate_obs',
-            'get_optical_obs',
+__all__ = [
+    'get_mpc_raw_data',
+    'validate_ades_mode',
+    'flag_unrecognized_ades_catalogs',
+    'create_optical_obs_df',
+    'add_psv_obs',
+    'get_gaia_query_results',
+    'add_gaia_obs',
+    'debias_obs',
+    'apply_debiasing_scheme',
+    'get_packed_prog_id',
+    'get_unpacked_prog_id',
+    'apply_station_weight_rules',
+    'apply_weighting_scheme',
+    'deweight_obs',
+    'eliminate_obs',
+    'get_optical_obs',
+    '_ades_mode_check',
+    '_ades_ast_cat_check',
+    '_get_gaia_query_results',
 ]
 
 def get_mpc_raw_data(tdes):
@@ -1060,3 +1064,9 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     elif eliminate:
         obs_df = eliminate_obs(obs_df, num_obs_per_night, verbose)
     return obs_df
+
+
+# Public helper names; the historical private spellings remain callable.
+_ades_mode_check = validate_ades_mode
+_ades_ast_cat_check = flag_unrecognized_ades_catalogs
+_get_gaia_query_results = get_gaia_query_results

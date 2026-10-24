@@ -2,17 +2,30 @@
 import os
 import time
 import json
+import subprocess
+import sys
 import requests
 
-__all__ = [ 'default_kernel_path',
-            'grss_path',
-            'initialize'
+__all__ = [
+    'default_kernel_path',
+    'grss_path',
+    'initialize',
+    '_connected_to_internet',
+    '_download_codes_file',
+    'check_and_get_codes_file',
+    'connected_to_internet',
+    'download_codes_file',
 ]
 
 grss_path = os.path.dirname(os.path.abspath(__file__))
 default_kernel_path = f'{grss_path}/kernels/'
 
 def _connected_to_internet(url='http://www.google.com/', timeout=30):
+    """Return whether a HEAD request completes, irrespective of its HTTP status.
+
+    Makes a network request to ``url`` with the timeout in seconds. A completed
+    request does not guarantee that a particular GRSS data service is available.
+    """
     try:
         _ = requests.head(url, timeout=timeout)
         return True
@@ -22,7 +35,10 @@ def _connected_to_internet(url='http://www.google.com/', timeout=30):
 
 def _download_codes_file():
     """
-    Download the observatory codes file from the Minor Planet Center.
+    Download MPC observatory codes and replace both local JSON code tables.
+
+    Existing in-memory code dictionaries are not refreshed by this operation;
+    reload the dependent modules or start a new process to read updated tables.
     """
     print("Updating observatory codes from the MPC...")
     url = "https://data.minorplanetcenter.net/api/obscodes"
@@ -92,11 +108,16 @@ def initialize():
         print("Internet connection is required to download/update the necessary data files.")
         return None
     # run the get_debiasing_data.py script
-    os.system(f'python {grss_path}/debias/get_debiasing_data.py')
+    subprocess.run([sys.executable, f'{grss_path}/debias/get_debiasing_data.py'], check=False)
     # run the get_kernels.py script
-    os.system(f'python {grss_path}/kernels/get_kernels.py')
+    subprocess.run([sys.executable, f'{grss_path}/kernels/get_kernels.py'], check=False)
     # get the observatory codes file
     check_and_get_codes_file()
     # set openmp environment variable to number of cores
     os.environ['OMP_NUM_THREADS'] = str(os.cpu_count())
     return None
+
+
+# Public helper names; the historical private spellings remain callable.
+connected_to_internet = _connected_to_internet
+download_codes_file = _download_codes_file

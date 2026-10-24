@@ -12,9 +12,10 @@ from ..utils import default_kernel_path, grss_path
 from .fit_utils import get_observer_info, get_similarity_stats
 from .fit_ades import special_codes
 
-__all__ = [ 'flatten_valid_observations',
-            'IterationParams',
-            'FitSimulation',
+__all__ = [
+    'flatten_valid_observations',
+    'IterationParams',
+    'FitSimulation',
 ]
 
 def flatten_valid_observations(arr):
@@ -502,6 +503,13 @@ class IterationParams:
                         plot_chi_squared, sigma_limit, radar_scale, markersize,
                         show_logarithmic, title, savefig, figname, auto_close)
         return None
+
+    # Public stage names and compatibility aliases share the same callable.
+    calculate_chis = _calculate_chis
+    assemble_info = _assemble_info
+    scatter_hist = _scatter_hist
+    plot_residuals = _plot_residuals
+    plot_chi = _plot_chi
 
 class FitSimulation:
     """
@@ -2403,6 +2411,10 @@ class FitSimulation:
         return None
 
 
+    def flatten_and_clean(self, arr):
+        """Return flattened, non-NaN observations; does not change fitter state."""
+        return flatten_valid_observations(arr)
+
     # Preserve legacy private spellings for callers that used them directly.
     _check_initial_solution = check_initial_solution
     _add_simulated_obs = add_simulated_obs
@@ -2420,3 +2432,15 @@ class FitSimulation:
     _get_partials = get_partials
     _add_iteration = add_iteration
     _check_convergence = check_convergence
+
+    # Public stage names and compatibility aliases share the same callable.
+    _check_priors = prepare_priors
+    _x_dict_to_state = solution_to_state
+    _x_dict_to_nongrav_params = solution_to_nongrav_params
+    _x_dict_to_events = solution_to_events
+    _get_perturbed_state = get_perturbed_state
+    _get_perturbation_info = get_perturbation_info
+    _get_residuals_and_partials = compute_residuals_and_partials
+    _get_rms_and_reject_outliers = compute_fit_statistics
+    _get_lsq_state_correction = solve_state_correction
+    _flatten_and_clean = flatten_and_clean

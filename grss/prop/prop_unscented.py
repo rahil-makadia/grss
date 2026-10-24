@@ -1,6 +1,10 @@
 """Unscented transformations for the GRSS orbit propagation code"""
 import numpy as np
 
+__all__ = [
+    'SigmaPoints',
+]
+
 class SigmaPoints:
     """
     Class for representing sigma points for the unscented transformation.
@@ -49,6 +53,7 @@ class SigmaPoints:
         return None
 
     def _get_weights(self):
+        """Return mean and covariance weights for the configured sigma-point type."""
         if self.type == "merwe":
             w_m, w_c = self._merwe_weights()
         elif self.type == "julier":
@@ -58,6 +63,7 @@ class SigmaPoints:
         return w_m, w_c
 
     def _merwe_weights(self):
+        """Return Merwe weights using this instance's alpha, beta and kappa."""
         if self.alpha is None or self.beta is None or self.kappa is None:
             raise ValueError(
                 "Must specify alpha, beta, and kappa for Merwe sigma points"
@@ -72,6 +78,7 @@ class SigmaPoints:
         return w_m, w_c
 
     def _julier_weights(self):
+        """Return Julier weights using this instance's kappa."""
         if self.kappa is None:
             raise ValueError("Must specify kappa for Julier sigma points")
         scale = self.n + self.kappa
@@ -80,6 +87,7 @@ class SigmaPoints:
         return w_m, w_m
 
     def _get_points(self):
+        """Return (sigma points, offsets) using the configured covariance and scale."""
         if self.type == "merwe":
             lambda_ = self.alpha**2 * (self.n + self.kappa) - self.n
             fac = self.n + lambda_
@@ -109,12 +117,17 @@ class SigmaPoints:
         return sigma_points, diff
 
     def _get_points_dict(self):
+        """Return solution dictionaries for cached points, preserving the epoch.
+
+        Parameter columns follow the input dictionary order with ``t`` omitted.
+        The epoch may be absent or appear anywhere in the input dictionary.
+        """
         dict_list = [None] * (2 * self.n + 1)
+        keys = [key for key in self.x_dict if key != 't']
         for i in range(2 * self.n + 1):
             dict_i = {"t": self.x_dict["t"]} if "t" in self.x_dict else {}
-            for j, key in enumerate(self.x_dict):
-                if key != "t":
-                    dict_i[key] = self.sigma_points[i][j - 1]
+            for j, key in enumerate(keys):
+                dict_i[key] = self.sigma_points[i][j]
             dict_list[i] = dict_i
         return dict_list
 
@@ -155,3 +168,10 @@ class SigmaPoints:
             diff = transformed_sigma_points[i] - new_x
             new_cov += self.w_c[i] * np.outer(diff, diff)
         return new_x, new_cov
+
+    # Public stage names and compatibility aliases share the same callable.
+    get_weights = _get_weights
+    merwe_weights = _merwe_weights
+    julier_weights = _julier_weights
+    get_points = _get_points
+    get_points_dict = _get_points_dict
