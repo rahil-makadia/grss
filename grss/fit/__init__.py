@@ -1,5 +1,6 @@
 """GRSS Python orbit determination subpackage"""
 import warnings
+from .fit_iod import *
 from .fit_optical import *
 from .fit_radar import *
 from .fit_simulation import *
