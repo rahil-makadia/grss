@@ -6,13 +6,26 @@ from mpl_toolkits.basemap import Basemap
 from astropy.time import Time
 from .. import libgrss
 
-__all__ = [ 'equat2eclip',
-            'eclip2equat',
-            'plot_solar_system',
-            'plot_ca_summary',
-            'plot_bplane',
-            'plot_earth_impact',
-            'compare_earth_impact',
+__all__ = [
+    'equat2eclip',
+    'eclip2equat',
+    'plot_solar_system',
+    'get_scale_factor',
+    'plot_ca_summary',
+    'mean_cov_to_ellipse',
+    'partials_to_ellipse',
+    'data_to_ellipse',
+    'days_to_dhms',
+    'plot_bplane',
+    'plot_single_bplane',
+    'plot_earth_impact',
+    'compare_earth_impact',
+    '_add_planet_xy',
+    '_add_planet_xz',
+    '_get_bplane_labels',
+    'add_planet_xy',
+    'add_planet_xz',
+    'get_bplane_labels',
 ]
 
 earth_obliq = 84381.448/3600.0*np.pi/180.0
@@ -1000,3 +1013,9 @@ def compare_earth_impact(coord1, coord2, sig1, sig2, labels, zoom_size=5.0e3, sa
     plt.suptitle(f'Impact Circumstance Comparison ({n_sig}$\\sigma$)', y=1.05)
     plt.show()
     return None
+
+
+# Public helper names; the historical private spellings remain callable.
+add_planet_xy = _add_planet_xy
+add_planet_xz = _add_planet_xz
+get_bplane_labels = _get_bplane_labels

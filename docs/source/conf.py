@@ -28,6 +28,8 @@ extensions = [
     "breathe",  # for linking to C++ documentation
 ]
 autosummary_generate = True
+autosummary_imported_members = True
+autosummary_ignore_module_all = False
 
 templates_path = ["_templates"]
 exclude_patterns = []

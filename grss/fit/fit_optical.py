@@ -1,5 +1,6 @@
 """Optical observation handling for the GRSS orbit determination code"""
 import os
+import re
 from io import StringIO
 from astropy.time import Time
 import requests
@@ -18,9 +19,26 @@ from .fit_ades import (
     special_codes,
 )
 
-__all__ = [ 'add_psv_obs',
-            'add_gaia_obs',
-            'get_optical_obs',
+__all__ = [
+    'get_mpc_raw_data',
+    'validate_ades_mode',
+    'flag_unrecognized_ades_catalogs',
+    'create_optical_obs_df',
+    'add_psv_obs',
+    'get_gaia_query_results',
+    'add_gaia_obs',
+    'debias_obs',
+    'apply_debiasing_scheme',
+    'get_packed_prog_id',
+    'get_unpacked_prog_id',
+    'apply_station_weight_rules',
+    'apply_weighting_scheme',
+    'deweight_obs',
+    'eliminate_obs',
+    'get_optical_obs',
+    '_ades_mode_check',
+    '_ades_ast_cat_check',
+    '_get_gaia_query_results',
 ]
 
 def get_mpc_raw_data(tdes):
@@ -34,8 +52,8 @@ def get_mpc_raw_data(tdes):
 
     Returns
     -------
-    raw_data : dict
-        JSON output of small body information query from JPL small-body radar API
+    raw_data : io.StringIO
+        File-like stream containing the MPC observation XML.
     """
     response = requests.get("https://data.minorplanetcenter.net/api/get-obs",
                             json={"desigs": [f"{tdes}"], "output_format":["XML"]},
@@ -48,7 +66,7 @@ def get_mpc_raw_data(tdes):
         raise ValueError("Error getting MPC XML data.")
     return StringIO(obs_data)
 
-def _ades_mode_check(df):
+def validate_ades_mode(df):
     """
     Check the mode values in the ADES data frame.
 
@@ -69,9 +87,9 @@ def _ades_mode_check(df):
                         f"Acceptable modes are {valid_modes}.")
     return None
 
-def _ades_ast_cat_check(df):
+def flag_unrecognized_ades_catalogs(df):
     """
-    Check the astCat values in the ADES data frame.
+    Flag observations with unrecognized ADES star catalogs for deletion.
 
     Parameters
     ----------
@@ -81,12 +99,8 @@ def _ades_ast_cat_check(df):
     Returns
     -------
     df : pandas DataFrame
-        ADES data frame with invalid astCat values removed
-
-    Raises
-    ------
-    ValueError
-        If the astCat values are invalid
+        Same ADES data frame, with ``selAst`` set to ``'d'`` for rows whose
+        ``astCat`` value is not recognized. The input is modified in place.
     """
     # from https://www.minorplanetcenter.net/iau/info/ADESFieldValues.html
     valid_cats = list(ades_catalog_map.keys())
@@ -160,8 +174,8 @@ def create_optical_obs_df(body_id, optical_obs_file=None, t_min_tdb=None,
     if verbose:
         source = "MPC" if optical_obs_file is None else "file"
         print(f"Read in {len(obs_df)} observations from the {source}.")
-    _ades_mode_check(obs_df)
-    obs_df = _ades_ast_cat_check(obs_df)
+    validate_ades_mode(obs_df)
+    obs_df = flag_unrecognized_ades_catalogs(obs_df)
     # filter the data based on the time range
     obs_df.query(f"{t_min_utc} <= obsTimeMJD <= {t_max_utc}", inplace=True)
     # reindex the data frame
@@ -259,7 +273,7 @@ def add_psv_obs(psv_obs_file, obs_df, t_min_tdb=None, t_max_tdb=None, verbose=Fa
         print(f"\tFiltered to {add_counter} observations that satisfy the time range constraints.")
     return obs_df
 
-def _get_gaia_query_results(body_id, release):
+def get_gaia_query_results(body_id, release):
     """
     Submit a Gaia archive query for a given body ID from a specific
     Gaia data release.
@@ -270,18 +284,29 @@ def _get_gaia_query_results(body_id, release):
         Target id, numbers are interpreted as asteroids,
         append 'P' for comets, start with comet type and a '/' for comet designations
     release : str
-        Gaia data release version database name ('gaiadr3', 'gaiafpr', etc.)
+        Gaia data release database name ('gaiadr3', 'gaiafpr', etc.).
 
     Returns
     -------
     res : astropy.table.Table
         Query results
+
+    Raises
+    ------
+    ValueError
+        If the body designation is empty or the release is not a database name.
     """
+    body_id = str(body_id).strip()
+    if not body_id:
+        raise ValueError("body_id must not be empty.")
+    if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", release):
+        raise ValueError("release must be a Gaia database name.")
     table = 'sso_observation'
     if body_id.isdigit():
         match_str = f"WHERE ({release}.{table}.number_mp={body_id})"
     else:
-        match_str = f"WHERE ({release}.{table}.denomination='{body_id.lower()}')"
+        designation = body_id.lower().replace("'", "''")
+        match_str = f"WHERE ({release}.{table}.denomination='{designation}')"
     query = (
         "SELECT transit_id,denomination,number_mp,epoch_utc,epoch_err,"
         + "ra,dec,"
@@ -302,13 +327,13 @@ def _get_gaia_query_results(body_id, release):
 
 def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verbose=False):
     """
-    Assemble the optical observations for a given body from Gaia FPR.
+    Add Gaia optical observations for the body identified by the input table.
 
     Parameters
     ----------
-    body_id : str/int
-        Target id, numbers are interpreted as asteroids,
-        append 'P' for comets, start with comet type and a '/' for comet designations
+    obs_df : pandas DataFrame
+        GRSS optical observation table. The body's designation is read from
+        the last row's ``permID`` or ``provID`` value. Modified in place.
     t_min_tdb : float, optional
         Minimum time (MJD TDB) for observations to be included, by default None
     t_max_tdb : float, optional
@@ -320,10 +345,8 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verb
 
     Returns
     -------
-    obs_array_optical : array
-        Optical observation data for the given body
-    observer_codes_optical : tuple
-        Observer locations for each observation in obs_array_optical
+    obs_df : pandas DataFrame
+        The input table with Gaia observations appended.
     """
     if t_min_tdb is None:
         t_min_tdb = -np.inf
@@ -333,7 +356,7 @@ def add_gaia_obs(obs_df, t_min_tdb=None, t_max_tdb=None, gaia_dr='gaiafpr', verb
     perm_id = obs_df.iloc[-1]['permID']
     prov_id = obs_df.iloc[-1]['provID']
     body_id = perm_id if isinstance(perm_id, str) else prov_id
-    res = _get_gaia_query_results(body_id, release=gaia_dr)
+    res = get_gaia_query_results(body_id, release=gaia_dr)
     if verbose:
         print(f"Read in {len(res)} Gaia observations from {gaia_dr}")
     sys = 'ICRF_AU'
@@ -415,12 +438,12 @@ def debias_obs(r_asc_vals, dec_vals, epoch_vals, catalog, biasdf, nside):
 
     Parameters
     ----------
-    r_asc : float
-        Right Ascension in radians.
-    dec : float
-        Declination in radians.
-    epoch : float
-        Epoch of observation in JD TT.
+    r_asc_vals : array-like
+        Right ascensions in degrees.
+    dec_vals : array-like
+        Declinations in degrees.
+    epoch_vals : array-like
+        Observation epochs in JD TT.
     catalog : str
         Star catalog MPC code.
     biasdf : pandas DataFrame
@@ -430,10 +453,10 @@ def debias_obs(r_asc_vals, dec_vals, epoch_vals, catalog, biasdf, nside):
 
     Returns
     -------
-    ra_deb : float
-        Debiased right ascension in radians.
-    dec_deb : float
-        Debiased declination in radians.
+    dra_cos_dec_vals : numpy.ndarray
+        Catalog right-ascension biases multiplied by cos(declination), in arcseconds.
+    ddec_vals : numpy.ndarray
+        Catalog declination biases in arcseconds.
     """
     j2000_jd = 2451545.0
     # find pixel from RADEC
@@ -996,7 +1019,8 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     t_max_tdb : float, optional
         Maximum time (MJD TDB) for observations to be included, by default None
     debias_lowres : bool, optional
-        Flag to debias the observations using the low resolution scheme, by default False
+        Use the low-resolution debiasing scheme by default. Set to False for
+        high resolution or None to skip debiasing.
     deweight : bool, optional
         Flag to deweight the observations, by default True
     eliminate : bool, optional
@@ -1017,8 +1041,6 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     ------
     ValueError
         If deweight and eliminate are both True.
-    ValueError
-        If deweight and eliminate are both False.
     """
     if eliminate and deweight:
         raise ValueError('Cannot deweight and eliminate observations at the same time.')
@@ -1042,3 +1064,9 @@ def get_optical_obs(body_id, optical_obs_file=None, t_min_tdb=None,
     elif eliminate:
         obs_df = eliminate_obs(obs_df, num_obs_per_night, verbose)
     return obs_df
+
+
+# Public helper names; the historical private spellings remain callable.
+_ades_mode_check = validate_ades_mode
+_ades_ast_cat_check = flag_unrecognized_ades_catalogs
+_get_gaia_query_results = get_gaia_query_results

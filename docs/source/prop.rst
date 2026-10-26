@@ -2,6 +2,11 @@ GRSS Propagator Module (grss.prop)
 ==================================
 The propagator within GRSS is based on the IAS15 algorithm [#]_, which is a 15th-order integrator based on Gauss-Radau quadrature. The algorithm is adaptive, meaning that the step size is adjusted to ensure that the error is below a certain threshold. However, the integrator can also be run in fixed-step mode, where a user-defined fixed time step is used until the end of the integration.
 
+Public plotting, ellipse, and time-formatting utilities from
+``grss.prop.prop_utils`` are also available directly from ``grss.prop``.
+Their individual API entries describe the required simulation objects and
+units. Underscore-prefixed helpers remain internal.
+
 The force model includes the following effects:
 
 #. Newtonian point-mass gravity
