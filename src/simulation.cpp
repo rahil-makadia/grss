@@ -268,14 +268,24 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
     this->isNongrav = false;
+    if (ngParams.a1 == 0.0L && ngParams.a2 == 0.0L && ngParams.a3 == 0.0L && ngParams.dt != 0.0L) {
+        throw std::invalid_argument(
+            "IntegBody::IntegBody: If dt is non-zero, at least one of a1, a2, or a3 must be non-zero.");
+    }
+    if (ngParams.dtEst && !(ngParams.a1Est || ngParams.a2Est || ngParams.a3Est)) {
+        throw std::invalid_argument(
+            "IntegBody::IntegBody: If dtEst is true, at least one of a1Est, a2Est, or a3Est must be true.");
+    }
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L ||
             ngParams.a1Est || ngParams.a2Est || ngParams.a3Est) {
         this->ngParams.a1 = ngParams.a1;
         this->ngParams.a2 = ngParams.a2;
         this->ngParams.a3 = ngParams.a3;
+        this->ngParams.dt = ngParams.dt;
         this->ngParams.a1Est = ngParams.a1Est;
         this->ngParams.a2Est = ngParams.a2Est;
         this->ngParams.a3Est = ngParams.a3Est;
+        this->ngParams.dtEst = ngParams.dtEst;
         this->ngParams.alpha = ngParams.alpha;
         this->ngParams.k = ngParams.k;
         this->ngParams.m = ngParams.m;
@@ -317,14 +327,24 @@ IntegBody::IntegBody(std::string name, real t0, real mass, real radius,
     this->acc[1] = 0.0L;
     this->acc[2] = 0.0L;
     this->isNongrav = false;
+    if (ngParams.a1 == 0.0L && ngParams.a2 == 0.0L && ngParams.a3 == 0.0L && ngParams.dt != 0.0L) {
+        throw std::invalid_argument(
+            "IntegBody::IntegBody: If dt is non-zero, at least one of a1, a2, or a3 must be non-zero.");
+    }
+    if (ngParams.dtEst && !(ngParams.a1Est || ngParams.a2Est || ngParams.a3Est)) {
+        throw std::invalid_argument(
+            "IntegBody::IntegBody: If dtEst is true, at least one of a1Est, a2Est, or a3Est must be true.");
+    }
     if (ngParams.a1 != 0.0L || ngParams.a2 != 0.0L || ngParams.a3 != 0.0L ||
             ngParams.a1Est || ngParams.a2Est || ngParams.a3Est) {
         this->ngParams.a1 = ngParams.a1;
         this->ngParams.a2 = ngParams.a2;
         this->ngParams.a3 = ngParams.a3;
+        this->ngParams.dt = ngParams.dt;
         this->ngParams.a1Est = ngParams.a1Est;
         this->ngParams.a2Est = ngParams.a2Est;
         this->ngParams.a3Est = ngParams.a3Est;
+        this->ngParams.dtEst = ngParams.dtEst;
         this->ngParams.alpha = ngParams.alpha;
         this->ngParams.k = ngParams.k;
         this->ngParams.m = ngParams.m;
@@ -349,6 +369,10 @@ void IntegBody::prepare_stm(){
             numParams++;
         }
         if (ngParams.a3Est) {
+            stmSize += 6;
+            numParams++;
+        }
+        if (ngParams.dtEst) {
             stmSize += 6;
             numParams++;
         }
@@ -416,7 +440,7 @@ void Event::apply_impulsive(PropSimulation *propSim, const real &t, std::vector<
     }
     if (propSim->integBodies[this->bodyIndex].propStm && this->eventEst) {
         IntegBody *body = &propSim->integBodies[this->bodyIndex];
-        const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est;
+        const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est + body->ngParams.dtEst;
         size_t DeltaVStmIdx = this->xIntegIndex + 6 + 36 + 6*numNongravs;
         for (size_t i = 0; i < propSim->eventMngr.impulsiveEvents.size(); i++) {
             const bool sameBody = propSim->eventMngr.impulsiveEvents[i].bodyIndex == this->bodyIndex;
@@ -509,19 +533,19 @@ PropSimulation::PropSimulation(std::string name, real t0,
                                      9.54954869555077e-11L / G, 3396.19e3L);
             SpiceBody JupiterBarycenter("Jupiter Barycenter", 5,
                                         this->integParams.t0,
-                                        2.82534584083387e-07L / G, 0.0L);
+                                        2.82534584083387e-07L / G, 71492.0e3L);
             SpiceBody SaturnBarycenter("Saturn Barycenter", 6,
                                        this->integParams.t0,
-                                       8.45970607324503e-08L / G, 0.0L);
+                                       8.45970607324503e-08L / G, 60268.0e3L);
             SpiceBody UranusBarycenter("Uranus Barycenter", 7,
                                        this->integParams.t0,
-                                       1.29202482578296e-08L / G, 0.0L);
+                                       1.29202482578296e-08L / G, 25559.0e3L);
             SpiceBody NeptuneBarycenter("Neptune Barycenter", 8,
                                         this->integParams.t0,
-                                        1.52435734788511e-08L / G, 0.0L);
+                                        1.52435734788511e-08L / G, 24764.0e3L);
             SpiceBody PlutoBarycenter("Pluto Barycenter", 9,
                                       this->integParams.t0,
-                                      2.17844105197418e-12L / G, 0.0L);
+                                      2.17844105197418e-12L / G, 1188.3e3L);
             Sun.isPPN = true;
             Sun.isMajor = true;
             MercuryBarycenter.isPPN = true;
@@ -665,19 +689,19 @@ PropSimulation::PropSimulation(std::string name, real t0,
                                      9.5495488297258119e-11L / G, 3396.19e3L);
             SpiceBody JupiterBarycenter("Jupiter Barycenter", 5,
                                         this->integParams.t0,
-                                        2.8253458252257917e-07L / G, 0.0L);
+                                        2.8253458252257917e-07L / G, 71492.0e3L);
             SpiceBody SaturnBarycenter("Saturn Barycenter", 6,
                                        this->integParams.t0,
-                                       8.4597059933762903e-08L / G, 0.0L);
+                                       8.4597059933762903e-08L / G, 60268.0e3L);
             SpiceBody UranusBarycenter("Uranus Barycenter", 7,
                                        this->integParams.t0,
-                                       1.2920265649682399e-08L / G, 0.0L);
+                                       1.2920265649682399e-08L / G, 25559.0e3L);
             SpiceBody NeptuneBarycenter("Neptune Barycenter", 8,
                                         this->integParams.t0,
-                                        1.5243573478851939e-08L / G, 0.0L);
+                                        1.5243573478851939e-08L / G, 24764.0e3L);
             SpiceBody PlutoBarycenter("Pluto Barycenter", 9,
                                       this->integParams.t0,
-                                      2.1750964648933581e-12L / G, 0.0L);
+                                      2.1750964648933581e-12L / G, 1188.3e3L);
             Sun.isPPN = true;
             Sun.isMajor = true;
             MercuryBarycenter.isPPN = true;
@@ -1513,6 +1537,7 @@ void PropSimulation::save(std::string filename, bool onlyMachineData) {
             if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
             if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
             if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
+            if (this->integBodies[i].ngParams.dtEst) file << doubleWidth << "DT [day]";
             file << std::endl;
             std::vector<real> stmFinalFlat = std::vector<real>(36+6*numParams, 0.0);
             for (size_t j = 0; j < 36+6*numParams; j++) {
@@ -1532,6 +1557,7 @@ void PropSimulation::save(std::string filename, bool onlyMachineData) {
                 if (this->integBodies[i].ngParams.a1Est) file << doubleWidth << "A1 [AU/day^2]";
                 if (this->integBodies[i].ngParams.a2Est) file << doubleWidth << "A2 [AU/day^2]";
                 if (this->integBodies[i].ngParams.a3Est) file << doubleWidth << "A3 [AU/day^2]";
+                if (this->integBodies[i].ngParams.dtEst) file << doubleWidth << "DT [day]";
                 file << std::endl;
                 for (size_t j = 0; j < this->integBodies[i].dCartdState.size(); j++) {
                     for (size_t k = 0; k < this->integBodies[i].dCartdState[0].size(); k++) {
@@ -1743,6 +1769,25 @@ void PropSimulation::save(std::string filename, bool onlyMachineData) {
             file << std::endl;
         }
         file << "$$CA_END" << std::endl;
+
+        if (this->xIntegEval.size() > 0 && this->tEval.size() == this->xIntegEval.size()) {
+            file << std::endl;
+            nextSubsection = "Interpolated States";
+            file << std::string((int)(maxChars-nextSubsection.size())/2, '-') << nextSubsection << std::string((int)(maxChars-nextSubsection.size())/2, '-') << std::endl;
+            file << subsectionFull << std::endl;
+            file << "$$XINTEGEVAL_START" << std::endl;
+            file << "t | xInterpBaryEquatJ2000" << std::endl;
+            for (size_t i = 0; i < this->xIntegEval.size(); i++) {
+                file << this->tEval[i] << " | ";
+                file << "[";
+                for (size_t j = 0; j < this->xIntegEval[i].size(); j++) {
+                    file << this->xIntegEval[i][j] << ",";
+                }
+                file << "]";
+                file << std::endl;
+            }
+            file << "$$XINTEGEVAL_END" << std::endl;
+        }
     }
     } // end of machine data
 

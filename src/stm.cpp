@@ -401,19 +401,21 @@ void stm_J2(STMParameters &stmParams, const real &gm, const real &J2,
  * @param[in] dvx Heliocentric velocity difference in the x direction [AU/day].
  * @param[in] dvy Heliocentric velocity difference in the y direction [AU/day].
  * @param[in] dvz Heliocentric velocity difference in the z direction [AU/day].
- * @param[in] rVec Relative position vector.
+ * @param[in] dtParams Extra parameters for the DT non-gravitational acceleration model [r(t-dt), f, g, rdot(t-dt)].
  * @param[in] nVec Relative angular momentum vector.
  */
 void stm_nongrav(STMParameters &stmParams, const real &g,
                  const NongravParameters &ngParams, const real &dx, const real &dy,
                  const real &dz, const real &dvx, const real &dvy, const real &dvz,
-                 real *rVec, real *nVec) {
+                 real *dtParams, real *nVec) {
     const real a1 = ngParams.a1;
     const real a2 = ngParams.a2;
     const real a3 = ngParams.a3;
+    const real dt = ngParams.dt;
     const bool a1Est = ngParams.a1Est;
     const bool a2Est = ngParams.a2Est;
     const bool a3Est = ngParams.a3Est;
+    const bool dtEst = ngParams.dtEst;
     const real alpha = ngParams.alpha;
     const real k = ngParams.k;
     const real m = ngParams.m;
@@ -428,6 +430,10 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
 
     real rHat[3] = {dx / rNorm, dy / rNorm, dz / rNorm};
     real tNorm;
+    real *rVec = new real[3];
+    rVec[0] = dx;
+    rVec[1] = dy;
+    rVec[2] = dz;
     real *tVec = new real[3];
     vcross(nVec, rVec, tVec);
     const real vDotT = dvx * tVec[0] + dvy * tVec[1] + dvz * tVec[2];
@@ -449,14 +455,38 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
     const real nyn3 = nVec[1] / n3;
     const real nzn3 = nVec[2] / n3;
 
+    const bool dtActive = (dt != 0.0) || dtEst;
+    const real rForG = dtActive ? dtParams[0] : rNorm;
     const real dgdr =
-        - alpha * m / r0 * pow(rNorm / r0, -m - 1) * pow(1 + pow(rNorm / r0, n), -k)
-        - alpha * k * n / r0 * pow(rNorm / r0, -m) *
-            pow(1 + pow(rNorm / r0, n), -k - 1) * pow(rNorm / r0, n - 1);
-
-    const real dgdx = dgdr * rHat[0];
-    const real dgdy = dgdr * rHat[1];
-    const real dgdz = dgdr * rHat[2];
+        - alpha * m / r0 * pow(rForG / r0, -m - 1) * pow(1 + pow(rForG / r0, n), -k)
+        - alpha * k * n / r0 * pow(rForG / r0, -m) *
+            pow(1 + pow(rForG / r0, n), -k - 1) * pow(rForG / r0, n - 1);
+    real dgdx, dgdy, dgdz;
+    real dgdvx, dgdvy, dgdvz;
+    if (dtActive) {
+        // in this case, dgd[x,y,z] are w.r.t. state at time t-dt at this point, so we
+        // apply the chain rule to get the derivative with respect to [x,y,z] at time t
+        const real lagrangeF = dtParams[1];
+        const real lagrangeG = dtParams[2];
+        const real xp = lagrangeF * dx + lagrangeG * dvx;
+        const real yp = lagrangeF * dy + lagrangeG * dvy;
+        const real zp = lagrangeF * dz + lagrangeG * dvz;
+        dgdx = dgdr * xp/rForG * lagrangeF;
+        dgdy = dgdr * yp/rForG * lagrangeF;
+        dgdz = dgdr * zp/rForG * lagrangeF;
+        // also need to account for the fact that r at time t-dt depends on
+        // velocity at time t, so we need to apply the chain rule again
+        dgdvx = dgdr * xp/rForG * lagrangeG;
+        dgdvy = dgdr * yp/rForG * lagrangeG;
+        dgdvz = dgdr * zp/rForG * lagrangeG;
+    } else {
+        dgdx = dgdr * rHat[0];
+        dgdy = dgdr * rHat[1];
+        dgdz = dgdr * rHat[2];
+        dgdvx = 0.0;
+        dgdvy = 0.0;
+        dgdvz = 0.0;
+    }
 
     stmParams.dfdpos[0] += a1*(dgdx*rHat[0] - g*rxr3*dx + g/rNorm)
                 + a2*(dgdx*tHat[0] - g*txt3*(2*dx*vDotT - tVec[0]*rDotV) + g*(dx*dvx - rDotV)/tNorm)
@@ -497,7 +527,22 @@ void stm_nongrav(STMParameters &stmParams, const real &g,
     stmParams.dfdvel[7] += g*(a2*(-dz*dy/tNorm - tyt3*r2*tVec[2]) - a3*(nzn3*(r2*dvy - dy*rDotV) - dx/nNorm));
     stmParams.dfdvel[8] += g*(a2*((dx*dx + dy*dy)/tNorm - tzt3*r2*tVec[2]) - a3*(nzn3*(r2*dvz - dz*rDotV)));
 
-    // Case 1, only one of a1, a2, or a3 is estimated
+    if (dtActive) {
+        const real xTerm = a1*rHat[0] + a2*tHat[0] + a3*nHat[0];
+        const real yTerm = a1*rHat[1] + a2*tHat[1] + a3*nHat[1];
+        const real zTerm = a1*rHat[2] + a2*tHat[2] + a3*nHat[2];
+        stmParams.dfdvel[0] += dgdvx * xTerm;
+        stmParams.dfdvel[4] += dgdvy * yTerm;
+        stmParams.dfdvel[8] += dgdvz * zTerm;
+        if (dtEst) {
+            const size_t dfdparStartIdx = 3*(a1Est + a2Est + a3Est);
+            stmParams.dfdpar[dfdparStartIdx] += dgdr * -dtParams[3] * xTerm;
+            stmParams.dfdpar[dfdparStartIdx+1] += dgdr * -dtParams[3] * yTerm;
+            stmParams.dfdpar[dfdparStartIdx+2] += dgdr * -dtParams[3] * zTerm;
+        }
+    }
+
+    // Accelerations: case 1, only one of a1, a2, or a3 is estimated
     if (a1Est && !a2Est && !a3Est) {
         stmParams.dfdpar[0] += g*rHat[0];
         stmParams.dfdpar[1] += g*rHat[1];
@@ -560,7 +605,7 @@ void stm_continuous_event(STMParameters &stmParams,
                           const real &tPastEvent, const real &postFac){
     const Event *thisEvent = &propSim->eventMngr.continuousEvents[eventIdx];
     const IntegBody *body = &propSim->integBodies[thisEvent->bodyIndex];
-    const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est;
+    const size_t numNongravs = body->ngParams.a1Est + body->ngParams.a2Est + body->ngParams.a3Est + body->ngParams.dtEst;
     size_t dfdparIdx = 3*numNongravs;
     for (size_t i = 0; i < propSim->eventMngr.impulsiveEvents.size(); i++) {
         const bool sameBody = propSim->eventMngr.impulsiveEvents[i].bodyIndex == thisEvent->bodyIndex;

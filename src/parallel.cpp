@@ -53,11 +53,12 @@ void propSim_parallel_omp(const PropSimulation refSim, const bool isCometary,
         ngParams.a1 = data[9];
         ngParams.a2 = data[10];
         ngParams.a3 = data[11];
-        ngParams.alpha = data[12];
-        ngParams.k = data[13];
-        ngParams.m = data[14];
-        ngParams.n = data[15];
-        ngParams.r0_au = data[16];
+        ngParams.dt = data[12];
+        ngParams.alpha = data[13];
+        ngParams.k = data[14];
+        ngParams.m = data[15];
+        ngParams.n = data[16];
+        ngParams.r0_au = data[17];
         PropSimulation sim(name, refSim);
         if (isCometary) {
             std::vector<real> com = {data[3], data[4], data[5],
