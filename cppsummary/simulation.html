@@ -17,7 +17,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>simulation.h &#8212; GRSS 4.5.9 documentation</title>
+    <title>simulation.h &#8212; GRSS 4.6.0 documentation</title>
   
   
   
@@ -40,14 +40,14 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=9b279c77" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=1b5557f7"></script>
+    <script src="../_static/documentation_options.js?v=9bba1503"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="pck.h" href="pck.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 01, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
   </head>
   
   
@@ -150,7 +150,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.5.9 documentation</p>
+    <p class="title logo__title">GRSS v4.6.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -167,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/chesley.html">(12104) Chesley orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/eggl.html">(28751) Eggl orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/farnocchia.html">(84100) Farnocchia orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/makadia.html">(20505) Makadia orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/shantanunaidu.html">(11468) Shantanunaidu orbit determination test</a></li>
 </ul>
 </li>
@@ -226,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.universal_propagator.html">grss.libgrss.universal_propagator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -552,9 +554,11 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2a1E"><code class="docutils literal notranslate"><span class="pre">a1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2a2E"><code class="docutils literal notranslate"><span class="pre">a2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2a3E"><code class="docutils literal notranslate"><span class="pre">a3</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2dtE"><code class="docutils literal notranslate"><span class="pre">dt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5a1EstE"><code class="docutils literal notranslate"><span class="pre">a1Est</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5a2EstE"><code class="docutils literal notranslate"><span class="pre">a2Est</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5a3EstE"><code class="docutils literal notranslate"><span class="pre">a3Est</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5dtEstE"><code class="docutils literal notranslate"><span class="pre">dtEst</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5alphaE"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters1kE"><code class="docutils literal notranslate"><span class="pre">k</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters1mE"><code class="docutils literal notranslate"><span class="pre">m</span></code></a></li>
@@ -1255,14 +1259,20 @@ document.write(`
 <dt class="field-odd">Param a3<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Parameter for normal nongravitational forces. </p>
 </dd>
-<dt class="field-even">Param a1Est<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if a1 is estimated (for orbit determination). </p>
+<dt class="field-even">Param dt<span class="colon">:</span></dt>
+<dd class="field-even"><p>Perihelion time offset for peak nongravitational forces. </p>
 </dd>
-<dt class="field-odd">Param a2Est<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Flag to indicate if a2 is estimated (for orbit determination). </p>
+<dt class="field-odd">Param a1Est<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if a1 is estimated (for orbit determination). </p>
 </dd>
-<dt class="field-even">Param a3Est<span class="colon">:</span></dt>
-<dd class="field-even"><p>Flag to indicate if a3 is estimated (for orbit determination). </p>
+<dt class="field-even">Param a2Est<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if a2 is estimated (for orbit determination). </p>
+</dd>
+<dt class="field-odd">Param a3Est<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Flag to indicate if a3 is estimated (for orbit determination). </p>
+</dd>
+<dt class="field-even">Param dtEst<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flag to indicate if dt is estimated (for orbit determination). </p>
 </dd>
 <dt class="field-odd">Param alpha<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Normalizing factor for nongravitational forces. </p>
@@ -1298,6 +1308,11 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters2dtE">
+<span class="target" id="structNongravParameters_1a645e1907cab92a95e1abb400a1a8d977"></span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dt</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0L</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters2dtE" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters5a1EstE">
 <span class="target" id="structNongravParameters_1a5077bf98fa9f2d1b733b329b86f90d38"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a1Est</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters5a1EstE" title="Link to this definition">#</a><br /></dt>
 <dd></dd></dl>
@@ -1310,6 +1325,11 @@ document.write(`
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters5a3EstE">
 <span class="target" id="structNongravParameters_1a2fe23a16e23a4c5e5faf8d7ca7470af7"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a3Est</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters5a3EstE" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17NongravParameters5dtEstE">
+<span class="target" id="structNongravParameters_1a726a308a78522f18639c8ee8de98653e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dtEst</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17NongravParameters5dtEstE" title="Link to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -2782,9 +2802,11 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2a1E"><code class="docutils literal notranslate"><span class="pre">a1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2a2E"><code class="docutils literal notranslate"><span class="pre">a2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2a3E"><code class="docutils literal notranslate"><span class="pre">a3</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters2dtE"><code class="docutils literal notranslate"><span class="pre">dt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5a1EstE"><code class="docutils literal notranslate"><span class="pre">a1Est</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5a2EstE"><code class="docutils literal notranslate"><span class="pre">a2Est</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5a3EstE"><code class="docutils literal notranslate"><span class="pre">a3Est</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5dtEstE"><code class="docutils literal notranslate"><span class="pre">dtEst</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters5alphaE"><code class="docutils literal notranslate"><span class="pre">alpha</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters1kE"><code class="docutils literal notranslate"><span class="pre">k</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N17NongravParameters1mE"><code class="docutils literal notranslate"><span class="pre">m</span></code></a></li>
@@ -2991,7 +3013,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 01, 2026.
+  Last updated on Oct 26, 2026.
   <br/>
 </p>
   </div>

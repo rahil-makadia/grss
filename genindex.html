@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; GRSS 4.5.9 documentation</title>
+    <title>Index &#8212; GRSS 4.6.0 documentation</title>
   
   
   
@@ -30,14 +30,14 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=9b279c77" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=c83e6b79" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="_static/documentation_options.js?v=1b5557f7"></script>
+    <script src="_static/documentation_options.js?v=9bba1503"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 01, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
   </head>
   
   
@@ -138,7 +138,7 @@
     <script>document.write(`<img src="_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.5.9 documentation</p>
+    <p class="title logo__title">GRSS v4.6.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
@@ -172,6 +172,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tests/python/fit/chesley.html">(12104) Chesley orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests/python/fit/eggl.html">(28751) Eggl orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests/python/fit/farnocchia.html">(84100) Farnocchia orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests/python/fit/makadia.html">(20505) Makadia orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tests/python/fit/shantanunaidu.html">(11468) Shantanunaidu orbit determination test</a></li>
 </ul>
 </li>
@@ -231,6 +232,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.universal_propagator.html">grss.libgrss.universal_propagator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -864,10 +866,10 @@ document.write(`
 </li>
       <li><a href="_autosummary/grss.libgrss.Event.html#grss.libgrss.Event.deltaV">deltaV (grss.libgrss.Event property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.libgrss.Event.html#grss.libgrss.Event.deltaVEst">deltaVEst (grss.libgrss.Event property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/grss.fit.fit_optical.deweight_obs.html#grss.fit.fit_optical.deweight_obs">deweight_obs() (in module grss.fit.fit_optical)</a>
 </li>
       <li><a href="_autosummary/grss.libgrss.CloseApproachParameters.html#grss.libgrss.CloseApproachParameters.dist">dist (grss.libgrss.CloseApproachParameters property)</a>
@@ -881,10 +883,14 @@ document.write(`
       <ul>
         <li><a href="_autosummary/grss.libgrss.ImpactParameters.html#grss.libgrss.ImpactParameters.dt">(grss.libgrss.ImpactParameters property)</a>
 </li>
+        <li><a href="_autosummary/grss.libgrss.NongravParameters.html#grss.libgrss.NongravParameters.dt">(grss.libgrss.NongravParameters property)</a>
+</li>
       </ul></li>
       <li><a href="_autosummary/grss.libgrss.IntegrationParameters.html#grss.libgrss.IntegrationParameters.dt0">dt0 (grss.libgrss.IntegrationParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.libgrss.IntegrationParameters.html#grss.libgrss.IntegrationParameters.dtChangeFactor">dtChangeFactor (grss.libgrss.IntegrationParameters property)</a>
+</li>
+      <li><a href="_autosummary/grss.libgrss.NongravParameters.html#grss.libgrss.NongravParameters.dtEst">dtEst (grss.libgrss.NongravParameters property)</a>
 </li>
       <li><a href="_autosummary/grss.libgrss.CloseApproachParameters.html#grss.libgrss.CloseApproachParameters.dtLin">dtLin (grss.libgrss.CloseApproachParameters property)</a>
 
@@ -1625,13 +1631,17 @@ document.write(`
 </li>
       <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters5a2EstE">NongravParameters::a2Est (C++ member)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters2a3E">NongravParameters::a3 (C++ member)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters5a3EstE">NongravParameters::a3Est (C++ member)</a>
 </li>
       <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters5alphaE">NongravParameters::alpha (C++ member)</a>
+</li>
+      <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters2dtE">NongravParameters::dt (C++ member)</a>
+</li>
+      <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters5dtEstE">NongravParameters::dtEst (C++ member)</a>
 </li>
       <li><a href="cppsummary/simulation.html#_CPPv4N17NongravParameters1kE">NongravParameters::k (C++ member)</a>
 </li>
@@ -2059,10 +2069,10 @@ document.write(`
 </li>
       <li><a href="cppsummary/spk.html#_CPPv4N12SpkCacheItem1tE">SpkCacheItem::t (C++ member)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cppsummary/spk.html#_CPPv412SpkEphemeris">SpkEphemeris (C++ struct)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cppsummary/spk.html#_CPPv4N12SpkEphemeris5cacheE">SpkEphemeris::cache (C++ member)</a>
 </li>
       <li><a href="cppsummary/spk.html#_CPPv4N12SpkEphemeris2mbE">SpkEphemeris::mb (C++ member)</a>
@@ -2138,6 +2148,8 @@ document.write(`
       <li><a href="cppsummary/stm.html#_CPPv4N13STMParameters6dfdposE">STMParameters::dfdpos (C++ member)</a>
 </li>
       <li><a href="cppsummary/stm.html#_CPPv4N13STMParameters6dfdvelE">STMParameters::dfdvel (C++ member)</a>
+</li>
+      <li><a href="cppsummary/utilities.html#c.SUN_GM">SUN_GM (C macro)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -2219,10 +2231,14 @@ document.write(`
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation.unmap_ephemeris">unmap_ephemeris() (grss.libgrss.PropSimulation method)</a>
+      <li><a href="cppsummary/elements.html#_CPPv420universal_propagatorRKNSt6vectorI4realEERK4realRK4realRK4realRKi">universal_propagator (C++ function)</a>
+</li>
+      <li><a href="_autosummary/grss.libgrss.universal_propagator.html#grss.libgrss.universal_propagator">universal_propagator() (in module grss.libgrss)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation.unmap_ephemeris">unmap_ephemeris() (grss.libgrss.PropSimulation method)</a>
+</li>
       <li><a href="_autosummary/grss.libgrss.PropSimulation.html#grss.libgrss.PropSimulation.unsafePersistentMemoryMap">unsafePersistentMemoryMap (grss.libgrss.PropSimulation property)</a>
 </li>
       <li><a href="cppsummary/ias15.html#_CPPv415update_g_with_bRKNSt6vectorI4realEERK6size_tRNSt6vectorI4realEE">update_g_with_b (C++ function)</a>
@@ -2381,7 +2397,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 01, 2026.
+  Last updated on Oct 26, 2026.
   <br/>
 </p>
   </div>

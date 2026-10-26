@@ -33,6 +33,8 @@ grss.libgrss.NongravParameters
         ~NongravParameters.a3
         ~NongravParameters.a3Est
         ~NongravParameters.alpha
+        ~NongravParameters.dt
+        ~NongravParameters.dtEst
         ~NongravParameters.k
         ~NongravParameters.m
         ~NongravParameters.n

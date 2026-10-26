@@ -17,7 +17,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>grss.libgrss.get_elements_partials &#8212; GRSS 4.5.9 documentation</title>
+    <title>grss.libgrss.get_elements_partials &#8212; GRSS 4.6.0 documentation</title>
   
   
   
@@ -40,14 +40,14 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=9b279c77" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=1b5557f7"></script>
+    <script src="../_static/documentation_options.js?v=9bba1503"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="grss.libgrss.delta_et_utc" href="grss.libgrss.delta_et_utc.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 01, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
   </head>
   
   
@@ -150,7 +150,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.5.9 documentation</p>
+    <p class="title logo__title">GRSS v4.6.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -167,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/chesley.html">(12104) Chesley orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/eggl.html">(28751) Eggl orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/farnocchia.html">(84100) Farnocchia orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/makadia.html">(20505) Makadia orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/shantanunaidu.html">(11468) Shantanunaidu orbit determination test</a></li>
 </ul>
 </li>
@@ -226,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grss.libgrss.universal_propagator.html">grss.libgrss.universal_propagator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -502,7 +504,7 @@ document.write(`
 <h1>grss.libgrss.get_elements_partials<a class="headerlink" href="#grss-libgrss-get-elements-partials" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="grss.libgrss.get_elements_partials">
-<span class="sig-prename descclassname"><span class="pre">grss.libgrss.</span></span><span class="sig-name descname"><span class="pre">get_elements_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochMjd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SupportsIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">SupportsFloat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SupportsIndex</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GM</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SupportsIndex</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.00029591220828559115</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.libgrss.get_elements_partials" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grss.libgrss.</span></span><span class="sig-name descname"><span class="pre">get_elements_partials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epochMjd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SupportsIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">collections.abc.Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">SupportsFloat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SupportsIndex</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conversion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GM</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SupportsFloat</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SupportsIndex</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.00029591220828411956</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#grss.libgrss.get_elements_partials" title="Link to this definition">#</a></dt>
 <dd><p>Calculate the partial derivatives of input ecliptic orbital elements with respect to
 the corresponding ecliptic Cartesian state vector.</p>
 <dl class="field-list simple">
@@ -511,7 +513,7 @@ the corresponding ecliptic Cartesian state vector.</p>
 <li><p><strong>epochMjd</strong> (<em>real</em>) – Epoch in modified Julian date.</p></li>
 <li><p><strong>elems</strong> (<em>list</em><em> of </em><em>real</em>) – Orbital elements vector (either Keplerian [a,e,i,OM,om,nu] or cometary [e,q,tp,OM,om,i]) with angles in radians.</p></li>
 <li><p><strong>conversion</strong> (<em>str</em>) – Conversion type (must be either “kep2cart” or “com2cart”).</p></li>
-<li><p><strong>GM</strong> (<em>real</em><em>, </em><em>optional</em>) – Gravitational parameter of the central body, by default 0.00029591220828559115L.</p></li>
+<li><p><strong>GM</strong> (<em>real</em><em>, </em><em>optional</em>) – Gravitational parameter of the central body, by default Sun.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -604,7 +606,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 01, 2026.
+  Last updated on Oct 26, 2026.
   <br/>
 </p>
   </div>

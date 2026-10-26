@@ -17,7 +17,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <meta name="msapplication-TileImage" content="mstile-310x310.png">
-    <title>stm.h &#8212; GRSS 4.5.9 documentation</title>
+    <title>stm.h &#8212; GRSS 4.6.0 documentation</title>
   
   
   
@@ -40,14 +40,14 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=9b279c77" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=1b5557f7"></script>
+    <script src="../_static/documentation_options.js?v=9bba1503"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@
     <link rel="prev" title="spk.h" href="spk.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Sep 01, 2026"/>
+    <meta name="docbuild:last-update" content="Oct 26, 2026"/>
   </head>
   
   
@@ -150,7 +150,7 @@
     <script>document.write(`<img src="../_static/grss-cropped.svg" class="logo__image only-dark" alt="GRSS - Home"/>`);</script>
   
   
-    <p class="title logo__title">GRSS v4.5.9 documentation</p>
+    <p class="title logo__title">GRSS v4.6.0 documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
@@ -167,6 +167,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/chesley.html">(12104) Chesley orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/eggl.html">(28751) Eggl orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/farnocchia.html">(84100) Farnocchia orbit determination test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/makadia.html">(20505) Makadia orbit determination test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tests/python/fit/shantanunaidu.html">(11468) Shantanunaidu orbit determination test</a></li>
 </ul>
 </li>
@@ -226,6 +227,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.matrix_inverse.html">grss.libgrss.matrix_inverse</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.propSim_parallel_omp.html">grss.libgrss.propSim_parallel_omp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.reconstruct_stm.html">grss.libgrss.reconstruct_stm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.universal_propagator.html">grss.libgrss.universal_propagator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.BPlaneParameters.html">grss.libgrss.BPlaneParameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.Body.html">grss.libgrss.Body</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../_autosummary/grss.libgrss.CloseApproachParameters.html">grss.libgrss.CloseApproachParameters</a></li>
@@ -635,7 +637,7 @@ document.write(`
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv411stm_nongravR13STMParametersRK4realRK17NongravParametersRK4realRK4realRK4realRK4realRK4realRK4realP4realP4real">
-<span class="target" id="stm_8h_1aadadb73c97cd5291b1cbb3e4945817b1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stm_nongrav</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413STMParameters" title="STMParameters"><span class="n"><span class="pre">STMParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stmParams</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv417NongravParameters" title="NongravParameters"><span class="n"><span class="pre">NongravParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ngParams</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dy</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dz</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dvx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dvy</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dvz</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">rVec</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">nVec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411stm_nongravR13STMParametersRK4realRK17NongravParametersRK4realRK4realRK4realRK4realRK4realRK4realP4realP4real" title="Link to this definition">#</a><br /></dt>
+<span class="target" id="stm_8h_1ab3d0634a9df11bc921b830d0db1c587a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stm_nongrav</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413STMParameters" title="STMParameters"><span class="n"><span class="pre">STMParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stmParams</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="simulation.html#_CPPv417NongravParameters" title="NongravParameters"><span class="n"><span class="pre">NongravParameters</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ngParams</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dy</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dz</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dvx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dvy</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dvz</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dtParams</span></span>, <span class="n"><span class="pre">real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">nVec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411stm_nongravR13STMParametersRK4realRK17NongravParametersRK4realRK4realRK4realRK4realRK4realRK4realP4realP4real" title="Link to this definition">#</a><br /></dt>
 <dd><p>Compute the derivatives of the non-gravitational acceleration with respect to position, velocity, and parameters. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -649,7 +651,7 @@ document.write(`
 <li><p><strong>dvx</strong> – <strong>[in]</strong> Heliocentric velocity difference in the x direction [AU/day]. </p></li>
 <li><p><strong>dvy</strong> – <strong>[in]</strong> Heliocentric velocity difference in the y direction [AU/day]. </p></li>
 <li><p><strong>dvz</strong> – <strong>[in]</strong> Heliocentric velocity difference in the z direction [AU/day]. </p></li>
-<li><p><strong>rVec</strong> – <strong>[in]</strong> Relative position vector. </p></li>
+<li><p><strong>dtParams</strong> – <strong>[in]</strong> Extra parameters for the DT non-gravitational acceleration model [r(t-dt), f, g, rdot(t-dt)]. </p></li>
 <li><p><strong>nVec</strong> – <strong>[in]</strong> Relative angular momentum vector. </p></li>
 </ul>
 </dd>
@@ -859,7 +861,7 @@ By Rahil Makadia
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Sep 01, 2026.
+  Last updated on Oct 26, 2026.
   <br/>
 </p>
   </div>

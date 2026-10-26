@@ -24,6 +24,7 @@
         matrix_inverse
         propSim_parallel_omp
         reconstruct_stm
+        universal_propagator
     
     
 
